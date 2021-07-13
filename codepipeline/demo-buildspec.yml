@@ -14,6 +14,8 @@ phases:
       - docker login $DOCKER_PROXY_HOST -u $DOCKER_USER_NAME -p $DOCKER_PASSWORD
   build:
     commands:
+      - echo Set DOCDB_SSL_CA
+      - export DOCDB_SSL_CA=`curl -L https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem`
       - echo Building the Docker image...
       - >
         docker build

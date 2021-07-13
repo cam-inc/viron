@@ -5,6 +5,7 @@ import { Config, MongoConfig } from '.';
  * Get configuration data.
  */
 export const get = (): Config => {
+  console.log(process.env);
   const mongo: MongoConfig = {
     type: 'mongo',
     openUri:
@@ -20,6 +21,11 @@ export const get = (): Config => {
       authSource: 'admin',
       useFindAndModify: false,
       useUnifiedTopology: true,
+      ssl: true,
+      sslValidate: false,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      sslCA: process.env.DOCDB_SSL_CA,
     },
   };
 
