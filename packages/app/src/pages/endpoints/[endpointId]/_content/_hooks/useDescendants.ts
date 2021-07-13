@@ -91,7 +91,9 @@ const useDescendants = function (
           );
           if (
             _.intersection(
-              baseOperationResponseKeys,
+              baseOperationResponseKeys.map(function (item) {
+                return item.name;
+              }),
               actionOperationRequestKeys
             ).length
           ) {

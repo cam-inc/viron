@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import Drawer, { useDrawer } from '$components/drawer';
 import RequestComponent from '$components/request';
 import { BaseError } from '$errors/index';
 import { RequestValue } from '$types/oas';
+import Action from '../action';
 import { UseDescendantsReturn } from '../../_hooks/useDescendants';
 
 export type Props = {
@@ -21,9 +22,15 @@ const Descendant: React.FC<Props> = ({
 }) => {
   const [isPending, setIsPending] = useState<boolean>(false);
   const drawer = useDrawer();
-  const handleClick = function () {
-    drawer.open();
-  };
+  const handleClick = useCallback(
+    function () {
+      if (isPending) {
+        return;
+      }
+      drawer.open();
+    },
+    [drawer, isPending]
+  );
 
   const handleRequestSubmit = async function (requestValue: RequestValue) {
     drawer.close();
@@ -40,10 +47,7 @@ const Descendant: React.FC<Props> = ({
 
   return (
     <>
-      <button onClick={handleClick}>
-        {descendant.request.operation.operationId}
-        {isPending && <span>(pending...)</span>}
-      </button>
+      <Action method={descendant.request.method} onClick={handleClick} />
       <Drawer {...drawer.bind}>
         <RequestComponent
           request={descendant.request}

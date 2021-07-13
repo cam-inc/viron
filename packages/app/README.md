@@ -16,8 +16,8 @@ $ npm run develop --workspace=@viron/app
 $ npm run build --workspace=@viron/app
 $ npm run serve --workspace=@viron/app
 
-# To type check.
-$ npm run typecheck --workspace=@viron/app
+# To test.
+$ npm run test --workspace=@viron/app
 ```
 
 ### Basic UI Structure
