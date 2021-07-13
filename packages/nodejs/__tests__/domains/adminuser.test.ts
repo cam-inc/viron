@@ -269,6 +269,7 @@ describe('domains/adminuser', () => {
         googleOAuth2RefreshToken: null,
         googleOAuth2TokenType: null,
       });
+      sandbox.stub(domainsAdminrole, 'listRoles').withArgs(id).resolves([]);
 
       const user = await findOneById(id);
       assert(user);
@@ -308,6 +309,7 @@ describe('domains/adminuser', () => {
           googleOAuth2RefreshToken: null,
           googleOAuth2TokenType: null,
         });
+      sandbox.stub(domainsAdminrole, 'listRoles').withArgs(id).resolves([]);
 
       const user = await findOneByEmail(email);
       assert(user);

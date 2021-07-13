@@ -28,6 +28,7 @@ paths:
       parameters:
         - $ref: './components.yaml#/components/parameters/PagerSizeQueryParam'
         - $ref: './components.yaml#/components/parameters/PagerPageQueryParam'
+        - $ref: './components.yaml#/components/parameters/SortQueryParam'
         - $ref: '#/components/parameters/PurchaseIdQueryParam'
       responses:
         200:
@@ -106,6 +107,7 @@ paths:
         - $ref: './users.yaml#/components/parameters/UserIdPathParam'
         - $ref: './components.yaml#/components/parameters/PagerSizeQueryParam'
         - $ref: './components.yaml#/components/parameters/PagerPageQueryParam'
+        - $ref: './components.yaml#/components/parameters/SortQueryParam'
       responses:
         200:
           description: OK

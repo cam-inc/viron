@@ -30,10 +30,11 @@ const format = (user: User): UserView => {
 export const list = async (
   conditions?: FindConditions<User>,
   size?: number,
-  page?: number
+  page?: number,
+  sort?: string[]
 ): Promise<ListWithPager<UserView>> => {
   const repository = getUserRepository();
-  const result = await repository.findWithPager(conditions, size, page);
+  const result = await repository.findWithPager(conditions, size, page, sort);
   return {
     ...result,
     list: result.list.map(format),

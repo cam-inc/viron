@@ -3,6 +3,7 @@ import { storeDefinitions } from '../../stores';
 import { domainsAdminUser } from '../../domains';
 import {
   getMongoQueryOptions,
+  getMongoSortOptions,
   getPagerResults,
   ListWithPager,
 } from '../../helpers';
@@ -39,9 +40,12 @@ export const findOneById = async (
 
 export const find = async (
   conditions: FilterQueryWithUserIds = {},
+  sort: string[] | null = null,
   options?: QueryOptions
 ): Promise<domainsAdminUser.AdminUser[]> => {
   const model = getModel();
+  options = options ?? {};
+  options.sort = getMongoSortOptions(sort);
   const docs = await model.find(convertConditions(conditions), null, options);
   return docs.map((doc) => doc.toJSON());
 };
@@ -49,11 +53,12 @@ export const find = async (
 export const findWithPager = async (
   conditions: FilterQueryWithUserIds = {},
   size?: number,
-  page?: number
+  page?: number,
+  sort: string[] | null = null
 ): Promise<ListWithPager<domainsAdminUser.AdminUser>> => {
   const options = getMongoQueryOptions(size, page);
   const [list, totalCount] = await Promise.all([
-    find(conditions, options),
+    find(conditions, sort, options),
     count(conditions),
   ]);
   return {
