@@ -8,7 +8,6 @@ export type StoreType = Mode;
 export const SERVICE_ENV = {
   LOCAL: 'local',
   DEVELOPMENT: 'development',
-  STAGING: 'staging',
   PRODUCTION: 'production',
 };
 export type ServiceEnv = typeof SERVICE_ENV[keyof typeof SERVICE_ENV];

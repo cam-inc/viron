@@ -37,9 +37,6 @@ export class Context {
       case SERVICE_ENV.DEVELOPMENT:
         this.serviceEnv = SERVICE_ENV.DEVELOPMENT;
         break;
-      case SERVICE_ENV.STAGING:
-        this.serviceEnv = SERVICE_ENV.STAGING;
-        break;
       case SERVICE_ENV.PRODUCTION:
         this.serviceEnv = SERVICE_ENV.PRODUCTION;
         break;
