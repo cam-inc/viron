@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import Error from '$components/error';
 import { ClassName } from '$types/index';
-import { Document, Info } from '$types/oas';
+import { Document, Info, TableColumn } from '$types/oas';
 import { UseBaseReturn } from '../../_hooks/useBase';
 import { UseDescendantsReturn } from '../../_hooks/useDescendants';
 import NumberContent from '../../_types/_number/index';
@@ -12,6 +12,7 @@ type Props = {
   content: Info['x-pages'][number]['contents'][number];
   base: UseBaseReturn;
   descendants: UseDescendantsReturn;
+  omittedColumns: TableColumn['key'][];
   className?: ClassName;
 };
 const Body: React.FC<Props> = ({
@@ -19,6 +20,7 @@ const Body: React.FC<Props> = ({
   content,
   base,
   descendants,
+  omittedColumns,
   className = '',
 }) => {
   const handleDescendantOperationSuccess = useCallback(
@@ -61,6 +63,7 @@ const Body: React.FC<Props> = ({
               descendants={descendants}
               onDescendantOperationSuccess={handleDescendantOperationSuccess}
               onDescendantOperationFail={handleDescendantOperationFail}
+              omittedColumns={omittedColumns}
             />
           );
         default:

@@ -37,11 +37,22 @@ const _Content: React.FC<Props> = ({
     setIsOpened(false);
   }, []);
 
+  const [omittedColumns, setOmittedColumns] = useState<
+    HeadProps['omittedColumns']
+  >([]);
+  const handleColumnsFilterChange = useCallback<
+    HeadProps['onColumnsFilterChange']
+  >(function (omitted) {
+    console.log(omitted);
+    setOmittedColumns(omitted);
+  }, []);
+
   return (
     <Paper elevation={0} shadowElevation={0}>
       <div id={content.id}>
         <Head
           className="p-2"
+          document={document}
           content={content}
           base={base}
           siblings={siblings}
@@ -51,6 +62,8 @@ const _Content: React.FC<Props> = ({
           isPinned={isPinned}
           onPin={onPin}
           onUnpin={onUnpin}
+          omittedColumns={omittedColumns}
+          onColumnsFilterChange={handleColumnsFilterChange}
         />
         {isOpened && (
           <>
@@ -60,6 +73,7 @@ const _Content: React.FC<Props> = ({
               content={content}
               base={base}
               descendants={descendants}
+              omittedColumns={omittedColumns}
             />
             <Tail
               className="p-2 border-t border-on-surface-faint"

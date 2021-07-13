@@ -8,6 +8,7 @@ slug: /
 
 ## URLの種類
 
+mainブランチとsnapshotブランチ
 以下の2つのタイプのURL
 - latest: 最新バージョンのvironを使うため
 - snapshot: 特定バージョンのvironを使うため
@@ -16,6 +17,15 @@ slug: /
 | ---- | ---- | ---- | ---- |
 | latest | s3://app.viron.plus | 無し | https://viron.plus/ |
 | snapshot | s3://snapshot-app.viron.plus | semver名 | https://snapshot.viron.plus/{semver}/ |
+
+## dev
+developブランチとdevelop-snapshotブランチ
+| type | S3 Bucket | Bucket内ディレクトリ | URL |
+| ---- | ---- | ---- | ---- |
+| latest | s3://development-app.viron.work | 無し | https://viron.work/ |
+| snapshot | s3://development-snapshot-app.viron.work | semver名 | https://snapshot.viron.work/{semver}/ |
+
+dev用のendpoint url: https://demo.viron.work/
 
 ## S3 Buckets
 

@@ -6,14 +6,16 @@ import React, { useCallback } from 'react';
 import Button from '$components/button';
 import { ON } from '$constants/index';
 import { ClassName } from '$types/index';
-import { Info } from '$types/oas';
+import { Document, Info } from '$types/oas';
 import { UseBaseReturn } from '../../_hooks/useBase';
 import { UseSiblingsReturn } from '../../_hooks/useSiblings';
+import Filter, { Props as FilterProps } from '../filter/index';
 import Refresh from '../refresh/index';
 import Search from '../search/index';
 import Sibling from '../sibling/index';
 
 export type Props = {
+  document: Document;
   content: Info['x-pages'][number]['contents'][number];
   base: UseBaseReturn;
   siblings: UseSiblingsReturn;
@@ -25,9 +27,12 @@ export type Props = {
   onUnpin: (
     contentId: Info['x-pages'][number]['contents'][number]['id']
   ) => void;
+  omittedColumns: FilterProps['omitted'];
+  onColumnsFilterChange: FilterProps['onChange'];
   className?: ClassName;
 };
 const Head: React.FC<Props> = ({
+  document,
   content,
   base,
   siblings,
@@ -37,6 +42,8 @@ const Head: React.FC<Props> = ({
   isPinned,
   onPin,
   onUnpin,
+  omittedColumns,
+  onColumnsFilterChange,
   className = '',
 }) => {
   const handleSiblingOperationSuccess = useCallback(
@@ -110,6 +117,16 @@ const Head: React.FC<Props> = ({
         )}
         <div className="flex-none ml-2">
           <div className="flex items-center">
+            {content.type === 'table' && (
+              <div className="mr-2 last:mr-0">
+                <Filter
+                  document={document}
+                  content={content}
+                  omitted={omittedColumns}
+                  onChange={onColumnsFilterChange}
+                />
+              </div>
+            )}
             <div className="mr-2 last:mr-0">
               <Refresh base={base} />
             </div>
