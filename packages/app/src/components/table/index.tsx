@@ -65,7 +65,7 @@ const Table: React.FC<Props> = ({
   return (
     <div className={className}>
       <div className="overflow-x-auto overscroll-x-contain">
-        <table className="border-collapse">
+        <table className="min-w-full border-collapse">
           <thead
             className={classnames('border-b-2', {
               'border-on-surface-faint': on === ON.SURFACE,

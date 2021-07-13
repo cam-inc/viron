@@ -3,7 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import Drawer, { useDrawer } from '$components/drawer';
 import Table, { Props as TableProps } from '$components/table';
 import { ON } from '$constants/index';
-import { Document, Info } from '$types/oas';
+import { Document, Info, TableColumn } from '$types/oas';
 import {
   getTableColumns,
   getTableRows,
@@ -20,6 +20,7 @@ type Props = {
   descendants: UseDescendantsReturn;
   onDescendantOperationSuccess: DescendantProps['onOperationSuccess'];
   onDescendantOperationFail: DescendantProps['onOperationFail'];
+  omittedColumns: TableColumn['key'][];
 };
 const _ContentTable: React.FC<Props> = ({
   document,
@@ -28,6 +29,7 @@ const _ContentTable: React.FC<Props> = ({
   descendants,
   onDescendantOperationSuccess,
   onDescendantOperationFail,
+  omittedColumns,
 }) => {
   const [sorts, setSorts] = useState<
     Record<
@@ -38,14 +40,18 @@ const _ContentTable: React.FC<Props> = ({
 
   const columns = useMemo<TableProps['columns']>(
     function () {
-      return getTableColumns(document, content).map(function (column) {
-        return {
-          ...column,
-          sort: sorts[column.key],
-        };
-      });
+      return getTableColumns(document, content)
+        .map(function (column) {
+          return {
+            ...column,
+            sort: sorts[column.key],
+          };
+        })
+        .filter(function (column) {
+          return !omittedColumns.includes(column.key);
+        });
     },
-    [document, content, sorts]
+    [document, content, omittedColumns, sorts]
   );
 
   const dataSource = useMemo<TableProps['dataSource']>(
