@@ -6,9 +6,9 @@ export const getCertificate = async (): Promise<SecureContextOptions> => {
   return {
     cert: await readFile(
       path.resolve(__dirname, '..', '..', 'cert', 'viron.crt')
-    ).catch(() => process.env.SSL_CERTIFICATE),
+    ).catch(() => (process.env.SSL_CERTIFICATE ?? '').replace(/\\n/g, '\n')),
     key: await readFile(
       path.resolve(__dirname, '..', '..', 'cert', 'viron.key')
-    ).catch(() => process.env.SSL_PRIVATE_KEY),
+    ).catch(() => (process.env.SSL_PRIVATE_KEY ?? '').replace(/\\n/g, '\n')),
   };
 };

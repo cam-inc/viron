@@ -5,7 +5,6 @@ import { Config, MongoConfig } from '.';
  * Get configuration data.
  */
 export const get = (): Config => {
-  console.log(process.env);
   const mongo: MongoConfig = {
     type: 'mongo',
     openUri:
