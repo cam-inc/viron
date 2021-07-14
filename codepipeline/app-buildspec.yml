@@ -14,16 +14,7 @@ phases:
   build:
     commands:
       - echo Building app...
-      - pwd
       - npm run build
-
-  post_build:
-    commands:
-      - echo push step...
-      - echo Build completed on `date`
-      - echo Pushing the Docker image...
-      - docker push $REPOSITORY_URI:$COMMIT_ID
-      - docker push $REPOSITORY_URI:latest
 
 artifacts:
   files:
