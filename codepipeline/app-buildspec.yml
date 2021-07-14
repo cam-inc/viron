@@ -19,6 +19,7 @@ phases:
       - cd ./packages/app/
       - npm run build
       - cd ../../
+      - ls ./packages/app/public
 
 artifacts:
   files:
