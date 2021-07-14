@@ -56,7 +56,8 @@ export const createApplication = async (): Promise<Express> => {
   const app = express();
 
   // Express configuration
-  app.set('port', process.env.PORT || 3000);
+  app.set('host', process.env.SERVICE_HOST || 'localhost');
+  app.set('port', process.env.SERVICE_PORT || 3000);
 
   app.use(compression());
   app.use(json());
