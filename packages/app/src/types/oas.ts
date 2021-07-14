@@ -33,7 +33,7 @@ export type Info = {
   'x-thumbnail'?: URL;
   // [extended] Color theme for the endpoint page. Default to 'light'.
   // TODO: 4パターンくらいまで増やすこと。
-  'x-theme'?: 'lime' | 'red' | 'blue' | 'orange';
+  'x-theme'?: 'lime' | 'deepOrange';
   // [extended] Be used on endpoint UI cards.
   'x-tags'?: string[];
   // [extended] Be used on endpoints page.
@@ -48,6 +48,8 @@ export type Info = {
     group?: string;
     //  What to be displayed on the page.
     contents: {
+      // Will be assigned on client side.
+      id: string;
       title: string;
       // TODO: 全部リストアップすること。
       type: 'number' | 'table' | 'custom';
@@ -81,6 +83,18 @@ export type X_Table = {
     requestKey: string;
   };
 };
+export const TABLE_SORT = {
+  ASC: 'asc',
+  DESC: 'desc',
+  NONE: 'none',
+} as const;
+export type TableSort = typeof TABLE_SORT[keyof typeof TABLE_SORT];
+export type TableColumn = {
+  type: Schema['type'];
+  name: string;
+  key: string;
+  isSortable: boolean;
+};
 export type Pager = {
   // Which request parameter to use when fetching.
   requestPageKey: string;
@@ -89,6 +103,8 @@ export type Pager = {
   responseMaxpageKey: string;
   responsePageKey: string;
 };
+// e.g. '${keyA}:asc,${keyB}:desc,${keyC}:desc'
+export type Sort = string;
 
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#tag-object
 export type Tag = {
@@ -144,15 +160,17 @@ export type PathItem = {
   parameters: Parameter[];
 };
 
-export type Method =
-  | 'get'
-  | 'put'
-  | 'post'
-  | 'delete'
-  | 'options'
-  | 'head'
-  | 'patch'
-  | 'trace';
+export const METHOD = {
+  GET: 'get',
+  PUT: 'put',
+  POST: 'post',
+  DELETE: 'delete',
+  OPTIONS: 'options',
+  HEAD: 'head',
+  PATCH: 'patch',
+  TRACE: 'trace',
+} as const;
+export type Method = typeof METHOD[keyof typeof METHOD];
 
 // This is not a part of OAS.
 export type Request = {
@@ -178,9 +196,11 @@ export type RequestPayloads = {
 
 // This is not a part of OAS.
 export type RequestParametersValue = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key in string]: any;
 };
 // This is not a part of OAS.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RequestRequestBodyValue = any;
 // This is not a part of OAS.
 export type RequestValue = {

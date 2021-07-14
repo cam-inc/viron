@@ -189,9 +189,9 @@ describe('domains/adminrole', () => {
         listUsers('reader'),
         listUsers('director'),
       ]);
-      assert.deepStrictEqual(editor, ['1', '2', '6']);
-      assert.deepStrictEqual(reader, ['3', '5']);
-      assert.deepStrictEqual(director, ['4']);
+      assert.deepStrictEqual(editor.sort(), ['1', '2', '6']);
+      assert.deepStrictEqual(reader.sort(), ['3', '5']);
+      assert.deepStrictEqual(director.sort(), ['4']);
     });
   });
 

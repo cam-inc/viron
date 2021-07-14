@@ -7,6 +7,7 @@ import { RecoilRoot, useRecoilState } from 'recoil';
 import resolveConfig from 'tailwindcss/resolveConfig';
 import { TailwindConfig } from 'tailwindcss/tailwind-config';
 import ErrorBoundary from '$components/errorBoundary';
+import Logo from '$components/logo';
 import '$i18n/index';
 import { isLaunchedState, screenState, themeState } from '$store/atoms/app';
 import '$styles/global.css';
@@ -55,59 +56,78 @@ const Root: React.FC<Props> = ({ children }) => {
   );
 
   const [theme] = useRecoilState(themeState);
+  useEffect(
+    function () {
+      const _theme = theme || '';
+      const bodyElm = document.querySelector('body');
+      if (!bodyElm) {
+        return;
+      }
+      bodyElm.dataset.theme = _theme;
+    },
+    [theme]
+  );
 
   const [, setScreen] = useRecoilState(screenState);
-  useEffect(function () {
-    const handler = function () {
-      const { clientWidth, clientHeight } = document.documentElement;
-      setScreen(function (currVal) {
-        return {
-          ...currVal,
-          width: clientWidth,
-          height: clientHeight,
-        };
+  useEffect(
+    function () {
+      const handler = function () {
+        const { clientWidth, clientHeight } = document.documentElement;
+        setScreen(function (currVal) {
+          return {
+            ...currVal,
+            width: clientWidth,
+            height: clientHeight,
+          };
+        });
+      };
+      handler();
+      const debouncedHander = _.debounce(handler, 1000);
+      window.addEventListener('resize', debouncedHander, {
+        passive: true,
       });
-    };
-    handler();
-    const debouncedHander = _.debounce(handler, 1000);
-    window.addEventListener('resize', debouncedHander);
-    return function cleanup() {
-      window.removeEventListener('resize', debouncedHander);
-    };
-  }, []);
-  useEffect(function () {
-    const set = function (matches: MediaQueryListEvent['matches']) {
-      setScreen(function (currVal) {
-        return {
-          ...currVal,
-          lg: matches,
-        };
-      });
-    };
-    const config = resolveConfig(tailwindConfig as TailwindConfig);
-    const mediaQueryList = window.matchMedia(
-      `(min-width: ${config.theme.screens?.lg})`
-    );
-    set(mediaQueryList.matches);
+      return function cleanup() {
+        window.removeEventListener('resize', debouncedHander);
+      };
+    },
+    [setScreen]
+  );
+  useEffect(
+    function () {
+      const set = function (matches: MediaQueryListEvent['matches']) {
+        setScreen(function (currVal) {
+          return {
+            ...currVal,
+            lg: matches,
+          };
+        });
+      };
+      const config = resolveConfig(tailwindConfig as TailwindConfig);
+      const mediaQueryList = window.matchMedia(
+        `(min-width: ${config.theme.screens?.lg})`
+      );
+      set(mediaQueryList.matches);
 
-    const handler = function (e: MediaQueryListEvent) {
-      set(e.matches);
-    };
-    mediaQueryList.addEventListener('change', handler);
-    return function cleanup() {
-      mediaQueryList.removeEventListener('change', handler);
-    };
-  }, []);
+      const handler = function (e: MediaQueryListEvent) {
+        set(e.matches);
+      };
+      mediaQueryList.addEventListener('change', handler);
+      return function cleanup() {
+        mediaQueryList.removeEventListener('change', handler);
+      };
+    },
+    [setScreen]
+  );
 
   return (
-    <div id="root" className="relative" data-theme={theme}>
+    <div id="root" className="relative font-mono">
       <div className="min-h-screen">{children}</div>
-      <DrawerWrapper className="fixed inset-0" />
-      <ModalWrapper className="fixed inset-0" />
-      <PopoverWrapper className="fixed inset-0" />
-      <NotificationWrapper className="fixed inset-0" />
-      <ProgressWrapper className="fixed inset-0" />
-      {!isLaunched && <Splash className="fixed inset-0" />}
+      <DrawerWrapper className="fixed inset-0 z-wrapper-drawer" />
+      <ModalWrapper className="fixed inset-0 z-wrapper-modal" />
+      <PopoverWrapper className="fixed inset-0 z-wrapper-popover" />
+      <NotificationWrapper className="fixed left-0 right-0 bottom-0 pr-4 pb-4 z-wrapper-notification" />
+      <ProgressWrapper className="fixed inset-0 z-wrapper-progress" />
+      {!isLaunched && <Splash className="fixed inset-0 z-splash" />}
     </div>
   );
 };
@@ -115,8 +135,17 @@ const Root: React.FC<Props> = ({ children }) => {
 const Splash: React.FC<{ className?: string }> = ({ className = '' }) => {
   // TODO
   return (
-    <div className={classnames('flex justify-center items-center', className)}>
-      <div className="w-6 h-6 bg-black" />
+    <div
+      className={classnames(
+        'flex justify-center items-center bg-background',
+        className
+      )}
+    >
+      <Logo
+        className="h-24 drop-shadow-zenith-01dp"
+        left="text-primary"
+        right="text-primary-variant"
+      />
     </div>
   );
 };

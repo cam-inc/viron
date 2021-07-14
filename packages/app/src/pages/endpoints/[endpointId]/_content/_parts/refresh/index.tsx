@@ -1,5 +1,7 @@
 import { AiOutlineReload } from '@react-icons/all-files/ai/AiOutlineReload';
 import React from 'react';
+import Button from '$components/button';
+import { ON } from '$constants/index';
 import { UseBaseReturn } from '../../_hooks/useBase';
 
 type Props = {
@@ -11,10 +13,12 @@ const Refresh: React.FC<Props> = ({ base }) => {
   };
 
   return (
-    <button onClick={handleClick}>
-      <AiOutlineReload className="inline" />
-      <span>refresh</span>
-    </button>
+    <Button
+      on={ON.SURFACE}
+      variant="text"
+      Icon={AiOutlineReload}
+      onClick={handleClick}
+    />
   );
 };
 export default Refresh;

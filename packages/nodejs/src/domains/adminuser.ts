@@ -130,7 +130,8 @@ const format = (adminUser: AdminUser, roleIds?: string[]): AdminUserView => {
 export const list = async (
   conditions: FindConditions<AdminUser> & { roleId?: string } = {},
   size?: number,
-  page?: number
+  page?: number,
+  sort?: string[]
 ): Promise<ListWithPager<AdminUserView>> => {
   const repository = repositoryContainer.getAdminUserRepository();
   if (conditions.roleId) {
@@ -138,7 +139,7 @@ export const list = async (
     conditions = Object.assign({}, conditions, { userIds });
     delete conditions.roleId;
   }
-  const result = await repository.findWithPager(conditions, size, page);
+  const result = await repository.findWithPager(conditions, size, page, sort);
   const adminRoles = await Promise.all(
     result.list.map((adminUser) => listRoles(adminUser.id))
   );

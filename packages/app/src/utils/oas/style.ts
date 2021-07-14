@@ -87,6 +87,7 @@ export const serializeForm = function (
   }
   if (_.isObject(variable)) {
     if (explode) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return _.map(variable, function (val: any, key) {
         if (_.isNumber(val)) {
           val = val.toString();
@@ -94,6 +95,7 @@ export const serializeForm = function (
         return `${key}=${val}`;
       }).join('&');
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return `${name}=${_.map(variable, function (val: any, key) {
         if (_.isNumber(val)) {
           val = val.toString();
@@ -127,6 +129,7 @@ export const serializeSimple = function (
       .join(',');
   }
   if (_.isObject(variable)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return _.map(variable, function (val: any, key) {
       if (_.isNumber(val)) {
         val = val.toString();

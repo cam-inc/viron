@@ -1,47 +1,91 @@
-import { Link, PageProps } from 'gatsby';
-import React from 'react';
+import classnames from 'classnames';
+import { PageProps } from 'gatsby';
+import React, { useCallback } from 'react';
 import { useRecoilState } from 'recoil';
 import Metadata from '$components/metadata';
+import Notification, { useNotification } from '$components/notification';
+import Paper from '$components/paper';
 import useTheme from '$hooks/theme';
+import Layout, { Props as LayoutProps } from '$layouts/index';
 import { listState as endpointListState } from '$store/atoms/endpoint';
+import { constructFakeDocument } from '$utils/oas';
 import Add from './_add/index';
-import Endpoint from './_endpoint';
-import Export from './_export';
-import Import from './_import';
+import Appbar from './_appbar';
+import Endpoint, { Props as EndpointProps } from './_endpoint';
+import Navigation from './_navigation';
 
 type Props = PageProps;
 const HomePage: React.FC<Props> = () => {
-  useTheme();
+  const document = constructFakeDocument({
+    info: {
+      title: 'fake document',
+      version: '0.0.0',
+      'x-pages': [],
+      'x-theme': 'deepOrange',
+    },
+  });
+  useTheme(document);
+
   const [endpointList] = useRecoilState(endpointListState);
+
+  const renderAppBar = useCallback<LayoutProps['renderAppBar']>(function (
+    args
+  ) {
+    return <Appbar {...args} />;
+  },
+  []);
+
+  const renderNavigation = useCallback<LayoutProps['renderNavigation']>(
+    function (args) {
+      return <Navigation {...args} />;
+    },
+    []
+  );
+
+  const notification = useNotification();
+  const handleRemove = useCallback<EndpointProps['onRemove']>(
+    function (endpoint) {
+      console.log(endpoint);
+      notification.open();
+    },
+    [notification]
+  );
+
+  const renderBody = useCallback<LayoutProps['renderBody']>(
+    function ({ className }) {
+      return (
+        <div className={classnames('p-2', className)}>
+          {endpointList.map(function (endpoint) {
+            return (
+              <div key={endpoint.id} className="mb-2 last:mb-0">
+                <Paper elevation={0} shadowElevation={0}>
+                  <Endpoint endpoint={endpoint} onRemove={handleRemove} />
+                </Paper>
+              </div>
+            );
+          })}
+          <div className="mb-2 last:mb-0">
+            <Paper elevation={0} shadowElevation={0}>
+              <Add />
+            </Paper>
+          </div>
+        </div>
+      );
+    },
+    [endpointList]
+  );
 
   return (
     <>
-      <Metadata title="Viron | home" />
-      <div id="page-home">
-        <div>
-          <Link to="/sample">sample</Link>
-        </div>
-        <div>
-          <p>ThemeとDarkModeのテスト</p>
-          <p className="bg-primary-l dark:bg-primary-d">color-primary</p>
-          <p className="bg-secondary-l dark:bg-secondary-d">color-secondary</p>
-          <p className="bg-tertiary-l dark:bg-tertiary-d">color-tertiary</p>
-        </div>
-        <Export />
-        <Import />
-        <ul>
-          {endpointList.map(function (endpoint) {
-            return (
-              <React.Fragment key={endpoint.id}>
-                <li className="mb-1 last:mb-0">
-                  <Endpoint id={endpoint.id} />
-                </li>
-              </React.Fragment>
-            );
-          })}
-        </ul>
-        <Add />
-      </div>
+      <Metadata title="home | Viron" />
+      <Layout
+        renderAppBar={renderAppBar}
+        renderNavigation={renderNavigation}
+        renderBody={renderBody}
+      />
+      <Notification {...notification.bind}>
+        <div>TODO: deleted</div>
+      </Notification>
     </>
   );
 };

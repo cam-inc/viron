@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { Endpoint } from '$types/index';
 import { Document, Info } from '$types/oas';
 import useBase, { UseBaseReturn } from './useBase';

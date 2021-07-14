@@ -1,6 +1,7 @@
 import { lint as _lint, LintReturn } from '@viron/linter';
 import { JSONPath } from 'jsonpath-plus';
 import _ from 'lodash';
+import { Failure, OASError, Result, Success } from '$errors/index';
 import { Endpoint, URL } from '$types/index';
 import {
   Content,
@@ -23,6 +24,10 @@ import {
   RequestValue,
   Server,
   Schema,
+  TableColumn,
+  TableSort,
+  TABLE_SORT,
+  X_Table,
 } from '$types/oas';
 import { isRelativeURL } from '$utils/index';
 import { serialize } from '$utils/oas/style';
@@ -66,6 +71,13 @@ export const resolve = function (document: Record<string, unknown>): Document {
       delete result.parent[result.parentProperty].$ref;
     },
   });
+  // Assign contentIds.
+  (document as Document).info['x-pages'].forEach(function (page) {
+    page.contents.forEach(function (content, idx) {
+      content.id = `${page.id}-${idx}`;
+    });
+  });
+
   return document as Document;
 };
 
@@ -87,21 +99,167 @@ export const constructFakeDocument = function ({
   return doc;
 };
 
-export const getTableSetting = function (info: Info): Info['x-table'] | null {
-  return info['x-table'] || null;
+export const getTableSetting = function (
+  info: Info
+): Result<X_Table, OASError> {
+  if (!info['x-table'] || !info['x-table'].responseListKey) {
+    return new Failure(new OASError('TODO'));
+  }
+  return new Success(info['x-table']);
+};
+
+export const getTableColumns = function (
+  document: Document,
+  content: Info['x-pages'][number]['contents'][number]
+): TableColumn[] {
+  const columns: TableColumn[] = [];
+  const getTableSettingResult = getTableSetting(document.info);
+  if (getTableSettingResult.isFailure()) {
+    return columns;
+  }
+  const isSortable = !!getTableSettingResult.value.sort;
+  const fields = getContentBaseOperationResponseKeys(document, content);
+  fields.forEach(function (field) {
+    columns.push({
+      type: field.type,
+      name: field.name,
+      key: field.name,
+      isSortable,
+    });
+  });
+  return columns;
+};
+
+export const getTableRows = function (
+  document: Document,
+  content: Info['x-pages'][number]['contents'][number],
+  data: any
+): Record<string, any>[] {
+  const rows: Record<string, any>[] = [];
+  const getTableSettingResult = getTableSetting(document.info);
+  if (getTableSettingResult.isFailure()) {
+    return rows;
+  }
+  // TODO: response['200'].content['application/json'].schema.properties[{responseListKey}].items.typeって、objectかもしれないしnumberかもしれないよ。
+  data[getTableSettingResult.value.responseListKey].forEach(function (
+    item: any
+  ) {
+    const row: Record<string, any> = {};
+    const fields = getContentBaseOperationResponseKeys(document, content);
+    fields.forEach(function (field) {
+      row[field.name] = item[field.name];
+    });
+    rows.push(row);
+  });
+  return rows;
+};
+
+export const mergeTableSortRequestValue = function (
+  document: Document,
+  request: Request,
+  baseRequestValue: RequestValue,
+  sorts: Record<TableColumn['key'], TableSort>
+): RequestValue {
+  const requestValue = _.cloneDeep<RequestValue>(baseRequestValue);
+  const getTableSettingResult = getTableSetting(document.info);
+  if (getTableSettingResult.isFailure()) {
+    return requestValue;
+  }
+  if (!getTableSettingResult.value.sort) {
+    return requestValue;
+  }
+  const { requestKey } = getTableSettingResult.value.sort;
+  const requestParameter = getRequestParameter(request.operation, requestKey);
+  // TODO: rquestParameter.schemaだけじゃなく、requestParameter.contentなパターンにも対応すること。
+  if (requestParameter && requestParameter.schema) {
+    switch (requestParameter.schema.type) {
+      case 'string':
+        requestValue.parameters = {
+          ...requestValue.parameters,
+          [requestKey]: (function (): string {
+            const arr: string[] = [];
+            _.forEach(sorts, function (sort, key) {
+              if (sort === TABLE_SORT.ASC || sort === TABLE_SORT.DESC) {
+                arr.push(`${key}:${sort}`);
+              }
+            });
+            return arr.join(',');
+          })(),
+        };
+        break;
+      case 'object':
+        requestValue.parameters = {
+          ...requestValue.parameters,
+          [requestKey]: (function (): Record<string, TableSort> {
+            return _.omitBy(sorts, function (sort) {
+              if (sort === TABLE_SORT.ASC || sort === TABLE_SORT.DESC) {
+                return false;
+              }
+              return true;
+            });
+          })(),
+        };
+        break;
+      case 'array':
+        requestValue.parameters = {
+          ...requestValue.parameters,
+          [requestKey]: (function (): string[] {
+            const arr: string[] = [];
+            _.forEach(sorts, function (sort, key) {
+              if (sort === TABLE_SORT.ASC || sort === TABLE_SORT.DESC) {
+                arr.push(`${key}:${sort}`);
+              }
+            });
+            return arr;
+          })(),
+        };
+        break;
+      case 'number':
+      case 'integer':
+      case 'boolean':
+        break;
+    }
+  }
+  // TODO: requestBodyにも対応すること。
+  return requestValue;
+};
+
+export const mergeTablePagerRequestValue = function (
+  document: Document,
+  baseRequestValue: RequestValue,
+  page: number
+): RequestValue {
+  const requestValue = _.cloneDeep<RequestValue>(baseRequestValue);
+  const getTableSettingResult = getTableSetting(document.info);
+  if (getTableSettingResult.isFailure()) {
+    return requestValue;
+  }
+  const requestPageKey = getTableSettingResult.value.pager?.requestPageKey;
+  if (!requestPageKey) {
+    return requestValue;
+  }
+  requestValue.parameters = {
+    ...requestValue.parameters,
+    [requestPageKey]: page,
+  };
+  // TODO: requestBodyにも対応すること。
+  return requestValue;
 };
 
 export const getPathItem = function (
   document: Document,
   path: string
-): PathItem | null {
-  return document.paths[path] || null;
+): Result<PathItem, OASError> {
+  if (!document.paths[path]) {
+    return new Failure(new OASError('TODO'));
+  }
+  return new Success(document.paths[path]);
 };
 
 export const getRequest = function (
   document: Document,
   { operationId }: { operationId?: OperationId } = {}
-): Request | null {
+): Result<Request, OASError> {
   if (!!operationId) {
     return getRequestByOperationId(document, operationId);
   }
@@ -110,7 +268,7 @@ export const getRequest = function (
     return !!value;
   });
   if (!pathItem) {
-    return null;
+    return new Failure(new OASError('TODO'));
   }
   let operation = _.find(pathItem, function (_, key) {
     // TODO: Methodを参照すること。
@@ -126,11 +284,11 @@ export const getRequest = function (
     ].includes(key);
   });
   if (!operation) {
-    return null;
+    return new Failure(new OASError('TODO'));
   }
   operation = operation as Operation;
   if (!operation.operationId) {
-    return null;
+    return new Failure(new OASError('TODO'));
   }
   return getRequestByOperationId(document, operation.operationId);
 };
@@ -138,7 +296,7 @@ export const getRequest = function (
 export const getRequestByOperationId = function (
   document: Document,
   operationId: OperationId
-): Request | null {
+): Result<Request, OASError> {
   const path = _.findKey(document.paths, function (pathItem) {
     const operations = _.pick(pathItem, [
       'get',
@@ -158,7 +316,7 @@ export const getRequestByOperationId = function (
     });
   });
   if (!path) {
-    return null;
+    return new Failure(new OASError('TODO'));
   }
 
   const operations = _.pick(document.paths[path], [
@@ -175,21 +333,37 @@ export const getRequestByOperationId = function (
     return operation?.operationId === operationId;
   });
   if (!operation) {
-    return null;
+    return new Failure(new OASError('TODO'));
   }
 
   const method = _.findKey(operations, function (operation) {
     return operation?.operationId === operationId;
   });
   if (!method) {
-    return null;
+    return new Failure(new OASError('TODO'));
   }
 
-  return {
+  return new Success({
     path,
     method: method as Method,
     operation,
-  };
+  });
+};
+
+export const getRequestParameter = function (
+  operation: Operation,
+  name: Parameter['name']
+): Parameter | null {
+  if (!operation.parameters) {
+    return null;
+  }
+  const parameter = operation.parameters.find(function (p) {
+    return p.name === name;
+  });
+  if (!parameter) {
+    return null;
+  }
+  return parameter;
 };
 
 export const getRequestParameterKeys = function (
@@ -197,12 +371,13 @@ export const getRequestParameterKeys = function (
   operationId: OperationId
 ): string[] {
   const ret: string[] = [];
-  const request = getRequest(document, {
+  const getRequestResult = getRequest(document, {
     operationId,
   });
-  if (!request) {
+  if (getRequestResult.isFailure()) {
     return ret;
   }
+  const request = getRequestResult.value;
   if (!request.operation.parameters) {
     return ret;
   }
@@ -218,12 +393,15 @@ export const getRequestParameterKeys = function (
 export const getContentBaseOperationResponseKeys = function (
   document: Document,
   content: Info['x-pages'][number]['contents'][number]
-): string[] {
-  const ret: string[] = [];
-  const request = getRequest(document, { operationId: content.operationId });
-  if (!request) {
+): { type: Schema['type']; name: string }[] {
+  const ret: { type: Schema['type']; name: string }[] = [];
+  const getRequestResult = getRequest(document, {
+    operationId: content.operationId,
+  });
+  if (getRequestResult.isFailure()) {
     return ret;
   }
+  const request = getRequestResult.value;
   if (!request.operation.responses) {
     return ret;
   }
@@ -236,30 +414,42 @@ export const getContentBaseOperationResponseKeys = function (
   if (!mediaType.schema) {
     return ret;
   }
+  let schema = mediaType.schema;
+  if (schema.allOf) {
+    schema = mergeAllOf(schema.allOf);
+  }
   switch (content.type) {
     case 'table': {
-      if (!mediaType.schema.properties) {
+      if (!schema.properties) {
         return ret;
       }
       const listKey = document.info['x-table']?.responseListKey;
       if (!listKey) {
         return ret;
       }
-      const properties = mediaType.schema.properties[listKey].properties;
+      const properties = schema.properties[listKey].items?.properties;
       if (!properties) {
         return ret;
       }
-      ret.push(..._.keys(properties));
+      _.keys(properties).forEach(function (key) {
+        ret.push({
+          type: properties[key].type,
+          name: key,
+        });
+      });
       break;
     }
     case 'number':
     case 'custom':
       break;
-    default:
-      // TODO: どーする？
-      throw new Error('TODO: 考慮忘れしてるよ');
   }
   return ret;
+};
+
+export const mergeAllOf = function (
+  schemas: NonNullable<Schema['allOf']>
+): Schema {
+  return _.merge({} as Schema, ...schemas);
 };
 
 export const parseURITemplate = function (

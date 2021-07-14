@@ -1,8 +1,9 @@
 import React from 'react';
-import { error as logError, NAMESPACE } from '$utils/logger/index';
+import Error from '$components/error';
+import { BaseError } from '$errors/index';
 
 type FallbackProps = {
-  error: Error;
+  error: BaseError;
   resetErrorBoundary: (...args: Array<unknown>) => void;
 };
 
@@ -20,7 +21,7 @@ type Props = React.PropsWithRef<
     >;
     FallbackComponent?: React.ComponentType<FallbackProps>;
     resetKeys?: Array<unknown>;
-    onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
+    onError?: (error: BaseError, errorInfo: React.ErrorInfo) => void;
     onReset?: (...args: Array<unknown>) => void;
     onResetKeysChange?: (
       prevResetKeys: Array<unknown> | undefined,
@@ -29,7 +30,7 @@ type Props = React.PropsWithRef<
   }>
 >;
 type State = {
-  error: Error | null;
+  error: BaseError | null;
 };
 const initialState: State = { error: null };
 const changedArray = function (a: Array<unknown> = [], b: Array<unknown> = []) {
@@ -39,32 +40,28 @@ const changedArray = function (a: Array<unknown> = [], b: Array<unknown> = []) {
 };
 
 class ErrorBoundary extends React.Component<Props, State> {
-  static getDerivedStateFromError(error: Error) {
+  static getDerivedStateFromError(error: BaseError): { error: BaseError } {
     return { error };
   }
 
   state = initialState;
   updatedWithError = false;
 
-  resetErrorBoundary = (...args: Array<unknown>) => {
+  resetErrorBoundary = (...args: Array<unknown>): void => {
     this.props.onReset?.(...args);
     this.reset();
   };
 
-  reset() {
+  reset(): void {
     this.updatedWithError = false;
     this.setState(initialState);
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: BaseError, errorInfo: React.ErrorInfo): void {
     this.props.onError?.(error, errorInfo);
-    logError({
-      messages: [error, errorInfo],
-      namespace: NAMESPACE.REACT_COMPONENT,
-    });
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     const { error } = this.state;
 
     if (error !== null) {
@@ -72,7 +69,7 @@ class ErrorBoundary extends React.Component<Props, State> {
     }
   }
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps: Props): void {
     const { error } = this.state;
     const { resetKeys } = this.props;
     if (error !== null && !this.updatedWithError) {
@@ -85,7 +82,7 @@ class ErrorBoundary extends React.Component<Props, State> {
     }
   }
 
-  render() {
+  render(): React.ReactNode {
     const { error } = this.state;
 
     if (error === null) {
@@ -107,9 +104,7 @@ class ErrorBoundary extends React.Component<Props, State> {
       return <FallbackComponent {...props} />;
     }
 
-    // Default error UI.
-    // TODO: 良い見た目に。
-    return <p>Error!!</p>;
+    return <Error error={error} />;
   }
 }
 

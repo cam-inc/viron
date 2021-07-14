@@ -1,102 +1,128 @@
-import React from 'react';
-import { Document, Info } from '$types/oas';
+import _ from 'lodash';
+import React, { useCallback, useMemo, useState } from 'react';
+import Drawer, { useDrawer } from '$components/drawer';
+import Table, { Props as TableProps } from '$components/table';
+import { ON } from '$constants/index';
+import { Document, Info, TableColumn } from '$types/oas';
 import {
-  getContentBaseOperationResponseKeys,
-  getTableSetting,
+  getTableColumns,
+  getTableRows,
+  mergeTableSortRequestValue,
 } from '$utils/oas';
+import { UseBaseReturn } from '../../_hooks/useBase';
 import { UseDescendantsReturn } from '../../_hooks/useDescendants';
-import Descendant from '../../_parts/descendant';
-
-// TODO: ソート機能とフィルター機能
+import Descendant, { Props as DescendantProps } from '../../_parts/descendant';
 
 type Props = {
   document: Document;
   content: Info['x-pages'][number]['contents'][number];
-  data: any;
+  base: UseBaseReturn;
   descendants: UseDescendantsReturn;
-  onDescendantOperationSuccess: (data: any) => void;
-  onDescendantOperationFail: (error: Error) => void;
+  onDescendantOperationSuccess: DescendantProps['onOperationSuccess'];
+  onDescendantOperationFail: DescendantProps['onOperationFail'];
+  omittedColumns: TableColumn['key'][];
 };
 const _ContentTable: React.FC<Props> = ({
   document,
   content,
-  data,
+  base,
   descendants,
   onDescendantOperationSuccess,
   onDescendantOperationFail,
+  omittedColumns,
 }) => {
-  const tableSetting = getTableSetting(document.info);
-  if (!tableSetting || !tableSetting.responseListKey) {
-    throw new Error(
-      'TODO: content.type="table"を使うなら必ずInfo[x-table]を定義してね！'
-    );
-  }
-  if (!data[tableSetting.responseListKey]) {
-    throw new Error(
-      `TODO: レスポンスに${tableSetting.responseListKey}がないお。。`
-    );
-  }
-  const fields = getContentBaseOperationResponseKeys(document, content);
-  // TODO: OASが修正されるまでの暫定対応
-  if (content.operationId === 'listPurchases') {
-    fields.push(
-      ...[
-        'amount',
-        'createdAt',
-        'id',
-        'itemId',
-        'unitPrice',
-        'updatedAt',
-        'userId',
-      ]
-    );
-  }
-  // TODO: response['200'].content['application/json'].schema.properties[{responseListKey}].items.typeって、objectかもしれないしnumberかもしれないよ。
-  const list: {
-    [key in string]: any;
-  }[] = data[tableSetting.responseListKey];
+  const [sorts, setSorts] = useState<
+    Record<
+      TableProps['columns'][number]['key'],
+      TableProps['columns'][number]['sort']
+    >
+  >({});
+
+  const columns = useMemo<TableProps['columns']>(
+    function () {
+      return getTableColumns(document, content)
+        .map(function (column) {
+          return {
+            ...column,
+            sort: sorts[column.key],
+          };
+        })
+        .filter(function (column) {
+          return !omittedColumns.includes(column.key);
+        });
+    },
+    [document, content, omittedColumns, sorts]
+  );
+
+  const dataSource = useMemo<TableProps['dataSource']>(
+    function () {
+      return getTableRows(document, content, base.data);
+    },
+    [document, content, base]
+  );
+
+  const renderActions = useCallback<NonNullable<TableProps['renderActions']>>(
+    function (data) {
+      return (
+        <div className="flex items-center">
+          {descendants.map(function (descendant, idx) {
+            return (
+              <div key={idx}>
+                <Descendant
+                  descendant={descendant}
+                  data={data}
+                  onOperationSuccess={onDescendantOperationSuccess}
+                  onOperationFail={onDescendantOperationFail}
+                />
+              </div>
+            );
+          })}
+        </div>
+      );
+    },
+    [descendants, onDescendantOperationSuccess, onDescendantOperationFail]
+  );
+
+  const handleRequestSortChange = useCallback<
+    NonNullable<TableProps['onRequestSortChange']>
+  >(
+    function (key, sort) {
+      const newSorts = {
+        ...sorts,
+        [key]: sort,
+      };
+      setSorts(newSorts);
+      const requestValue = mergeTableSortRequestValue(
+        document,
+        base.request,
+        base.requestValue,
+        newSorts
+      );
+      base.fetch(requestValue);
+    },
+    [document, base, sorts]
+  );
+
+  const drawer = useDrawer();
+  const handleTableRowClick = useCallback<TableProps['onRowClick']>(
+    function () {
+      drawer.open();
+    },
+    [drawer]
+  );
 
   return (
-    <div>
-      <ul>
-        {list.map(function (item, idx) {
-          return (
-            <React.Fragment key={idx}>
-              <li>
-                <div>
-                  <p>{idx}:</p>
-                  <ul>
-                    {descendants.map(function (descendant, idx) {
-                      return (
-                        <React.Fragment key={idx}>
-                          <li>
-                            <Descendant
-                              descendant={descendant}
-                              data={item}
-                              onOperationSuccess={onDescendantOperationSuccess}
-                              onOperationFail={onDescendantOperationFail}
-                            />
-                          </li>
-                        </React.Fragment>
-                      );
-                    })}
-                  </ul>
-                  {fields.map(function (field, idx) {
-                    return (
-                      <React.Fragment key={idx}>
-                        <span>
-                          {field}:{item[field]}
-                        </span>
-                      </React.Fragment>
-                    );
-                  })}
-                </div>
-              </li>
-            </React.Fragment>
-          );
-        })}
-      </ul>
-    </div>
+    <>
+      <Table
+        on={ON.SURFACE}
+        columns={columns}
+        dataSource={dataSource}
+        renderActions={descendants.length ? renderActions : undefined}
+        onRequestSortChange={handleRequestSortChange}
+        onRowClick={handleTableRowClick}
+      />
+      <Drawer {...drawer.bind}>TODO</Drawer>
+    </>
   );
 };
 export default _ContentTable;

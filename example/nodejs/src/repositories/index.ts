@@ -33,12 +33,14 @@ interface Repository<Entity, CreateAttributes, UpdateAttributes> {
   findOneById: (id: string) => Promise<Entity | null>;
   find: (
     conditions?: FindConditions<Entity>,
+    sort?: string[] | null,
     options?: FindOptions<Entity>
   ) => Promise<Entity[]>;
   findWithPager: (
     conditions?: FindConditions<Entity>,
     size?: number,
-    page?: number
+    page?: number,
+    sort?: string[] | null
   ) => Promise<ListWithPager<Entity>>;
   findOne: (conditions?: FindConditions<Entity>) => Promise<Entity>;
   count: (conditions?: FindConditions<Entity>) => Promise<number>;

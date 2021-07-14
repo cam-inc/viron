@@ -16,9 +16,12 @@ const Progress: React.FC<Props> = ({ isOpened, onRequestClose, children }) => {
     [isOpened]
   );
 
-  const handleClick = useCallback(function () {
-    onRequestClose();
-  }, []);
+  const handleClick = useCallback(
+    function () {
+      onRequestClose();
+    },
+    [onRequestClose]
+  );
 
   if (!isOpened) {
     return null;
