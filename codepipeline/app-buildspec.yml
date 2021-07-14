@@ -9,20 +9,17 @@ phases:
   pre_build:
     commands:
       - echo Install packages...
-      - cd ./packages/app/
+      - cd $CODEBUILD_SRC_DIR/packages/app
       - npm install --no-progress --legacy-peer-deps && npm cache verify
-      - cd ../../
 
   build:
     commands:
       - echo Building app...
-      - cd ./packages/app/
+      - cd $CODEBUILD_SRC_DIR/packages/app
       - npm run build
-      - cd ../../
-      - ls ./packages/app/public
 
 artifacts:
   files:
-    - packages/app/public
+    - packages/app/public/**/*
   name: viron-app-artifact
   discard-paths: no
