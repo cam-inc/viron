@@ -12,13 +12,15 @@ phases:
       - cd $CODEBUILD_SRC_DIR/packages/app
       - npm install --no-progress --legacy-peer-deps && npm cache verify
       - PACKAGE_VERSION=`node -pe "require('./package.json').version"`
+      - mkdir $PACKAGE_VERSION
 
   build:
     commands:
       - echo Building app...
-      - echo $PACKAGE_VERSION
       - cd $CODEBUILD_SRC_DIR/packages/app
       - npm run build:prefix
+      - mv public/* $PACKAGE_VERSION/
+      - mv $PACKAGE_VERSION public/
 
 artifacts:
   files:
