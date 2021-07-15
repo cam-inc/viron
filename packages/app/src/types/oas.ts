@@ -122,18 +122,18 @@ export type CommonMark = string;
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#contact-object
 export type Contact = {
   // The identifying name of the contact person/organization.
-  name: string;
+  name?: string;
   // The URL pointing to the contact information.
-  url: URL;
+  url?: URL;
   // The email address of the contact person/organization.
-  email: EMail;
+  email?: EMail;
 };
 
 // [extendable] The license information for the API.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#license-object
 export type License = {
   name: string;
-  url: URL;
+  url?: URL;
 };
 
 // [extendable] Holds the relative paths to the individual endpoints and their operations.
@@ -218,7 +218,7 @@ export type Operation = {
   operationId?: OperationId;
   parameters?: Parameter[];
   requestBody?: RequestBody;
-  responses?: Responses;
+  responses: Responses;
   callbacks?: {
     [key: string]: Callback;
   };
@@ -460,7 +460,7 @@ export type Response = {
   };
   // A map containing descriptions of potential response payloads.
   content?: Content;
-  links: {
+  links?: {
     [key: string]: Link;
   };
 };

@@ -10,7 +10,7 @@ import { Props as LayoutProps } from '$layouts/index';
 
 type Props = {
   className?: string;
-} & Parameters<LayoutProps['renderNavigation']>[0];
+} & Parameters<NonNullable<LayoutProps['renderNavigation']>>[0];
 const _Navigation: React.FC<Props> = ({ className = '' }) => {
   const renderHead = useCallback<NonNullable<NavigationProps['renderHead']>>(
     function () {

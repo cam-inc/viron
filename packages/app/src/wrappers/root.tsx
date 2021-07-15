@@ -137,14 +137,14 @@ const Splash: React.FC<{ className?: string }> = ({ className = '' }) => {
   return (
     <div
       className={classnames(
-        'flex justify-center items-center bg-background',
+        'flex justify-center items-center bg-primary',
         className
       )}
     >
       <Logo
         className="h-24 drop-shadow-zenith-01dp"
-        left="text-primary"
-        right="text-primary-variant"
+        left="text-on-primary"
+        right="text-on-primary-variant"
       />
     </div>
   );

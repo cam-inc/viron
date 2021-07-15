@@ -48,11 +48,7 @@ const Body: React.FC<Props> = ({
       switch (content.type) {
         case 'number':
           return (
-            <NumberContent
-              document={document}
-              content={content}
-              data={base.data}
-            />
+            <NumberContent document={document} content={content} base={base} />
           );
         case 'table':
           return (

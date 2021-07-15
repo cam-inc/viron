@@ -4,7 +4,7 @@ import Logo from '$components/logo';
 import { Props as LayoutProps } from '$layouts/index';
 import { screenState } from '$store/atoms/app';
 
-type Props = Parameters<LayoutProps['renderAppBar']>[0];
+type Props = Parameters<NonNullable<LayoutProps['renderAppBar']>>[0];
 const Appbar: React.FC<Props> = ({ className = '', openNavigation }) => {
   const [screen] = useRecoilState(screenState);
   const { lg } = screen;

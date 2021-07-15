@@ -132,8 +132,8 @@ const Group: React.FC<{
   };
   return (
     <div>
-      <div
-        className="flex justify-center py-2 pr-2 text-xs text-on-surface"
+      <button
+        className="w-full text-left flex justify-center py-2 pr-2 text-xs text-on-surface hover:text-on-surface-high focus:outline-none focus:ring-2 focus:ring-inset focus:ring-on-surface-high active:text-on-surface-high"
         style={{
           paddingLeft: `${depth * 8}px`,
         }}
@@ -143,7 +143,7 @@ const Group: React.FC<{
         <div className="flex-0 ml-2 flex items-center text-xxs">
           {isOpened ? <AiOutlineDown /> : <AiOutlineUp />}
         </div>
-      </div>
+      </button>
       <div
         className={classnames({
           hidden: !isOpened,
@@ -170,18 +170,22 @@ const Page: React.FC<{
     onSelect(pageId);
   };
   return (
-    <div
-      className={classnames('py-1 pr-2 text-xs', {
-        'text-on-surface': !isSelected,
-        'font-bold text-primary bg-on-primary border-r-[4px] border-primary':
-          isSelected,
-      })}
+    <button
+      className={classnames(
+        'block w-full text-left py-1 pr-2 text-xs focus:outline-none focus:ring-2 focus:ring-inset',
+        {
+          'text-on-surface hover:text-on-surface-high focus:ring-on-surface-high active:text-on-surface-high':
+            !isSelected,
+          'font-bold text-primary bg-on-primary border-r-[4px] border-primary hover:bg-on-primary-high hover:text-primary-high focus:ring-primary-high active:text-primary-high':
+            isSelected,
+        }
+      )}
       style={{
         paddingLeft: `${depth * 8}px`,
       }}
       onClick={handleClick}
     >
       {pageId}
-    </div>
+    </button>
   );
 };

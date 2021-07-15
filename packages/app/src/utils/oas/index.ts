@@ -99,6 +99,13 @@ export const constructFakeDocument = function ({
   return doc;
 };
 
+export const getNumber = function (data: any): Result<number, OASError> {
+  if (typeof data !== 'number') {
+    return new Failure(new OASError('TODO'));
+  }
+  return new Success(data);
+};
+
 export const getTableSetting = function (
   info: Info
 ): Result<X_Table, OASError> {
