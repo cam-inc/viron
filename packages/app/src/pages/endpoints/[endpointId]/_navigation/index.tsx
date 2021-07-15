@@ -14,7 +14,7 @@ export type Props = {
   pages: PagesProps['pages'];
   selectedPageId: PagesProps['selectedPageId'];
   onPageSelect: PagesProps['onSelect'];
-} & Parameters<LayoutProps['renderNavigation']>[0];
+} & Parameters<NonNullable<LayoutProps['renderNavigation']>>[0];
 const _Navigation: React.FC<Props> = ({
   pages,
   selectedPageId,

@@ -165,7 +165,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
     [selectedPageId, pinnedContentIds, _navigate]
   );
 
-  const renderAppBar = useCallback<LayoutProps['renderAppBar']>(
+  const renderAppBar = useCallback<NonNullable<LayoutProps['renderAppBar']>>(
     function (args) {
       if (isPending || !endpoint || !document || error) {
         return null;
@@ -175,7 +175,9 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
     [endpoint, document, isPending, error]
   );
 
-  const renderNavigation = useCallback<LayoutProps['renderNavigation']>(
+  const renderNavigation = useCallback<
+    NonNullable<LayoutProps['renderNavigation']>
+  >(
     function (args) {
       if (isPending || !endpoint || !document || error) {
         return null;

@@ -6,7 +6,7 @@ import { screenState } from '$store/atoms/app';
 import Export from '../_export';
 import Import from '../_import';
 
-type Props = Parameters<LayoutProps['renderAppBar']>[0];
+type Props = Parameters<NonNullable<LayoutProps['renderAppBar']>>[0];
 const Appbar: React.FC<Props> = ({ className = '', openNavigation }) => {
   const [screen] = useRecoilState(screenState);
   const { lg } = screen;

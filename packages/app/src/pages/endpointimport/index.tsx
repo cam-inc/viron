@@ -142,19 +142,18 @@ const EndpointImportPagge: React.FC<Props> = ({ location }) => {
     [location, setEndpointList]
   );
 
-  const renderAppBar = useCallback<LayoutProps['renderAppBar']>(function (
-    args
-  ) {
-    return <Appbar {...args} />;
-  },
-  []);
-
-  const renderNavigation = useCallback<LayoutProps['renderNavigation']>(
+  const renderAppBar = useCallback<NonNullable<LayoutProps['renderAppBar']>>(
     function (args) {
-      return <Navigation {...args} />;
+      return <Appbar {...args} />;
     },
     []
   );
+
+  const renderNavigation = useCallback<
+    NonNullable<LayoutProps['renderNavigation']>
+  >(function (args) {
+    return <Navigation {...args} />;
+  }, []);
 
   const renderBody = useCallback<LayoutProps['renderBody']>(
     function ({ className = '' }) {

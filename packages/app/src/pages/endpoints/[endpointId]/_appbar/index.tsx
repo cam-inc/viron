@@ -9,7 +9,7 @@ import { Document } from '$types/oas';
 type Props = {
   endpoint: Endpoint;
   document: Document;
-} & Parameters<LayoutProps['renderAppBar']>[0];
+} & Parameters<NonNullable<LayoutProps['renderAppBar']>>[0];
 const Header: React.FC<Props> = ({
   className = '',
   openNavigation,
