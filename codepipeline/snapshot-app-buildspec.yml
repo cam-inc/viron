@@ -1,0 +1,28 @@
+version: 0.2
+run-as: root
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: latest
+
+  pre_build:
+    commands:
+      - echo Install packages...
+      - cd $CODEBUILD_SRC_DIR/packages/app
+      - npm install --no-progress --legacy-peer-deps && npm cache verify
+      - PACKAGE_VERSION=`node -pe "require('./package.json').version"`
+
+  build:
+    commands:
+      - echo Building app...
+      - echo $PACKAGE_VERSION
+      - cd $CODEBUILD_SRC_DIR/packages/app
+      - npm run build:prefix
+
+artifacts:
+  files:
+    - 'packages/app/**/*'
+  base-directory: public
+  name: viron-app-artifact
+  discard-paths: yes
