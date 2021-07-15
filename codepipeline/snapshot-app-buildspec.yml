@@ -22,7 +22,6 @@ phases:
 
 artifacts:
   files:
-    - 'packages/app/**/*'
-  base-directory: public
+    - 'packages/app/public/**/*'
   name: viron-app-artifact
   discard-paths: yes
