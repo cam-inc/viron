@@ -95,7 +95,7 @@ Cypress is used under the hood of all E2E and integration tests.
 Run `npm run develop --workspace=@viron/app` and then,
 - `START_SERVER_AND_TEST_INSECURE=1 CYPRESS_BASE_URL=https://localhost:8000 npm run test:e2e --workspace=@viron/app` to run end-to-end testing.
 - `START_SERVER_AND_TEST_INSECURE=1 CYPRESS_BASE_URL=https://localhost:8000 npm run test:e2e:open --workspace=@viron/app` to test in the interactive GUI.
-- `START_SERVER_AND_TEST_INSECURE=1 CYPRESS_BASE_URL=https://localhost:8000 CYPRESS_RECORD_KEY=<record key> npm run test:e2e:record --workspace=@viron/app` to record test result and submit it to Cypress Dashboard.
+- `START_SERVER_AND_TEST_INSECURE=1 CYPRESS_BASE_URL=https://localhost:8000 CYPRESS_PROJECT_ID=<project id> CYPRESS_RECORD_KEY=<record key> npm run test:e2e:record --workspace=@viron/app` to record test result and submit it to Cypress Dashboard.
 
 #### Unit Testig
 `npm run test:unit --workspace=@viron/app` to run unit testing. Jest is used under the hood.
@@ -105,7 +105,9 @@ Hoping to switch to [Cypress Component Testing](https://docs.cypress.io/guides/c
 `npm run test:static --workspace=@viron/app` to type check.
 
 ### Continuous Integration
-E2E and integration testings are executed and the result will be sent to Cypress Dashboard, which is open to public.
+E2E and integration testings are executed and the result will be sent to Cypress Dashboard, which is open to public. (only the `app-production` project.)
+`CYPRESS_PROJECT_ID=<production project id> CYPRESS_RECORD_KEY=<production record key> npm run ci:production:record --workspace=@vion/app` to run for production environment.
+`CYPRESS_PROJECT_ID=<development project id> CYPRESS_RECORD_KEY=<development record key> npm run ci:development:record --workspace=@vion/app` to run for development environment.
 `npm run ci:local --workspace=@viron/app` to execute CI tasks locally for tesing purpose.
 
 ### Main Prerequisite Knowledge and Technologies
