@@ -1,17 +1,21 @@
 import React from 'react';
+import Error from '$components/error';
 import { Document, Info } from '$types/oas';
+import { getNumber } from '$utils/oas';
+import { UseBaseReturn } from '../../_hooks/useBase';
 
 type Props = {
   document: Document;
   content: Info['x-pages'][number]['contents'][number];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any;
+  base: UseBaseReturn;
 };
-const _ContentNumber: React.FC<Props> = ({ data }) => {
-  return (
-    <div>
-      <p>{JSON.stringify(data)}</p>
-    </div>
-  );
+const _ContentNumber: React.FC<Props> = ({ base }) => {
+  const result = getNumber(base.data);
+  if (result.isFailure()) {
+    return <Error error={result.value} />;
+  }
+
+  return <div>{result.value.toLocaleString()}</div>;
 };
 export default _ContentNumber;

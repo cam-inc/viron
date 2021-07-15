@@ -3,196 +3,280 @@
   "info": {
     "title": "Viron Mock",
     "version": "mock",
+    "description": "# heading 1 \n ## heading 2",
+    "termsOfService": "https://TODO.viron.app/",
+    "contact": {
+      "name": "Viron",
+      "url": "https://TODO.viron.app/",
+      "email": "TODO@viron.app"
+    },
+    "license": {
+      "name": "TODO",
+      "url": "https://TODO.viron.app/"
+    },
+    "x-thumbnail": "https://st0.fensi.plus/ui/common/favicon/owner/favicon-96x96.png",
+    "x-theme": "lime",
+    "x-tags": ["tagA", "tagB", "tagC"],
+    "x-table": {
+      "responseListKey": "list",
+      "pager": {
+        "requestPageKey": "page",
+        "requestSizeKey": "size",
+        "responseMaxpageKey": "maxpage",
+        "responsePageKey": "page"
+      },
+      "sort": {
+        "requestKey": "sort"
+      }
+    },
+    "x-autocomplete": {
+      "responseLabelKey": "label",
+      "responseValueKey": "value"
+    },
     "x-pages": [
       {
-        "id": "general",
-        "title": "General",
-        "contents": []
-      },
-      {
-        "id": "quickview",
-        "title": "Quick View",
-        "group": "Dashboard",
-        "contents": []
-      },
-      {
-        "id": "simple",
-        "title": "Simple",
-        "group": "Management",
-        "contents": []
-      },
-      {
-        "id": "dau",
-        "title": "DAU",
-        "group": "Management/Analytics",
-        "contents": []
-      },
-      {
-        "id": "ggg",
-        "title": "Ggg",
-        "group": "Management",
-        "contents": []
-      },
-      {
-        "id": "mau",
-        "title": "MAU",
-        "group": "Management/Analytics",
+        "id": "types",
+        "title": "All Content Types",
+        "description": "# heading 1 \n ## heading 2",
+        "group": "Basic",
         "contents": [
           {
-            "title": "titlee",
+            "title": "Type of Table",
+            "type": "table",
+            "operationId": "get:/types/table"
+          },
+          {
+            "title": "Type of Number",
             "type": "number",
-            "getOperationId": "getMau",
-            "parameters": {
-              "id": "foo",
-              "q": "qqqqq"
-            },
-            "requestBody": {
-              "propA": "see me",
-              "propC": {
-                "propC-C": "aaa"
-              },
-              "propG": [
-                "one", "two", "three", "four", "five"
-              ]
-            }
+            "operationId": "get:/types/number"
           }
         ]
-      },
-      {
-        "id": "last",
-        "title": "Last",
-        "contents": []
-      },
-      {
-        "id": "pv",
-        "title": "PV",
-        "group": "Management/Analytics",
-        "contents": []
       }
     ]
   },
   "paths": {
-    "/mau.json": {
+    "/types/table": {
       "get": {
-        "operationId": "getMau",
+        "operationId": "get:/types/table",
         "parameters": [
           {
-            "name": "q",
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/sampleA"
-            }
+            "$ref": "#/components/parameters/PagerPage"
           },
           {
-            "name": "X-Custom-Header",
-            "in": "header",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/components/parameters/PagerSize"
           },
           {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "c",
-            "in": "cookie",
-            "schema": {
-              "type": "string"
-            }
+            "$ref": "#/components/parameters/Sort"
           }
         ],
-        "requestBody": {
-          "description": "description",
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "propA": {
-                    "type": "string"
-                  },
-                  "propB": {
-                    "type": "string"
-                  },
-                  "propC": {
-                    "type": "object",
-                    "properties": {
-                      "propC-a": {
-                        "$ref": "#/components/schemas/sampleA"
-                      },
-                      "propC-b": {
-                        "$ref": "#/components/schemas/sampleA"
-                      },
-                      "propC-C": {
-                        "$ref": "#/components/schemas/sampleA"
-                      }
-                    },
-                    "required": ["propC-a"]
-                  },
-                  "propD": {
-                    "type": "boolean"
-                  },
-                  "propE": {
-                    "type": "number"
-                  },
-                  "propF": {
-                    "type": "integer"
-                  },
-                  "propG": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    },
-                    "default": ["abc", "def"],
-                    "maxItems": 4,
-                    "minItems": 2
-                  },
-                  "propH": {
-                    "type": "object",
-                    "properties": {
-                      "kekeke": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "required": ["propA"]
-              }
-            }
-          },
-          "required": true
-        },
         "responses": {
           "200": {
-            "description": "response description.",
+            "description": "description",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "properties": {
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "userId": {
+                            "$ref": "#/components/schemas/UserId"
+                          }
+                        }
+                      }
+                    },
+                    "page": {
+                      "$ref": "#/components/schemas/PagerPage"
+                    },
+                    "maxpage": {
+                      "$ref": "#/components/schemas/PagerMaxpage"
+                    }
+                  }
                 }
               }
             }
           }
         }
       }
+    },
+    "/types/number": {
+      "get": {
+        "operationId": "get:/types/number",
+        "responses": {
+          "200": {
+            "description": "description",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pathItem": {
+      "summary": "summary string.",
+      "description": "# heading 1 \n ## heading 2",
+      "servers": [
+        {
+          "url": "https://TODO.viron.app/",
+          "description": "sample one"
+        },
+        {
+          "url": "https://TODO.viron.app/",
+          "description": "sample two"
+        }
+      ],
+      "parameters": [
+        {
+          "name": "userId",
+          "in": "query",
+          "schema": {
+            "$ref": "#/components/schemas/UserId"
+          }
+        }
+      ]
+    },
+    "/operation": {
+      "get": {
+        "tags": ["A", "B", "C"],
+        "summary": "A short summary of what the operation does.",
+        "description": "# heading 1 \n ## heading 2",
+        "externalDocs": {
+          "url": "https://TODO.viron.app/",
+          "description": "description"
+        },
+        "operationId": "get:/operation",
+        "responses": {
+          "default": {
+            "$ref": "#/components/responses/empty"
+          }
+        },
+        "callbacks": {},
+        "deprecated": true,
+        "security": [
+          {
+            "api_key": []
+          }
+        ],
+        "servers": [
+          {
+            "url": "https://TODO.viron.app/",
+            "description": "sample one"
+          },
+          {
+            "url": "https://TODO.viron.app/",
+            "description": "sample two"
+          }
+        ]
+      }
     }
   },
   "components": {
     "schemas": {
-      "sampleA": {
+      "UserId": {
         "type": "string"
       },
-      "sampleB": {
-        "type": "number"
+      "PagerPage": {
+        "type": "integer"
       },
-      "sampleC": {
-        "$ref": "#/components/schemas/sampleA"
+      "PagerSize": {
+        "type": "integer"
+      },
+      "PagerMaxpage": {
+        "type": "integer"
+      },
+      "Sort": {
+        "type": "string"
+      }
+    },
+    "parameters": {
+      "PagerPage": {
+        "name": "page",
+        "in": "query",
+        "schema": {
+          "$ref": "#/components/schemas/PagerPage"
+        }
+      },
+      "PagerSize": {
+        "name": "size",
+        "in": "query",
+        "schema": {
+          "$ref": "#/components/schemas/PagerSize"
+        }
+      },
+      "Sort": {
+        "name": "sort",
+        "in": "query",
+        "schema": {
+          "$ref": "#/components/schemas/Sort"
+        }
+      }
+    },
+    "responses": {
+      "empty": {
+        "description": "empty response."
+      },
+      "table": {
+        "description": "table response."
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "A",
+      "description": "tag of A."
+    },
+    {
+      "name": "B",
+      "description": "tag of B.",
+      "externalDocs": {
+        "url": "https://TODO.viron.app/",
+        "description": "description"
+      }
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://localhost:8000/",
+      "description": "simple."
+    },
+    {
+      "url": "https://{username}.TODO.viron.app:{port}/{basePath}",
+      "description": "complicated.",
+      "variables": {
+        "username": {
+          "default": "demo",
+          "description": "this value is assigned by the service provider"
+        },
+        "port": {
+          "default": "443",
+          "enum": ["8443", "443"]
+        },
+        "basePath": {
+          "default": "v2"
+        }
+      }
+    }
+  ],
+  "externalDocs": {
+    "url": "https://TODO.viron.app/",
+    "description": "external documentation."
+  },
+  "security": [
+    {
+      "api_key": []
+    },
+    {
+      "petstore_auth": [
+        "write:pets",
+        "read:pets"
+      ]
+    }
+  ]
 }
