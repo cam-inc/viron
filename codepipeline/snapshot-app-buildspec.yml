@@ -20,7 +20,9 @@ phases:
       - cd $CODEBUILD_SRC_DIR/packages/app
       - npm run build:prefix
       - mv public/* $PACKAGE_VERSION/
+      - ls $PACKAGE_VERSION
       - mv $PACKAGE_VERSION public/
+      - ls public
 
 artifacts:
   files:
