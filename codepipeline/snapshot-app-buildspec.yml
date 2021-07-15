@@ -12,20 +12,18 @@ phases:
       - cd $CODEBUILD_SRC_DIR/packages/app
       - npm install --no-progress --legacy-peer-deps && npm cache verify
       - PACKAGE_VERSION=`node -pe "require('./package.json').version"`
-      - mkdir $PACKAGE_VERSION
 
   build:
     commands:
       - echo Building app...
       - cd $CODEBUILD_SRC_DIR/packages/app
       - npm run build:prefix
-      - mv public/* $PACKAGE_VERSION/
-      - ls $PACKAGE_VERSION
-      - mv $PACKAGE_VERSION public/
-      - ls public
+      - mkdir -p $CODEBUILD_SRC_DIR/public/$PACKAGE_VERSION
+      - mv $CODEBUILD_SRC_DIR/packages/app/public/* $CODEBUILD_SRC_DIR/public/$PACKAGE_VERSION/
 
 artifacts:
   files:
-    - 'packages/app/public/**/*'
+    - '**/*'
+  base-directory: public
   name: viron-app-artifact
-  discard-paths: yes
+  discard-paths: no
