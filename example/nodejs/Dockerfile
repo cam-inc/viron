@@ -1,4 +1,4 @@
-ARG DOCKER_PROXY_HOST
+ARG DOCKER_PROXY_HOST="docker.io"
 FROM ${DOCKER_PROXY_HOST}/node:16
 
 RUN mkdir -p /example/nodejs
