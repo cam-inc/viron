@@ -153,7 +153,7 @@ const Head: React.FC<Props> = ({
             </div>
           )}
         </div>
-        {siblings.length && (
+        {!!siblings.length && (
           <div className="flex-none ml-2">
             <div className="flex items-center">
               {siblings.map(function (sibling, idx) {

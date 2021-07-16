@@ -1,0 +1,8 @@
+{
+  "list": [
+    { "userId": "userA" },
+    { "userId": "userB" }
+  ],
+  "page": 1,
+  "maxpage": 10
+}
