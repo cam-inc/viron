@@ -1,8 +1,8 @@
 {
   "name": "@viron/lib",
-  "version": "0.0.1",
+  "version": "0.0.1-alpha.7",
   "scripts": {
-    "build": "npm run clean && npm run format && npm run lint && tsc --project tsconfig.json && cp -fr src/openapi dist/",
+    "build": "npm run clean && tsc --project tsconfig.json && cp -fr src/openapi dist/",
     "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
     "coverage": "jest --coverage",
     "format": "npm run format:prettier",
@@ -20,7 +20,7 @@
     "dist"
   ],
   "dependencies": {
-    "@viron/linter": "^0.0.1",
+    "@viron/linter": "*",
     "casbin": "^5.6.1",
     "casbin-mongoose-adapter": "^3.0.1",
     "casbin-sequelize-adapter": "^2.2.0",

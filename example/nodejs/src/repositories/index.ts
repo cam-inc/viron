@@ -21,7 +21,7 @@ import {
   PurchaseCreateAttributes,
   PurchaseUpdateAttributes,
 } from '../domains/purchase';
-import { MODE_MONGO, MODE_MYSQL } from '../constants';
+import { MODE } from '../constants';
 
 export type FindConditions<Entity> =
   | MongoFilterQuery<Entity>
@@ -55,9 +55,9 @@ export type RepositoryNames = keyof typeof mongoRepositories &
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getRepository = (name: RepositoryNames): any => {
   switch (ctx.mode) {
-    case MODE_MONGO:
+    case MODE.MONGO:
       return mongoRepositories[name];
-    case MODE_MYSQL:
+    case MODE.MYSQL:
       return mysqlRepositories[name];
     default:
       throw noSetEnvMode();
