@@ -92,7 +92,6 @@ const _ContentTable: React.FC<Props> = ({
         [key]: sort,
       };
       setSorts(newSorts);
-      console.log(newSorts);
       const requestValue = mergeTableSortRequestValue(
         document,
         base.request,

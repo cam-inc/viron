@@ -51,6 +51,19 @@
             "operationId": "get:/types/number"
           }
         ]
+      },
+      {
+        "id": "pathItem",
+        "title": "PathItem全般",
+        "description": "# heading 1 \n ## heading 2",
+        "group": "Basic",
+        "contents": [
+          {
+            "title": "PathItem",
+            "type": "number",
+            "operationId": "get:/pathItem"
+          }
+        ]
       }
     ]
   },
@@ -140,7 +153,22 @@
             "$ref": "#/components/schemas/UserId"
           }
         }
-      ]
+      ],
+      "get": {
+        "operationId": "get:/pathItem",
+        "responses": {
+          "200": {
+            "description": "共通parametersが含まれているか",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "/operation": {
       "get": {
@@ -154,7 +182,7 @@
         "operationId": "get:/operation",
         "responses": {
           "default": {
-            "$ref": "#/components/responses/empty"
+            "$ref": "#/components/responses/Empty"
           }
         },
         "callbacks": {},
@@ -219,11 +247,8 @@
       }
     },
     "responses": {
-      "empty": {
+      "Empty": {
         "description": "empty response."
-      },
-      "table": {
-        "description": "table response."
       }
     }
   },

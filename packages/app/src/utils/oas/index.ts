@@ -9,6 +9,7 @@ import {
   Info,
   MediaType,
   Method,
+  METHOD,
   Operation,
   OperationId,
   Parameter,
@@ -267,7 +268,7 @@ export const getRequest = function (
   document: Document,
   { operationId }: { operationId?: OperationId } = {}
 ): Result<Request, OASError> {
-  if (!!operationId) {
+  if (operationId) {
     return getRequestByOperationId(document, operationId);
   }
   // Returns first found one.
@@ -305,56 +306,52 @@ export const getRequestByOperationId = function (
   operationId: OperationId
 ): Result<Request, OASError> {
   const path = _.findKey(document.paths, function (pathItem) {
-    const operations = _.pick(pathItem, [
-      'get',
-      'put',
-      'post',
-      'delete',
-      'options',
-      'head',
-      'patch',
-      'trace',
-    ]);
-    return !!_.find(operations, function (value) {
-      if (!value) {
+    const operations = _.pick(pathItem, _.values(METHOD));
+    return !!_.find(operations, function (operation) {
+      if (!operation) {
         return false;
       }
-      return value.operationId === operationId;
+      return operation.operationId === operationId;
     });
   });
   if (!path) {
     return new Failure(new OASError('TODO'));
   }
 
-  const operations = _.pick(document.paths[path], [
-    'get',
-    'put',
-    'post',
-    'delete',
-    'options',
-    'head',
-    'patch',
-    'trace',
-  ]);
+  const pathItem = document.paths[path];
+  const operations = _.pick(pathItem, _.values(METHOD));
   const operation = _.find(operations, function (operation) {
+    return operation?.operationId === operationId;
+  });
+  const method = _.findKey(operations, function (operation) {
     return operation?.operationId === operationId;
   });
   if (!operation) {
     return new Failure(new OASError('TODO'));
   }
-
-  const method = _.findKey(operations, function (operation) {
-    return operation?.operationId === operationId;
-  });
   if (!method) {
     return new Failure(new OASError('TODO'));
   }
-
-  return new Success({
+  const request: Request = {
     path,
     method: method as Method,
-    operation,
-  });
+    operation: _.cloneDeep(operation),
+  };
+  if (pathItem.parameters) {
+    const parameters: Parameter[] = request.operation.parameters || [];
+    pathItem.parameters.forEach(function (parameter) {
+      const findIndex = parameters.findIndex(function (_parameter) {
+        return _parameter.name === parameter.name;
+      });
+      if (findIndex < 0) {
+        parameters.push(parameter);
+      } else {
+        parameters[findIndex] = parameter;
+      }
+    });
+    request.operation.parameters = parameters;
+  }
+  return new Success(request);
 };
 
 export const getRequestParameter = function (
