@@ -157,7 +157,7 @@ export type PathItem = {
   patch?: Operation;
   trace?: Operation;
   servers?: Server[];
-  parameters: Parameter[];
+  parameters?: Parameter[];
 };
 
 export const METHOD = {

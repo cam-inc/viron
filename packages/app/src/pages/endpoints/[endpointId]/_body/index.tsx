@@ -79,7 +79,7 @@ const Head: React.FC<{
   return (
     <div className={className}>
       <div className="flex items-center">
-        {breadcrumbList.length && (
+        {!!breadcrumbList.length && (
           <Breadcrumb
             className="flex-none text-xxs mr-2"
             on={ON.BACKGROUND}

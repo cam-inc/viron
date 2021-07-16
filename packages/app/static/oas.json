@@ -38,7 +38,6 @@
         "id": "types",
         "title": "All Content Types",
         "description": "# heading 1 \n ## heading 2",
-        "group": "Basic",
         "contents": [
           {
             "title": "Type of Table",
@@ -51,6 +50,74 @@
             "operationId": "get:/types/number"
           }
         ]
+      },
+      {
+        "id": "pathItem",
+        "title": "PathItem全般",
+        "description": "# heading 1 \n ## heading 2",
+        "contents": [
+          {
+            "title": "PathItem",
+            "type": "number",
+            "operationId": "get:/pathItem"
+          }
+        ]
+      },
+      {
+        "id": "operation",
+        "title": "Operation全般",
+        "description": "# heading 1 \n ## heading 2",
+        "contents": [
+          {
+            "title": "Operation",
+            "type": "number",
+            "operationId": "get:/operation"
+          }
+        ]
+      },
+      {
+        "id": "siblings",
+        "title": "Siblings全般",
+        "contents": [
+          {
+            "title": "Type of Number",
+            "type": "number",
+            "operationId": "get:/siblings/number",
+            "actions": [
+              {
+                "operationId": "get:/actions/csv"
+              },
+              {
+                "operationId": "get:/actions/csv/{userId}"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "descentends",
+        "title": "Descendants全般",
+        "contents": [
+          {
+            "title": "Type of Table",
+            "type": "table",
+            "operationId": "get:/descendants/table",
+            "actions": [
+              {
+                "operationId": "get:/actions/csv"
+              },
+              {
+                "operationId": "get:/actions/csv/{userId}"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "grouping",
+        "title": "Grouping",
+        "group": "one/two/three/four/five",
+        "contents": []
       }
     ]
   },
@@ -139,8 +206,39 @@
           "schema": {
             "$ref": "#/components/schemas/UserId"
           }
+        },
+        {
+          "name": "userName",
+          "in": "query",
+          "schema": {
+            "$ref": "#/components/schemas/UserName"
+          }
         }
-      ]
+      ],
+      "get": {
+        "operationId": "get:/pathItem",
+        "parameters": [
+          {
+            "name": "userName",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "共通parametersが含まれているか",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "/operation": {
       "get": {
@@ -154,10 +252,9 @@
         "operationId": "get:/operation",
         "responses": {
           "default": {
-            "$ref": "#/components/responses/empty"
+            "$ref": "#/components/responses/Empty"
           }
         },
-        "callbacks": {},
         "deprecated": true,
         "security": [
           {
@@ -175,11 +272,185 @@
           }
         ]
       }
+    },
+    "/siblings/number": {
+      "get": {
+        "operationId": "get:/siblings/number",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Number"
+          }
+        }
+      },
+      "put": {
+        "operationId": "put:/siblings/number",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Empty"
+          }
+        }
+      },
+      "post": {
+        "operationId": "post:/siblings/number",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Empty"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete:/siblings/number",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Empty"
+          }
+        }
+      },
+      "options": {
+        "operationId": "options:/siblings/number",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Empty"
+          }
+        }
+      },
+      "head": {
+        "operationId": "head:/siblings/number",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Empty"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch:/siblings/number",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Empty"
+          }
+        }
+      },
+      "trace": {
+        "operationId": "trace:/siblings/number",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Empty"
+          }
+        }
+      }
+    },
+    "/descendants/table": {
+      "get": {
+        "operationId": "get:/descendants/table",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Table"
+          }
+        }
+      }
+    },
+    "/descendants/table/xxx": {
+      "get": {
+        "operationId": "get:/descendants/table/xxx",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Empty"
+          }
+        }
+      },
+      "put": {
+        "operationId": "put:/descendants/table/xxx",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Empty"
+          }
+        }
+      },
+      "post": {
+        "operationId": "post:/descendants/table/xxx",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Empty"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete:/descendants/table/xxx",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Empty"
+          }
+        }
+      },
+      "options": {
+        "operationId": "options:/descendants/table/xxx",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Empty"
+          }
+        }
+      },
+      "head": {
+        "operationId": "head:/descendants/table/xxx",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Empty"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch:/descendants/table/xxx",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Empty"
+          }
+        }
+      },
+      "trace": {
+        "operationId": "trace:/descendants/table/xxx",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Empty"
+          }
+        }
+      }
+    },
+    "/actions/csv": {
+      "get": {
+        "operationId": "get:/actions/csv",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Empty"
+          }
+        }
+      }
+    },
+    "/actions/csv/{userId}": {
+      "get": {
+        "operationId": "get:/actions/csv/{userId}",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Empty"
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
       "UserId": {
+        "type": "string"
+      },
+      "UserName": {
         "type": "string"
       },
       "PagerPage": {
@@ -219,11 +490,40 @@
       }
     },
     "responses": {
-      "empty": {
+      "Empty": {
         "description": "empty response."
       },
-      "table": {
-        "description": "table response."
+      "Number": {
+        "description": "empty response."
+      },
+      "Table": {
+        "description": "empty response.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "list": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "userId": {
+                        "$ref": "#/components/schemas/UserId"
+                      }
+                    }
+                  }
+                },
+                "page": {
+                  "$ref": "#/components/schemas/PagerPage"
+                },
+                "maxpage": {
+                  "$ref": "#/components/schemas/PagerMaxpage"
+                }
+              }
+            }
+          }
+        }
       }
     }
   },

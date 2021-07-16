@@ -3,7 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import Drawer, { useDrawer } from '$components/drawer';
 import Table, { Props as TableProps } from '$components/table';
 import { ON } from '$constants/index';
-import { Document, Info, TableColumn } from '$types/oas';
+import { Document, Info, TableColumn, TABLE_SORT } from '$types/oas';
 import {
   getTableColumns,
   getTableRows,
@@ -44,7 +44,7 @@ const _ContentTable: React.FC<Props> = ({
         .map(function (column) {
           return {
             ...column,
-            sort: sorts[column.key],
+            sort: sorts[column.key] || TABLE_SORT.NONE,
           };
         })
         .filter(function (column) {
