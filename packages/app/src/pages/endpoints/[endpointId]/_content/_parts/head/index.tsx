@@ -4,6 +4,7 @@ import { BiCaretDownSquare } from '@react-icons/all-files/bi/BiCaretDownSquare';
 import { BiCaretRightSquare } from '@react-icons/all-files/bi/BiCaretRightSquare';
 import React, { useCallback } from 'react';
 import Button from '$components/button';
+import OperationTag from '$components/operationTag';
 import { ON } from '$constants/index';
 import { ClassName } from '$types/index';
 import { Document, Info } from '$types/oas';
@@ -96,7 +97,23 @@ const Head: React.FC<Props> = ({
         <div className="flex-1 min-w-0">
           <div className="text-xxs">{content.type}</div>
           <div className="text-xxs">{content.operationId}</div>
-          <div className="">{content.title || content.id}</div>
+          <div>{content.title}</div>
+          {base.request.operation.tags && (
+            <div className="flex items-center">
+              {base.request.operation.tags.map(function (operationTag) {
+                return (
+                  <React.Fragment key={operationTag}>
+                    <OperationTag
+                      className="mr-2 last:mr-0"
+                      on={ON.SURFACE}
+                      operationTag={operationTag}
+                      documentTags={document.tags}
+                    />
+                  </React.Fragment>
+                );
+              })}
+            </div>
+          )}
         </div>
         {siblings.length && (
           <div className="flex-none ml-2">

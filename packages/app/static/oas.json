@@ -64,6 +64,19 @@
             "operationId": "get:/pathItem"
           }
         ]
+      },
+      {
+        "id": "operation",
+        "title": "Operation全般",
+        "description": "# heading 1 \n ## heading 2",
+        "group": "Basic",
+        "contents": [
+          {
+            "title": "Operation",
+            "type": "number",
+            "operationId": "get:/operation"
+          }
+        ]
       }
     ]
   },
