@@ -1,7 +1,7 @@
 import pino from 'pino';
 import { Sequelize } from 'sequelize';
 import { repositoryContainer, domainsAuth } from '@viron/lib';
-import { Mode, MODE_MONGO, MODE_MYSQL } from './constants';
+import { Mode, MODE, ServiceEnv, SERVICE_ENV } from './constants';
 import { preflight as preflightMongo } from './stores/mongo';
 import { preflight as preflightMysql } from './stores/mysql';
 import { Config, get as getConfig, MongoConfig, MysqlConfig } from './config';
@@ -17,22 +17,35 @@ export const logger = pino({
 
 export class Context {
   public mode: Mode;
+  public serviceEnv: ServiceEnv;
   public config: Config;
   public stores!: Stores;
 
   constructor() {
     switch (process.env.MODE) {
-      case MODE_MONGO:
-        this.mode = MODE_MONGO;
+      case MODE.MONGO:
+        this.mode = MODE.MONGO;
         break;
-      case MODE_MYSQL:
-        this.mode = MODE_MYSQL;
+      case MODE.MYSQL:
+        this.mode = MODE.MYSQL;
         break;
       default:
         throw noSetEnvMode();
     }
 
-    this.config = getConfig(this.mode);
+    switch (process.env.SERVICE_ENV) {
+      case SERVICE_ENV.DEVELOPMENT:
+        this.serviceEnv = SERVICE_ENV.DEVELOPMENT;
+        break;
+      case SERVICE_ENV.PRODUCTION:
+        this.serviceEnv = SERVICE_ENV.PRODUCTION;
+        break;
+      default:
+        this.serviceEnv = SERVICE_ENV.LOCAL;
+        break;
+    }
+
+    this.config = getConfig(this.mode, this.serviceEnv);
   }
 
   public async preflight(): Promise<void> {
@@ -48,7 +61,7 @@ export class Context {
     const mainConfig = this.config.store.main;
 
     switch (this.mode) {
-      case MODE_MONGO:
+      case MODE.MONGO:
         // eslint-disable-next-line no-case-declarations
         const configMongo = mainConfig as MongoConfig;
         this.stores = {
@@ -61,7 +74,7 @@ export class Context {
           `Completed loading the store (main). type=${configMongo.type}, openUri=${configMongo.openUri}`
         );
         break;
-      case MODE_MYSQL:
+      case MODE.MYSQL:
         // eslint-disable-next-line no-case-declarations
         const configMysql = mainConfig as MysqlConfig;
         this.stores = {

@@ -90,6 +90,9 @@ export class RepositoryContainer {
           authSource: options.authSource,
           useFindAndModify: mongooseConfig.useFindAndModify,
           useUnifiedTopology: options.useUnifiedTopology,
+          ssl: options.ssl,
+          sslValidate: options.sslValidate,
+          sslCA: options.sslCA,
         });
         this.casbin = await newEnforcer(
           domainsAdminRole.rbacModel,

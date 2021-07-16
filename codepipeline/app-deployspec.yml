@@ -1,0 +1,9 @@
+version: 0.2
+run-as: root
+
+phases:
+  build:
+    commands:
+      - echo Clean Buckets...
+      - aws s3 rm s3://$AWS_S3_APP_BUCKET_NAME/ --recursive
+

@@ -8,18 +8,18 @@ logger.info(`Set mode. mode=${ctx.mode}`);
 const main = async (): Promise<void> => {
   await ctx.preflight();
   const app = await createApplication();
-  const server = https.createServer(getCertificate(), app);
+  const server = https.createServer(await getCertificate(), app);
 
   /**
    * Start Express server.
    */
   server.listen(app.get('port'), () => {
-    console.log(
+    logger.info(
       '@viron/example/nodejs is running at https://localhost:%d in %s mode',
       app.get('port'),
       app.get('env')
     );
-    console.log('  Press CTRL-C to stop\n');
+    logger.info('  Press CTRL-C to stop\n');
   });
 };
 

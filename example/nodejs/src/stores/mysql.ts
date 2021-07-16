@@ -1,4 +1,4 @@
-import { MODE_MYSQL, StoreType } from '../constants';
+import { MODE, StoreType } from '../constants';
 import { MysqlConfig } from '../config';
 import { createConnection } from './connection/mysql';
 import { MysqlModels, models } from './definitions/mysql';
@@ -19,7 +19,7 @@ export const preflight = async (config: MysqlConfig): Promise<MysqlStore> => {
   await s.sync({ alter: true });
 
   return {
-    type: MODE_MYSQL,
+    type: MODE.MYSQL,
     models: ms,
     instance: s,
   };
