@@ -340,13 +340,12 @@ export const getRequestByOperationId = function (
   if (pathItem.parameters) {
     const parameters: Parameter[] = request.operation.parameters || [];
     pathItem.parameters.forEach(function (parameter) {
-      const findIndex = parameters.findIndex(function (_parameter) {
-        return _parameter.name === parameter.name;
-      });
-      if (findIndex < 0) {
+      if (
+        !parameters.find(function (_parameter) {
+          return _parameter.name === parameter.name;
+        })
+      ) {
         parameters.push(parameter);
-      } else {
-        parameters[findIndex] = parameter;
       }
     });
     request.operation.parameters = parameters;

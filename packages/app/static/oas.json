@@ -152,10 +152,26 @@
           "schema": {
             "$ref": "#/components/schemas/UserId"
           }
+        },
+        {
+          "name": "userName",
+          "in": "query",
+          "schema": {
+            "$ref": "#/components/schemas/UserName"
+          }
         }
       ],
       "get": {
         "operationId": "get:/pathItem",
+        "parameters": [
+          {
+            "name": "userName",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "共通parametersが含まれているか",
@@ -208,6 +224,9 @@
   "components": {
     "schemas": {
       "UserId": {
+        "type": "string"
+      },
+      "UserName": {
         "type": "string"
       },
       "PagerPage": {
