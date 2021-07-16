@@ -214,7 +214,6 @@
             "$ref": "#/components/responses/Empty"
           }
         },
-        "callbacks": {},
         "deprecated": true,
         "security": [
           {
