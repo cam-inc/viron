@@ -540,6 +540,15 @@
                         "type": "integer",
                         "maximum": 5,
                         "exclusiveMaximum": true
+                      },
+                      "MINIMUM": {
+                        "type": "integer",
+                        "minimum": 5
+                      },
+                      "EXCLUSIVE_MINIMUM": {
+                        "type": "integer",
+                        "minimum": 5,
+                        "exclusiveMinimum": true
                       }
                     }
                   }
