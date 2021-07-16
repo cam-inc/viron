@@ -3,6 +3,7 @@ import _ from 'lodash';
 import React, { useCallback, useMemo } from 'react';
 import Drawer, { useDrawer } from '$components/drawer';
 import Request from '$components/request';
+import { ON } from '$constants/index';
 import { AuthConfig, Endpoint } from '$types/index';
 import { Request as TypeRequest, RequestValue } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
@@ -96,8 +97,13 @@ const Signout: React.FC<Props> = ({
     [endpoint, authconfig, request, onSignout]
   );
 
-  const elm = useMemo<JSX.Element>(
+  const elm = useMemo<JSX.Element | null>(
     function () {
+      if (!authconfig) {
+        return null;
+      }
+      const { pathObject } = authconfig;
+      const document = constructFakeDocument({ paths: pathObject });
       return (
         <>
           <button
@@ -108,12 +114,17 @@ const Signout: React.FC<Props> = ({
             <div className="text-xs">Signout</div>
           </button>
           <Drawer {...drawer.bind}>
-            <Request request={request as TypeRequest} onSubmit={handleSubmit} />
+            <Request
+              on={ON.SURFACE}
+              document={document}
+              request={request as TypeRequest}
+              onSubmit={handleSubmit}
+            />
           </Drawer>
         </>
       );
     },
-    [handleClick, drawer, request, handleSubmit]
+    [handleClick, authconfig, drawer, request, handleSubmit]
   );
 
   if (!authconfig) {

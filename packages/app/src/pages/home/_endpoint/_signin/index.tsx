@@ -9,6 +9,7 @@ import Button from '$components/button';
 import Error from '$components/error';
 import Drawer, { useDrawer } from '$components/drawer';
 import Request from '$components/request';
+import { ON } from '$constants/index';
 import { remove, KEY, set } from '$storage/index';
 import { AuthConfig, Endpoint } from '$types/index';
 import { RequestValue } from '$types/oas';
@@ -145,7 +146,12 @@ const OAuth: React.FC<{
           OAuth({`https://localhost:8000/oauthredirect`})
         </div>
       </div>
-      <Request request={getRequestResult.value} onSubmit={handleSubmit} />
+      <Request
+        on={ON.SURFACE}
+        document={document}
+        request={getRequestResult.value}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 };
@@ -205,7 +211,12 @@ const Email: React.FC<{
         <AiOutlineLogin className="mr-1" />
         <div className="text-xs">Email</div>
       </div>
-      <Request request={getRequestResult.value} onSubmit={handleSubmit} />
+      <Request
+        on={ON.SURFACE}
+        document={document}
+        request={getRequestResult.value}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 };

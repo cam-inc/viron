@@ -6,11 +6,14 @@ import { AiOutlineRight } from '@react-icons/all-files/ai/AiOutlineRight';
 import classnames from 'classnames';
 import React, { useCallback, useMemo, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
+import CommonMark from '$components/commonMark';
 import FieldError from '$components/fieldError';
+import { On } from '$constants/index';
 import { Schema } from '$types/oas';
 import { UseActiveReturn, useNameForError } from '../../hooks/index';
 
 type Props = {
+  on: On;
   name: string;
   schema: Schema;
   formState: UseFormReturn['formState'];
@@ -22,6 +25,7 @@ type Props = {
   required: boolean;
 };
 const Container: React.FC<Props> = ({
+  on,
   name,
   schema,
   formState,
@@ -102,6 +106,7 @@ const Container: React.FC<Props> = ({
           <AiOutlineInfoCircle className="inline" />
         </div>
         <div className="mr-1">{displayName}</div>
+        {schema.deprecated && <div className="mr-1 font-bold">deprecated</div>}
         <FieldError name={nameForError} errors={formState.errors} />
       </div>
       <div
@@ -109,7 +114,13 @@ const Container: React.FC<Props> = ({
           hidden: !isActive || !isOpened,
         })}
       >
-        {children}
+        <div>
+          {schema.title && <div>{schema.title}</div>}
+          {schema.description && (
+            <CommonMark on={on} data={schema.description} />
+          )}
+        </div>
+        <div>{children}</div>
       </div>
     </div>
   );

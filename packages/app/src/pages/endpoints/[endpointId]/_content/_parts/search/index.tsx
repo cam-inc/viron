@@ -4,13 +4,14 @@ import Button from '$components/button';
 import Drawer, { useDrawer } from '$components/drawer';
 import RequestComponent from '$components/request';
 import { ON } from '$constants/index';
-import { RequestValue } from '$types/oas';
+import { Document, RequestValue } from '$types/oas';
 import { UseBaseReturn } from '../../_hooks/useBase';
 
 type Props = {
+  document: Document;
   base: UseBaseReturn;
 };
-const Search: React.FC<Props> = ({ base }) => {
+const Search: React.FC<Props> = ({ document, base }) => {
   const drawer = useDrawer();
   const handleClick = function () {
     drawer.open();
@@ -30,6 +31,8 @@ const Search: React.FC<Props> = ({ base }) => {
       />
       <Drawer {...drawer.bind}>
         <RequestComponent
+          on={ON.SURFACE}
+          document={document}
           request={base.request}
           defaultValues={base.requestValue}
           onSubmit={handleRequestSubmit}
