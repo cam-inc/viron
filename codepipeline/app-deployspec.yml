@@ -4,6 +4,11 @@ run-as: root
 phases:
   build:
     commands:
-      - echo Clean Buckets...
-      - aws s3 rm s3://$AWS_S3_APP_BUCKET_NAME/ --recursive
+      - echo Sync Files...
+      - aws s3 sync . s3://$AWS_S3_APP_BUCKET_NAME
+
+  post_build:
+    commands:
+      - echo CloudFront Invalidation...
+      - aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_APP_DISTRIBUTION_ID --paths "/*"
 
