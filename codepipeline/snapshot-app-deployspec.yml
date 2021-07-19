@@ -12,7 +12,7 @@ phases:
       - cd $CODEBUILD_SRC_DIR/packages/app
       - PACKAGE_VERSION=`node -pe "require('./package.json').version"`
       - cd $CODEBUILD_SRC_DIR/packages/app/public
-      - aws s3 sync . s3://$AWS_S3_APP_BUCKET_NAME/$PACKAGE_VERSION --delete
+      - aws s3 sync . s3://$AWS_S3_SNAPSHOT_APP_BUCKET_NAME/$PACKAGE_VERSION --delete
 
   post_build:
     commands:
