@@ -17,12 +17,9 @@ phases:
       - echo Building app...
       - cd $CODEBUILD_SRC_DIR/packages/app
       - npm run build
-      - mkdir -p $CODEBUILD_SRC_DIR/public
-      - mv $CODEBUILD_SRC_DIR/packages/app/public/* $CODEBUILD_SRC_DIR/public/
 
 artifacts:
   files:
     - '**/*'
-  base-directory: public
   name: viron-app-artifact
   discard-paths: no
