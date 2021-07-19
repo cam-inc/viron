@@ -17,12 +17,13 @@ phases:
       - echo Building app...
       - cd $CODEBUILD_SRC_DIR/packages/app
       - npm run build
-      - mkdir -p $CODEBUILD_SRC_DIR/public
-      - mv $CODEBUILD_SRC_DIR/packages/app/public/* $CODEBUILD_SRC_DIR/public/
 
 artifacts:
   files:
-    - '**/*'
-  base-directory: public
+    - codepipeline/app-deployspec.yml
+    - packages/app/package.json
+    - packages/app/public/**/*
+    - packages/app/cypress.json
+    - packages/app/cypress/**/*
   name: viron-app-artifact
   discard-paths: no
