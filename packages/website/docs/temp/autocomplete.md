@@ -1,7 +1,5 @@
 ---
-id: autocomplete
 title: Autocomplete
-slug: /
 ---
 
 Autocompleteについて。

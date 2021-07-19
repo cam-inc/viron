@@ -1,7 +1,5 @@
 ---
-id: related_operations
 title: Related Operations
-slug: /
 ---
 
 各Contentにおける関連Operationについて。

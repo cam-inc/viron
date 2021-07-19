@@ -1,7 +1,5 @@
 ---
-id: auth
 title: Authentication
-slug: /
 ---
 
 - [ ] 401

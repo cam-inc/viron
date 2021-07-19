@@ -1,23 +1,29 @@
+// @see: https://docusaurus.io/docs/docusaurus.config.js
 module.exports = {
   title: 'VIRON',
-  tagline: 'Automated admin tool',
-  url: 'https://github.com/cam-inc/viron',
-  baseUrl: '/',
+  url: 'https://cam-inc.github.io',
+  baseUrl: '/viron/website/',
+  favicon: 'img/favicon.ico',
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'ja'],
+  },
   onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.ico',
-  organizationName: 'cam-inc', // Usually your GitHub org/user name.
-  projectName: 'viron', // Usually your repo name.
+  onDuplicateRoutes: 'warn',
+  tagline: 'OAS-base Admin Tool.',
+  organizationName: 'CAM, Inc.',
+  projectName: 'viron',
   themeConfig: {
     navbar: {
-      title: 'VIRON',
+      title: 'Viron',
       logo: {
         alt: 'VIRON',
         src: 'img/logo.svg',
       },
-      items: [{
-          to: 'docs/',
-          activeBasePath: 'docs',
+      items: [
+        {
+          to: 'docs/introduction',
           label: 'Docs',
           position: 'left',
         },
@@ -31,15 +37,18 @@ module.exports = {
           label: 'GitHub',
           position: 'right',
         },
+        {
+          type: 'localeDropdown',
+          position: 'right',
+        },
       ],
     },
     footer: {
-      style: 'dark',
       links: [{
           title: 'Docs',
           items: [{
               label: 'Documentation',
-              to: 'docs/',
+              to: 'docs',
             },
             {
               label: 'Quick start',
@@ -81,13 +90,9 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          // Please change this to your repo.
-          editUrl: 'https://github.com/facebook/docusaurus/edit/master/website/',
         },
         blog: {
           showReadingTime: true,
-          // Please change this to your repo.
-          editUrl: 'https://github.com/facebook/docusaurus/edit/master/website/blog/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

@@ -1,0 +1,42 @@
+{
+  "link.title.Docs": {
+    "message": "Docs",
+    "description": "The title of the footer links column with title=Docs in the footer"
+  },
+  "link.title.Community": {
+    "message": "Community",
+    "description": "The title of the footer links column with title=Community in the footer"
+  },
+  "link.title.More": {
+    "message": "More",
+    "description": "The title of the footer links column with title=More in the footer"
+  },
+  "link.item.label.Documentation": {
+    "message": "Documentation",
+    "description": "The label of footer link with label=Documentation linking to docs"
+  },
+  "link.item.label.Quick start": {
+    "message": "Quick start",
+    "description": "The label of footer link with label=Quick start linking to docs/doc1"
+  },
+  "link.item.label.Stack Overflow": {
+    "message": "Stack Overflow",
+    "description": "The label of footer link with label=Stack Overflow linking to https://stackoverflow.com/questions/tagged/viron"
+  },
+  "link.item.label.Github Issues": {
+    "message": "Github Issues",
+    "description": "The label of footer link with label=Github Issues linking to https://github.com/cam-inc/viron/issues"
+  },
+  "link.item.label.Blog": {
+    "message": "Blog",
+    "description": "The label of footer link with label=Blog linking to blog"
+  },
+  "link.item.label.GitHub": {
+    "message": "GitHub",
+    "description": "The label of footer link with label=GitHub linking to https://github.com/cam-inc/viron"
+  },
+  "copyright": {
+    "message": "Copyright © 2021 CAM, Inc. Built with Docusaurus.",
+    "description": "The footer copyright"
+  }
+}
