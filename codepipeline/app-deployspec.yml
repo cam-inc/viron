@@ -2,6 +2,10 @@ version: 0.2
 run-as: root
 
 phases:
+  install:
+    runtime-versions:
+      nodejs: latest
+
   build:
     commands:
       - echo Sync Files...
@@ -10,5 +14,9 @@ phases:
 
   post_build:
     commands:
-      - echo CloudFront Invalidation...
-      - aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_APP_DISTRIBUTION_ID --paths "/*"
+      #- echo CloudFront Invalidation...
+      #- aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_APP_DISTRIBUTION_ID --paths "/*"
+
+      - echo E2E Testing...
+      - cd $CODEBUILD_SRC_DIR/packages/app
+      - npm run ci:development:record
