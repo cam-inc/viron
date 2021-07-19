@@ -4,8 +4,8 @@
 
 ## Development
 
-Run the example API server refering to the Quick Start section of [this](../../example/nodejs/README.md).
-Then run `npm run develop --workspace=@viron/app` and access to [https://localhost:8000/](https://localhost:8000/).
+Run the example API server in the Quick Start section [here](../../example/nodejs/README.md).
+Then run `npm run develop --workspace=@viron/app` in order to access [https://localhost:8000/](https://localhost:8000/).
 
 ### Basic Commands
 
@@ -42,9 +42,9 @@ As we use Gatsby of version 2, we need to do some tricks to architect a UI tree.
 <RootWrapper>
 ```
 
-- RootWrapper: This stays at the most outside of the application wrapping Root element which is gatsby's default root element.
+- RootWrapper: This stays at the outermost layer of the application wrapping Root element which is gatsby's default root element.
 - Root: This is Gatsby's default root element.
-- PageWrapper: This stays at the outside of the page page elements. It get rendered as navigations happen.
+- PageWrapper: This stays at the outside of the page page elements. It will get rendered as navigations happen.
 - Page Element(s): This is equivalent to each element in the `pages` directory. This will be mounted and unmounted as navigations happen.
 - Layout(s): This is equivalent to each element in the `layouts` directory. This stays inside a page element, so this will be mounted and unmouted as well like page elements.
 - ModalWrapper: A parent component of every modal component.
@@ -54,25 +54,25 @@ As we use Gatsby of version 2, we need to do some tricks to architect a UI tree.
 
 We use the [Recoil](https://recoiljs.org/) as a state management library. Belows are some of reasons we chose the Recoil.
 - It's a product from [Facebook Open Source](https://opensource.facebook.com/). It should work well with React.
-- It has a lot of useful funtionalities like time-travel debugging, routing, undo and etc.
-- It has new generation idea.
+- It has a lot of useful functions like time-travel debugging, routing, undo and etc.
+- It has new generation ideas.
 
 ### Page Specific Components Naming Rule
 
-Gatsby regards files under the `src/pages` directory as pages. But occasionally you would want to put files that are promised to be used by a single file under the directory and won't let them to be treated as pages. We call those files `Page Specific Components`.
+Gatsby regards files under the `src/pages` directory as pages. But occasionally you would want to put files that are promised to be used by a single file under the directory so that they won't be treated as pages. We call those files `Page Specific Components`.
 To accomplish this we created a rule that any files and directories under the `src/pages` directory with prefix of `_` are regarded as a page specific component. Read the [ignore specific files](https://www.gatsbyjs.com/plugins/gatsby-plugin-page-creator/?=#ignoring-specific-files) section of the Gatsby's default plugin `gatsby-plugin-page-creator` and `ignore` option in the `gatsby-config` file for more information.
 
 ### Internationalization
 
-For internationalization, [i18next](https://www.i18next.com/) is used as a provider of core functionalities. And [react-i18next](https://react.i18next.com/) to integrate with the react framework.
-We decided to not use [i18next-http-backend](https://github.com/i18next/i18next-http-backend) because switching languages on client-side(i.e. on Browsers) is not good for SEO. Read [this](https://developers.google.com/search/docs/advanced/crawling/managing-multi-regional-sites?hl=en&ref_topic=2370587&visit_id=637521501660173954-3611086595&rd=1) and [this](https://itnext.io/techniques-approaches-for-multi-language-gatsby-apps-8ba13ff433c5)for your further information.
-Ideally it's better to serve a html file per language (i.e. use different URLs for different language versions) like [gatsby-plugin-i18n](https://github.com/angeloocana/gatsby-plugin-i18n) does. We, just for now, stick to the multilingual-page system.
+For internationalization, [i18next](https://www.i18next.com/) is used as a provider of core functions. Also, [react-i18next](https://react.i18next.com/) integrates with the react framework.
+We decided to not use [i18next-http-backend](https://github.com/i18next/i18next-http-backend) because switching languages on client-side(i.e. on Browsers) is not good for SEO. Read [this](https://developers.google.com/search/docs/advanced/crawling/managing-multi-regional-sites?hl=en&ref_topic=2370587&visit_id=637521501660173954-3611086595&rd=1) and [this](https://itnext.io/techniques-approaches-for-multi-language-gatsby-apps-8ba13ff433c5) for further information.
+Ideally it's better to serve a html file per language (i.e. use different URLs for different language versions) like [gatsby-plugin-i18n](https://github.com/angeloocana/gatsby-plugin-i18n) does. Just for now, we stick to the multilingual-page system.
 
 ### Theme and prefers-color-scheme
-Viron offers a functionality for users to switch color themes so they can easily recognize which environment they are editing.(e.g. local, staging, production, etc.) On the other hand, as many of you probably know, there is a color-related idea in the client-side world, `Light Mode` and `Dark Mode`. This makes it a bit tricky to handle color themes when dealing with them considering Light/Dark modes. Here is our strategy for it.
+Viron offers a function for users to switch color themes so they can easily recognize which environment they are editing (e.g. local, staging, production, etc.). On the other hand, as many of you probably know, there is a color-related idea in the client-side world: `Light Mode` and `Dark Mode`. This makes it a bit tricky to handle color themes when dealing with them considering Light/Dark modes. Here is our strategy for it.
 
-- One theme consists of two sets of color palette. One for light mode and the other for dark mode. For example, a theme named `terminal` will have a color palette for light mode (terminal-light) and a color palette for dark mode (erminal-dark).
-- We use the [tailwind's function](https://tailwindcss.com/docs/dark-mode) to switch light/dark mode.
+- One theme consists of two sets of color palettes. One for light mode and the other for dark mode. For example, a theme named `terminal` will have a color palette for light mode (terminal-light) and a color palette for dark mode (erminal-dark).
+- We use the [tailwind's function](https://tailwindcss.com/docs/dark-mode) to switch between light and dark mode.
 - We define [the tailwind colors configuration using CSS custom properties](https://tailwindcss.com/docs/customizing-colors#naming-your-colors), and overwrite them leveraging CSS specificity. See the global.css file for more detail.
 - All colors are generated using the custom property hue color. (i.e. --color-hue)
 
@@ -80,12 +80,12 @@ Viron offers a functionality for users to switch color themes so they can easily
 We follow [Google Material Design's principles](https://material.io/design/color/dark-theme.html) to manage our color system and to use them.
 
 ### Error Handling
-To handle errors that would be fired inside react components, we use [Error Boundaries](https://reactjs.org/docs/error-boundaries.html). Inside the ErrorBoundary react component which follows [this strategy](https://dev.to/dinhhuyams/react-error-boundary-surviving-through-pandemic-2pl9), all errors are propagated to the [logger](./src/utils/logger/index.ts). Then logger will output information on browser's console, and send data to external services if necessary. For errors that would be caught outside of react components, just call the logger. The logger is the final destination of all errors.
+To handle errors that would be fired inside react components, we use [Error Boundaries](https://reactjs.org/docs/error-boundaries.html). Inside the ErrorBoundary react component which follows [this strategy](https://dev.to/dinhhuyams/react-error-boundary-surviving-through-pandemic-2pl9), all errors are propagated to the [logger](./src/utils/logger/index.ts). Then logger will output information on the browser's console, and send data to external services if necessary. For errors that would be caught outside of react components, just call the logger. The logger is the final destination of all errors.
 
 All errors are defined [here](./src/errors/index.ts).
 
 ### Animation
-Try sticking to implementing only fade-in animations. In many cases fade-in animations are meaningful in the point of UX but fade-out animations are not that much important. Fade-out animations tend to make users wait and make source code tricky to read.
+Try sticking to implementing only fade-in animations. In many cases fade-in animations are meaningful in the point of UX but fade-out animations are not very important. Fade-out animations tend to make users wait and make source code tricky to read.
 
 ### Test
 
@@ -99,7 +99,7 @@ Run `npm run develop --workspace=@viron/app` and then,
 
 #### Unit Testig
 `npm run test:unit --workspace=@viron/app` to run unit testing. Jest is used under the hood.
-Hoping to switch to [Cypress Component Testing](https://docs.cypress.io/guides/component-testing/introduction#What-is-Component-Testing) in the future once it gets in production.
+We are hoping to switch to [Cypress Component Testing](https://docs.cypress.io/guides/component-testing/introduction#What-is-Component-Testing) in the future once it gets in production.
 
 #### Static Type Check Test
 `npm run test:static --workspace=@viron/app` to type check.
