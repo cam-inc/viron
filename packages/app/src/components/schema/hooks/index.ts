@@ -76,7 +76,6 @@ export const useEliminate = function (): UseEliminateReturn {
   const execute = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function (data: { [key in string]: any }) {
-      console.log(ref);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const f = function (prefix: string, data: any) {
         if (_.isObject(data)) {
