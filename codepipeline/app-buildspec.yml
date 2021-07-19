@@ -20,6 +20,7 @@ phases:
 
 artifacts:
   files:
+    - codepipeline/app-deployspec.yml
     - packages/app/public/**/*
     - packages/app/package.json
     - packages/app/cypress.json
