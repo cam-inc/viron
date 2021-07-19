@@ -1,9 +1,10 @@
 import _ from 'lodash';
 import React, { useEffect } from 'react';
-import { useFieldArray } from 'react-hook-form';
+import { useFieldArray, Validate } from 'react-hook-form';
 import _Schema from '$components/schema';
 import { Schema } from '$types/oas';
 import { getDefaultValue } from '$utils/oas';
+import { getRegisterOptions } from '$utils/oas/v8n';
 import { useNameForError } from '../../hooks/index';
 import { Props } from '../../index';
 
@@ -32,27 +33,25 @@ const SchemaOfTypeArray: React.FC<Props> = ({
         clearErrors(nameForError);
         return;
       }
-      let errorMessage: string | null = null;
-      if (required && _.isUndefined(data)) {
-        errorMessage = 'required';
-      }
+
+      const errorMessages: ReturnType<Validate<any[]>>[] = [];
+      const registerOptions = getRegisterOptions({ required, schema });
       if (!required && _.isUndefined(data)) {
         return;
       }
-      if (!_.isUndefined(schema.maxItems)) {
-        if (schema.maxItems < data.length) {
-          errorMessage = 'maxItems';
+      _.forEach(
+        registerOptions.validate as Record<string, Validate<any[]>>,
+        function (v) {
+          const result = v(data);
+          if (result !== true) {
+            errorMessages.push(result);
+          }
         }
-      }
-      if (!_.isUndefined(schema.minItems)) {
-        if (data.length < schema.minItems) {
-          errorMessage = 'minItems';
-        }
-      }
-      if (!!errorMessage) {
+      );
+      if (errorMessages.length) {
         setError(nameForError, {
           type: 'manual',
-          message: errorMessage,
+          message: errorMessages[0] as string,
         });
       } else {
         clearErrors(nameForError);
@@ -60,13 +59,11 @@ const SchemaOfTypeArray: React.FC<Props> = ({
     },
     [
       nameForError,
-      data,
-      data?.length,
+      JSON.stringify(data),
       isDeepActive,
       clearErrors,
       required,
-      schema.maxItems,
-      schema.minItems,
+      JSON.stringify(schema),
       setError,
     ]
   );

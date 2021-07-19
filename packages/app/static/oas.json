@@ -525,23 +525,98 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "numeric": {
+                  "MULTIPLE_OF": {
+                    "type": "integer",
+                    "multipleOf": 5
+                  },
+                  "MAXIMUM": {
+                    "type": "integer",
+                    "maximum": 5
+                  },
+                  "EXCLUSIVE_MAXIMUM": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "exclusiveMaximum": true
+                  },
+                  "MINIMUM": {
+                    "type": "integer",
+                    "minimum": 5
+                  },
+                  "EXCLUSIVE_MINIMUM": {
+                    "type": "integer",
+                    "minimum": 5,
+                    "exclusiveMinimum": true
+                  },
+                  "MAX_LENGTH": {
+                    "type": "string",
+                    "maxLength": 5
+                  },
+                  "MIN_LENGTH": {
+                    "type": "string",
+                    "minLength": 5
+                  },
+                  "MAX_ITEMS": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 2
+                  },
+                  "MIN_ITEMS": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 2
+                  },
+                  "UNIQUE_ITEMS": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "uniqueItems": true
+                  },
+                  "MAX_PROPERTIES": {
                     "type": "object",
                     "properties": {
-                      "MULTIPLE_OF": {
-                        "type": "integer",
-                        "multipleOf": 5
-                      },
-                      "MAXIMUM": {
-                        "type": "integer",
-                        "maximum": 5
-                      },
-                      "EXCLUSIVE_MAXIMUM": {
-                        "type": "integer",
-                        "maximum": 5,
-                        "exclusiveMaximum": true
+                      "one": {
+                        "type": "string"
                       }
-                    }
+                    },
+                    "maxProperties": 2
+                  },
+                  "MIN_PROPERTIES": {
+                    "type": "object",
+                    "properties": {
+                      "one": {
+                        "type": "string"
+                      }
+                    },
+                    "minProperties": 2
+                  },
+                  "REQUIRED": {
+                    "type": "object",
+                    "properties": {
+                      "one": {
+                        "type": "string"
+                      },
+                      "two": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["one", "two", "three"]
+                  },
+                  "ADDITIONAL_PROPERTIES": {
+                    "type": "object",
+                    "properties": {
+                      "one": {
+                        "type": "string"
+                      },
+                      "two": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false
                   }
                 }
               }

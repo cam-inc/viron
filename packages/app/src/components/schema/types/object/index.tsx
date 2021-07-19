@@ -1,6 +1,9 @@
 import _ from 'lodash';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { Validate } from 'react-hook-form';
 import _Schema from '$components/schema';
+import { getRegisterOptions } from '$utils/oas/v8n';
+import { useNameForError } from '../../hooks/index';
 import { Props } from '../../index';
 
 const SchemaOfTypeObject: React.FC<Props> = ({
@@ -16,9 +19,55 @@ const SchemaOfTypeObject: React.FC<Props> = ({
   watch,
   setError,
   clearErrors,
+  required,
   isDeepActive,
   activeRef,
 }) => {
+  const data = watch(name);
+  const nameForError = useNameForError({ schema, name });
+  useEffect(
+    function () {
+      if (!isDeepActive) {
+        clearErrors(nameForError);
+        return;
+      }
+      const errorMessages: ReturnType<Validate<Record<string, any>>>[] = [];
+      const registerOptions = getRegisterOptions({ required, schema });
+      if (!required && _.isUndefined(data)) {
+        return;
+      }
+      _.forEach(
+        registerOptions.validate as Record<
+          string,
+          Validate<Record<string, any>>
+        >,
+        function (v) {
+          const result = v(data);
+          if (result !== true) {
+            errorMessages.push(result);
+          }
+        }
+      );
+      if (errorMessages.length) {
+        setError(nameForError, {
+          type: 'manual',
+          message: errorMessages[0] as string,
+        });
+      } else {
+        clearErrors(nameForError);
+      }
+    },
+    [
+      nameForError,
+      JSON.stringify(data),
+      isDeepActive,
+      clearErrors,
+      required,
+      JSON.stringify(schema),
+      setError,
+    ]
+  );
+
   return (
     <>
       <ul className="ml-2">

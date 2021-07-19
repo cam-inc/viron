@@ -7,7 +7,6 @@ import Schema from '$components/schema';
 import { useEliminate } from '$components/schema/hooks/index';
 import {
   Document,
-  Parameter,
   Request,
   RequestValue,
   Schema as SchemaType,
