@@ -8,6 +8,7 @@ import { useNameForError } from '../../hooks/index';
 import { Props } from '../../index';
 
 const SchemaOfTypeArray: React.FC<Props> = ({
+  on,
   name,
   schema,
   register,
@@ -104,6 +105,7 @@ const SchemaOfTypeArray: React.FC<Props> = ({
                 -remove
               </div>
               <_Schema
+                on={on}
                 name={`${name}.${index}`}
                 schema={schema.items as Schema}
                 formState={formState}

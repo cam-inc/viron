@@ -1,9 +1,12 @@
 import React, { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
+import { On } from '$constants/index';
 import Button from '$components/button';
+import Operation from '$components/operation';
 import Schema from '$components/schema';
 import { useEliminate } from '$components/schema/hooks/index';
 import {
+  Document,
   Parameter,
   Request,
   RequestValue,
@@ -12,11 +15,15 @@ import {
 import { pickContentType } from '$utils/oas';
 
 type Props = {
+  on: On;
+  document: Document;
   request: Request;
   defaultValues?: RequestValue;
   onSubmit: (requestValue: RequestValue) => void;
 };
 const _Request: React.FC<Props> = ({
+  on,
+  document,
   request,
   defaultValues = {} as RequestValue,
   onSubmit,
@@ -49,13 +56,19 @@ const _Request: React.FC<Props> = ({
   return (
     <div className="text-xxs">
       <form onSubmit={_handleSubmit}>
-        <p>
-          <span className="mr-4">{request.method.toUpperCase()}</span>
-          <span>{request.path}</span>
-        </p>
+        <div>
+          <div>{request.method.toUpperCase()}</div>
+          <div>{request.path}</div>
+          <Operation
+            on={on}
+            document={document}
+            operation={request.operation}
+          />
+        </div>
         {!!request.operation.parameters && (
           <div>
             <Schema
+              on={on}
               name="parameters"
               schema={{
                 type: 'object',
@@ -64,15 +77,16 @@ const _Request: React.FC<Props> = ({
                     [key in string]: SchemaType;
                   } = {};
                   request.operation.parameters.forEach(function (parameter) {
-                    parameter = parameter as Parameter;
-                    obj[parameter.name] = parameter.schema as SchemaType;
+                    obj[parameter.name] = {
+                      deprecated: parameter.deprecated,
+                      ...parameter.schema,
+                    } as SchemaType;
                   });
                   return obj;
                 })(),
                 required: (function () {
                   const arr: string[] = [];
                   request.operation.parameters.forEach(function (parameter) {
-                    parameter = parameter as Parameter;
                     if (parameter.required) {
                       arr.push(parameter.name);
                     }
@@ -98,6 +112,7 @@ const _Request: React.FC<Props> = ({
         {!!request.operation.requestBody && (
           <div>
             <Schema
+              on={on}
               name="requestBody"
               schema={
                 request.operation.requestBody.content[

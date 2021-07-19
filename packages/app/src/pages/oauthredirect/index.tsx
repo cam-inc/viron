@@ -6,7 +6,7 @@ import { useRecoilState } from 'recoil';
 import Error from '$components/error';
 import Metadata from '$components/metadata';
 import Request from '$components/request';
-import { StatusCode } from '$constants/index';
+import { ON, StatusCode } from '$constants/index';
 import { BaseError, getHTTPError, NetworkError } from '$errors/index';
 import useTheme from '$hooks/theme';
 import Layout, { Props as LayoutProps } from '$layouts/index';
@@ -138,10 +138,15 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
         // TODO: ここにくることはないはず。
         return null;
       }
+      if (!document) {
+        return null;
+      }
       return (
         <div>
           <p>{`https://localhost:8000/oauthredirect`}</p>
           <Request
+            on={ON.BACKGROUND}
+            document={document}
             request={request}
             defaultValues={defaultValues}
             onSubmit={handleSubmit}
@@ -149,7 +154,7 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
         </div>
       );
     },
-    [error, isPending, request, defaultValues, handleSubmit]
+    [error, isPending, document, request, defaultValues, handleSubmit]
   );
 
   return (

@@ -43,7 +43,6 @@ const _Content: React.FC<Props> = ({
   const handleColumnsFilterChange = useCallback<
     HeadProps['onColumnsFilterChange']
   >(function (omitted) {
-    console.log(omitted);
     setOmittedColumns(omitted);
   }, []);
 

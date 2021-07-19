@@ -4,6 +4,7 @@ import _Schema from '$components/schema';
 import { Props } from '../../index';
 
 const SchemaOfTypeObject: React.FC<Props> = ({
+  on,
   name,
   schema,
   register,
@@ -25,6 +26,7 @@ const SchemaOfTypeObject: React.FC<Props> = ({
           return (
             <li key={_name}>
               <_Schema
+                on={on}
                 name={`${name}.${_name}`}
                 schema={_schema}
                 formState={formState}

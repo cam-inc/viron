@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { UseFormReturn } from 'react-hook-form';
+import { On } from '$constants/index';
 import { Schema } from '$types/oas';
 import { useActive, UseEliminateReturn } from './hooks/index';
 import Container from './parts/container';
@@ -11,6 +12,7 @@ import SchemaOfTypeString from './types/string';
 import SchemaOfTypeObject from './types/object';
 
 export type Props = {
+  on: On;
   name: string;
   schema: Schema;
   register: UseFormReturn['register'];
@@ -27,6 +29,7 @@ export type Props = {
   activeRef: UseEliminateReturn['ref'];
 };
 const _Schema: React.FC<Props> = ({
+  on,
   name,
   schema,
   register,
@@ -57,8 +60,6 @@ const _Schema: React.FC<Props> = ({
           return SchemaOfTypeArray;
         case 'boolean':
           return SchemaOfTypeBoolean;
-        default:
-          throw new Error(`Type of "${schema.type}" is not supported.`);
       }
     },
     [schema]
@@ -75,6 +76,7 @@ const _Schema: React.FC<Props> = ({
 
   return (
     <Container
+      on={on}
       name={name}
       schema={schema}
       formState={formState}
@@ -86,6 +88,7 @@ const _Schema: React.FC<Props> = ({
       required={required}
     >
       <Component
+        on={on}
         name={name}
         schema={schema}
         register={register}

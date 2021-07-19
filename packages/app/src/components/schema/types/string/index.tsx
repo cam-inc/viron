@@ -1,40 +1,24 @@
 import _ from 'lodash';
 import React, { useMemo } from 'react';
-import { RegisterOptions, ValidateResult } from 'react-hook-form';
 import Textinput from '$components/textinput';
+import { getRegisterOptions } from '$utils/oas/v8n';
 import { Props } from '../../index';
 
 const SchemaOfTypeString: React.FC<Props> = ({
   name,
   register,
   required,
+  schema,
   isDeepActive,
 }) => {
-  const registerOptions = useMemo<RegisterOptions>(
+  const registerOptions = useMemo<ReturnType<typeof getRegisterOptions>>(
     function () {
-      const options: RegisterOptions = {};
       if (!isDeepActive) {
-        return options;
+        return {};
       }
-      options.validate = {};
-      if (required) {
-        options.validate.required = function (data): ValidateResult {
-          if (_.isUndefined(data)) {
-            return 'Required';
-          }
-          return true;
-        };
-      }
-      // TODO:
-      options.validate.testes = function (data): ValidateResult {
-        if (!data) {
-          return 'TesTes';
-        }
-        return true;
-      };
-      return options;
+      return getRegisterOptions({ required, schema });
     },
-    [isDeepActive, required]
+    [required, schema, isDeepActive]
   );
 
   return (

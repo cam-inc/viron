@@ -69,6 +69,7 @@ const _ContentTable: React.FC<Props> = ({
             return (
               <div key={idx}>
                 <Descendant
+                  document={document}
                   descendant={descendant}
                   data={data}
                   onOperationSuccess={onDescendantOperationSuccess}

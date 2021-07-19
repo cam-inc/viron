@@ -1,18 +1,21 @@
 import React, { useCallback, useState } from 'react';
 import Drawer, { useDrawer } from '$components/drawer';
 import RequestComponent from '$components/request';
+import { ON } from '$constants/index';
 import { BaseError } from '$errors/index';
-import { RequestValue } from '$types/oas';
+import { Document, RequestValue } from '$types/oas';
 import Action from '../action';
 import { UseSiblingsReturn } from '../../_hooks/useSiblings';
 
 export type Props = {
+  document: Document;
   sibling: UseSiblingsReturn[number];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onOperationSuccess: (data: any) => void;
   onOperationFail: (error: BaseError) => void;
 };
 const Sibling: React.FC<Props> = ({
+  document,
   sibling,
   onOperationSuccess,
   onOperationFail,
@@ -48,6 +51,8 @@ const Sibling: React.FC<Props> = ({
       <Action method={sibling.request.method} onClick={handleClick} />
       <Drawer {...drawer.bind}>
         <RequestComponent
+          on={ON.SURFACE}
+          document={document}
           request={sibling.request}
           defaultValues={sibling.defaultValues}
           onSubmit={handleRequestSubmit}
