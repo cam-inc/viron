@@ -21,8 +21,9 @@ phases:
 artifacts:
   files:
     - codepipeline/app-deployspec.yml
-    - packages/app/public/**/*
     - packages/app/package.json
+    - packages/app/public/**/*
     - packages/app/cypress.json
+    - packages/app/cypress/**/*
   name: viron-app-artifact
   discard-paths: no
