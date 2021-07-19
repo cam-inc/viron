@@ -1,7 +1,5 @@
 ---
-id: theme
 title: Theme
-slug: /
 ---
 
 ### テーマについて

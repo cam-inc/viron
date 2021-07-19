@@ -1,0 +1,14 @@
+{
+  "version.label": {
+    "message": "Next",
+    "description": "The label for version current"
+  },
+  "sidebar.mySidebar.category.Getting-Started": {
+    "message": "Getting-Started",
+    "description": "The label for category Getting-Started in sidebar mySidebar"
+  },
+  "sidebar.mySidebar.category.temp": {
+    "message": "temp",
+    "description": "The label for category temp in sidebar mySidebar"
+  }
+}

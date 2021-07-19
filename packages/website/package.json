@@ -1,22 +1,23 @@
 {
-  "name": "@viron/docs",
+  "name": "@viron/website",
   "version": "0.0.1",
-  "private": true,
   "scripts": {
     "pre-commit": "echo PRE-COMMIT",
     "pre-push": "echo PRE-PUSH",
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
+    "start:ja": "docusaurus start --locale ja",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "serve": "docusaurus serve",
     "clear": "docusaurus clear",
+    "write-translations:ja": "docusaurus write-translations --locale ja",
     "test": "echo TEST"
   },
   "dependencies": {
-    "@docusaurus/core": "2.0.0-beta.0",
-    "@docusaurus/preset-classic": "2.0.0-beta.0",
+    "@docusaurus/core": "2.0.0-beta.3",
+    "@docusaurus/preset-classic": "2.0.0-beta.3",
     "@mdx-js/react": "^1.6.21",
     "clsx": "^1.1.1",
     "react": "^17.0.1",

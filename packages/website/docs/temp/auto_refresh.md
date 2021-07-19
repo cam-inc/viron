@@ -1,7 +1,5 @@
 ---
-id: auto_refresh
 title: Auto refresh
-slug: /
 ---
 
 自動更新機能について。

@@ -1,7 +1,5 @@
 ---
-id: oas_info_extended
 title: Extended Info Object
-slug: /
 ---
 
 OASのInfoオブジェクトに対する、Viron拡張箇所について。
