@@ -129,6 +129,10 @@ export const getRegisterOptions = function ({
   if (schema.not) {
     options.validate.not = getValidateNot(schema.not);
   }
+  // format
+  if (schema.format) {
+    options.validate.format = getValidateFormat(schema.format, schema.type);
+  }
   return options;
 };
 
@@ -457,6 +461,17 @@ export const getValidateOneOf = function (
 // @see: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00#section-5.25
 export const getValidateNot = function (
   not: NonNullable<Schema['not']>
+): Validate<any> {
+  return function (data) {
+    // TODO
+    return true;
+  };
+};
+
+// @see: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00#section-7
+export const getValidateFormat = function (
+  format: NonNullable<Schema['format']>,
+  type: Schema['type']
 ): Validate<any> {
   return function (data) {
     // TODO
