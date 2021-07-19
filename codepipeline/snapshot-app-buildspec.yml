@@ -21,6 +21,7 @@ phases:
 artifacts:
   files:
     - codepipeline/snapshot-app-deployspec.yml
+    - packages/app/package.json
     - packages/app/public/**/*
   name: viron-snapshot-app-artifact
   discard-paths: no
