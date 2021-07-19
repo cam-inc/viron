@@ -16,7 +16,7 @@ phases:
     commands:
       #- echo CloudFront Invalidation...
       #- aws cloudfront create-invalidation --distribution-id $AWS_CLOUDFRONT_APP_DISTRIBUTION_ID --paths "/*"
-
       - echo E2E Testing...
       - cd $CODEBUILD_SRC_DIR/packages/app
+      - npm install --no-progress --legacy-peer-deps && npm cache verify
       - npm run ci:development:record

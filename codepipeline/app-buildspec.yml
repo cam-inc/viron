@@ -20,6 +20,8 @@ phases:
 
 artifacts:
   files:
-    - '**/*'
+    - packages/app/public/**/*
+    - packages/app/package.json
+    - packages/app/cypress.json
   name: viron-app-artifact
   discard-paths: no
