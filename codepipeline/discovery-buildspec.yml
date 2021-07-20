@@ -20,7 +20,7 @@ phases:
 
 artifacts:
   files:
-    - codepipeline/snapshot-app-deployspec.yml
+    - codepipeline/discovery-deployspec.yml
     - packages/website/build/**/*
   name: viron-discovery-artifact
   discard-paths: no
