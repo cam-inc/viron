@@ -1,0 +1,26 @@
+version: 0.2
+run-as: root
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: latest
+
+  pre_build:
+    commands:
+      - echo Install packages...
+      - cd $CODEBUILD_SRC_DIR/packages/website
+      - npm install --no-progress && npm cache verify
+
+  build:
+    commands:
+      - echo Building app...
+      - cd $CODEBUILD_SRC_DIR/packages/website
+      - npm run build
+
+artifacts:
+  files:
+    - codepipeline/snapshot-app-deployspec.yml
+    - packages/website/build/**/*
+  name: viron-discovery-artifact
+  discard-paths: no
