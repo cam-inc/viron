@@ -11,7 +11,7 @@ module.exports = {
   onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
   onDuplicateRoutes: 'warn',
-  tagline: 'OAS-base Admin Tool.',
+  tagline: 'Provide OAS document, Get GUI.',
   organizationName: 'CAM, Inc.',
   projectName: 'viron',
   themeConfig: {
@@ -44,39 +44,63 @@ module.exports = {
       ],
     },
     footer: {
-      links: [{
-          title: 'Docs',
-          items: [{
-              label: 'Documentation',
-              to: 'docs',
+      links: [
+        {
+          title: 'Resources',
+          items: [
+            {
+              label: 'Blog',
+              to: 'blog',
             },
             {
-              label: 'Quick start',
-              to: 'docs/doc1',
+              label: 'Documentation',
+              to: 'docs/introduction',
+            },
+            {
+              label: 'Introduction',
+              to: 'docs/introduction',
+            },
+            {
+              label: 'Quick Start',
+              to: 'docs/Getting-Started/quick-start',
+            },
+            {
+              label: 'Demo',
+              to: 'docs/Getting-Started/demo',
             },
           ],
         },
         {
           title: 'Community',
-          items: [{
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/viron',
+          items: [
+            {
+              label: 'GitHub',
+              href: 'https://github.com/cam-inc/viron',
             },
             {
-              label: 'Github Issues',
+              label: 'Twitter',
+              href: 'https://twitter.com/viron/TODO',
+            },
+            {
+              label: 'Issues',
               href: 'https://github.com/cam-inc/viron/issues',
+            },
+            {
+              label: 'Stack Overflow',
+              href: 'https://stackoverflow.com/questions/tagged/viron',
             },
           ],
         },
         {
-          title: 'More',
-          items: [{
-              label: 'Blog',
-              to: 'blog',
+          title: 'Legal',
+          items: [
+            {
+              label: 'Privacy Policy',
+              href: 'https://viron.app/privacyPolicy/TODO',
             },
             {
-              label: 'GitHub',
-              href: 'https://github.com/cam-inc/viron',
+              label: 'Terms of Service',
+              href: 'https://viron.app/termsOfServicey/TODO',
             },
           ],
         },
