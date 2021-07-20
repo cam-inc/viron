@@ -1,8 +1,8 @@
 // @see: https://docusaurus.io/docs/docusaurus.config.js
 module.exports = {
   title: 'VIRON',
-  url: 'https://cam-inc.github.io',
-  baseUrl: '/viron/website/',
+  url: process.env.VIRON_WEBSITE_URL || 'https://cam-inc.github.io',
+  baseUrl: '/',
   favicon: 'img/favicon.ico',
   i18n: {
     defaultLocale: 'en',
