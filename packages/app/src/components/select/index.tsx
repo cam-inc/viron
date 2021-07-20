@@ -7,7 +7,7 @@ type Props<T> = {
   Option: React.FC<{ className: ClassName; data: T }>;
   OptionBlank?: React.FC<{ className: ClassName }>;
 };
-const _Select = function <T = null>({
+const _Select = function <T>({
   list,
   Select,
   Option,

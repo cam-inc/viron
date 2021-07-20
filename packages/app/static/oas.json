@@ -619,8 +619,20 @@
                     "additionalProperties": false
                   },
                   "ENUM": {
-                    "type": "string",
-                    "enum": ["AAA", "BBB"]
+                    "type": "number",
+                    "enum": [1, 2]
+                  },
+                  "NUMBER": {
+                    "type": "number"
+                  },
+                  "INTEGER": {
+                    "type": "integer"
+                  },
+                  "STRING": {
+                    "type": "string"
+                  },
+                  "BOOLEAN": {
+                    "type": "boolean"
                   }
                 }
               }
