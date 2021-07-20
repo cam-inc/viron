@@ -54,6 +54,7 @@ const SchemaOfTypeNumber: React.FC<Props> = ({
         />
       ) : (
         <Numberinput
+          isFloat
           render={function (bind) {
             return <input {...bind} {...register(name, registerOptions)} />;
           }}
