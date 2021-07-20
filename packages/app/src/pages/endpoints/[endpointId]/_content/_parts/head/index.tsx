@@ -6,7 +6,7 @@ import React, { useCallback } from 'react';
 import Button from '$components/button';
 import Operation from '$components/operation';
 import { ON } from '$constants/index';
-import { ClassName } from '$types/index';
+import { ClassName, Endpoint } from '$types/index';
 import { Document, Info } from '$types/oas';
 import { UseBaseReturn } from '../../_hooks/useBase';
 import { UseSiblingsReturn } from '../../_hooks/useSiblings';
@@ -16,6 +16,7 @@ import Search from '../search/index';
 import Sibling from '../sibling/index';
 
 export type Props = {
+  endpoint: Endpoint;
   document: Document;
   content: Info['x-pages'][number]['contents'][number];
   base: UseBaseReturn;
@@ -33,6 +34,7 @@ export type Props = {
   className?: ClassName;
 };
 const Head: React.FC<Props> = ({
+  endpoint,
   document,
   content,
   base,
@@ -111,6 +113,7 @@ const Head: React.FC<Props> = ({
                 return (
                   <div key={idx} className="mr-2 last:mr-0">
                     <Sibling
+                      endpoint={endpoint}
                       document={document}
                       sibling={sibling}
                       onOperationSuccess={handleSiblingOperationSuccess}
@@ -138,7 +141,7 @@ const Head: React.FC<Props> = ({
               <Refresh base={base} />
             </div>
             <div className="mr-2 last:mr-0">
-              <Search document={document} base={base} />
+              <Search endpoint={endpoint} document={document} base={base} />
             </div>
             <div className="mr-2 last:mr-0">
               <Button

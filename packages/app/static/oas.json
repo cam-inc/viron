@@ -633,6 +633,16 @@
                   },
                   "BOOLEAN": {
                     "type": "boolean"
+                  },
+                  "AUTOCOMPLETE": {
+                    "type": "string",
+                    "x-autocomplete": {
+                      "operationId": "get:/autocomplete",
+                      "defaultParametersValue": {
+                        "flexible": "${autocompleteValue}",
+                        "fixed": 123
+                      }
+                    }
                   }
                 }
               }
@@ -669,6 +679,50 @@
             "description": "sample two"
           }
         ]
+      }
+    },
+    "/autocomplete": {
+      "get": {
+        "operationId": "get:/autocomplete",
+        "parameters": [
+          {
+            "name": "flexible",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fixed",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "description",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   },

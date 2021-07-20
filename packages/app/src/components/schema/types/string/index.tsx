@@ -3,13 +3,17 @@ import React, { useMemo } from 'react';
 import Select from '$components/select';
 import Textinput from '$components/textinput';
 import { getRegisterOptions } from '$utils/oas/v8n';
+import { useAutocomplete } from '../../hooks';
 import { Props } from '../../index';
 
 const SchemaOfTypeString: React.FC<Props> = ({
+  endpoint,
+  document,
   name,
   register,
   required,
   schema,
+  watch,
   isDeepActive,
 }) => {
   const registerOptions = useMemo<ReturnType<typeof getRegisterOptions>>(
@@ -21,6 +25,13 @@ const SchemaOfTypeString: React.FC<Props> = ({
     },
     [required, schema, isDeepActive]
   );
+  // Autocomplete.
+  const data = watch(name);
+  const {
+    isEnabled: isAutocompleteEnabled,
+    datalist: autocompleteDatalist,
+    id: autocompleteId,
+  } = useAutocomplete<string>(endpoint, document, schema, data);
 
   return (
     <>
@@ -53,16 +64,27 @@ const SchemaOfTypeString: React.FC<Props> = ({
           }}
         />
       ) : (
-        <Textinput
-          render={function (className) {
-            return (
-              <input
-                className={className}
-                {...register(name, registerOptions)}
-              />
-            );
-          }}
-        />
+        <>
+          <Textinput
+            autocompleteId={autocompleteId}
+            render={function (bind) {
+              return <input {...bind} {...register(name, registerOptions)} />;
+            }}
+          />
+          {isAutocompleteEnabled && (
+            <datalist id={autocompleteId}>
+              {autocompleteDatalist.map(function (item, idx) {
+                return (
+                  <React.Fragment key={idx}>
+                    <option value={item.value}>
+                      {item.label || item.value}
+                    </option>
+                  </React.Fragment>
+                );
+              })}
+            </datalist>
+          )}
+        </>
       )}
     </>
   );

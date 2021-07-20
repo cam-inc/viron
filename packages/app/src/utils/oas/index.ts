@@ -28,6 +28,7 @@ import {
   TableColumn,
   TableSort,
   TABLE_SORT,
+  X_Autocomplete,
   X_Table,
 } from '$types/oas';
 import { isRelativeURL } from '$utils/index';
@@ -252,6 +253,15 @@ export const mergeTablePagerRequestValue = function (
   };
   // TODO: requestBodyにも対応すること。
   return requestValue;
+};
+
+export const getAutocompleteSetting = function (
+  info: Info
+): Result<X_Autocomplete, OASError> {
+  if (!info['x-autocomplete'] || !info['x-autocomplete'].responseValueKey) {
+    return new Failure(new OASError('TODO'));
+  }
+  return new Success(info['x-autocomplete']);
 };
 
 export const getPathItem = function (

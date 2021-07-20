@@ -1,7 +1,17 @@
 import _ from 'lodash';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { Schema } from '$types/oas';
+import { Endpoint } from '$types/index';
+import { Document, Schema } from '$types/oas';
+import { promiseErrorHandler } from '$utils/index';
+import {
+  constructRequestInfo,
+  constructRequestInit,
+  constructRequestPayloads,
+  cleanupRequestValue,
+  getAutocompleteSetting,
+  getRequest,
+} from '$utils/oas';
 
 export type UseActiveReturn = {
   isActive: boolean;
@@ -126,4 +136,110 @@ export const useNameForError = function ({
     },
     [schema, name]
   );
+};
+
+export type UseAutocompleteReturn<T> = {
+  isEnabled: boolean;
+  datalist: {
+    value: T;
+    label?: string;
+  }[];
+  id: string;
+};
+export const useAutocomplete = function <T>(
+  endpoint: Endpoint,
+  document: Document,
+  schema: Schema,
+  payload: T
+): UseAutocompleteReturn<T> {
+  const [isEnabled, setIsEnabled] = useState<boolean>(
+    !!schema['x-autocomplete']
+  );
+  const [datalist, setDatalist] = useState<
+    UseAutocompleteReturn<T>['datalist']
+  >([]);
+
+  useEffect(
+    function () {
+      const autocomplete = schema['x-autocomplete'];
+      if (!autocomplete) {
+        setIsEnabled(false);
+        return;
+      }
+      const getAutocompleteSettingResult = getAutocompleteSetting(
+        document.info
+      );
+      if (getAutocompleteSettingResult.isFailure()) {
+        setIsEnabled(false);
+        return;
+      }
+      const autocompleteSetting = getAutocompleteSettingResult.value;
+      setIsEnabled(true);
+      const getRequestResult = getRequest(document, {
+        operationId: autocomplete.operationId,
+      });
+      if (getRequestResult.isFailure()) {
+        // TODO: エラー処理。
+        return;
+      }
+      const request = getRequestResult.value;
+      const requestValue = cleanupRequestValue(request, {
+        parameters: autocomplete.defaultParametersValue,
+        requestBody: autocomplete.defaultRequestBodyValue,
+      });
+      const f = async function () {
+        const requestPayloads = constructRequestPayloads(
+          request.operation,
+          requestValue
+        );
+        const requestInfo = constructRequestInfo(
+          endpoint,
+          document,
+          request,
+          requestPayloads
+        );
+        const requestInit = constructRequestInit(request, requestPayloads);
+        const [response, responseError] = await promiseErrorHandler<Response>(
+          window.fetch(requestInfo, requestInit)
+        );
+        if (responseError) {
+          // TODO: エラー処理
+          return;
+        }
+        if (!response.ok) {
+          // TODO: エラー処理
+          return;
+        }
+        const data = await response.json();
+        if (!_.isArray(data)) {
+          // TODO: エラー処理
+          return;
+        }
+        const datalist: UseAutocompleteReturn<T>['datalist'] = data.map(
+          function (item) {
+            const ret: UseAutocompleteReturn<T>['datalist'][number] = {
+              value: item[autocompleteSetting.responseValueKey] as T,
+            };
+            if (autocompleteSetting.responseLabelKey) {
+              ret.label = item[autocompleteSetting.responseLabelKey];
+            }
+            return ret;
+          }
+        );
+        setDatalist(datalist);
+      };
+      f();
+    },
+    [endpoint, document, JSON.stringify(schema), JSON.stringify(payload)]
+  );
+
+  const id = useMemo<UseAutocompleteReturn<T>['id']>(function () {
+    return `autocomplete-${Date.now().toString()}`;
+  }, []);
+
+  return {
+    isEnabled,
+    datalist,
+    id,
+  };
 };
