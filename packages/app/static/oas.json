@@ -619,8 +619,8 @@
                     "additionalProperties": false
                   },
                   "ENUM": {
-                    "type": "number",
-                    "enum": [1, 2]
+                    "type": "string",
+                    "enum": ["ONE", "TWO"]
                   },
                   "NUMBER": {
                     "type": "number"

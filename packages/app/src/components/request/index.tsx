@@ -46,7 +46,6 @@ const _Request: React.FC<Props> = ({
     function () {
       return handleSubmit(function (data) {
         execute(data);
-        console.log(data);
         onSubmit(data as RequestValue);
       });
     },
