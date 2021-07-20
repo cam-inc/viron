@@ -88,27 +88,40 @@ No more creating an administration GUI, but just **provide Viron with an OAS doc
 
 ## Who Viron is for
 
-Our target consumers are
+Our target consumers are someone who
 
-- 管理画面に工数を使いたくない人。
-- シンプルな管理画面を求めている人。
+- has a RESTfull API service.
+- seeks a simple yet powerful administration tool.
+- doesn't have time to create an administration page.
 
 ## Who Viron is NOT for
 
 Out of our target are consumers who
 
-- 複雑な管理画面を求めているひと。
+- require a complex GUI that OAS cannot describe.
+- have a GraphQL service.
 
 ## Features
 
-Some of notable featrues are:
+Some of the notable features are:
 
 ### Frontend-NoCode
 
-### Open Source Software
+You don't need to write any frontend-side codes. It is Viron that provides GUI.
+
+### Open-Source Software
+
+Viron is an open-source software which means we grant anyone for free to edit, study, distribute and contribute to it.
 
 ### Fine-Tuned User Interface
 
+Viron works on all modern browsers and offers responsive UI.
+It supports light and dark modes with color themes. Visit [here](../todo) for more detail.
+
 ### OpenAPI Specification-driven
 
+What OAS can describe is what Viron can display on a screen. Viron grows as OAS does.
+
 ### Secure
+
+You can secure your OAS document by configuring authentication rules. You can also self-host Viron GUI on any static file server.
