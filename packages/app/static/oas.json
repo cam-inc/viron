@@ -617,6 +617,10 @@
                       }
                     },
                     "additionalProperties": false
+                  },
+                  "ENUM": {
+                    "type": "string",
+                    "enum": ["AAA", "BBB"]
                   }
                 }
               }
