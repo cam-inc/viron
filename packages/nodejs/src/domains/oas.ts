@@ -68,18 +68,11 @@ export interface OasXPageContentAction {
 
 export type OasXPageContentActions = OasXPageContentAction[];
 
-export interface OasXPageContentPreview {
-  operationId: string;
-  target: string;
-  defaultParametersValue?: OasCustomParameters;
-  defaultRequestBodyValue?: OasCustomRequestBody;
-}
-
 export interface OasXPageContent {
   operationId: string;
   resourceId: string;
   type: string;
-  defaultParameterValues?: OasCustomParameters;
+  defaultParametersValue?: OasCustomParameters;
   defaultRequestBodyValues?: OasCustomRequestBody;
   pagination?: boolean;
   query?: string[];
@@ -87,7 +80,6 @@ export interface OasXPageContent {
   sort?: string[];
   autoRefreshSec?: number;
   actions?: OasXPageContentActions;
-  preview?: OasXPageContentPreview;
 }
 
 export type OasXPageContents = OasXPageContent[];
@@ -125,6 +117,7 @@ export interface OasXAutocomplete {
 }
 
 export type OasNames =
+  | 'adminaccounts'
   | 'adminroles'
   | 'adminusers'
   | 'auditlogs'
@@ -225,8 +218,8 @@ const toExpressStylePath = (path: string): string =>
 const match = (uri: string, path: string): Match =>
   matchPath(toExpressStylePath(path))(uri);
 
-// uriにヒットするとpathとpathItemをoasから取得する
-const getPathItem = (
+// uriにヒットするpathとpathItemをoasから取得する
+export const getPathItem = (
   uri: string,
   apiDefinition: VironOpenAPIObject
 ): {

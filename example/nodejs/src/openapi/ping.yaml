@@ -15,6 +15,7 @@ paths:
         - ping
       summary: ping
       description: 死活監視
+      x-skip-auditlog: true
       responses:
         200:
           description: OK

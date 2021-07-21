@@ -125,6 +125,7 @@ export type AdminUserUpdatePayload =
 const format = (adminUser: AdminUser, roleIds?: string[]): AdminUserView => {
   return Object.assign({}, adminUser, { roleIds: roleIds ?? [] });
 };
+export const formatAdminUser = format;
 
 // 一覧取得
 export const list = async (

@@ -6,6 +6,7 @@ import {
   getMongoSortOptions,
   getPagerResults,
   ListWithPager,
+  normalizeMongoFilterQuery,
 } from '../../helpers';
 import { repositoryContainer } from '..';
 
@@ -46,7 +47,11 @@ export const find = async (
   const model = getModel();
   options = options ?? {};
   options.sort = getMongoSortOptions(sort);
-  const docs = await model.find(convertConditions(conditions), null, options);
+  const docs = await model.find(
+    normalizeMongoFilterQuery(convertConditions(conditions)),
+    null,
+    options
+  );
   return docs.map((doc) => doc.toJSON());
 };
 
@@ -71,7 +76,7 @@ export const findOne = async (
   conditions: FilterQuery<domainsAdminUser.AdminUser> = {}
 ): Promise<domainsAdminUser.AdminUser | null> => {
   const model = getModel();
-  const doc = await model.findOne(conditions);
+  const doc = await model.findOne(normalizeMongoFilterQuery(conditions));
   return doc ? doc.toJSON() : null;
 };
 
@@ -79,7 +84,9 @@ export const count = async (
   conditions: FilterQueryWithUserIds = {}
 ): Promise<number> => {
   const model = getModel();
-  return await model.countDocuments(convertConditions(conditions));
+  return await model.countDocuments(
+    normalizeMongoFilterQuery(convertConditions(conditions))
+  );
 };
 
 export const createOne = async (

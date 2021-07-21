@@ -7,6 +7,7 @@ import {
   getMysqlSortOptions,
   getPagerResults,
   ListWithPager,
+  normalizeMysqlFilterQuery,
 } from '../../helpers';
 import { repositoryContainer } from '..';
 
@@ -45,7 +46,7 @@ export const find = async (
   options: FindOptions<domainsAdminUser.AdminUser> = {}
 ): Promise<domainsAdminUser.AdminUser[]> => {
   const model = getModel();
-  options.where = convertConditions(conditions);
+  options.where = normalizeMysqlFilterQuery(convertConditions(conditions));
   options.order = getMysqlSortOptions(sort);
   const docs = await model.findAll(options);
   return docs.map((doc) => doc.toJSON() as domainsAdminUser.AdminUser);
@@ -59,7 +60,7 @@ export const findWithPager = async (
 ): Promise<ListWithPager<domainsAdminUser.AdminUser>> => {
   const model = getModel();
   const options = getMysqlFindOptions(size, page);
-  options.where = convertConditions(conditions);
+  options.where = normalizeMysqlFilterQuery(convertConditions(conditions));
   options.order = getMysqlSortOptions(sort);
   const result = await model.findAndCountAll(options);
   return {
@@ -72,7 +73,9 @@ export const findOne = async (
   conditions: WhereOptions<domainsAdminUser.AdminUser> = {}
 ): Promise<domainsAdminUser.AdminUser | null> => {
   const model = getModel();
-  const doc = await model.findOne({ where: conditions });
+  const doc = await model.findOne({
+    where: normalizeMysqlFilterQuery(conditions),
+  });
   return doc ? (doc.toJSON() as domainsAdminUser.AdminUser) : null;
 };
 
@@ -80,7 +83,9 @@ export const count = async (
   conditions: WhereOptionsWithUserIds = {}
 ): Promise<number> => {
   const model = getModel();
-  return await model.count({ where: convertConditions(conditions) });
+  return await model.count({
+    where: normalizeMysqlFilterQuery(convertConditions(conditions)),
+  });
 };
 
 export const createOne = async (

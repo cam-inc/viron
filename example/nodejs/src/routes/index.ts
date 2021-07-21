@@ -8,6 +8,7 @@ import { RouteContext } from '../application';
 import { logger } from '../context';
 import { jwt } from '../security_handlers/jwt';
 
+import * as routesAdminAccounts from './adminaccounts';
 import * as routesAdminRoles from './adminroles';
 import * as routesAdminUsers from './adminusers';
 import * as routesAuditLogs from './auditlogs';
@@ -50,6 +51,11 @@ const routes: Route[] = [
   },
   { name: 'users', oasPath: oasPath('users'), handlers: routesUsers },
   {
+    name: 'adminaccounts',
+    oasPath: domainsOas.getPath('adminaccounts'),
+    handlers: routesAdminAccounts,
+  },
+  {
     name: 'adminroles',
     oasPath: domainsOas.getPath('adminroles'),
     handlers: routesAdminRoles,
@@ -86,6 +92,7 @@ export async function register(app: Express): Promise<void> {
   app.use((req, _res, next) => {
     req._context = {
       apiDefinition: apiDefinition as domainsOas.VironOpenAPIObject,
+      auth: null,
     };
     next();
   });
