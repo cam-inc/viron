@@ -643,6 +643,15 @@
                         "fixed": 123
                       }
                     }
+                  },
+                  "X-ENUM": {
+                    "type": "string",
+                    "x-enum": {
+                      "operationId": "get:/enum",
+                      "defaultParametersValue": {
+                        "fixed": "fixed"
+                      }
+                    }
                   }
                 }
               }
@@ -717,6 +726,35 @@
                         "type": "string"
                       }
                     }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/enum": {
+      "get": {
+        "operationId": "get:/enum",
+        "parameters": [
+          {
+            "name": "fixed",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "description",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
                   }
                 }
               }

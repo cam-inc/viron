@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import Select from '$components/select';
 import Textinput from '$components/textinput';
 import { getRegisterOptions } from '$utils/oas/v8n';
-import { useAutocomplete } from '../../hooks';
+import { useAutocomplete, useDynamicEnum } from '../../hooks';
 import { Props } from '../../index';
 
 const SchemaOfTypeString: React.FC<Props> = ({
@@ -33,58 +33,86 @@ const SchemaOfTypeString: React.FC<Props> = ({
     id: autocompleteId,
   } = useAutocomplete<string>(endpoint, document, schema, data);
 
+  // Dynamic Enum
+  const { isEnabled: isDynamicEnumEnabled, list: dynamicEnumList } =
+    useDynamicEnum<string>(endpoint, document, schema);
+
+  if (isDynamicEnumEnabled) {
+    return (
+      <Select<string>
+        list={dynamicEnumList}
+        Select={function ({ className, children }) {
+          return (
+            <select className={className} {...register(name, registerOptions)}>
+              {children}
+            </select>
+          );
+        }}
+        Option={function ({ className, data }) {
+          return (
+            <option className={className} value={data}>
+              {data}
+            </option>
+          );
+        }}
+        OptionBlank={function ({ className }) {
+          return (
+            <option className={className} value={undefined}>
+              ---
+            </option>
+          );
+        }}
+      />
+    );
+  }
+
+  if (schema.enum) {
+    return (
+      <Select<string>
+        list={schema.enum}
+        Select={function ({ className, children }) {
+          return (
+            <select className={className} {...register(name, registerOptions)}>
+              {children}
+            </select>
+          );
+        }}
+        Option={function ({ className, data }) {
+          return (
+            <option className={className} value={data}>
+              {data}
+            </option>
+          );
+        }}
+        OptionBlank={function ({ className }) {
+          return (
+            <option className={className} value={undefined}>
+              ---
+            </option>
+          );
+        }}
+      />
+    );
+  }
+
   return (
     <>
-      {schema.enum ? (
-        <Select<string>
-          list={schema.enum}
-          Select={function ({ className, children }) {
+      <Textinput
+        autocompleteId={autocompleteId}
+        render={function (bind) {
+          return <input {...bind} {...register(name, registerOptions)} />;
+        }}
+      />
+      {isAutocompleteEnabled && (
+        <datalist id={autocompleteId}>
+          {autocompleteDatalist.map(function (item, idx) {
             return (
-              <select
-                className={className}
-                {...register(name, registerOptions)}
-              >
-                {children}
-              </select>
+              <React.Fragment key={idx}>
+                <option value={item.value}>{item.label || item.value}</option>
+              </React.Fragment>
             );
-          }}
-          Option={function ({ className, data }) {
-            return (
-              <option className={className} value={data}>
-                {data}
-              </option>
-            );
-          }}
-          OptionBlank={function ({ className }) {
-            return (
-              <option className={className} value={undefined}>
-                ---
-              </option>
-            );
-          }}
-        />
-      ) : (
-        <>
-          <Textinput
-            autocompleteId={autocompleteId}
-            render={function (bind) {
-              return <input {...bind} {...register(name, registerOptions)} />;
-            }}
-          />
-          {isAutocompleteEnabled && (
-            <datalist id={autocompleteId}>
-              {autocompleteDatalist.map(function (item, idx) {
-                return (
-                  <React.Fragment key={idx}>
-                    <option value={item.value}>
-                      {item.label || item.value}
-                    </option>
-                  </React.Fragment>
-                );
-              })}
-            </datalist>
-          )}
-        </>
+          })}
+        </datalist>
       )}
     </>
   );

@@ -416,6 +416,12 @@ export type Schema = {
     defaultParametersValue: RequestParametersValue;
     defaultRequestBodyValue?: RequestRequestBodyValue;
   };
+  // [extended] To enable dynamic enumfunctionality.
+  'x-enum'?: {
+    operationId: OperationId;
+    defaultParametersValue: RequestParametersValue;
+    defaultRequestBodyValue?: RequestRequestBodyValue;
+  };
 };
 
 // When request bodies or response payloads may be one of a number of different schemas, a discriminator object can be used to aid in serialization, deserialization, and validation.

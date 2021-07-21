@@ -251,3 +251,76 @@ export const useAutocomplete = function <T>(
     id,
   };
 };
+
+export type UseDynamicEnumReturn<T> = {
+  isEnabled: boolean;
+  list: T[];
+};
+export const useDynamicEnum = function <T>(
+  endpoint: Endpoint,
+  document: Document,
+  schema: Schema
+): UseDynamicEnumReturn<T> {
+  const [isEnabled, setIsEnabled] = useState<boolean>(!!schema['x-enum']);
+  const [list, setList] = useState<UseDynamicEnumReturn<T>['list']>([]);
+
+  useEffect(
+    function () {
+      const dynamicEnum = schema['x-enum'];
+      if (!dynamicEnum) {
+        setIsEnabled(false);
+        return;
+      }
+      setIsEnabled(true);
+      const getRequestResult = getRequest(document, {
+        operationId: dynamicEnum.operationId,
+      });
+      if (getRequestResult.isFailure()) {
+        // TODO: エラー処理。
+        return;
+      }
+      const request = getRequestResult.value;
+      const requestValue = cleanupRequestValue(request, {
+        parameters: dynamicEnum.defaultParametersValue,
+        requestBody: dynamicEnum.defaultRequestBodyValue,
+      });
+      const f = async function () {
+        const requestPayloads = constructRequestPayloads(
+          request.operation,
+          requestValue
+        );
+        const requestInfo = constructRequestInfo(
+          endpoint,
+          document,
+          request,
+          requestPayloads
+        );
+        const requestInit = constructRequestInit(request, requestPayloads);
+        const [response, responseError] = await promiseErrorHandler<Response>(
+          window.fetch(requestInfo, requestInit)
+        );
+        if (responseError) {
+          // TODO: エラー処理
+          return;
+        }
+        if (!response.ok) {
+          // TODO: エラー処理
+          return;
+        }
+        const data = await response.json();
+        if (!_.isArray(data)) {
+          // TODO: エラー処理
+          return;
+        }
+        setList(data as T[]);
+      };
+      f();
+    },
+    [endpoint, document, JSON.stringify(schema)]
+  );
+
+  return {
+    isEnabled,
+    list,
+  };
+};
