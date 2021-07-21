@@ -102,6 +102,7 @@ export const OAS_X_AUTHCONFIG_DEFAULT_PARAMETERS =
   'x-authconfig-default-parameters';
 export const OAS_X_AUTHCONFIG_DEFAULT_REQUESTBODY =
   'x-authconfig-default-requestBody';
+export const OAS_X_SKIP_AUDITLOG = 'x-skip-auditlog';
 
 export const AUTH_TYPE = {
   EMAIL: 'email',

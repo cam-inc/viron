@@ -9,16 +9,18 @@ import {
   ExegesisPluginContext,
   HttpIncomingMessage,
 } from 'exegesis-express';
-import { domainsOas } from '@viron/lib';
+import { domainsAuth, domainsOas } from '@viron/lib';
 import { register } from './routes';
 import { middlewareI18n } from './middlewares/i18n';
 import { middlewareNotFound } from './middlewares/notfound';
 import { middlewareCors } from './middlewares/cors';
 import { middlewareAccessLog } from './middlewares/accesslog';
+import { middlewareAuditLog } from './middlewares/auditlog';
 import { ctx } from './context';
 
 interface RequestContext {
   apiDefinition: domainsOas.VironOpenAPIObject;
+  auth: domainsAuth.JwtClaims | null;
 }
 
 declare global {
@@ -66,6 +68,7 @@ export const createApplication = async (): Promise<Express> => {
   app.use(middlewareAccessLog());
   app.use(middlewareI18n());
   app.use(middlewareCors(ctx.config.cors));
+  app.use(middlewareAuditLog());
 
   // Primary app routes.
   await register(app);

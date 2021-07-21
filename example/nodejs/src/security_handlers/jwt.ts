@@ -49,6 +49,8 @@ export const jwt = async (
   const pContext = context as PluginContext;
   const token = pContext.req.cookies[COOKIE_KEY.VIRON_AUTHORIZATION];
   const claims = await domainsAuth.verifyJwt(token);
+  // exegesisのContext外でも使えるように
+  pContext.req._context.auth = claims;
 
   if (claims) {
     const userId = claims.sub;

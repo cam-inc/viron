@@ -1,5 +1,7 @@
+import { OAS_X_SKIP_AUDITLOG } from '../constants';
 import { ListWithPager } from '../helpers';
 import { FindConditions, repositoryContainer } from '../repositories';
+import { getPathItem, VironOpenAPIObject } from './oas';
 
 export interface AuditLog {
   id: string;
@@ -41,4 +43,15 @@ export const createOne = async (
 ): Promise<AuditLog> => {
   const repository = repositoryContainer.getAuditLogRepository();
   return await repository.createOne(payload);
+};
+
+// スキップ判定
+export const isSkip = (
+  uri: string,
+  method: string,
+  apiDefinition: VironOpenAPIObject
+): boolean => {
+  const { pathItem } = getPathItem(uri, apiDefinition);
+  const operation = pathItem?.[method.toLowerCase()];
+  return !!operation?.[OAS_X_SKIP_AUDITLOG];
 };

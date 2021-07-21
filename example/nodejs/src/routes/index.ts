@@ -92,6 +92,7 @@ export async function register(app: Express): Promise<void> {
   app.use((req, _res, next) => {
     req._context = {
       apiDefinition: apiDefinition as domainsOas.VironOpenAPIObject,
+      auth: null,
     };
     next();
   });

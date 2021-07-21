@@ -218,8 +218,8 @@ const toExpressStylePath = (path: string): string =>
 const match = (uri: string, path: string): Match =>
   matchPath(toExpressStylePath(path))(uri);
 
-// uriにヒットするとpathとpathItemをoasから取得する
-const getPathItem = (
+// uriにヒットするpathとpathItemをoasから取得する
+export const getPathItem = (
   uri: string,
   apiDefinition: VironOpenAPIObject
 ): {
