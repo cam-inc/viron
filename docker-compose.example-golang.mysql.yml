@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+
+  example:
+    build: 
+      context: '.'
+      dockerfile: Dockerfile.example-golang
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - 8000:8000
+    environment:
+      - MODE=mysql
+    env_file:
+      - $PWD/example/golang/.env
+    volumes:
+      - $PWD/go.mod:/viron/exlample/go.mod
+      - $PWD/go.sum:/viron/exlample/go.sum
+      - $PWD/packages/golang:/viron/example/golang
+      - $PWD/packages/golang:/viron/packages/golang
+    command: go mod tidy && go run main.go
+
+  mysql:
+    extends:
+      file: example/golang/docker-compose.mysql.yml
+      service: mysql

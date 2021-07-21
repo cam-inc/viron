@@ -1,0 +1,71 @@
+openapi: 3.0.2
+info:
+  version: 0.0.1
+  title: '@viron/lib authconfigs'
+  description: authconfigs api specifications
+
+tags:
+  - name: vironAuthConfig
+
+paths:
+  /viron/authconfigs:
+    get:
+      operationId: listVironAuthconfigs
+      tags:
+        - vironAuthConfig
+      summary: list auth configs
+      description: 認証設定を取得する
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VironAuthConfigListWithPager'
+
+components:
+  schemas:
+    VironAuthConfigListWithPager:
+      type: object
+      properties:
+        list:
+          $ref: '#/components/schemas/VironAuthConfigList'
+      required:
+        - list
+
+    VironAuthConfigList:
+      type: array
+      items:
+        $ref: '#/components/schemas/VironAuthConfig'
+
+    VironAuthConfig:
+      type: object
+      properties:
+        provider:
+          description: 認証プロバイダ
+          type: string
+          example: google
+        type:
+          description: 認証方式
+          type: string
+          enum:
+            - email
+            - oauth
+            - signout
+          example: oauth
+        pathObject:
+          description: OASのPathsObject
+          type: object
+          properties: {}
+        defaultParametersValue:
+          description: クライアントからリクエストする際のパラメータ
+          type: object
+          properties: {}
+        defaultRequestBodyValue:
+          description: クライアントからリクエストする際のリクエストボディ
+          type: object
+          properties: {}
+      required:
+        - provider
+        - type
+        - pathObject
