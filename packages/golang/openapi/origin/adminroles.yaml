@@ -1,0 +1,163 @@
+openapi: 3.0.2
+info:
+  version: 0.0.1
+  title: '@viron/lib admin roles'
+  description: admin roles api specifications
+  x-pages:
+    - id: vironAdminRoles
+      group: 管理画面/管理
+      title: Viron 管理ロール
+      description: 管理ロール一覧を閲覧できます
+      contents:
+        - operationId: listVironAdminRoles
+          resourceId: vironAdminRole
+          type: table
+
+tags:
+  - name: vironAdminRoles
+
+paths:
+  /viron/adminroles:
+    get:
+      operationId: listVironAdminRoles
+      tags:
+        - vironAdminRole
+      summary: list admin roles
+      description: 管理ロール一覧
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VironAdminRoleListWithPager'
+      security:
+        - jwt: []
+    post:
+      operationId: createVironAdminRole
+      tags:
+        - vironAdminRole
+      summary: create an admin role
+      description: 管理ロール作成
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VironAdminRoleCreatePayload'
+      responses:
+        201:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VironAdminRole'
+      security:
+        - jwt: []
+
+  /viron/adminroles/{id}:
+    put:
+      operationId: updateVironAdminRole
+      tags:
+        - vironAdminRole
+      summary: update an admin role
+      description: 管理ロール更新
+      parameters:
+        - $ref: './components.yaml#/components/parameters/VironIdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VironAdminRoleUpdatePayload'
+      responses:
+        204:
+          description: OK
+      security:
+        - jwt: []
+    delete:
+      operationId: removeVironAdminRole
+      tags:
+        - vironAdminRole
+      summary: delete an admin role
+      description: 管理ロール削除
+      parameters:
+        - $ref: './components.yaml#/components/parameters/VironIdPathParam'
+      responses:
+        204:
+          description: OK
+      security:
+        - jwt: []
+
+components:
+  schemas:
+    VironAdminRoleListWithPager:
+      allOf:
+        - $ref: './components.yaml#/components/schemas/VironPager'
+        - type: object
+          properties:
+            list:
+              $ref: '#/components/schemas/VironAdminRoleList'
+          required:
+            - list
+
+    VironAdminRoleList:
+      type: array
+      items:
+        $ref: '#/components/schemas/VironAdminRole'
+
+    VironAdminRole:
+      type: object
+      properties:
+        id:
+          description: ロールID
+          type: string
+        permissions:
+          description: 権限
+          type: array
+          items:
+            $ref: '#/components/schemas/VironAdminRolePermission'
+      required:
+        - id
+        - permissions
+
+    VironAdminRolePermission:
+      type: object
+      properties:
+        resourceId:
+          type: string
+        permission:
+          type: string
+          enum:
+            - read
+            - write
+            - deny
+      required:
+        - resourceId
+        - permission
+
+    VironAdminRoleCreatePayload:
+      type: object
+      properties:
+        id:
+          description: ロールID
+          type: string
+        permissions:
+          description: 権限
+          type: array
+          items:
+            $ref: '#/components/schemas/VironAdminRolePermission'
+      required:
+        - id
+        - permissions
+
+    VironAdminRoleUpdatePayload:
+      type: object
+      properties:
+        permissions:
+          description: 権限
+          type: array
+          items:
+            $ref: '#/components/schemas/VironAdminRolePermission'
+      required:
+        - permissions

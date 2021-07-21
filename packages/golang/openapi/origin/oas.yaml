@@ -1,0 +1,51 @@
+openapi: 3.0.2
+info:
+  version: 0.0.1
+  title: '@viron/lib oas'
+  description: oas api specifications
+  # type=tableの仕様定義
+  x-table:
+    responseListKey: list # リストデータを返すキー
+    pager:
+      requestPageKey: page # ページ番号を指定するクエリパラメータ
+      requestSizeKey: size # ページサイズを指定するクエリパラメータ
+      responseMaxpageKey: maxPage # 最大ページ数を返すキー
+      responsePageKey: currentPage # 現在のページ番号を返すキー
+    sort:
+      requestKey: sort # ソートを指定するクエリパラメータ
+  # オートコンプリートの仕様定義
+  x-autocomplete:
+    responseLabelKey: label
+    responseValueKey: value
+
+tags:
+  - name: oas
+
+paths:
+  /oas:
+    get:
+      operationId: getOas
+      tags:
+        - oas
+      summary: get oas
+      description: OpenAPI Specification の取得
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {}
+      security:
+        - jwt: []
+
+components:
+  securitySchemes:
+    jwt:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://localhost:3000/signin
+          scopes:
+            api:access: API access
