@@ -72,7 +72,7 @@ export interface OasXPageContent {
   operationId: string;
   resourceId: string;
   type: string;
-  defaultParameterValues?: OasCustomParameters;
+  defaultParametersValue?: OasCustomParameters;
   defaultRequestBodyValues?: OasCustomRequestBody;
   pagination?: boolean;
   query?: string[];
