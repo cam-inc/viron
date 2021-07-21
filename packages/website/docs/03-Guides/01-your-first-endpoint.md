@@ -16,7 +16,6 @@ Let's start by creating a simple RESTfull API server using [express](https://exp
 As long as the API server is RESTfull, it's up to you how to set up a server. The reason why we chose express is that it's famous enough to be used as an example.
 :::
 
-
 ```sh
 mkdir guide
 cd guide
@@ -25,6 +24,10 @@ npm install express --save
 ```
 
 Attach a file named `app.js` under the `guide` directory.
+
+:::warn
+TODO: httpsにすること。
+:::
 
 ```js
 // app.js
@@ -47,7 +50,7 @@ Now you are ready to launch your first RESTfull API server for Viron by executin
 node app.js
 ```
 
-Open up your favorite browser and navigate to `http:localhost:4000`.
+Open up your favorite browser and navigate to `https:localhost:4000`.
 If you see a paragraph `Hello Viron!` on the browser's screen, you are good and proceed to the next section!
 
 ## Serve an OAS Document

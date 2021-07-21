@@ -1,6 +1,10 @@
 import { lint as _lint, LintReturn } from '@viron/linter';
 import { JSONPath } from 'jsonpath-plus';
 import _ from 'lodash';
+import {
+  EnvironmentalVariable,
+  ENVIRONMENTAL_VARIABLE,
+} from '$constants/index';
 import { Failure, OASError, Result, Success } from '$errors/index';
 import { Endpoint, URL } from '$types/index';
 import {
@@ -474,6 +478,28 @@ export const parseURITemplate = function (
   });
   return template;
 };
+
+export const replaceEnvironmentalVariableOfDefaultRequestParametersValue =
+  function <T>(
+    defaultParametersValue: RequestParametersValue,
+    replaces: Partial<Record<EnvironmentalVariable, T>>
+  ): RequestParametersValue {
+    const requestParametersValue: RequestParametersValue = _.cloneDeep(
+      defaultParametersValue
+    );
+    _.forEach(replaces, function (to, environmentalVariable) {
+      if (typeof to !== 'string') {
+        return;
+      }
+      _.forEach(requestParametersValue, function (value, key) {
+        if (typeof value !== 'string') {
+          return;
+        }
+        requestParametersValue[key] = value.replace(environmentalVariable, to);
+      });
+    });
+    return requestParametersValue;
+  };
 
 export const cleanupRequestValue = function (
   request: Request,

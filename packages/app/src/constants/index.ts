@@ -18,6 +18,13 @@ export const URL = {
 } as const;
 export type Url = typeof URL[keyof typeof URL];
 
+export const ENVIRONMENTAL_VARIABLE = {
+  AUTOCOMPLETE_VALUE: '${autocompleteValue}',
+  OAUTH_REDIRECT_URI: '${oauthRedirectURL}',
+} as const;
+export type EnvironmentalVariable =
+  typeof ENVIRONMENTAL_VARIABLE[keyof typeof ENVIRONMENTAL_VARIABLE];
+
 export const STATUS_CODE = {
   CONTINUE: 100,
   SWITCHING_PROTOCOL: 101,

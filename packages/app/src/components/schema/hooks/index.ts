@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
+import { ENVIRONMENTAL_VARIABLE } from '$constants/index';
 import { Endpoint } from '$types/index';
 import { Document, Schema } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
@@ -11,6 +12,7 @@ import {
   cleanupRequestValue,
   getAutocompleteSetting,
   getRequest,
+  replaceEnvironmentalVariableOfDefaultRequestParametersValue,
 } from '$utils/oas';
 
 export type UseActiveReturn = {
@@ -184,7 +186,13 @@ export const useAutocomplete = function <T>(
       }
       const request = getRequestResult.value;
       const requestValue = cleanupRequestValue(request, {
-        parameters: autocomplete.defaultParametersValue,
+        parameters:
+          replaceEnvironmentalVariableOfDefaultRequestParametersValue<T>(
+            autocomplete.defaultParametersValue,
+            {
+              [ENVIRONMENTAL_VARIABLE.AUTOCOMPLETE_VALUE]: payload,
+            }
+          ),
         requestBody: autocomplete.defaultRequestBodyValue,
       });
       const f = async function () {
