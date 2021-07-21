@@ -384,7 +384,8 @@ export type Schema = {
     | 'ipv6'
     | 'date'
     | 'date-time'
-    | 'password';
+    | 'password'
+    | 'wyswyg';
   // The default value represents what would be assumed by the consumer of the input as the value of the schema if one is not provided. Unlike JSON Schema, the value MUST conform to the defined type for the Schema Object defined at the same level. For example, if type is string, then default can be "foo" but cannot be 1.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-6.2
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

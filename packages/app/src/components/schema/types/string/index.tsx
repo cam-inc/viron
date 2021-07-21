@@ -1,12 +1,14 @@
 import _ from 'lodash';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import Select from '$components/select';
 import Textinput from '$components/textinput';
+import Wyswyg, { Props as WyswygProps } from '$components/wyswyg';
 import { getRegisterOptions } from '$utils/oas/v8n';
 import { useAutocomplete, useDynamicEnum } from '../../hooks';
 import { Props } from '../../index';
 
 const SchemaOfTypeString: React.FC<Props> = ({
+  on,
   endpoint,
   document,
   name,
@@ -36,6 +38,18 @@ const SchemaOfTypeString: React.FC<Props> = ({
   // Dynamic Enum
   const { isEnabled: isDynamicEnumEnabled, list: dynamicEnumList } =
     useDynamicEnum<string>(endpoint, document, schema);
+
+  // format: wyswyg
+  const handleWyswygChange = useCallback<WyswygProps['onChange']>(function (
+    api,
+    block
+  ) {
+    console.log(api, block);
+    api.saver.save().then((output) => {
+      console.log('output: ', output);
+    });
+  },
+  []);
 
   if (isDynamicEnumEnabled) {
     return (
@@ -93,6 +107,10 @@ const SchemaOfTypeString: React.FC<Props> = ({
         }}
       />
     );
+  }
+
+  if (schema.format === 'wyswyg') {
+    return <Wyswyg on={on} onChange={handleWyswygChange} />;
   }
 
   return (

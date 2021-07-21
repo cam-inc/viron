@@ -652,6 +652,10 @@
                         "fixed": "fixed"
                       }
                     }
+                  },
+                  "WYSWYG": {
+                    "type": "string",
+                    "format": "wyswyg"
                   }
                 }
               }
