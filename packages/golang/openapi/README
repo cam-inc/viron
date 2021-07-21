@@ -1,0 +1,3 @@
+oapi-codegen -generate "types,skip-prune,spec" -package components -o ./packages/golang/routes/components/components.gen.go ./packages/golang/openapi/origin/components.yaml
+oapi-codegen -import-mapping ./components.yaml:github.com/cam-inc/viron/packages/golang/routes/components -generate "types,chi-server" -package oas -o ./packages/golang/routes/oas/oas.gen.go ./packages/golang/openapi/origin/oas.yaml
+oapi-codegen -import-mapping ./components.yaml:github.com/cam-inc/viron/packages/golang/routes/components -generate "types,chi-server" -package auth -o ./packages/golang/routes/auth/auth.gen.go ./packages/golang/openapi/origin/auth.yaml
