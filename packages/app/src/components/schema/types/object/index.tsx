@@ -7,6 +7,8 @@ import { useNameForError } from '../../hooks/index';
 import { Props } from '../../index';
 
 const SchemaOfTypeObject: React.FC<Props> = ({
+  endpoint,
+  document,
   on,
   name,
   schema,
@@ -75,6 +77,8 @@ const SchemaOfTypeObject: React.FC<Props> = ({
           return (
             <li key={_name}>
               <_Schema
+                endpoint={endpoint}
+                document={document}
                 on={on}
                 name={`${name}.${_name}`}
                 schema={_schema}

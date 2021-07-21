@@ -1,6 +1,10 @@
 import { lint as _lint, LintReturn } from '@viron/linter';
 import { JSONPath } from 'jsonpath-plus';
 import _ from 'lodash';
+import {
+  EnvironmentalVariable,
+  ENVIRONMENTAL_VARIABLE,
+} from '$constants/index';
 import { Failure, OASError, Result, Success } from '$errors/index';
 import { Endpoint, URL } from '$types/index';
 import {
@@ -28,6 +32,7 @@ import {
   TableColumn,
   TableSort,
   TABLE_SORT,
+  X_Autocomplete,
   X_Table,
 } from '$types/oas';
 import { isRelativeURL } from '$utils/index';
@@ -254,6 +259,15 @@ export const mergeTablePagerRequestValue = function (
   return requestValue;
 };
 
+export const getAutocompleteSetting = function (
+  info: Info
+): Result<X_Autocomplete, OASError> {
+  if (!info['x-autocomplete'] || !info['x-autocomplete'].responseValueKey) {
+    return new Failure(new OASError('TODO'));
+  }
+  return new Success(info['x-autocomplete']);
+};
+
 export const getPathItem = function (
   document: Document,
   path: string
@@ -464,6 +478,28 @@ export const parseURITemplate = function (
   });
   return template;
 };
+
+export const replaceEnvironmentalVariableOfDefaultRequestParametersValue =
+  function <T>(
+    defaultParametersValue: RequestParametersValue,
+    replaces: Partial<Record<EnvironmentalVariable, T>>
+  ): RequestParametersValue {
+    const requestParametersValue: RequestParametersValue = _.cloneDeep(
+      defaultParametersValue
+    );
+    _.forEach(replaces, function (to, environmentalVariable) {
+      if (typeof to !== 'string') {
+        return;
+      }
+      _.forEach(requestParametersValue, function (value, key) {
+        if (typeof value !== 'string') {
+          return;
+        }
+        requestParametersValue[key] = value.replace(environmentalVariable, to);
+      });
+    });
+    return requestParametersValue;
+  };
 
 export const cleanupRequestValue = function (
   request: Request,

@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { On } from '$constants/index';
-import { Schema } from '$types/oas';
+import { Endpoint } from '$types/index';
+import { Document, Schema } from '$types/oas';
 import { useActive, UseEliminateReturn } from './hooks/index';
 import Container from './parts/container';
 import SchemaOfTypeArray from './types/array';
@@ -12,6 +13,8 @@ import SchemaOfTypeString from './types/string';
 import SchemaOfTypeObject from './types/object';
 
 export type Props = {
+  endpoint: Endpoint;
+  document: Document;
   on: On;
   name: string;
   schema: Schema;
@@ -29,6 +32,8 @@ export type Props = {
   activeRef: UseEliminateReturn['ref'];
 };
 const _Schema: React.FC<Props> = ({
+  endpoint,
+  document,
   on,
   name,
   schema,
@@ -88,6 +93,8 @@ const _Schema: React.FC<Props> = ({
       required={required}
     >
       <Component
+        endpoint={endpoint}
+        document={document}
         on={on}
         name={name}
         schema={schema}

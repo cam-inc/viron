@@ -138,7 +138,7 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
         // TODO: ここにくることはないはず。
         return null;
       }
-      if (!document) {
+      if (!endpoint || !document) {
         return null;
       }
       return (
@@ -146,6 +146,7 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
           <p>{`https://localhost:8000/oauthredirect`}</p>
           <Request
             on={ON.BACKGROUND}
+            endpoint={endpoint}
             document={document}
             request={request}
             defaultValues={defaultValues}
@@ -154,7 +155,7 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
         </div>
       );
     },
-    [error, isPending, document, request, defaultValues, handleSubmit]
+    [error, isPending, endpoint, document, request, defaultValues, handleSubmit]
   );
 
   return (

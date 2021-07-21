@@ -1,5 +1,5 @@
 ---
-title: CLI Tool
+title: @viron/lib
 ---
 
 のりたまさんの@viron/libについて

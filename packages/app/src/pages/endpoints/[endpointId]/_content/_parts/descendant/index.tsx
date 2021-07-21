@@ -3,11 +3,13 @@ import Drawer, { useDrawer } from '$components/drawer';
 import RequestComponent from '$components/request';
 import { ON } from '$constants/index';
 import { BaseError } from '$errors/index';
+import { Endpoint } from '$types/index';
 import { Document, RequestValue } from '$types/oas';
 import Action from '../action';
 import { UseDescendantsReturn } from '../../_hooks/useDescendants';
 
 export type Props = {
+  endpoint: Endpoint;
   document: Document;
   descendant: UseDescendantsReturn[number];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -17,6 +19,7 @@ export type Props = {
   onOperationFail: (error: BaseError) => void;
 };
 const Descendant: React.FC<Props> = ({
+  endpoint,
   document,
   descendant,
   data,
@@ -54,6 +57,7 @@ const Descendant: React.FC<Props> = ({
       <Drawer {...drawer.bind}>
         <RequestComponent
           on={ON.SURFACE}
+          endpoint={endpoint}
           document={document}
           request={descendant.request}
           defaultValues={descendant.getDefaultValues(data)}

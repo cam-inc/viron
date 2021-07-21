@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import Error from '$components/error';
-import { ClassName } from '$types/index';
+import { ClassName, Endpoint } from '$types/index';
 import { Document, Info, TableColumn } from '$types/oas';
 import { UseBaseReturn } from '../../_hooks/useBase';
 import { UseDescendantsReturn } from '../../_hooks/useDescendants';
@@ -8,6 +8,7 @@ import NumberContent from '../../_types/_number/index';
 import TableContent from '../../_types/_table/index';
 
 type Props = {
+  endpoint: Endpoint;
   document: Document;
   content: Info['x-pages'][number]['contents'][number];
   base: UseBaseReturn;
@@ -16,6 +17,7 @@ type Props = {
   className?: ClassName;
 };
 const Body: React.FC<Props> = ({
+  endpoint,
   document,
   content,
   base,
@@ -53,6 +55,7 @@ const Body: React.FC<Props> = ({
         case 'table':
           return (
             <TableContent
+              endpoint={endpoint}
               document={document}
               content={content}
               base={base}

@@ -148,6 +148,7 @@ const OAuth: React.FC<{
       </div>
       <Request
         on={ON.SURFACE}
+        endpoint={endpoint}
         document={document}
         request={getRequestResult.value}
         onSubmit={handleSubmit}
@@ -213,6 +214,7 @@ const Email: React.FC<{
       </div>
       <Request
         on={ON.SURFACE}
+        endpoint={endpoint}
         document={document}
         request={getRequestResult.value}
         onSubmit={handleSubmit}

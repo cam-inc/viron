@@ -617,6 +617,41 @@
                       }
                     },
                     "additionalProperties": false
+                  },
+                  "ENUM": {
+                    "type": "string",
+                    "enum": ["ONE", "TWO"]
+                  },
+                  "NUMBER": {
+                    "type": "number"
+                  },
+                  "INTEGER": {
+                    "type": "integer"
+                  },
+                  "STRING": {
+                    "type": "string"
+                  },
+                  "BOOLEAN": {
+                    "type": "boolean"
+                  },
+                  "AUTOCOMPLETE": {
+                    "type": "string",
+                    "x-autocomplete": {
+                      "operationId": "get:/autocomplete",
+                      "defaultParametersValue": {
+                        "flexible": "${autocompleteValue}",
+                        "fixed": 123
+                      }
+                    }
+                  },
+                  "X-ENUM": {
+                    "type": "string",
+                    "x-enum": {
+                      "operationId": "get:/enum",
+                      "defaultParametersValue": {
+                        "fixed": "fixed"
+                      }
+                    }
                   }
                 }
               }
@@ -653,6 +688,79 @@
             "description": "sample two"
           }
         ]
+      }
+    },
+    "/autocomplete": {
+      "get": {
+        "operationId": "get:/autocomplete",
+        "parameters": [
+          {
+            "name": "flexible",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fixed",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "description",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/enum": {
+      "get": {
+        "operationId": "get:/enum",
+        "parameters": [
+          {
+            "name": "fixed",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "description",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   },

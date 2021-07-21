@@ -51,6 +51,7 @@ const _Content: React.FC<Props> = ({
       <div id={content.id}>
         <Head
           className="p-2"
+          endpoint={endpoint}
           document={document}
           content={content}
           base={base}
@@ -68,6 +69,7 @@ const _Content: React.FC<Props> = ({
           <>
             <Body
               className="p-2 border-t border-on-surface-faint"
+              endpoint={endpoint}
               document={document}
               content={content}
               base={base}

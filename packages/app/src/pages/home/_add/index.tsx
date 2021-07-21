@@ -141,31 +141,17 @@ const Add: React.FC<Props> = () => {
         <Textinput
           label="Endpoint Id"
           error={formState.errors.endpointId}
-          render={function (
-            className
-          ): React.ReactElement<JSX.IntrinsicElements['input'], 'input'> {
+          render={function (bind) {
             return (
-              <input
-                className={className}
-                defaultValue=""
-                {...register('endpointId')}
-              />
+              <input defaultValue="" {...bind} {...register('endpointId')} />
             );
           }}
         />
         <Textinput
           label="URL"
           error={formState.errors.url}
-          render={function (
-            className
-          ): React.ReactElement<JSX.IntrinsicElements['input'], 'input'> {
-            return (
-              <input
-                className={className}
-                defaultValue=""
-                {...register('url')}
-              />
-            );
+          render={function (bind) {
+            return <input defaultValue="" {...bind} {...register('url')} />;
           }}
         />
         <Button on="surface" size="xs" type="submit" label="submit" />

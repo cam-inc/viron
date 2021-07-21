@@ -69,10 +69,7 @@ export type Info = {
   // [extended] Common setting for page contents that are type of table.
   'x-table'?: X_Table;
   // [extended] Common setting for autocomplete function.
-  'x-autocomplete'?: {
-    responseLabelKey?: string;
-    responseValueKey: string;
-  };
+  'x-autocomplete'?: X_Autocomplete;
 };
 
 // [extended] Common setting for page contents that are type of table.
@@ -105,6 +102,12 @@ export type Pager = {
 };
 // e.g. '${keyA}:asc,${keyB}:desc,${keyC}:desc'
 export type Sort = string;
+
+// [extended] Common setting for autocomplete function.
+export type X_Autocomplete = {
+  responseValueKey: string;
+  responseLabelKey?: string;
+};
 
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#tag-object
 export type Tag = {
@@ -408,7 +411,17 @@ export type Schema = {
   // Default to false.
   deprecated?: boolean;
   // [extended] To enable autocomplete functionality.
-  'x-autocomplete'?: OperationId;
+  'x-autocomplete'?: {
+    operationId: OperationId;
+    defaultParametersValue: RequestParametersValue;
+    defaultRequestBodyValue?: RequestRequestBodyValue;
+  };
+  // [extended] To enable dynamic enumfunctionality.
+  'x-enum'?: {
+    operationId: OperationId;
+    defaultParametersValue: RequestParametersValue;
+    defaultRequestBodyValue?: RequestRequestBodyValue;
+  };
 };
 
 // When request bodies or response payloads may be one of a number of different schemas, a discriminator object can be used to aid in serialization, deserialization, and validation.

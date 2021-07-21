@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import Drawer, { useDrawer } from '$components/drawer';
 import Table, { Props as TableProps } from '$components/table';
 import { ON } from '$constants/index';
+import { Endpoint } from '$types/index';
 import { Document, Info, TableColumn, TABLE_SORT } from '$types/oas';
 import {
   getTableColumns,
@@ -14,6 +15,7 @@ import { UseDescendantsReturn } from '../../_hooks/useDescendants';
 import Descendant, { Props as DescendantProps } from '../../_parts/descendant';
 
 type Props = {
+  endpoint: Endpoint;
   document: Document;
   content: Info['x-pages'][number]['contents'][number];
   base: UseBaseReturn;
@@ -23,6 +25,7 @@ type Props = {
   omittedColumns: TableColumn['key'][];
 };
 const _ContentTable: React.FC<Props> = ({
+  endpoint,
   document,
   content,
   base,
@@ -69,6 +72,7 @@ const _ContentTable: React.FC<Props> = ({
             return (
               <div key={idx}>
                 <Descendant
+                  endpoint={endpoint}
                   document={document}
                   descendant={descendant}
                   data={data}
@@ -81,7 +85,13 @@ const _ContentTable: React.FC<Props> = ({
         </div>
       );
     },
-    [descendants, onDescendantOperationSuccess, onDescendantOperationFail]
+    [
+      endpoint,
+      document,
+      descendants,
+      onDescendantOperationSuccess,
+      onDescendantOperationFail,
+    ]
   );
 
   const handleRequestSortChange = useCallback<

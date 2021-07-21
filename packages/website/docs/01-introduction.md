@@ -7,7 +7,7 @@ title: Introduction
 ## What is Viron
 
 Viron is an [OpenAPI Specification](https://oai.github.io/Documentation/)-based administration web service that allows you to administrate any kinds of service you own.
-It provides you with Frontend-NoCode GUI. All you need to do is just to let Viron fetch your OpenAPI document. You don't need to consume engineers' crucial person-hours anymore for just constructing an administration web service which is not the main target you would let them work on.
+It provides you with Frontend-NoCode GUI. All you need to do is just to let Viron fetch your OpenAPI document. You don't need to consume engineers' crucial person-hours anymore for just constructing an administration web service which is not the main target you would want to let them work on.
 
 ## The Idea
 

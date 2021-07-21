@@ -5,6 +5,7 @@ import Button from '$components/button';
 import Operation from '$components/operation';
 import Schema from '$components/schema';
 import { useEliminate } from '$components/schema/hooks/index';
+import { Endpoint } from '$types/index';
 import {
   Document,
   Request,
@@ -15,6 +16,7 @@ import { pickContentType } from '$utils/oas';
 
 type Props = {
   on: On;
+  endpoint: Endpoint;
   document: Document;
   request: Request;
   defaultValues?: RequestValue;
@@ -22,6 +24,7 @@ type Props = {
 };
 const _Request: React.FC<Props> = ({
   on,
+  endpoint,
   document,
   request,
   defaultValues = {} as RequestValue,
@@ -67,6 +70,8 @@ const _Request: React.FC<Props> = ({
         {!!request.operation.parameters && (
           <div>
             <Schema
+              endpoint={endpoint}
+              document={document}
               on={on}
               name="parameters"
               schema={{
@@ -111,6 +116,8 @@ const _Request: React.FC<Props> = ({
         {!!request.operation.requestBody && (
           <div>
             <Schema
+              endpoint={endpoint}
+              document={document}
               on={on}
               name="requestBody"
               schema={

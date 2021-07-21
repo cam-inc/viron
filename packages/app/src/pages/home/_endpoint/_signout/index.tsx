@@ -116,6 +116,7 @@ const Signout: React.FC<Props> = ({
           <Drawer {...drawer.bind}>
             <Request
               on={ON.SURFACE}
+              endpoint={endpoint}
               document={document}
               request={request as TypeRequest}
               onSubmit={handleSubmit}
