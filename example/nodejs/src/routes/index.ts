@@ -8,6 +8,7 @@ import { RouteContext } from '../application';
 import { logger } from '../context';
 import { jwt } from '../security_handlers/jwt';
 
+import * as routesAdminAccounts from './adminaccounts';
 import * as routesAdminRoles from './adminroles';
 import * as routesAdminUsers from './adminusers';
 import * as routesAuditLogs from './auditlogs';
@@ -49,6 +50,11 @@ const routes: Route[] = [
     handlers: routesResources,
   },
   { name: 'users', oasPath: oasPath('users'), handlers: routesUsers },
+  {
+    name: 'adminaccounts',
+    oasPath: domainsOas.getPath('adminaccounts'),
+    handlers: routesAdminAccounts,
+  },
   {
     name: 'adminroles',
     oasPath: domainsOas.getPath('adminroles'),

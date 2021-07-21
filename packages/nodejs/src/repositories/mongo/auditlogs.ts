@@ -7,6 +7,7 @@ import {
   getMongoSortOptions,
   getPagerResults,
   ListWithPager,
+  normalizeMongoFilterQuery,
 } from '../../helpers';
 
 const getModel = (): storeDefinitions.mongo.auditLogs.AuditLogModel => {
@@ -31,7 +32,11 @@ export const find = async (
   const model = getModel();
   options = options ?? {};
   options.sort = getMongoSortOptions(sort);
-  const docs = await model.find(conditions, null, options);
+  const docs = await model.find(
+    normalizeMongoFilterQuery(conditions),
+    null,
+    options
+  );
   return docs.map((doc) => doc.toJSON());
 };
 
@@ -56,7 +61,7 @@ export const count = async (
   conditions: FilterQuery<domainsAuditLog.AuditLog> = {}
 ): Promise<number> => {
   const model = getModel();
-  return await model.countDocuments(conditions);
+  return await model.countDocuments(normalizeMongoFilterQuery(conditions));
 };
 
 export const createOne = async (

@@ -1,7 +1,11 @@
-import { QueryOptions as MongoQueryOptions } from 'mongoose';
+import {
+  QueryOptions as MongoQueryOptions,
+  FilterQuery as MongoFilterQuery,
+} from 'mongoose';
 import {
   FindOptions as MysqlFindOptions,
   Order as MysqlOrder,
+  WhereOptions as MysqlWhereOptions,
 } from 'sequelize/types';
 import {
   DEFAULT_PAGER_SIZE,
@@ -44,6 +48,21 @@ export const getMongoSortOptions = (
   return order;
 };
 
+// Mongo: フィルタクエリからundefinedを除外
+export const normalizeMongoFilterQuery = <T>(
+  query: MongoFilterQuery<T>
+): MongoFilterQuery<T> => {
+  return Object.entries(query).reduce(
+    (acc: MongoFilterQuery<T>, [key, val]) => {
+      if (val !== undefined) {
+        Object.assign(acc, { [key]: val });
+      }
+      return acc;
+    },
+    {}
+  );
+};
+
 // Mysql: クエリ用のオプションを生成
 export const getMysqlFindOptions = (
   size: number = DEFAULT_PAGER_PAGE,
@@ -66,4 +85,19 @@ export const getMysqlSortOptions = (
     const [key, value] = parseSort(str);
     return [key, value.toUpperCase()];
   });
+};
+
+// Mysql: フィルタクエリからundefinedを除外
+export const normalizeMysqlFilterQuery = <T>(
+  query: MysqlWhereOptions<T>
+): MysqlWhereOptions<T> => {
+  return Object.entries(query).reduce(
+    (acc: MysqlWhereOptions<T>, [key, val]) => {
+      if (val !== undefined) {
+        Object.assign(acc, { [key]: val });
+      }
+      return acc;
+    },
+    {}
+  );
 };

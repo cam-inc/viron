@@ -4,6 +4,7 @@ import {
   getMysqlSortOptions,
   getPagerResults,
   ListWithPager,
+  normalizeMysqlFilterQuery,
 } from '@viron/lib';
 import { ctx } from '../../context';
 import {
@@ -28,7 +29,7 @@ export const find = async (
   options: FindOptions<Purchase> = {}
 ): Promise<Purchase[]> => {
   const model = getModel();
-  options.where = conditions;
+  options.where = normalizeMysqlFilterQuery(conditions);
   options.order = getMysqlSortOptions(sort);
   const docs = await model.findAll(options);
   return docs.map((doc) => doc.toJSON() as Purchase);
@@ -42,7 +43,7 @@ export const findWithPager = async (
 ): Promise<ListWithPager<Purchase>> => {
   const model = getModel();
   const options = getMysqlFindOptions(size, page);
-  options.where = conditions;
+  options.where = normalizeMysqlFilterQuery(conditions);
   options.order = getMysqlSortOptions(sort);
   const result = await model.findAndCountAll(options);
   return {
@@ -55,7 +56,9 @@ export const findOne = async (
   conditions: WhereOptions<Purchase> = {}
 ): Promise<Purchase | null> => {
   const model = getModel();
-  const doc = await model.findOne({ where: conditions });
+  const doc = await model.findOne({
+    where: normalizeMysqlFilterQuery(conditions),
+  });
   return doc ? (doc.toJSON() as Purchase) : null;
 };
 
@@ -63,7 +66,7 @@ export const count = async (
   conditions: WhereOptions<Purchase> = {}
 ): Promise<number> => {
   const model = getModel();
-  return await model.count({ where: conditions });
+  return await model.count({ where: normalizeMysqlFilterQuery(conditions) });
 };
 
 export const createOne = async (

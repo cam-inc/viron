@@ -68,13 +68,6 @@ export interface OasXPageContentAction {
 
 export type OasXPageContentActions = OasXPageContentAction[];
 
-export interface OasXPageContentPreview {
-  operationId: string;
-  target: string;
-  defaultParametersValue?: OasCustomParameters;
-  defaultRequestBodyValue?: OasCustomRequestBody;
-}
-
 export interface OasXPageContent {
   operationId: string;
   resourceId: string;
@@ -87,7 +80,6 @@ export interface OasXPageContent {
   sort?: string[];
   autoRefreshSec?: number;
   actions?: OasXPageContentActions;
-  preview?: OasXPageContentPreview;
 }
 
 export type OasXPageContents = OasXPageContent[];
@@ -125,6 +117,7 @@ export interface OasXAutocomplete {
 }
 
 export type OasNames =
+  | 'adminaccounts'
   | 'adminroles'
   | 'adminusers'
   | 'auditlogs'

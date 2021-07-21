@@ -1,3 +1,4 @@
+export * as domainsAdminAccount from './adminaccount';
 export * as domainsAdminRole from './adminrole';
 export * as domainsAdminUser from './adminuser';
 export * as domainsAuditLog from './auditlog';

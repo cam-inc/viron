@@ -8,6 +8,7 @@ import {
   getMysqlSortOptions,
   getPagerResults,
   ListWithPager,
+  normalizeMysqlFilterQuery,
 } from '../../helpers';
 
 const getModel = (): storeDefinitions.mysql.auditLogs.AuditLogModelCtor => {
@@ -30,7 +31,7 @@ export const find = async (
   options: FindOptions<domainsAuditLog.AuditLog> = {}
 ): Promise<domainsAuditLog.AuditLog[]> => {
   const model = getModel();
-  options.where = conditions;
+  options.where = normalizeMysqlFilterQuery(conditions);
   options.order = getMysqlSortOptions(sort);
   const docs = await model.findAll(options);
   return docs.map((doc) => doc.toJSON() as domainsAuditLog.AuditLog);
@@ -44,7 +45,7 @@ export const findWithPager = async (
 ): Promise<ListWithPager<domainsAuditLog.AuditLog>> => {
   const model = getModel();
   const options = getMysqlFindOptions(size, page);
-  options.where = conditions;
+  options.where = normalizeMysqlFilterQuery(conditions);
   options.order = getMysqlSortOptions(sort);
   const result = await model.findAndCountAll(options);
   return {
@@ -57,7 +58,7 @@ export const count = async (
   conditions: WhereOptions<domainsAuditLog.AuditLog> = {}
 ): Promise<number> => {
   const model = getModel();
-  return await model.count({ where: conditions });
+  return await model.count({ where: normalizeMysqlFilterQuery(conditions) });
 };
 
 export const createOne = async (

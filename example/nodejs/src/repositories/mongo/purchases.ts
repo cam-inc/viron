@@ -4,6 +4,7 @@ import {
   getPagerResults,
   getMongoQueryOptions,
   getMongoSortOptions,
+  normalizeMongoFilterQuery,
 } from '@viron/lib';
 import {
   Purchase,
@@ -30,7 +31,11 @@ export const find = async (
   const model = getModel();
   options = options ?? {};
   options.sort = getMongoSortOptions(sort);
-  const docs = await model.find(conditions, null, options);
+  const docs = await model.find(
+    normalizeMongoFilterQuery(conditions),
+    null,
+    options
+  );
   return docs.map((doc) => doc.toJSON());
 };
 
@@ -55,7 +60,7 @@ export const findOne = async (
   conditions: FilterQuery<Purchase> = {}
 ): Promise<Purchase | null> => {
   const model = getModel();
-  const doc = await model.findOne(conditions);
+  const doc = await model.findOne(normalizeMongoFilterQuery(conditions));
   return doc ? doc.toJSON() : null;
 };
 
@@ -63,7 +68,7 @@ export const count = async (
   conditions: FilterQuery<Purchase> = {}
 ): Promise<number> => {
   const model = getModel();
-  return await model.countDocuments(conditions);
+  return await model.countDocuments(normalizeMongoFilterQuery(conditions));
 };
 
 export const createOne = async (

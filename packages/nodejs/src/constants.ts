@@ -134,3 +134,5 @@ export const THEME = {
 export type Theme = typeof THEME[keyof typeof THEME];
 
 export const TABLE_SORT_DELIMITER = ':';
+
+export const ADMIN_USER_ID_ME = 'me';

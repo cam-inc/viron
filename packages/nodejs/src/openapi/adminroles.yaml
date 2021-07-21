@@ -126,6 +126,7 @@ components:
       properties:
         resourceId:
           type: string
+          # TODO: autocomplete
         permission:
           type: string
           enum:
