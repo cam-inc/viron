@@ -13,14 +13,16 @@ type Server struct {
 
 // Run server run
 func (s *Server) Run() error {
-	return http.ListenAndServe(fmt.Sprintf("%s:%d", s.Host, s.Port), s.handler)
+	addr := fmt.Sprintf("%s:%d", s.Host, s.Port)
+	fmt.Printf("Addr -> %s", addr)
+	return http.ListenAndServe(addr, s.handler)
 }
 
 // New start
-func New(hander http.Handler, host string, port int) *Server {
+func New(handler http.Handler, host string, port int) *Server {
 
 	s := &Server{
-		handler: hander,
+		handler: handler,
 		Host: host,
 		Port: port,
 	}
