@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
 
-  example:
+  example_golang:
     build: 
       context: '.'
       dockerfile: Dockerfile.example-golang
@@ -16,11 +16,14 @@ services:
     env_file:
       - $PWD/example/golang/.env
     volumes:
-      - $PWD/go.mod:/viron/exlample/go.mod
-      - $PWD/go.sum:/viron/exlample/go.sum
-      - $PWD/packages/golang:/viron/example/golang
+      - $PWD/example/golang/go.mod:/viron/example/go.mod
+      - $PWD/example/golang/go.sum:/viron/example/go.sum
+      - $PWD/example/golang:/viron/example/golang
+      - $PWD/packages/golang/go.mod:/viron/packages/go.mod
+      - $PWD/packages/golang/go.sum:/viron/packages/go.sum
       - $PWD/packages/golang:/viron/packages/golang
-    command: go mod tidy && go run main.go
+    command: bash -c "go mod tidy && go run /viron/example/golang/cmd/main.go"
+
 
   mysql:
     extends:

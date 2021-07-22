@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/viron/packages/golang/example/golang/pkg/server"
-	"github.com/viron/packages/golang/example/golang/routes"
 	"os"
 	"strconv"
+
+	"github.com/viron/example/golang/pkg/constant"
+	"github.com/viron/example/golang/pkg/server"
+	"github.com/viron/example/golang/routes"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/automaxprocs/maxprocs"
@@ -13,7 +15,7 @@ import (
 
 type (
 	options struct {
-		env string
+		env  string
 		host string
 		port int
 	}
@@ -28,17 +30,14 @@ func main() {
 	c := &cobra.Command{}
 	o := &options{}
 
-	fmt.Println("REGISTER_COMMAND")
 	registerCommand(c)
 	c.RunE = func(c *cobra.Command, args []string) error {
 		return run(o)
 	}
 	// コマンドライン変数を受け取る
 	c.Flags().StringVarP(&o.env, "env", "e", "dev", "environment")
-	o.host = os.Getenv("HOST")
-	o.port, _  = strconv.Atoi(os.Getenv("PORT"))
-
-	fmt.Println("EXECUTE")
+	o.host = os.Getenv(constant.SERVICE_HOST)
+	o.port, _ = strconv.Atoi(os.Getenv(constant.SERVICE_PORT))
 
 	if err := c.Execute(); err != nil {
 		fmt.Print(err)
