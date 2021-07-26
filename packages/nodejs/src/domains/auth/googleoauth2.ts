@@ -1,7 +1,11 @@
 import { google, Auth } from 'googleapis';
 import { v4 as uuidv4 } from 'uuid';
 import { signJwt } from '.';
-import { AUTH_TYPE, GOOGLE_OAUTH2_DEFAULT_SCOPES } from '../../constants';
+import {
+  ADMIN_ROLE,
+  AUTH_TYPE,
+  GOOGLE_OAUTH2_DEFAULT_SCOPES,
+} from '../../constants';
 import {
   forbidden,
   googleOAuth2Unavailable,
@@ -9,7 +13,8 @@ import {
   signinFailed,
 } from '../../errors';
 import { getDebug } from '../../logging';
-import { findOneByEmail, updateOneById } from '../adminuser';
+import { createOne, findOneByEmail, updateOneById } from '../adminuser';
+import { addRoleForUser } from '../adminrole';
 import { createFirstAdminUser } from './common';
 
 const debug = getDebug('domains:auth:googleoauth2');
@@ -154,10 +159,13 @@ export const signinGoogleOAuth2 = async (
       { email, ...credentials },
       AUTH_TYPE.GOOGLE
     );
-    if (!firstAdminUser) {
-      throw signinFailed();
+    if (firstAdminUser) {
+      adminUser = firstAdminUser;
+    } else {
+      // 初回ログイン時ユーザー作成
+      adminUser = await createOne({ email, ...credentials }, AUTH_TYPE.GOOGLE);
+      await addRoleForUser(adminUser.id, ADMIN_ROLE.VIEWER);
     }
-    adminUser = firstAdminUser;
   }
   if (adminUser.authType !== AUTH_TYPE.GOOGLE) {
     throw signinFailed();

@@ -17,6 +17,7 @@ export const signinEmail = async (
       AUTH_TYPE.EMAIL
     );
     if (!firstAdminUser) {
+      // 他に管理者がいる場合は発行してもらう必要がある
       throw signinFailed();
     }
     adminUser = firstAdminUser;

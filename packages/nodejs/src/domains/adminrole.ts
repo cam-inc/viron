@@ -309,9 +309,8 @@ export const createViewer = async (
   apiDefinitions: VironOpenAPIObject
 ): Promise<boolean> => {
   const policies = await listPolicies(ADMIN_ROLE.VIEWER);
-  const resourceIds = listResourcesByOas(apiDefinitions);
-  if (policies.length === resourceIds.length) {
-    // 更新するものがないので何もしない
+  if (policies.length) {
+    // すでにviewerがある場合は何もしない
     return false;
   }
 
@@ -322,6 +321,7 @@ export const createViewer = async (
     },
     {}
   );
+  const resourceIds = listResourcesByOas(apiDefinitions);
   const permissions = resourceIds.map((resourceId: string) => {
     return {
       resourceId,

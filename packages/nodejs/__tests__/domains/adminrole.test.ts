@@ -474,22 +474,7 @@ describe('domains/adminrole', () => {
       assert.strictEqual(actual[1].permission, PERMISSION.READ);
     });
 
-    it('Add read policy for added resouce', async () => {
-      // 先に1件入れておく(newsがあとで追加されたように見せる)
-      await casbin.addPolicy(ADMIN_ROLE.VIEWER, 'blog', PERMISSION.DENY);
-
-      const result = await createViewer(oas);
-      assert.strictEqual(result, true);
-      const actual = await listPolicies(ADMIN_ROLE.VIEWER);
-      assert.strictEqual(actual.length, 2);
-      assert.strictEqual(actual[0].resourceId, 'blog');
-      assert.strictEqual(actual[0].permission, PERMISSION.DENY);
-      assert.strictEqual(actual[1].resourceId, 'news');
-      assert.strictEqual(actual[1].permission, PERMISSION.READ);
-    });
-
     it('Failed to create viewer role when already exists.', async () => {
-      // 先に入れておく(追加されたリソースがないように見せる)
       await casbin.addPolicy(ADMIN_ROLE.VIEWER, 'blog', PERMISSION.DENY);
       await casbin.addPolicy(ADMIN_ROLE.VIEWER, 'news', PERMISSION.DENY);
 
