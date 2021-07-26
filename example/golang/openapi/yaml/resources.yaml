@@ -1,0 +1,52 @@
+openapi: 3.0.2
+info:
+  version: 0.0.1
+  title: '@viron/example-nodejs resources'
+  description: resources api specifications
+
+tags:
+  - name: resource
+
+paths:
+  /resources/{resourceName}/downloads:
+    get:
+      operationId: downloadResources
+      tags:
+        - resource
+      summary: download resources
+      description: データダウンロード
+      parameters:
+        - $ref: '#/components/parameters/ResourceNamePathParam'
+        - $ref: '#/components/parameters/FormatQueryParam'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+            text/csv:
+              schema:
+                type: string
+      security:
+        - jwt: []
+
+components:
+  parameters:
+    ResourceNamePathParam:
+      name: resourceName
+      in: path
+      schema:
+        type: string
+      required: true
+
+    FormatQueryParam:
+      name: format
+      in: query
+      schema:
+        type: string
+        enum:
+          - json
+          - csv
+        default: json
+      required: false
