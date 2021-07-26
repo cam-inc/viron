@@ -3,9 +3,10 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
 
+	"github.com/cam-inc/viron/example/golang/pkg/constant"
 	"github.com/go-sql-driver/mysql"
-	"github.com/viron/example/golang/pkg/constant"
 )
 
 type (
@@ -93,23 +94,13 @@ func (m *MySQL) ToDriverConfig() *mysql.Config {
 
 func New() *Config {
 
+	mysqlPort, _ := strconv.Atoi(os.Getenv(constant.MYSQL_PORT))
 	// TODO: yaml -> statik で環境別設定
 	return &Config{
 		StoreMySQL: &MySQL{
-			/**
-			  dialect: 'mysql',
-			  database: 'viron_example',
-			  username: 'root',
-			  password: 'password',
-			  host: 'mysql',
-			  port: 3306,
-			  ssl: false,
-			  protocol: 'tcp',
-			  logging: true,
-			*/
 			Dialect:              "mysql",
-			Host:                 "viron.example.golang",
-			Port:                 3306,
+			Host:                 os.Getenv(constant.MYSQL_HOST),
+			Port:                 mysqlPort,
 			Net:                  "tcp",
 			User:                 os.Getenv(constant.MYSQL_USER),
 			Password:             os.Getenv(constant.MYSQL_PASSWORD),
