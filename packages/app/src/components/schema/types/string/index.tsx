@@ -157,6 +157,9 @@ const SchemaOfTypeString: React.FC<Props> = ({
           if (schema.format === 'email') {
             return 'email';
           }
+          if (schema.format === 'password') {
+            return 'password';
+          }
           return 'text';
         })()}
         autocompleteId={autocompleteId}

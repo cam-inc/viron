@@ -660,6 +660,10 @@
                   "EMAIL": {
                     "type": "string",
                     "format": "email"
+                  },
+                  "PASSWORD": {
+                    "type": "string",
+                    "format": "password"
                   }
                 }
               }
