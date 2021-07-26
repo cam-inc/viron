@@ -89,6 +89,23 @@ paths:
       security:
         - jwt: []
 
+  /viron/resource_ids:
+    get:
+      operationId: listVironResourceIds
+      tags:
+        - vironAdminRole
+      summary: list admin resource ids
+      description: リソースID一覧(enum用)
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VironResourceIdList'
+      security:
+        - jwt: []
+
 components:
   schemas:
     VironAdminRoleListWithPager:
@@ -126,7 +143,8 @@ components:
       properties:
         resourceId:
           type: string
-          # TODO: autocomplete
+          x-enum:
+            operationId: listVironAdminRoleIds
         permission:
           type: string
           enum:
@@ -162,3 +180,8 @@ components:
             $ref: '#/components/schemas/VironAdminRolePermission'
       required:
         - permissions
+
+    VironResourceIdList:
+      type: array
+      items:
+        type: string

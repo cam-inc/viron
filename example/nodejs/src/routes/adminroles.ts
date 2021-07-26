@@ -37,3 +37,13 @@ export const removeVironAdminRole = async (
   await domainsAdminRole.removeOneById(context.params.path.id);
   context.res.status(204).end();
 };
+
+// リソース一覧(enum用)
+export const listVironResourceIds = async (
+  context: RouteContext
+): Promise<void> => {
+  const resouceIds = domainsAdminRole.listResourcesByOas(
+    context.req._context.apiDefinition
+  );
+  context.res.json(resouceIds);
+};
