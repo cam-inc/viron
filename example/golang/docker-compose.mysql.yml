@@ -9,7 +9,7 @@ services:
     depends_on:
       - mysql
     ports:
-      - 8000:8000
+      - 3000:3000
     environment:
       - MODE=mysql
     env_file:

@@ -52,7 +52,8 @@ func run(o *options) error {
 
 	fmt.Println("RUN")
 
-	return s.Run()
+	//return s.Run()
+	return s.RunSSL()
 }
 
 func registerCommand(registry *cobra.Command) {
