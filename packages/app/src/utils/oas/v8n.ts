@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { RegisterOptions, Validate } from 'react-hook-form';
 import { Schema } from '$types/oas';
+import { email } from '$utils/v8n';
 
 export const getRegisterOptions = function ({
   required,
@@ -473,6 +474,73 @@ export const getValidateFormat = function (
   format: NonNullable<Schema['format']>,
   type: Schema['type']
 ): Validate<any> {
+  if (type === 'string') {
+    if (format === 'wyswyg') {
+      return function (data: string) {
+        const _data = JSON.parse(data) as Record<string, any>;
+        // @see: https://editorjs.io/saving-data#output-data-format
+        if (
+          _.isUndefined(_data.time) ||
+          _.isUndefined(_data.blocks) ||
+          _.isUndefined(_data.version)
+        ) {
+          return 'Should be of Editor.js output data format.';
+        }
+        return true;
+      };
+    }
+    if (format === 'email') {
+      return function (data: string) {
+        if (!email.isValidSync(data)) {
+          return `Should be an e-mail string.`;
+        }
+        return true;
+      };
+    }
+    if (format === 'hostname') {
+      return function (data: string) {
+        // @see: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00#section-7.3.3
+        // @see: https://datatracker.ietf.org/doc/html/rfc1034#section-3.1
+        if (
+          !new RegExp(
+            '^[a-zd]([a-zd-]{0,61}[a-zd])?(.[a-zd]([a-zd-]{0,61}[a-zd])?)*$',
+            'i'
+          ).test(data)
+        ) {
+          return `Should be a hostname string.`;
+        }
+        if (255 < data.length) {
+          return `Should be a hostname string.`;
+        }
+        return true;
+      };
+    }
+    if (format === 'ipv4') {
+      return function (data: string) {
+        if (
+          !new RegExp(
+            '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?).){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
+          ).test(data)
+        ) {
+          return `Should be a IP v4 string.`;
+        }
+        return true;
+      };
+    }
+    if (format === 'ipv6') {
+      return function (data: string) {
+        if (
+          !new RegExp(
+            '(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]).){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]).){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))'
+          ).test(data)
+        ) {
+          return `Should be a IP v6string.`;
+        }
+        return true;
+      };
+    }
+  }
+
   return function (data) {
     // TODO
     return true;

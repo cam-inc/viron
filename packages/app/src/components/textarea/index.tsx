@@ -3,37 +3,22 @@ import { FieldError } from 'react-hook-form';
 import { ClassName } from '$types/index';
 
 type Bind = {
-  type: React.InputHTMLAttributes<HTMLInputElement>['type'];
   className: ClassName;
-  list?: string;
 };
 type Props = {
-  type?: React.InputHTMLAttributes<HTMLInputElement>['type'];
   label?: string;
   description?: string;
   error?: FieldError;
-  autocompleteId?: string;
   render: (
     bind: Bind
-  ) => React.ReactElement<JSX.IntrinsicElements['input'], 'input'>;
+  ) => React.ReactElement<JSX.IntrinsicElements['textarea'], 'textarea'>;
 };
 
-const Textinput: React.FC<Props> = ({
-  type = 'text',
-  label,
-  description,
-  error,
-  autocompleteId,
-  render,
-}) => {
+const Textarea: React.FC<Props> = ({ label, description, error, render }) => {
   const bind: Bind = {
-    type,
     className:
       'p-1 bg-background text-on-background border border-on-background-faint rounded focus:bg-surface focus:text-on-surface focus:outline-none focus:ring-2 focus:ring-on-surface',
   };
-  if (autocompleteId) {
-    bind.list = autocompleteId;
-  }
   return (
     <div>
       {!!label && <div className="text-xs font-bold">{label}</div>}
@@ -43,4 +28,4 @@ const Textinput: React.FC<Props> = ({
     </div>
   );
 };
-export default Textinput;
+export default Textarea;

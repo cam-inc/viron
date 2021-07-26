@@ -38,9 +38,6 @@ const SchemaOfTypeArray: React.FC<Props> = ({
 
       const errorMessages: ReturnType<Validate<any[]>>[] = [];
       const registerOptions = getRegisterOptions({ required, schema });
-      if (!required && _.isUndefined(data)) {
-        return;
-      }
       _.forEach(
         registerOptions.validate as Record<string, Validate<any[]>>,
         function (v) {

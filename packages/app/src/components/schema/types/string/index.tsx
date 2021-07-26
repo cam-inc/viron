@@ -1,12 +1,16 @@
 import _ from 'lodash';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import { Validate } from 'react-hook-form';
 import Select from '$components/select';
+import Textarea from '$components/textarea';
 import Textinput from '$components/textinput';
+import Wyswyg, { Props as WyswygProps } from '$components/wyswyg';
 import { getRegisterOptions } from '$utils/oas/v8n';
-import { useAutocomplete, useDynamicEnum } from '../../hooks';
+import { useAutocomplete, useDynamicEnum, useNameForError } from '../../hooks';
 import { Props } from '../../index';
 
 const SchemaOfTypeString: React.FC<Props> = ({
+  on,
   endpoint,
   document,
   name,
@@ -15,7 +19,11 @@ const SchemaOfTypeString: React.FC<Props> = ({
   schema,
   watch,
   isDeepActive,
+  setValue,
+  setError,
+  clearErrors,
 }) => {
+  const nameForError = useNameForError({ schema, name });
   const registerOptions = useMemo<ReturnType<typeof getRegisterOptions>>(
     function () {
       if (!isDeepActive) {
@@ -23,7 +31,7 @@ const SchemaOfTypeString: React.FC<Props> = ({
       }
       return getRegisterOptions({ required, schema });
     },
-    [required, schema, isDeepActive]
+    [required, JSON.stringify(schema), isDeepActive]
   );
   // Autocomplete.
   const data = watch(name);
@@ -36,6 +44,50 @@ const SchemaOfTypeString: React.FC<Props> = ({
   // Dynamic Enum
   const { isEnabled: isDynamicEnumEnabled, list: dynamicEnumList } =
     useDynamicEnum<string>(endpoint, document, schema);
+
+  // format: wyswyg
+  const handleWyswygChange = useCallback<WyswygProps['onChange']>(
+    function (api, block) {
+      const f = async function () {
+        const data = await api.saver.save();
+        const _data = JSON.stringify(data);
+        setValue(name, _data);
+
+        if (!isDeepActive) {
+          clearErrors(nameForError);
+          return;
+        }
+        const errorMessages: ReturnType<Validate<string>>[] = [];
+        _.forEach(
+          registerOptions.validate as Record<string, Validate<string>>,
+          function (v) {
+            const result = v(_data);
+            if (result !== true) {
+              errorMessages.push(result);
+            }
+          }
+        );
+        if (errorMessages.length) {
+          setError(nameForError, {
+            type: 'manual',
+            message: errorMessages[0] as string,
+          });
+        } else {
+          clearErrors(nameForError);
+        }
+      };
+      f();
+    },
+    [
+      required,
+      isDeepActive,
+      setValue,
+      setError,
+      clearErrors,
+      nameForError,
+      registerOptions,
+    ]
+  );
 
   if (isDynamicEnumEnabled) {
     return (
@@ -95,9 +147,32 @@ const SchemaOfTypeString: React.FC<Props> = ({
     );
   }
 
+  if (schema.format === 'wyswyg') {
+    return <Wyswyg on={on} onChange={handleWyswygChange} />;
+  }
+
+  if (schema.format === 'multiline') {
+    return (
+      <Textarea
+        render={function (bind) {
+          return <textarea {...bind} {...register(name, registerOptions)} />;
+        }}
+      />
+    );
+  }
+
   return (
     <>
       <Textinput
+        type={(function () {
+          if (schema.format === 'email') {
+            return 'email';
+          }
+          if (schema.format === 'password') {
+            return 'password';
+          }
+          return 'text';
+        })()}
         autocompleteId={autocompleteId}
         render={function (bind) {
           return <input {...bind} {...register(name, registerOptions)} />;
