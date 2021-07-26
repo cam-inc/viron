@@ -42,12 +42,14 @@ const Wyswyg: React.FC<Props> = ({
     setEditor(editor);
   }, []);
 
+  // Dynamically change some Editor.js properties.
   useEffect(
     function () {
       if (!editor) {
         return;
       }
       editor.isReady.then(function () {
+        // Force update the onChange callback even though Editor.js doesn't expose the property configuration as public one.
         // @ts-ignore
         editor.configuration.onChange = onChange;
       });
