@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/viron/packages/golang/repositories"
+	"github.com/cam-inc/viron/packages/golang/repositories"
 )
 
 type revokedTokensPersistence struct {
