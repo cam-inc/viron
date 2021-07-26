@@ -35,9 +35,6 @@ const SchemaOfTypeObject: React.FC<Props> = ({
       }
       const errorMessages: ReturnType<Validate<Record<string, any>>>[] = [];
       const registerOptions = getRegisterOptions({ required, schema });
-      if (!required && _.isUndefined(data)) {
-        return;
-      }
       _.forEach(
         registerOptions.validate as Record<
           string,

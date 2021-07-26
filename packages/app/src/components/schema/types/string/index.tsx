@@ -1,10 +1,11 @@
 import _ from 'lodash';
 import React, { useCallback, useMemo } from 'react';
+import { Validate } from 'react-hook-form';
 import Select from '$components/select';
 import Textinput from '$components/textinput';
 import Wyswyg, { Props as WyswygProps } from '$components/wyswyg';
 import { getRegisterOptions } from '$utils/oas/v8n';
-import { useAutocomplete, useDynamicEnum } from '../../hooks';
+import { useAutocomplete, useDynamicEnum, useNameForError } from '../../hooks';
 import { Props } from '../../index';
 
 const SchemaOfTypeString: React.FC<Props> = ({
@@ -17,7 +18,11 @@ const SchemaOfTypeString: React.FC<Props> = ({
   schema,
   watch,
   isDeepActive,
+  setValue,
+  setError,
+  clearErrors,
 }) => {
+  const nameForError = useNameForError({ schema, name });
   const registerOptions = useMemo<ReturnType<typeof getRegisterOptions>>(
     function () {
       if (!isDeepActive) {
@@ -25,7 +30,7 @@ const SchemaOfTypeString: React.FC<Props> = ({
       }
       return getRegisterOptions({ required, schema });
     },
-    [required, schema, isDeepActive]
+    [required, JSON.stringify(schema), isDeepActive]
   );
   // Autocomplete.
   const data = watch(name);
@@ -40,16 +45,48 @@ const SchemaOfTypeString: React.FC<Props> = ({
     useDynamicEnum<string>(endpoint, document, schema);
 
   // format: wyswyg
-  const handleWyswygChange = useCallback<WyswygProps['onChange']>(function (
-    api,
-    block
-  ) {
-    console.log(api, block);
-    api.saver.save().then((output) => {
-      console.log('output: ', output);
-    });
-  },
-  []);
+  const handleWyswygChange = useCallback<WyswygProps['onChange']>(
+    function (api, block) {
+      const f = async function () {
+        const data = await api.saver.save();
+        const _data = JSON.stringify(data);
+        setValue(name, _data);
+
+        if (!isDeepActive) {
+          clearErrors(nameForError);
+          return;
+        }
+        const errorMessages: ReturnType<Validate<string>>[] = [];
+        _.forEach(
+          registerOptions.validate as Record<string, Validate<string>>,
+          function (v) {
+            const result = v(_data);
+            if (result !== true) {
+              errorMessages.push(result);
+            }
+          }
+        );
+        if (errorMessages.length) {
+          setError(nameForError, {
+            type: 'manual',
+            message: errorMessages[0] as string,
+          });
+        } else {
+          clearErrors(nameForError);
+        }
+      };
+      f();
+    },
+    [
+      required,
+      isDeepActive,
+      setValue,
+      setError,
+      clearErrors,
+      nameForError,
+      registerOptions,
+    ]
+  );
 
   if (isDynamicEnumEnabled) {
     return (

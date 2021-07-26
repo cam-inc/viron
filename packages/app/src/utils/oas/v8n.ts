@@ -473,6 +473,11 @@ export const getValidateFormat = function (
   format: NonNullable<Schema['format']>,
   type: Schema['type']
 ): Validate<any> {
+  if (format === 'wyswyg') {
+    return function (data) {
+      return true;
+    };
+  }
   return function (data) {
     // TODO
     return true;

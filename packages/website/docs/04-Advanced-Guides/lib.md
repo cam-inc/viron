@@ -1,5 +1,5 @@
 ---
-title: @viron/lib
+title: viron/lib
 ---
 
 のりたまさんの@viron/libについて
