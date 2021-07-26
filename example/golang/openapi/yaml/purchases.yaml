@@ -1,0 +1,248 @@
+openapi: 3.0.2
+info:
+  version: 0.0.1
+  title: '@viron/example-nodejs purchases'
+  description: purchases api specifications
+  x-pages:
+    - id: purchase
+      group: 管理画面/ユーザー
+      title: 購買情報
+      description: 購買情報を閲覧/管理します
+      contents:
+        - operationId: listPurchases
+          resourceId: purchase
+          type: table
+          pagination: true
+
+tags:
+  - name: purchase
+
+paths:
+  /purchases:
+    get:
+      operationId: listPurchases
+      tags:
+        - purchase
+      summary: list purchases
+      description: 購買情報一覧
+      parameters:
+        - $ref: './components.yaml#/components/parameters/PagerSizeQueryParam'
+        - $ref: './components.yaml#/components/parameters/PagerPageQueryParam'
+        - $ref: './components.yaml#/components/parameters/SortQueryParam'
+        - $ref: '#/components/parameters/PurchaseIdQueryParam'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseListWithPager'
+      security:
+        - jwt: []
+
+    post:
+      operationId: createPurchase
+      tags:
+        - purchase
+      summary: create purchase
+      description: 購買情報作成
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseCreatePayload'
+      responses:
+        201:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Purchase'
+      security:
+        - jwt: []
+
+  /purchases/{purchaseId}:
+    put:
+      operationId: updatePurchase
+      tags:
+        - purchase
+      summary: update purchase
+      description: 購買情報更新
+      parameters:
+        - $ref: '#/components/parameters/PurchaseIdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseUpdatePayload'
+      responses:
+        204:
+          description: OK
+      security:
+        - jwt: []
+
+    delete:
+      operationId: removePurchase
+      tags:
+        - purchase
+      summary: remove purchase
+      description: 購買情報削除
+      parameters:
+        - $ref: '#/components/parameters/PurchaseIdPathParam'
+      responses:
+        204:
+          description: OK
+      security:
+        - jwt: []
+
+  /users/{userId}/purchases:
+    get:
+      operationId: listUserPurchases
+      tags:
+        - purchase
+      description: ユーザーの購買情報一覧
+      parameters:
+        - $ref: './users.yaml#/components/parameters/UserIdPathParam'
+        - $ref: './components.yaml#/components/parameters/PagerSizeQueryParam'
+        - $ref: './components.yaml#/components/parameters/PagerPageQueryParam'
+        - $ref: './components.yaml#/components/parameters/SortQueryParam'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseListWithPager'
+      security:
+        - jwt: []
+
+  /users/{userId}/purchases/{purchaseId}:
+    get:
+      operationId: getUserPurchase
+      tags:
+        - purchase
+      description: ユーザーの購買情報1件取得
+      parameters:
+        - $ref: './users.yaml#/components/parameters/UserIdPathParam'
+        - $ref: '#/components/parameters/PurchaseIdPathParam'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Purchase'
+      security:
+        - jwt: []
+
+components:
+  parameters:
+    PurchaseIdPathParam:
+      name: purchaseId
+      in: path
+      schema:
+        type: string
+      required: true
+
+    PurchaseIdQueryParam:
+      name: purchaseId
+      in: query
+      schema:
+        type: string
+      required: false
+
+  schemas:
+    PurchaseListWithPager:
+      allOf:
+        - $ref: './components.yaml#/components/schemas/Pager'
+        - type: object
+          properties:
+            list:
+              $ref: '#/components/schemas/PurchaseList'
+          required:
+            - list
+
+    PurchaseList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Purchase'
+
+    Purchase:
+      type: object
+      properties:
+        id:
+          description: ID
+          type: string
+        userId:
+          description: ユーザーID
+          type: string
+        itemId:
+          description: アイテムID
+          type: string
+        amount:
+          description: 購入数
+          type: integer
+          format: int32
+        unitPrice:
+          description: 単価
+          type: integer
+          format: int32
+        createdAt:
+          description: 作成日時
+          type: string
+          format: date-time
+        updatedAt:
+          description: 更新日時
+          type: string
+          format: date-time
+      required:
+        - id
+        - userId
+        - itemId
+        - amount
+        - unitPrice
+
+    PurchaseCreatePayload:
+      type: object
+      properties:
+        userId:
+          description: ユーザーID
+          type: string
+          # x-autocomplete: {}
+        itemId:
+          description: アイテムID
+          type: string
+        amount:
+          description: 購入数
+          type: integer
+          format: int32
+        unitPrice:
+          description: 単価
+          type: integer
+          format: int32
+      required:
+        - userId
+        - itemId
+        - amount
+        - unitPrice
+
+    PurchaseUpdatePayload:
+      type: object
+      properties:
+        itemId:
+          description: アイテムID
+          type: string
+        amount:
+          description: 購入数
+          type: integer
+          format: int32
+        unitPrice:
+          description: 単価
+          type: integer
+          format: int32
+      required:
+        - itemId
+        - amount
+        - unitPrice
