@@ -7,7 +7,7 @@ title: Introduction
 ## What is Viron
 
 Viron is an [OpenAPI Specification](https://oai.github.io/Documentation/)-based administration web service that allows you to administrate any kinds of service you own.
-It provides you with Frontend-NoCode GUI. All you need to do is just to let Viron fetch your OpenAPI document. You don't need to consume engineers' crucial person-hours anymore for just constructing an administration web service which is not the main target you would want to let them work on.
+It provides you with Frontend-NoCode GUI. All you need to do is just to let Viron fetch your OpenAPI document. You do not need to waste engineers' crucial time on constructing an administration web service, which is not their main focus.
 
 ## The Idea
 
@@ -86,17 +86,13 @@ At this point, Viron can **construct a GUI** whose function is to do the task ab
 
 No more creating an administration GUI, but just **provide Viron with an OAS document** that defines your service so that **Viron provides you with a GUI** that is all dedicated to your service.
 
-## Who Viron is for
-
-Our target consumers are someone who
+## Viron is for Consumers who
 
 - has a RESTfull API service.
 - seeks a simple yet powerful administration tool.
 - doesn't have time to create an administration page.
 
-## Who Viron is NOT for
-
-Out of our target are consumers who
+## Viron is NOT for Consumers who
 
 - require a complex GUI that OAS cannot describe.
 - have a GraphQL service.
@@ -111,12 +107,12 @@ You don't need to write any frontend-side codes. It is Viron that provides GUI.
 
 ### Open-Source Software
 
-Viron is an open-source software which means we grant anyone for free to edit, study, distribute and contribute to it.
+Viron is an open-source software that grants anyone to edit, study, distribute and contribute to it for free.
 
 ### Fine-Tuned User Interface
 
 Viron works on all modern browsers and offers responsive UI.
-It supports light and dark modes with color themes. Visit [here](../todo) for more detail.
+It supports light and dark modes with color themes. Visit [here](../todo) for more information.
 
 ### OpenAPI Specification-driven
 
