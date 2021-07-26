@@ -668,6 +668,18 @@
                   "MULTILINE": {
                     "type": "string",
                     "format": "multiline"
+                  },
+                  "HOSTNAME": {
+                    "type": "string",
+                    "format": "hostname"
+                  },
+                  "IPV4": {
+                    "type": "string",
+                    "format": "ipv4"
+                  },
+                  "IPV6": {
+                    "type": "string",
+                    "format": "ipv6"
                   }
                 }
               }

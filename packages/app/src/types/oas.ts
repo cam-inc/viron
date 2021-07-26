@@ -377,7 +377,6 @@ export type Schema = {
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-7.3
   // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#dataTypeFormat
   format?:
-    | 'date-time'
     | 'email'
     | 'hostname'
     | 'ipv4'
