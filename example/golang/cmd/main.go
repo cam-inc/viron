@@ -5,9 +5,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/viron/example/golang/pkg/constant"
-	"github.com/viron/example/golang/pkg/server"
-	"github.com/viron/example/golang/routes"
+	"github.com/cam-inc/viron/example/golang/pkg/constant"
+	"github.com/cam-inc/viron/example/golang/pkg/server"
+	"github.com/cam-inc/viron/example/golang/routes"
 
 	"github.com/spf13/cobra"
 	"go.uber.org/automaxprocs/maxprocs"
@@ -49,6 +49,8 @@ func main() {
 func run(o *options) error {
 
 	s := server.New(routes.New(), o.host, o.port)
+
+	fmt.Println("RUN")
 
 	return s.Run()
 }

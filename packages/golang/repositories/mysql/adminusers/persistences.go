@@ -10,9 +10,9 @@ import (
 
 	"github.com/volatiletech/sqlboiler/v4/boil"
 
-	models "github.com/viron/packages/golang/repositories/mysql/gen"
+	models "github.com/cam-inc/viron/packages/golang/repositories/mysql/gen"
 
-	"github.com/viron/packages/golang/repositories"
+	"github.com/cam-inc/viron/packages/golang/repositories"
 )
 
 type adminUsersPersistence struct {

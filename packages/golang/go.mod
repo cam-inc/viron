@@ -1,4 +1,4 @@
-module github.com/viron/packages/golang
+module github.com/cam-inc/viron/packages/golang
 
 go 1.16
 
