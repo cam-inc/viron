@@ -2,6 +2,7 @@ import _ from 'lodash';
 import React, { useCallback, useMemo } from 'react';
 import { Validate } from 'react-hook-form';
 import Select from '$components/select';
+import Textarea from '$components/textarea';
 import Textinput from '$components/textinput';
 import Wyswyg, { Props as WyswygProps } from '$components/wyswyg';
 import { getRegisterOptions } from '$utils/oas/v8n';
@@ -148,6 +149,16 @@ const SchemaOfTypeString: React.FC<Props> = ({
 
   if (schema.format === 'wyswyg') {
     return <Wyswyg on={on} onChange={handleWyswygChange} />;
+  }
+
+  if (schema.format === 'multiline') {
+    return (
+      <Textarea
+        render={function (bind) {
+          return <textarea {...bind} {...register(name, registerOptions)} />;
+        }}
+      />
+    );
   }
 
   return (

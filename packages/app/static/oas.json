@@ -664,6 +664,10 @@
                   "PASSWORD": {
                     "type": "string",
                     "format": "password"
+                  },
+                  "MULTILINE": {
+                    "type": "string",
+                    "format": "multiline"
                   }
                 }
               }
