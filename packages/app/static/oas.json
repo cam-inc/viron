@@ -656,6 +656,10 @@
                   "WYSWYG": {
                     "type": "string",
                     "format": "wyswyg"
+                  },
+                  "EMAIL": {
+                    "type": "string",
+                    "format": "email"
                   }
                 }
               }

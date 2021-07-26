@@ -3,10 +3,12 @@ import { FieldError } from 'react-hook-form';
 import { ClassName } from '$types/index';
 
 type Bind = {
+  type: React.InputHTMLAttributes<HTMLInputElement>['type'];
   className: ClassName;
   list?: string;
 };
 type Props = {
+  type?: React.InputHTMLAttributes<HTMLInputElement>['type'];
   label?: string;
   description?: string;
   error?: FieldError;
@@ -17,6 +19,7 @@ type Props = {
 };
 
 const Textinput: React.FC<Props> = ({
+  type = 'text',
   label,
   description,
   error,
@@ -24,6 +27,7 @@ const Textinput: React.FC<Props> = ({
   render,
 }) => {
   const bind: Bind = {
+    type,
     className:
       'p-1 bg-background text-on-background border border-on-background-faint rounded focus:bg-surface focus:text-on-surface focus:outline-none focus:ring-2 focus:ring-on-surface',
   };

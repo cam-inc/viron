@@ -153,6 +153,12 @@ const SchemaOfTypeString: React.FC<Props> = ({
   return (
     <>
       <Textinput
+        type={(function () {
+          if (schema.format === 'email') {
+            return 'email';
+          }
+          return 'text';
+        })()}
         autocompleteId={autocompleteId}
         render={function (bind) {
           return <input {...bind} {...register(name, registerOptions)} />;

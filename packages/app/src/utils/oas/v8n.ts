@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { RegisterOptions, Validate } from 'react-hook-form';
 import { Schema } from '$types/oas';
+import { email } from '$utils/v8n';
 
 export const getRegisterOptions = function ({
   required,
@@ -473,11 +474,31 @@ export const getValidateFormat = function (
   format: NonNullable<Schema['format']>,
   type: Schema['type']
 ): Validate<any> {
-  if (format === 'wyswyg') {
-    return function (data) {
-      return true;
-    };
+  if (type === 'string') {
+    if (format === 'wyswyg') {
+      return function (data) {
+        const _data = JSON.parse(data) as Record<string, any>;
+        // @see: https://editorjs.io/saving-data#output-data-format
+        if (
+          _.isUndefined(_data.time) ||
+          _.isUndefined(_data.blocks) ||
+          _.isUndefined(_data.version)
+        ) {
+          return 'Should be of Editor.js output data format.';
+        }
+        return true;
+      };
+    }
+    if (format === 'email') {
+      return function (data) {
+        if (!email.isValidSync(data)) {
+          return `Should be an e-mail string.`;
+        }
+        return true;
+      };
+    }
   }
+
   return function (data) {
     // TODO
     return true;
