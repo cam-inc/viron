@@ -8,10 +8,11 @@ require (
 	github.com/friendsofgo/errors v0.9.2
 	github.com/getkin/kin-openapi v0.66.0
 	github.com/go-chi/chi/v5 v5.0.3
+	github.com/go-chi/jwtauth v1.2.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/kat-co/vala v0.0.0-20170210184112-42e1d8b61f12
-	github.com/pkg/errors v0.9.1 // indirect
+	github.com/lestrrat-go/jwx v1.1.0
 	github.com/spf13/viper v1.8.1
 	github.com/volatiletech/null v8.0.0+incompatible // indirect
 	github.com/volatiletech/null/v8 v8.1.2
