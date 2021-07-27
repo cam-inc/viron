@@ -20,7 +20,7 @@ func (s *Server) Run() error {
 	return http.ListenAndServe(addr, s.handler)
 }
 
-func (s *Server) RunSSL() error {
+func (s *Server) RunTLS() error {
 	fmt.Println("INNER RUN")
 	addr := fmt.Sprintf(":%d", s.Port)
 	//addr := fmt.Sprintf("%s:%d", s.Host, s.Port)
