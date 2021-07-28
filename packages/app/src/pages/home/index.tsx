@@ -53,18 +53,18 @@ const HomePage: React.FC<Props> = () => {
   const renderBody = useCallback<LayoutProps['renderBody']>(
     function ({ className }) {
       return (
-        <div className={classnames('p-2', className)}>
+        <div className={classnames('p-2 grid grid-cols-1 gap-2', className)}>
           {endpointList.map(function (endpoint) {
             return (
-              <div key={endpoint.id} className="mb-2 last:mb-0">
-                <Paper elevation={0} shadowElevation={0}>
+              <div key={endpoint.id}>
+                <Paper className="h-full" elevation={0} shadowElevation={0}>
                   <Endpoint endpoint={endpoint} onRemove={handleRemove} />
                 </Paper>
               </div>
             );
           })}
-          <div className="mb-2 last:mb-0">
-            <Paper elevation={0} shadowElevation={0}>
+          <div>
+            <Paper className="h-full" elevation={0} shadowElevation={0}>
               <Add />
             </Paper>
           </div>
@@ -76,7 +76,7 @@ const HomePage: React.FC<Props> = () => {
 
   return (
     <>
-      <Metadata title="home | Viron" />
+      <Metadata title="Home" />
       <Layout
         renderAppBar={renderAppBar}
         renderNavigation={renderNavigation}

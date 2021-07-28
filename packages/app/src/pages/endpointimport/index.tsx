@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import Error from '$components/error';
 import Metadata from '$components/metadata';
-import { StatusCode } from '$constants/index';
+import { ON, StatusCode } from '$constants/index';
 import { BaseError, getHTTPError, NetworkError, OASError } from '$errors/index';
 import useTheme from '$hooks/theme';
 import Layout, { Props as LayoutProps } from '$layouts/index';
@@ -163,7 +163,7 @@ const EndpointImportPagge: React.FC<Props> = ({ location }) => {
         );
       }
       if (error) {
-        return <Error error={error} />;
+        return <Error on={ON.BACKGROUND} error={error} />;
       }
       // TODO: 自動でnavigateするのでこれが表示されることはないはず。
       return <div>TODO: import完了</div>;

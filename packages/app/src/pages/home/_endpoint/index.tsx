@@ -1,4 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { BiInfoCircle } from '@react-icons/all-files/bi/BiInfoCircle';
+import React, { useCallback, useEffect, useState } from 'react';
+import Button from '$components/button';
+import Error from '$components/error';
+import { ON, STATUS_CODE } from '$constants/index';
+import { BaseError, HTTPUnexpectedError, NetworkError } from '$errors/index';
 import { Endpoint } from '$types/index';
 import { promiseErrorHandler } from '$utils/index';
 import Enter from './_enter';
@@ -15,6 +20,15 @@ export type Props = {
 const _Endpoint: React.FC<Props> = ({ endpoint, onRemove }) => {
   const [isPending, setIsPending] = useState<boolean>(true);
   const [isSigninRequired, setIsSigninRequired] = useState<boolean>(false);
+  const [error, setError] = useState<BaseError | null>(null);
+  const [isOpened, setIsOpened] = useState<boolean>(true);
+
+  const handleOpenerClick = useCallback(
+    function () {
+      setIsOpened(!isOpened);
+    },
+    [isOpened]
+  );
 
   useEffect(
     function () {
@@ -32,38 +46,30 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove }) => {
           })
         );
         if (!!responseError) {
-          throw new Error(responseError.message);
+          const error = new NetworkError(responseError.message);
+          setError(error);
+          return;
         }
         if (response.ok) {
           setIsSigninRequired(false);
           setIsPending(false);
           return;
         }
-        if (response.status === 401 || response.status === 403) {
+        if (
+          response.status === STATUS_CODE.UNAUTHORIZED ||
+          response.status === STATUS_CODE.FORBIDDEN
+        ) {
           setIsSigninRequired(true);
           setIsPending(false);
           return;
         }
-        // TODO: show error.
+        const error = new HTTPUnexpectedError();
+        setError(error);
         return;
       };
       f();
     },
-    [endpoint, setIsSigninRequired, setIsPending]
-  );
-
-  const enter = useMemo<JSX.Element>(
-    function () {
-      return <Enter endpoint={endpoint} isSigninRequired={isSigninRequired} />;
-    },
-    [endpoint, isSigninRequired]
-  );
-
-  const signin = useMemo<JSX.Element>(
-    function () {
-      return <Signin endpoint={endpoint} isSigninRequired={isSigninRequired} />;
-    },
-    [endpoint, isSigninRequired]
+    [endpoint]
   );
 
   const handleSignout = useCallback(
@@ -72,18 +78,10 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove }) => {
     },
     [setIsSigninRequired]
   );
-  const signout = useMemo<JSX.Element>(
-    function () {
-      return (
-        <Signout
-          endpoint={endpoint}
-          isSigninRequired={isSigninRequired}
-          onSignout={handleSignout}
-        />
-      );
-    },
-    [endpoint, isSigninRequired, handleSignout]
-  );
+
+  if (error) {
+    return <Error on={ON.SURFACE} error={error} />;
+  }
 
   if (isPending) {
     return (
@@ -95,36 +93,44 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove }) => {
 
   return (
     <div className="p-2">
-      <div className="pb-2 flex items-center">
-        <div className="flex-none mr-2">
+      <div className="flex items-center gap-2">
+        <div className="flex-none">
           <Thumbnail className="" endpoint={endpoint} />
         </div>
-        <div className="flex-1 min-w-0 mr-2">
+        <div className="flex-1 min-w-0">
           <div className="text-on-surface-low text-xxs">{endpoint.id}</div>
-          <div className="text-on-surface-high">
+          <div className="text-on-surface-high text-xs">
             {endpoint.document?.info.title || '---'}
           </div>
-          <div className="text-on-surface-low text-xs">{endpoint.url}</div>
         </div>
         <div className="flex-none">
-          <div className="flex items-center">
-            <div className="mr-2 last:mr-0">
-              <QRCode endpoint={endpoint} />
-            </div>
-            <div className="mr-2 last:mr-0">
-              <Remove endpoint={endpoint} onRemove={onRemove} />
-            </div>
-            <div className="mr-2 last:mr-0">{enter}</div>
-            <div className="mr-2 last:mr-0">{signin}</div>
-            <div className="mr-2 last:mr-0">{signout}</div>
+          <div className="flex items-center gap-2">
+            <Button
+              on={ON.SURFACE}
+              variant="text"
+              Icon={BiInfoCircle}
+              onClick={handleOpenerClick}
+            />
+            <QRCode endpoint={endpoint} />
+            <Remove endpoint={endpoint} onRemove={onRemove} />
+            <Enter endpoint={endpoint} isSigninRequired={isSigninRequired} />
+            <Signin endpoint={endpoint} isSigninRequired={isSigninRequired} />
+            <Signout
+              endpoint={endpoint}
+              isSigninRequired={isSigninRequired}
+              onSignout={handleSignout}
+            />
           </div>
         </div>
       </div>
-      <div className="pt-2 border-t border-on-surface-faint">
-        <div className="text-xxs">
-          {endpoint.document?.info.description || '---'}
+      {isOpened && (
+        <div className="mt-2 pt-2 border-t border-on-surface-faint">
+          <div className="text-on-surface-low text-xxs">{endpoint.url}</div>
+          <div className="text-xxs">
+            {endpoint.document?.info.description || '---'}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

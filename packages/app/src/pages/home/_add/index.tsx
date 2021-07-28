@@ -5,14 +5,22 @@ import { useRecoilState } from 'recoil';
 import * as yup from 'yup';
 import Button from '$components/button';
 import Textinput from '$components/textinput';
+import { ON, STATUS_CODE } from '$constants/index';
+import { HTTPUnexpectedError } from '$errors/index';
 import { listState as endpointListState } from '$store/atoms/endpoint';
-import { AuthConfig, Endpoint, EndpointID, URL as TypeURL } from '$types/index';
+import {
+  AuthConfig,
+  ClassName,
+  Endpoint,
+  EndpointID,
+  URL as TypeURL,
+} from '$types/index';
 import { promiseErrorHandler } from '$utils/index';
 import { lint, resolve } from '$utils/oas';
 import { endpointId, url } from '$utils/v8n';
 
 type Props = {
-  className?: string;
+  className?: ClassName;
 };
 type FormData = {
   endpointId: EndpointID;
@@ -52,7 +60,7 @@ const Add: React.FC<Props> = () => {
           mode: 'cors',
         })
       );
-      if (!!responseError) {
+      if (responseError) {
         // Network error.
         setError('url', {
           type: 'manual',
@@ -91,11 +99,14 @@ const Add: React.FC<Props> = () => {
 
       // The OAS document requires authentication.
       // The endpoint exists and it's not open to public.
-      if (!response.ok && response.status === 401) {
+      if (!response.ok && response.status === STATUS_CODE.UNAUTHORIZED) {
         const authconfigsPath = response.headers.get('x-viron-authtypes-path');
         // TODO: 値のundefinedチェックに加えて、値の妥当性もチェックすること。
         if (!authconfigsPath) {
-          // TODO: エラー表示。Viron仕様上、'x-viron-authtypes-path'レスポンスヘッダーは必須。
+          setError('url', {
+            type: 'manual',
+            message: 'The x-viron-authtypes-path response header is missing.',
+          });
           return;
         }
         const [authconfigsResponse, authconfigsResponseError] =
@@ -106,7 +117,12 @@ const Add: React.FC<Props> = () => {
           );
         if (!!authconfigsResponseError) {
           // Network error.
-          // TODO: show error.
+          setError('url', {
+            type: 'manual',
+            message: `Couldn't establish a connection to ${
+              new URL(data.url).origin
+            }${authconfigsPath}.`,
+          });
           return;
         }
         // TODO: GET /authconfigsのレスポンスをフラットなAuthConfig[]に変更したい。
@@ -129,7 +145,11 @@ const Add: React.FC<Props> = () => {
 
       // Something went wrong.
       // response.ok is false and response.status is other than 401.
-      // TODO: show error.
+      const error = new HTTPUnexpectedError();
+      setError('url', {
+        type: 'manual',
+        message: error.message,
+      });
       return;
     },
     [endpointList, setEndpointList, reset, setError]
@@ -139,6 +159,7 @@ const Add: React.FC<Props> = () => {
     <div className="p-2">
       <form onSubmit={handleSubmit(addEndpoint)}>
         <Textinput
+          className="mb-2 last:mb-0"
           label="Endpoint Id"
           error={formState.errors.endpointId}
           render={function (bind) {
@@ -148,13 +169,14 @@ const Add: React.FC<Props> = () => {
           }}
         />
         <Textinput
+          className="mb-2 last:mb-0"
           label="URL"
           error={formState.errors.url}
           render={function (bind) {
             return <input defaultValue="" {...bind} {...register('url')} />;
           }}
         />
-        <Button on="surface" size="xs" type="submit" label="submit" />
+        <Button on={ON.SURFACE} size="xs" type="submit" label="Add" />
       </form>
     </div>
   );

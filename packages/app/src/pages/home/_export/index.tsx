@@ -3,10 +3,10 @@ import React from 'react';
 import { useRecoilState } from 'recoil';
 import Button from '$components/button';
 import { listState as endpointListState } from '$store/atoms/endpoint';
-import { EndpointForDistribution } from '$types/index';
+import { ClassName, EndpointForDistribution } from '$types/index';
 
 type Props = {
-  className?: string;
+  className?: ClassName;
 };
 const Export: React.FC<Props> = ({ className = '' }) => {
   const [endpointList] = useRecoilState(endpointListState);

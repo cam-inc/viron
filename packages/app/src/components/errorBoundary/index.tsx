@@ -1,5 +1,6 @@
 import React from 'react';
 import Error from '$components/error';
+import { On } from '$constants/index';
 import { BaseError } from '$errors/index';
 
 type FallbackProps = {
@@ -9,6 +10,7 @@ type FallbackProps = {
 
 type Props = React.PropsWithRef<
   React.PropsWithChildren<{
+    on: On;
     fallback?: React.ReactElement<
       unknown,
       string | React.FunctionComponent | typeof React.Component
@@ -89,7 +91,7 @@ class ErrorBoundary extends React.Component<Props, State> {
       return this.props.children;
     }
 
-    const { fallback, fallbackRender, FallbackComponent } = this.props;
+    const { on, fallback, fallbackRender, FallbackComponent } = this.props;
     const props: FallbackProps = {
       error,
       resetErrorBoundary: this.resetErrorBoundary,
@@ -104,7 +106,7 @@ class ErrorBoundary extends React.Component<Props, State> {
       return <FallbackComponent {...props} />;
     }
 
-    return <Error error={error} />;
+    return <Error on={on} error={error} />;
   }
 }
 

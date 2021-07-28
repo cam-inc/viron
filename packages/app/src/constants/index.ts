@@ -7,8 +7,8 @@ export const ON = {
 export type On = typeof ON[keyof typeof ON];
 
 export const URL = {
-  DOCUMENTATION: 'https://viron.app/TODO/documentation/',
-  BLOG: 'https://viron.app/TODO/blog/',
+  DOCUMENTATION: 'https://discovery.viron.app/docs/',
+  BLOG: 'https://discovery.viron.app/blog/',
   RELEASE_NOTES: 'https://viron.app/TODO/release_notes/',
   HELP: 'https://viron.app/TODO/help/',
   TERMS_OF_USE: 'https://viron.app/TODO/terms/',

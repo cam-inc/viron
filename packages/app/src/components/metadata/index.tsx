@@ -97,7 +97,7 @@ const Metadata: React.FC<Props> = ({
     const ret: Partial<_Metadata> = {};
     // title
     if (title) {
-      ret.title = `${siteMetadata.title} | ${title}`;
+      ret.title = `${title} | ${siteMetadata.title}`;
     } else {
       ret.title = `${siteMetadata.title}`;
     }

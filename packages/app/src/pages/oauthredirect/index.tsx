@@ -132,7 +132,7 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
         );
       }
       if (error) {
-        return <Error error={error} />;
+        return <Error on={ON.BACKGROUND} error={error} />;
       }
       if (!request || !defaultValues) {
         // TODO: ここにくることはないはず。

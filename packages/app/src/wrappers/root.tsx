@@ -8,6 +8,7 @@ import resolveConfig from 'tailwindcss/resolveConfig';
 import { TailwindConfig } from 'tailwindcss/tailwind-config';
 import ErrorBoundary from '$components/errorBoundary';
 import Logo from '$components/logo';
+import { ON } from '$constants/index';
 import '$i18n/index';
 import { isLaunchedState, screenState, themeState } from '$store/atoms/app';
 import '$styles/global.css';
@@ -30,7 +31,7 @@ const RootWrapper: React.FC<Props> = (props) => {
       <React.StrictMode>
         <HelmetProvider>
           <RecoilRoot>
-            <ErrorBoundary>
+            <ErrorBoundary on={ON.BACKGROUND}>
               {/* Need to wrap a component to encapsulate all state related processes inside the RecoilRoot component.*/}
               <Root {...props} />
             </ErrorBoundary>

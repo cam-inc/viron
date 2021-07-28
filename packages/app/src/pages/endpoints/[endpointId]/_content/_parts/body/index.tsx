@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import Error from '$components/error';
+import { ON } from '$constants/index';
 import { ClassName, Endpoint } from '$types/index';
 import { Document, Info, TableColumn } from '$types/oas';
 import { UseBaseReturn } from '../../_hooks/useBase';
@@ -45,7 +46,7 @@ const Body: React.FC<Props> = ({
         return <div>TODO: pending...</div>;
       }
       if (base.error) {
-        return <Error error={base.error} />;
+        return <Error on={ON.SURFACE} error={base.error} />;
       }
       switch (content.type) {
         case 'number':

@@ -34,6 +34,7 @@ export const CODE = {
   BASE: '#base',
   NETWORK: '#network',
   HTTP: '#http',
+  FILE_READER: '#fileReader',
   OAS: '#oas',
 } as const;
 export type Code = typeof CODE[keyof typeof CODE];
@@ -42,6 +43,7 @@ export const NAME = {
   BASE: 'base',
   NETWORK: 'network',
   HTTP: 'http',
+  FILE_READER: 'fileReader',
   OAS: 'oas',
 } as const;
 export type Name = typeof NAME[keyof typeof NAME];
@@ -71,6 +73,15 @@ export class HTTP401Error extends HTTPError {
 
 export class HTTP403Error extends HTTPError {
   message = 'TODO';
+}
+
+export class HTTPUnexpectedError extends HTTPError {
+  message = 'TODO';
+}
+
+export class FileReaderError extends BaseError {
+  code: Code = CODE.FILE_READER;
+  name: Name = NAME.FILE_READER;
 }
 
 export class OASError extends BaseError {

@@ -135,7 +135,7 @@ const OAuth: React.FC<{
   );
 
   if (getRequestResult.isFailure()) {
-    return <Error error={getRequestResult.value} />;
+    return <Error on={ON.SURFACE} error={getRequestResult.value} />;
   }
 
   return (
@@ -203,7 +203,7 @@ const Email: React.FC<{
   );
 
   if (getRequestResult.isFailure()) {
-    return <Error error={getRequestResult.value} />;
+    return <Error on={ON.SURFACE} error={getRequestResult.value} />;
   }
 
   return (

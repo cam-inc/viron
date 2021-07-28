@@ -2,10 +2,11 @@ import classnames from 'classnames';
 import { Link as GatsbyLink, GatsbyLinkProps } from 'gatsby';
 import React from 'react';
 import { ON, On } from '$constants/index';
+import { ClassName } from '$types/index';
 
 type Props = {
   on: On;
-  className?: string;
+  className?: ClassName;
 } & Pick<GatsbyLinkProps<Record<string, string>>, 'to'>;
 const Link: React.FC<Props> = ({ on, className = '', to, children }) => {
   const _className = classnames('focus:outline-none focus:ring-2', className, {

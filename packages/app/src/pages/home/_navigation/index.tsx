@@ -7,9 +7,10 @@ import NavigationLinks from '$components/navigation/links';
 import NavigationServices from '$components/navigation/services';
 import { ON } from '$constants/index';
 import { Props as LayoutProps } from '$layouts/index';
+import { ClassName } from '$types/index';
 
 type Props = {
-  className?: string;
+  className?: ClassName;
 } & Parameters<NonNullable<LayoutProps['renderNavigation']>>[0];
 const _Navigation: React.FC<Props> = ({ className = '' }) => {
   const renderHead = useCallback<NonNullable<NavigationProps['renderHead']>>(
@@ -48,6 +49,7 @@ const _Navigation: React.FC<Props> = ({ className = '' }) => {
 
   return (
     <Navigation
+      on={ON.SURFACE}
       className={classnames(className, 'h-full')}
       renderHead={renderHead}
       renderTail={renderTail}
