@@ -23,7 +23,7 @@ func (a *auditLogsPersistence) Count(ctx context.Context, conditions repositorie
 	panic("implement me")
 }
 
-func (a *auditLogsPersistence) CreateOne(ctx context.Context, entity repositories.Entity) error {
+func (a *auditLogsPersistence) CreateOne(ctx context.Context, entity repositories.Entity) (repositories.Entity, error) {
 	panic("implement me")
 }
 

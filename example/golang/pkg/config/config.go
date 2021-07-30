@@ -97,6 +97,13 @@ func New() *Config {
 	mysqlPort, _ := strconv.Atoi(os.Getenv(constant.MYSQL_PORT))
 	// TODO: yaml -> statik で環境別設定
 	return &Config{
+		Auth: &Auth{
+			JWT: &JWT{
+				Secret:        "xxxxxxxxxxxxxxxxxxxx",
+				Provider:      "viron_example",
+				ExpirationSec: 24 * 60 * 60,
+			},
+		},
 		StoreMySQL: &MySQL{
 			Dialect:              "mysql",
 			Host:                 os.Getenv(constant.MYSQL_HOST),

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/cam-inc/viron/example/golang/pkg/domains"
+
 	"github.com/cam-inc/viron/example/golang/routes/root"
 
 	"github.com/cam-inc/viron/example/golang/routes/components"
@@ -22,6 +24,7 @@ import (
 
 	"github.com/cam-inc/viron/example/golang/pkg/config"
 	"github.com/cam-inc/viron/example/golang/pkg/store"
+	domainAuth "github.com/cam-inc/viron/packages/golang/domains/auth"
 	"github.com/cam-inc/viron/packages/golang/routes/auth"
 	"github.com/cam-inc/viron/packages/golang/routes/oas"
 	"github.com/go-chi/chi/v5"
@@ -41,9 +44,11 @@ var (
 
 func New() http.Handler {
 
-	mysqlConfig := config.New().StoreMySQL
+	cfg := config.New()
+	mysqlConfig := cfg.StoreMySQL
 	fmt.Printf("msyql: %v\n", mysqlConfig)
 	store.SetupMySQL(mysqlConfig)
+	domains.SetUpMySQL(store.GetMySQLConnection())
 
 	apiDocs = []*apiDefinition{}
 
@@ -86,6 +91,7 @@ func New() http.Handler {
 		oas:  oasDoc,
 	})
 
+	domainAuth.SetUp(cfg.Auth.JWT.Secret, cfg.Auth.JWT.Provider, cfg.Auth.JWT.ExpirationSec)
 	authImpl := auth.New()
 	auth.HandlerFromMux(authImpl, routeRoot)
 	authDoc, _ := auth.GetSwagger()
