@@ -3,7 +3,7 @@ package repositories
 import (
 	"context"
 
-	"github.com/volatiletech/sqlboiler/queries/qm"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 type (
@@ -21,7 +21,7 @@ type (
 		FindOne(context.Context, string) (Entity, error)
 		Find(context.Context, Conditions) (EntitySlice, error)
 		Count(context.Context, Conditions) int
-		CreateOne(context.Context, Entity) error
+		CreateOne(context.Context, Entity) (Entity, error)
 		UpdateByID(context.Context, string, Entity) error
 		RemoveByID(context.Context, string) error
 	}

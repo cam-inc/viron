@@ -3,8 +3,10 @@ package adminusers
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"strconv"
+	"time"
+
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
 	"github.com/volatiletech/null/v8"
 
@@ -19,28 +21,124 @@ type adminUsersPersistence struct {
 	conn *sql.DB
 }
 
+type AdminUserConditions struct {
+	ID        uint
+	Email     string
+	Limit     int
+	Offset    int
+	LikeEmail string
+	IDs       []uint
+	Emails    []string
+}
+
+func (c *AdminUserConditions) ConvertConditionMySQL() []qm.QueryMod {
+
+	conditions := []qm.QueryMod{}
+	if c.ID != 0 {
+		conditions = append(conditions, qm.Where("id = ?", c.ID))
+	}
+	if c.Email != "" {
+		conditions = append(conditions, qm.Where("email = ?", c.Email))
+	}
+	if c.LikeEmail != "" {
+		conditions = append(conditions, qm.Where("email like ?", c.LikeEmail))
+	}
+	if len(c.IDs) != 0 {
+		ids := []interface{}{}
+		for i := range c.IDs {
+			ids = append(ids, i)
+		}
+		conditions = append(conditions, qm.WhereIn("id in ?", ids...))
+	}
+	if len(c.Emails) != 0 {
+		emails := []interface{}{}
+		for e := range c.Emails {
+			emails = append(emails, e)
+		}
+		conditions = append(conditions, qm.WhereIn("email in ?", emails...))
+	}
+
+	if c.Limit != 0 {
+		conditions = append(conditions, qm.Limit(c.Limit))
+	}
+
+	conditions = append(conditions, qm.Offset(c.Offset))
+
+	return conditions
+}
+
 func (a *adminUsersPersistence) FindOne(ctx context.Context, id string) (repositories.Entity, error) {
 	return &repositories.AdminUser{}, nil
 }
 
 func (a *adminUsersPersistence) Find(ctx context.Context, conditions repositories.Conditions) (repositories.EntitySlice, error) {
-	//panic("implement me")
 
-	where := conditions.ConvertConditionMySQL()
+	mods := conditions.ConvertConditionMySQL()
 
-	list := repositories.EntitySlice{
-		&repositories.AdminUser{},
+	list := repositories.EntitySlice{}
+
+	result, err := models.Adminusers(mods...).All(ctx, a.conn)
+	if err != nil {
+		return nil, err
 	}
-	fmt.Println(where)
+
+	for _, r := range result {
+		adminuser := &repositories.AdminUser{
+			ID:                       r.ID,
+			Email:                    r.Email,
+			AuthType:                 r.AuthType,
+			Password:                 r.Password.Ptr(),
+			Salt:                     r.Salt.Ptr(),
+			GoogleOAuth2TokenType:    r.GoogleOAuth2TokenType.Ptr(),
+			GoogleOAuth2RefreshToken: r.GoogleOAuth2RefreshToken.Ptr(),
+			GoogleOAuth2ExpiryDate:   r.GoogleOAuth2ExpiryDate.Ptr(),
+			GoogleOAuth2AccessToken:  r.GoogleOAuth2AccessToken.Ptr(),
+			GoogleOAuth2IdToken:      r.GoogleOAuth2IdToken.Ptr(),
+			CreatedAt:                r.CreatedAt,
+			UpdatedAt:                r.UpdatedAt,
+		}
+		list = append(list, adminuser)
+	}
+
 	return list, nil
 }
 
 func (a *adminUsersPersistence) Count(ctx context.Context, conditions repositories.Conditions) int {
-	panic("implement me")
+	var mods []qm.QueryMod
+	if conditions != nil {
+		mods = conditions.ConvertConditionMySQL()
+	}
+	count, err := models.Adminusers(mods...).Count(ctx, a.conn)
+	if err != nil {
+		return 0
+	}
+	return int(count)
+
 }
 
-func (a *adminUsersPersistence) CreateOne(ctx context.Context, entity repositories.Entity) error {
-	panic("implement me")
+func (a *adminUsersPersistence) CreateOne(ctx context.Context, entity repositories.Entity) (repositories.Entity, error) {
+	adminuser := &repositories.AdminUser{}
+	if err := entity.Bind(adminuser); err != nil {
+		return nil, err
+	}
+	model := &models.Adminuser{
+		AuthType:                 adminuser.AuthType,
+		Email:                    adminuser.Email,
+		Password:                 null.StringFromPtr(adminuser.Password),
+		Salt:                     null.StringFromPtr(adminuser.Salt),
+		GoogleOAuth2AccessToken:  null.StringFromPtr(adminuser.GoogleOAuth2AccessToken),
+		GoogleOAuth2IdToken:      null.StringFromPtr(adminuser.GoogleOAuth2IdToken),
+		GoogleOAuth2RefreshToken: null.StringFromPtr(adminuser.GoogleOAuth2RefreshToken),
+		GoogleOAuth2ExpiryDate:   null.IntFromPtr(adminuser.GoogleOAuth2ExpiryDate),
+		GoogleOAuth2TokenType:    null.StringFromPtr(adminuser.GoogleOAuth2TokenType),
+		CreatedAt:                time.Now(),
+		UpdatedAt:                time.Now(),
+	}
+	if err := model.Insert(ctx, a.conn, boil.Infer()); err != nil {
+		return nil, err
+	}
+	adminuser.ID = model.ID
+	return adminuser, nil
 }
 
 func (a *adminUsersPersistence) UpdateByID(ctx context.Context, id string, entity repositories.Entity) error {
