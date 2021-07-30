@@ -29,7 +29,7 @@ const schemaDefinition: ModelAttributes<AdminUserModel, AdminUser> = {
   },
   // for email
   password: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(1024),
     allowNull: true,
   },
   salt: {
@@ -42,7 +42,7 @@ const schemaDefinition: ModelAttributes<AdminUserModel, AdminUser> = {
     allowNull: true,
   },
   googleOAuth2ExpiryDate: {
-    type: DataTypes.NUMBER,
+    type: DataTypes.INTEGER.UNSIGNED,
     allowNull: true,
   },
   googleOAuth2IdToken: {
