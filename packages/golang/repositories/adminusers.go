@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/volatiletech/sqlboiler/queries/qm"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 type (
@@ -21,6 +21,8 @@ type (
 		GoogleOAuth2TokenType    *string
 		CreatedAt                time.Time
 		UpdatedAt                time.Time
+
+		RoleIDs []string
 	}
 
 	AdminUserOptions struct {

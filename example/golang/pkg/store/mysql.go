@@ -4,18 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/cam-inc/viron/packages/golang/repositories"
-
-	"github.com/cam-inc/viron/packages/golang/repositories/mysql/adminusers"
-	"github.com/cam-inc/viron/packages/golang/repositories/mysql/auditlogs"
-	"github.com/cam-inc/viron/packages/golang/repositories/mysql/revokedtokens"
-
 	"github.com/cam-inc/viron/example/golang/pkg/config"
 )
 
 var (
-	conn          *sql.DB
-	mRepositories map[string]repositories.Repository
+	conn *sql.DB
 )
 
 func NewMySQL(config *config.MySQL) *sql.DB {
@@ -46,8 +39,11 @@ func NewMySQL(config *config.MySQL) *sql.DB {
 
 func SetupMySQL(config *config.MySQL) {
 	conn = NewMySQL(config)
-	mRepositories = map[string]repositories.Repository{}
-	mRepositories["adminusers"] = adminusers.New(conn)
-	mRepositories["auditlogs"] = auditlogs.New(conn)
-	mRepositories["revokedtokens"] = revokedtokens.New(conn)
+}
+
+func GetMySQLConnection() *sql.DB {
+	if conn == nil {
+		panic("====DEBUG connection is nil DEBUG====")
+	}
+	return conn
 }

@@ -23,7 +23,7 @@ func (r *revokedTokensPersistence) Count(ctx context.Context, conditions reposit
 	panic("implement me")
 }
 
-func (r *revokedTokensPersistence) CreateOne(ctx context.Context, entity repositories.Entity) error {
+func (r *revokedTokensPersistence) CreateOne(ctx context.Context, entity repositories.Entity) (repositories.Entity, error) {
 	panic("implement me")
 }
 
