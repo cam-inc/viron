@@ -34,6 +34,7 @@ type (
 		/*
 			allowOrigins: ['https://localhost:8000'],
 		*/
+		AllowOrigins []string `yaml:"allowOrigins"`
 	}
 	JWT struct {
 		Secret        string `yaml:"secret"`
@@ -103,6 +104,9 @@ func New() *Config {
 				Provider:      "viron_example",
 				ExpirationSec: 24 * 60 * 60,
 			},
+		},
+		Cors: &Cors{
+			AllowOrigins: []string{"https://localhost:8000"},
 		},
 		StoreMySQL: &MySQL{
 			Dialect:              "mysql",

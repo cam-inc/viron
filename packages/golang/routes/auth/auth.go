@@ -17,11 +17,6 @@ import (
 type authObj struct {
 }
 
-func sendError(w http.ResponseWriter, code int, err error) {
-	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(err)
-}
-
 /*
 /*
 // サインアウト
@@ -96,13 +91,13 @@ func (a *authObj) SigninEmail(w http.ResponseWriter, r *http.Request) {
 	signinEmail := &SigninEmailPayload{}
 	if err := json.NewDecoder(r.Body).Decode(signinEmail); err != nil {
 		fmt.Println("DEBUG JSON DECODE FAILED")
-		sendError(w, http.StatusBadRequest, err)
+		helpers.SendError(w, http.StatusBadRequest, err)
 		return
 	}
 
 	if signinEmail == nil {
 		fmt.Println("DEBUG signin email failed")
-		sendError(w, http.StatusBadRequest, errors.SigninFailed)
+		helpers.SendError(w, http.StatusBadRequest, errors.SigninFailed)
 		return
 	}
 
@@ -110,7 +105,7 @@ func (a *authObj) SigninEmail(w http.ResponseWriter, r *http.Request) {
 
 	token, err := auth.SigninEmail(ctx, string(signinEmail.Email), signinEmail.Password)
 	if err != nil {
-		sendError(w, err.StatusCode(), err)
+		helpers.SendError(w, err.StatusCode(), err)
 		return
 	}
 	v := ctx.Value(constant.CTX_KEY_JWT_EXPIRATION_SEC)
