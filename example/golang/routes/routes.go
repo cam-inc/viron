@@ -1,10 +1,12 @@
 package routes
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
+
+	"github.com/cam-inc/viron/packages/golang/helpers"
 
 	"github.com/cam-inc/viron/example/golang/pkg/domains"
 
@@ -18,8 +20,6 @@ import (
 
 	packageComponents "github.com/cam-inc/viron/packages/golang/routes/components"
 
-	"github.com/cam-inc/viron/packages/golang/constant"
-
 	"github.com/getkin/kin-openapi/openapi3"
 
 	"github.com/cam-inc/viron/example/golang/pkg/config"
@@ -31,17 +31,6 @@ import (
 	"github.com/imdario/mergo"
 )
 
-type (
-	apiDefinition struct {
-		name string
-		oas  *openapi3.T
-	}
-)
-
-var (
-	apiDocs []*apiDefinition
-)
-
 func New() http.Handler {
 
 	cfg := config.New()
@@ -49,8 +38,6 @@ func New() http.Handler {
 	fmt.Printf("msyql: %v\n", mysqlConfig)
 	store.SetupMySQL(mysqlConfig)
 	domains.SetUpMySQL(store.GetMySQLConnection())
-
-	apiDocs = []*apiDefinition{}
 
 	definition := &openapi3.T{
 		ExtensionProps: openapi3.ExtensionProps{
@@ -61,45 +48,33 @@ func New() http.Handler {
 				Extensions: map[string]interface{}{},
 			},
 		},
-		ExternalDocs: &openapi3.ExternalDocs{
-			ExtensionProps: openapi3.ExtensionProps{
-				Extensions: map[string]interface{}{},
-			},
-		},
 	}
 
 	routeRoot := chi.NewRouter()
+	routeRoot.Use(Cors(cfg.Cors))
+
 	oasImpl := oas.New()
 	oas.HandlerWithOptions(oasImpl, oas.ChiServerOptions{
 		BaseRouter: routeRoot,
 		Middlewares: []oas.MiddlewareFunc{
-			func(handlerFunc http.HandlerFunc) http.HandlerFunc {
-				fn := func(w http.ResponseWriter, r *http.Request) {
-					ctx := r.Context()
-					ctx = context.WithValue(ctx, constant.CTX_KEY_API_DEFINITION, definition)
-					handlerFunc.ServeHTTP(w, r.WithContext(ctx))
-				}
-				return fn
-
-			},
+			InjectAPIDefinition(definition),
 		},
 	})
 	oasDoc, _ := oas.GetSwagger()
 
-	apiDocs = append(apiDocs, &apiDefinition{
-		name: "oas",
-		oas:  oasDoc,
-	})
-
 	domainAuth.SetUp(cfg.Auth.JWT.Secret, cfg.Auth.JWT.Provider, cfg.Auth.JWT.ExpirationSec)
 	authImpl := auth.New()
 	auth.HandlerFromMux(authImpl, routeRoot)
-	authDoc, _ := auth.GetSwagger()
 
-	apiDocs = append(apiDocs, &apiDefinition{
-		name: "auth",
-		oas:  authDoc,
+	authconfigImp := authconfigs.New()
+	authconfigs.HandlerWithOptions(authconfigImp, authconfigs.ChiServerOptions{
+		BaseRouter: routeRoot,
+		Middlewares: []authconfigs.MiddlewareFunc{
+			InjectAPIDefinition(definition),
+		},
 	})
+
+	authDoc, _ := auth.GetSwagger()
 
 	routeRoot.Get("/ping", func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(http.StatusOK)
@@ -129,60 +104,93 @@ func New() http.Handler {
 	fmt.Println(string(b))
 
 	authconfigsDoc, _ := authconfigs.GetSwagger()
+	//helpers.Ref(authconfigsDoc, "./components.yaml", "")
+
 	if err := merge(definition, authconfigsDoc); err != nil {
 		panic(err)
 	}
-	bb, _ := json.Marshal(definition)
-	fmt.Println(string(bb))
 
 	adminusersDoc, _ := adminusers.GetSwagger()
+	//helpers.Ref(adminusersDoc, "./components.yaml", "")
 	if err := merge(definition, adminusersDoc); err != nil {
 		panic(err)
 	}
 
-	bbb, _ := json.Marshal(definition)
-	fmt.Println(string(bbb))
-
 	adminrolesDoc, _ := adminroles.GetSwagger()
+	//helpers.Ref(adminrolesDoc, "./components.yaml", "")
 	if err := merge(definition, adminrolesDoc); err != nil {
 		panic(err)
 	}
-	bbbb, _ := json.Marshal(definition)
-	fmt.Println(string(bbbb))
 
 	auditlogsDoc, _ := auditlogs.GetSwagger()
+	//helpers.Ref(auditlogsDoc, "./components.yaml", "")
 	if err := merge(definition, auditlogsDoc); err != nil {
 		panic(err)
 	}
-	bbbbb, _ := json.Marshal(definition)
-	fmt.Println(string(bbbbb))
 
 	if err := merge(definition, oasDoc); err != nil {
 		panic(err)
 	}
-	bbbbbb, _ := json.Marshal(definition)
-	fmt.Println(string(bbbbbb))
 
 	if err := merge(definition, authDoc); err != nil {
 		panic(err)
 	}
-	bbbbbbb, _ := json.Marshal(definition)
-	fmt.Println(string(bbbbbbb))
 
-	/*
-		b, _ := json.Marshal(oasDoc.Info)
-		fmt.Println(string(b))
-		bb, _ := json.Marshal(authDoc.Info)
-		fmt.Println(string(bb))
-	*/
+	helpers.Ref(definition, "./components.yaml", "")
 
-	/*
-		bbb, _ := json.Marshal(apiDocs)
-		fmt.Println(string(bbb))
-
-
-	*/
 	return routeRoot
+}
+
+func convertP(src *openapi3.Operation) error {
+
+	if src.OperationID != "" {
+		first := src.OperationID[:1]
+		lower := strings.ToLower(first)
+		src.OperationID = strings.Replace(src.OperationID, first, lower, 1)
+	}
+
+	if src.RequestBody != nil {
+		if src.RequestBody.Ref != "" && strings.Contains(src.RequestBody.Ref, "./") {
+			src.RequestBody.Ref = strings.Replace(src.RequestBody.Ref, "./", "https://local-api.viron.work:3000/", -1)
+			fmt.Printf("req:%s\n", src.RequestBody.Ref)
+		}
+	}
+	for _, res := range src.Responses {
+		if res.Ref != "" && strings.Contains(res.Ref, "./") {
+			res.Ref = strings.Replace(res.Ref, "./", "httress://local-aresi.viron.work:3000/", -1)
+			fmt.Printf("res:%s\n", res.Ref)
+		}
+	}
+	for _, p := range src.Parameters {
+		if p.Ref != "" && strings.Contains(p.Ref, "./") {
+			p.Ref = strings.Replace(p.Ref, "./", "https://local-api.viron.work:3000/", -1)
+			fmt.Printf("p:%s\n", p.Ref)
+		}
+	}
+	return nil
+}
+
+func convertT(src *openapi3.T) error {
+
+	for _, pathItem := range src.Paths {
+		if pathItem.Ref != "" && strings.Contains(pathItem.Ref, "./") {
+			pathItem.Ref = strings.Replace(pathItem.Ref, "./", "https://local-api.viron.work:3000/", -1)
+			fmt.Printf("%s\n", pathItem.Ref)
+		}
+		if pathItem.Get != nil {
+			convertP(pathItem.Get)
+		}
+		if pathItem.Post != nil {
+			convertP(pathItem.Post)
+		}
+		if pathItem.Put != nil {
+			convertP(pathItem.Put)
+		}
+		if pathItem.Delete != nil {
+			convertP(pathItem.Delete)
+		}
+	}
+	return nil
 }
 
 func merge(dist *openapi3.T, src *openapi3.T) error {
@@ -199,6 +207,11 @@ func merge(dist *openapi3.T, src *openapi3.T) error {
 	//}
 	fmt.Println("--")
 	if err := mergo.Merge(&dist.Components.Headers, src.Components.Headers); err != nil {
+		fmt.Printf("merge failed %v\n", err)
+	}
+
+	fmt.Println("--")
+	if err := mergo.Merge(&dist.Components.Schemas, src.Components.Schemas); err != nil {
 		fmt.Printf("merge failed %v\n", err)
 	}
 

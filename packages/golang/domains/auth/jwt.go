@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cam-inc/viron/packages/golang/errors"
+
 	"github.com/cam-inc/viron/packages/golang/constant"
 
 	"github.com/lestrrat-go/jwx/jwa"
@@ -60,10 +62,17 @@ func Sign(subject string) string {
 	return fmt.Sprintf("%s %s", constant.AUTH_SCHEME, tokenStr)
 }
 
-func Verify(token string) *Claim {
+func Verify(token string) (*Claim, error) {
+
+	if jwt == nil {
+		return nil, errors.JwtUninitialized
+	}
+
+	// TODO: token revoked check
+
 	jwtToken, err := jwtauth.VerifyToken(jwt.jwtAuth, token)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
 	claim := &Claim{
@@ -75,5 +84,24 @@ func Verify(token string) *Claim {
 		Aud: jwtToken.Audience(),
 	}
 
-	return claim
+	return claim, nil
 }
+
+/*
+// JWT検証
+export const verifyJwt = async (
+  token?: string | null
+): Promise<JwtClaims | null> => {
+  if (!jwt) {
+    throw jwtUninitialized();
+  }
+  if (!token) {
+    return null;
+  }
+  if (await isSignedout(token)) {
+    debug('Already signed out. token: %s', token);
+    return null;
+  }
+  return await jwt.verify(token);
+};
+*/
