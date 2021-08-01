@@ -43,6 +43,7 @@ var (
 	JwtUninitialized        = initialize(500, "Uninitialized jwt is not available")
 	RoleIdAlreadyExists     = initialize(400, "The role-id is already exists.")
 	SigninFailed            = initialize(400, "Signin failed")
+	OasUndefined            = initialize(404, "OAS is undefined")
 )
 
 /**
