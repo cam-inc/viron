@@ -21,19 +21,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/VironAuthConfigListWithPager'
+                $ref: '#/components/schemas/VironAuthConfigList'
 
 components:
   schemas:
-    VironAuthConfigListWithPager:
+    VironAuthConfigList:
       type: object
       properties:
         list:
-          $ref: '#/components/schemas/VironAuthConfigList'
+          $ref: '#/components/schemas/VironAuthConfigItems'
+        oas:
+          $ref: '#/components/schemas/VironAuthConfigOas'
       required:
         - list
 
-    VironAuthConfigList:
+    VironAuthConfigItems:
       type: array
       items:
         $ref: '#/components/schemas/VironAuthConfig'
@@ -53,10 +55,10 @@ components:
             - oauth
             - signout
           example: oauth
-        pathObject:
-          description: OASのPathsObject
-          type: object
-          properties: {}
+        operationId: 
+          description: クライアントがリクエストするAPIのOperationID
+          type: string
+          example: signinEmail
         defaultParametersValue:
           description: クライアントからリクエストする際のパラメータ
           type: object
@@ -68,4 +70,9 @@ components:
       required:
         - provider
         - type
-        - pathObject
+        - operationId
+
+    VironAuthConfigOas:
+      description: aaa
+      type: object
+      properties: {}

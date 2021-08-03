@@ -5,6 +5,7 @@ import {
   OpenAPIObject,
   PathsObject,
   PathItemObject,
+  OperationObject,
 } from 'openapi3-ts';
 import jsonSchemaRefParser from '@apidevtools/json-schema-ref-parser';
 import { load } from 'js-yaml';
@@ -36,6 +37,10 @@ export {
   PathsObject as VironPathsObject,
   PathItemObject as VironPathItemObject,
 };
+
+export interface VironOperationObject extends OperationObject {
+  operationId: string;
+}
 
 export interface VironInfoObjectExtentions {
   [OAS_X_THUMBNAIL]?: string;
@@ -214,7 +219,7 @@ export const loadResolvedOas = async (
 const toExpressStylePath = (path: string): string =>
   path.replace(/{/g, ':').replace(/}/g, '');
 
-// uri(ex.`/users/1`) が path(ex.`/users/{userId}`) にヒットするか
+// uri(ex.`/users/1`) が oasのpath定義(ex.`/users/{userId}`) にヒットするか
 const match = (uri: string, path: string): Match =>
   matchPath(toExpressStylePath(path))(uri);
 
@@ -242,7 +247,7 @@ const listContentsByOas = (
   return xPages.map((xPage) => xPage.contents).flat();
 };
 
-// x-pagesからoperationIdを取得
+// x-pagesからoperationIdに一致するresourceIdを取得
 const findResourceId = (
   operationId: string,
   apiDefinition: VironOpenAPIObject
@@ -255,13 +260,22 @@ const findResourceId = (
 };
 
 // uri,methodに対応するopeartionIdを取得
+export const findOperation = (
+  uri: string,
+  method: ApiMethod,
+  apiDefinition: VironOpenAPIObject
+): OperationObject | null => {
+  const { pathItem } = getPathItem(uri, apiDefinition);
+  return pathItem?.[method] ?? null;
+};
+
+// uri,methodに対応するopeartionIdを取得
 const findOperationId = (
   uri: string,
   method: ApiMethod,
   apiDefinition: VironOpenAPIObject
 ): string | null => {
-  const { pathItem } = getPathItem(uri, apiDefinition);
-  const operation = pathItem?.[method];
+  const operation = findOperation(uri, method, apiDefinition);
   return operation?.operationId ?? null;
 };
 
