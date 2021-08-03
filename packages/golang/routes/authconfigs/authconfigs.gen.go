@@ -36,9 +36,6 @@ type VironAuthConfig struct {
 	// クライアントからリクエストする際のリクエストボディ
 	DefaultRequestBodyValue *map[string]interface{} `json:"defaultRequestBodyValue,omitempty"`
 
-	// OASのPathsObject
-	PathObject map[string]interface{} `json:"pathObject"`
-
 	// 認証プロバイダ
 	Provider string `json:"provider"`
 
@@ -52,9 +49,23 @@ type VironAuthConfigType string
 // VironAuthConfigList defines model for VironAuthConfigList.
 type VironAuthConfigList []VironAuthConfig
 
-// VironAuthConfigListWithPager defines model for VironAuthConfigListWithPager.
-type VironAuthConfigListWithPager struct {
+// VironAuthConfigListWithOas defines model for VironAuthConfigListWithOas.
+type VironAuthConfigListWithOas struct {
 	List VironAuthConfigList `json:"list"`
+	Oas  VironAuthOas        `json:"oas"`
+}
+
+// VironAuthOas defines model for VironAuthOas.
+type VironAuthOas struct {
+
+	// oas components
+	Components *map[string]interface{} `json:"components,omitempty"`
+
+	// oas info
+	Info *map[string]interface{} `json:"info,omitempty"`
+
+	// oas paths
+	Paths *map[string]interface{} `json:"paths,omitempty"`
 }
 
 // ServerInterface represents all server handlers.
@@ -134,17 +145,17 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/6xUTW8TMRD9K9HAcZUN5bYnCicEUiuQyqHKwd1Mdl3t2q7tjYiiSHR9AFShAodWFC58",
-	"HEqllgOnShX8GCuo/Atk77ZpNukBxCmJZ/zezHvPGUHMc8EZMq0gGoGKU8yJ/7pGJWfLhU7vcdaniTsS",
-	"kguUmqJv6GGfFJleJZLkqFGqNZIVWFVULKnQlDOIwJbfrPlqyy+2/GTNd2te2O0dW7605siVykNbnvrD",
-	"d7bc+X3w3m6fWPPGXTEfrTmz5U8IQA8FQgR8YxNjDePggv0RbhWo9F3eG/5P+tmS+WDNc1t+XjSHIDpd",
-	"qX7NUa8sP7bbJ6tEp6puWQQg+YD2UM5fPz96dX54Zs2+NcfWvHYrmGcQAD4lucgcSsJ5kuEUVWlJWeJQ",
-	"q4PFiL/2Tidnuw6IFTlE64A5oRkEwEmhUwhA0YTxQkP3KtdFsUE1DkDiVkEl9hzU5TZ144xA3QXrN2L2",
-	"kCovJNWY+5TdlNiHCG6E06CGdUrDZkQv9wYiJRleA/+E6nSVJJXis5HOava/IPUDN1XwOPPbujbK+nze",
-	"GKdt7PFUiwjaUgJj2qcxcXXlxKTau3Bn4OjDjG60rtyBAAYoVYXVaXfat9zuXCAjgkIEt9ud9lLthV80",
-	"rGCuQkQjSFBfl5nzw+PJyYEt30529yY/9qvXAp5D+iHv9yACJ8alPtPZJCrBmao0Xup03EfMmUbm+YgQ",
-	"Wb1quKkc6cUf0T94MXXXy914kA+8VarIcyKHEHmjvJCt6bSaODXWYdBIV9cD1tURMJI7Q5pd4+74TwAA",
-	"AP//HmYCYFUFAAA=",
+	"H4sIAAAAAAAC/6xUzW4TPRR9leh+33KUhLKbFT8rBFIRi7KosnAnNxlXM7ZreyKiaCQ6XgCqUIFFKwob",
+	"fhalUsuCVaUKHsYKKm+B7EmaZDJBgNiNfOxzzr333BlBxFPBGTKtIByBimJMif/coJKzm5mOb3PWo313",
+	"JCQXKDVFf6GLPZIl+j6RJEWNUm2QJMMSUZGkQlPOIARbfLbmky0+2uK9NV+seWp392zxzJoTBxXHtjj3",
+	"h69tsffj6I3dPbPmpXti3llzYYtvEIAeCoQQ+NY2RhryYKr+AHcyVPoW7w7/pfwiZN5a88QWH+p8CMkH",
+	"tItyWfjy5Pnl8YU1h9acWvPCOTCPIQB8RFKROJY+5/0EZ6xKS8r6jrU8qGf8fnA+vth3RCxLIdwETAlN",
+	"IABOMh1DAIr2Gc80dOa1pmBFKg9A4k5GJXYd1VU1k4sBCKLj9bLaTk35lZTco0o731Rj6kPyv8QehPBf",
+	"a5az1iRkrWrCruoGIiUZrqB/SHW8XkZ0MY/JRPsPJL3d3HXu98067WrbvHRJ88sm1fpe3MDFiXOiGnN4",
+	"DTdlPV7/ziN1iSU6XiFVQktv8uWTlcouZpFvrmoQQRtKYER7NCIO99xU+0DeGLiutBK61Zh7AwEMUKqS",
+	"q91sN6/5+QhkRFAI4Xqz3VyDuSJaJc08RTiCPupV63N5fDo+O7LFq/H+wfjrYbn34DWkN3mnCyG4ZFyN",
+	"beZNohKcqXJwa+12OT+mkXk9IkQyKbW1rZzo9Jf6F8GcBt03e7GS9bt+KCpLUyKHEPoA+jY2Zl41cb3Y",
+	"hEFlzTqecIKOgJHUjaN6K+/kPwMAAP//BhRrhB0GAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

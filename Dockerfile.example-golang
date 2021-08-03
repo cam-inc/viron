@@ -7,11 +7,6 @@ ENV HOME /viron
 USER root
 WORKDIR $HOME
 
-# Setup project
-COPY go.mod $HOME/go.mod
-COPY go.sum $HOME/go.sum
-RUN go mod tidy
-
 # Copy packages
 COPY packages/golang $HOME/packages/golang
 

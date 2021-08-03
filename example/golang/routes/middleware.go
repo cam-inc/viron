@@ -2,13 +2,25 @@ package routes
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"reflect"
+	"runtime"
+	"time"
+
+	"github.com/cam-inc/viron/packages/golang/domains/auth"
+
+	"github.com/cam-inc/viron/packages/golang/helpers"
 
 	"github.com/cam-inc/viron/example/golang/pkg/config"
 	"github.com/go-chi/cors"
 
 	"github.com/cam-inc/viron/packages/golang/constant"
 	"github.com/getkin/kin-openapi/openapi3"
+)
+
+const (
+	JwtScopes = "jwt.Scopes"
 )
 
 func InjectAPIDefinition(apiDef *openapi3.T) func(http.HandlerFunc) http.HandlerFunc {
@@ -33,42 +45,40 @@ func Cors(cfg *config.Cors) func(http.Handler) http.Handler {
 	})
 }
 
-func JWTSecurityHandler(oas *openapi3.T, cfg *config.Auth) func(handler http.HandlerFunc) http.HandlerFunc {
-	/*
-		type result struct {
-			typeName string             `json:"type,omitempty"`
-			status   string             `json:"status,omitempty"`
-			message  string             `json:"message,omitempty"`
-			user     *domains.AdminUser `json:"user,omitempty"`
-		}
-
-		send := func(w http.ResponseWriter, status int, res *result) {
-			if status == http.StatusOK || status == http.StatusNoContent {
-
-			} else {
-				http.Error(w, message, status)
-			}
-		}
-
-		fail := func(err *errors.VironError) {
-
-		}
-	*/
+func JWTSecurityHandler(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFunc {
 	return func(handlerFunc http.HandlerFunc) http.HandlerFunc {
 
 		// TODO: oas security 'jwt' check and through
 
 		fn := func(w http.ResponseWriter, r *http.Request) {
+
+			// DEBUG
+			fv := reflect.ValueOf(handlerFunc)
+			fmt.Printf("[%+v]\n", runtime.FuncForPC(fv.Pointer()).Name())
+			// DEBUG
+
 			ctx := r.Context()
-			// http.Error(w, errContextCanceled, http.StatusServiceUnavailable)
+			if ctx.Value(JwtScopes) == nil {
+				fmt.Println("jwtScope is nil.")
+				handlerFunc.ServeHTTP(w, r.WithContext(ctx))
+				return
+			} else {
+				fmt.Println("jwtScope is not nil.")
+			}
 
 			cookie, _ := r.Cookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION)
 			if cookie == nil {
-
+				w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
+				cookie = helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
+					Expires: time.Unix(0, 0),
+				})
+				http.SetCookie(w, cookie)
+				http.Error(w, `{"message":"Unauthorized"}`, http.StatusUnauthorized)
+				return
 			}
 
 			//claim, err := auth.Verify(cookie.Value)
-
+			auth.Verify(cookie.Value)
 			handlerFunc.ServeHTTP(w, r.WithContext(ctx))
 		}
 		return fn
