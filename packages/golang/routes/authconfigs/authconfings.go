@@ -15,42 +15,15 @@ import (
 )
 
 type (
-	authConfigs struct{}
+	authConfigs        struct{}
+	authConfigResponse struct {
+		List []*domains.AuthConfig `json:"list"`
+		Oas  *openapi3.T           `json:"oas"`
+	}
 )
 
 func (a *authConfigs) ListVironAuthconfigs(w http.ResponseWriter, r *http.Request) {
-	//panic("implement me")
-	/*
-	    genAuthConfig(
-	      AUTH_CONFIG_PROVIDER.VIRON,
-	      AUTH_CONFIG_TYPE.EMAIL,
-	      API_METHOD.POST,
-	      EMAIL_SIGNIN_PATH,
-	      context.req._context.apiDefinition
-	    ),
-	    genAuthConfig(
-	      AUTH_CONFIG_PROVIDER.GOOGLE,
-	      AUTH_CONFIG_TYPE.OAUTH,
-	      API_METHOD.GET,
-	      OAUTH2_GOOGLE_AUTHORIZATION_PATH,
-	      context.req._context.apiDefinition
-	    ),
-	    genAuthConfig(
-	      AUTH_CONFIG_PROVIDER.GOOGLE,
-	      AUTH_CONFIG_TYPE.OAUTH_CALLBACK,
-	      API_METHOD.POST,
-	      OAUTH2_GOOGLE_CALLBACK_PATH,
-	      context.req._context.apiDefinition
-	    ),
-	    genAuthConfig(
-	      AUTH_CONFIG_PROVIDER.SIGNOUT,
-	      AUTH_CONFIG_TYPE.SIGNOUT,
-	      API_METHOD.POST,
-	      SIGNOUT_PATH,
-	      context.req._context.apiDefinition
-	    ),
-	  ];
-	*/
+
 	ctx := r.Context()
 	apiDefCtx := ctx.Value(constant.CTX_KEY_API_DEFINITION)
 	if apiDefCtx == nil {
@@ -59,52 +32,65 @@ func (a *authConfigs) ListVironAuthconfigs(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	res := []*domains.AuthConfig{}
+	list := []*domains.AuthConfig{}
+	paths := map[string]*openapi3.PathItem{}
 	apiDef := apiDefCtx.(*openapi3.T)
-	if r, err := domains.GenAuthConfig(constant.AUTH_CONFIG_PROVIDER_VIRON,
+	if r, pathItem, err := domains.GenAuthConfig(constant.AUTH_CONFIG_PROVIDER_VIRON,
 		constant.AUTH_TYPE_EMAIL,
-		constant.API_METHOD_POST,
+		http.MethodPost,
 		constant.EMAIL_SIGNIN_PATH,
 		apiDef); err != nil {
 		helpers.SendError(w, err.StatusCode(), err)
 		return
 	} else {
-		res = append(res, r)
+		list = append(list, r)
+		paths[constant.EMAIL_SIGNIN_PATH] = pathItem
 	}
-	if r, err := domains.GenAuthConfig(constant.AUTH_CONFIG_PROVIDER_GOOGLE,
+	if r, pathItem, err := domains.GenAuthConfig(constant.AUTH_CONFIG_PROVIDER_GOOGLE,
 		constant.AUTH_CONFIG_TYPE_OAUTH,
-		constant.API_METHOD_GET,
+		http.MethodGet,
 		constant.OAUTH2_GOOGLE_AUTHORIZATION_PATH,
 		apiDef); err != nil {
 		helpers.SendError(w, err.StatusCode(), err)
 		return
 	} else {
-		res = append(res, r)
+		list = append(list, r)
+		paths[constant.OAUTH2_GOOGLE_AUTHORIZATION_PATH] = pathItem
 	}
-	if r, err := domains.GenAuthConfig(constant.AUTH_CONFIG_PROVIDER_GOOGLE,
+	if r, pathItem, err := domains.GenAuthConfig(constant.AUTH_CONFIG_PROVIDER_GOOGLE,
 		constant.AUTH_CONFIG_TYPE_OAUTH_CALLBACK,
-		constant.API_METHOD_POST,
+		http.MethodPost,
 		constant.OAUTH2_GOOGLE_CALLBACK_PATH,
 		apiDef); err != nil {
 		helpers.SendError(w, err.StatusCode(), err)
 		return
 	} else {
-		res = append(res, r)
+		list = append(list, r)
+		paths[constant.OAUTH2_GOOGLE_CALLBACK_PATH] = pathItem
 	}
-	if r, err := domains.GenAuthConfig(constant.AUTH_CONFIG_PROVIDER_SIGNOUT,
+	if r, pathItem, err := domains.GenAuthConfig(constant.AUTH_CONFIG_PROVIDER_SIGNOUT,
 		constant.AUTH_CONFIG_TYPE_SIGNOUT,
-		constant.API_METHOD_POST,
+		http.MethodPost,
 		constant.SIGNOUT_PATH,
 		apiDef); err != nil {
 		helpers.SendError(w, err.StatusCode(), err)
 		return
 	} else {
-		res = append(res, r)
+		list = append(list, r)
+		paths[constant.SIGNOUT_PATH] = pathItem
 	}
 
-	page := helpers.Paging(res, len(res), constant.DEFAULT_PAGER_PAGE)
+	res := &authConfigResponse{
+		List: list,
+		Oas: &openapi3.T{
+			OpenAPI:    apiDef.OpenAPI,
+			Info:       apiDef.Info,
+			Components: apiDef.Components,
+			Paths:      paths,
+		},
+	}
 
-	response, _ := json.Marshal(page)
+	response, _ := json.Marshal(res)
 	fmt.Fprintln(w, string(response))
 
 }

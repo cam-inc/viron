@@ -13,11 +13,18 @@ func ref(r string, org string, rep string) string {
 	return r
 }
 
+func UpperCamelToLowerCamel(operationID string) string {
+	if operationID == "" {
+		return operationID
+	}
+	first := operationID[:1]
+	lower := strings.ToLower(first)
+	return strings.Replace(operationID, first, lower, 1)
+}
+
 func opeRef(ope *openapi3.Operation, org string, rep string) error {
 	if ope.OperationID != "" {
-		first := ope.OperationID[:1]
-		lower := strings.ToLower(first)
-		ope.OperationID = strings.Replace(ope.OperationID, first, lower, 1)
+		ope.OperationID = UpperCamelToLowerCamel(ope.OperationID)
 	}
 	if ope.RequestBody != nil {
 		ope.RequestBody.Ref = ref(ope.RequestBody.Ref, org, rep)
@@ -85,3 +92,11 @@ func Ref(docRoot *openapi3.T, org string, rep string) error {
 	}
 	return nil
 }
+
+/*
+func HasJWT(docRoot *openapi3.T) bool {
+	for _, path := range docRoot.Paths {
+		path.Get
+	}
+}
+*/

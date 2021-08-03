@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   version: 0.0.1
-  title: '@viron/example-nodejs'
+  title: '@viron/example-golang'
   description: api specifications
 
 servers:

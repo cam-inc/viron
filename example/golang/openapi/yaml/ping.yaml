@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   version: 0.0.1
-  title: '@viron/example-nodejs ping'
+  title: '@viron/example-golang ping'
   description: ping api specifications
 
 tags:
