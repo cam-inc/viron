@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/cam-inc/viron/packages/golang/helpers"
 
@@ -52,12 +51,14 @@ func New() http.Handler {
 
 	routeRoot := chi.NewRouter()
 	routeRoot.Use(Cors(cfg.Cors))
+	//routeRoot.Use(JWTSecurityHandler(cfg.Auth))
 
 	oasImpl := oas.New()
 	oas.HandlerWithOptions(oasImpl, oas.ChiServerOptions{
 		BaseRouter: routeRoot,
 		Middlewares: []oas.MiddlewareFunc{
 			InjectAPIDefinition(definition),
+			JWTSecurityHandler(cfg.Auth),
 		},
 	})
 	oasDoc, _ := oas.GetSwagger()
@@ -71,6 +72,7 @@ func New() http.Handler {
 		BaseRouter: routeRoot,
 		Middlewares: []authconfigs.MiddlewareFunc{
 			InjectAPIDefinition(definition),
+			JWTSecurityHandler(cfg.Auth),
 		},
 	})
 
@@ -139,58 +141,6 @@ func New() http.Handler {
 	helpers.Ref(definition, "./components.yaml", "")
 
 	return routeRoot
-}
-
-func convertP(src *openapi3.Operation) error {
-
-	if src.OperationID != "" {
-		first := src.OperationID[:1]
-		lower := strings.ToLower(first)
-		src.OperationID = strings.Replace(src.OperationID, first, lower, 1)
-	}
-
-	if src.RequestBody != nil {
-		if src.RequestBody.Ref != "" && strings.Contains(src.RequestBody.Ref, "./") {
-			src.RequestBody.Ref = strings.Replace(src.RequestBody.Ref, "./", "https://local-api.viron.work:3000/", -1)
-			fmt.Printf("req:%s\n", src.RequestBody.Ref)
-		}
-	}
-	for _, res := range src.Responses {
-		if res.Ref != "" && strings.Contains(res.Ref, "./") {
-			res.Ref = strings.Replace(res.Ref, "./", "httress://local-aresi.viron.work:3000/", -1)
-			fmt.Printf("res:%s\n", res.Ref)
-		}
-	}
-	for _, p := range src.Parameters {
-		if p.Ref != "" && strings.Contains(p.Ref, "./") {
-			p.Ref = strings.Replace(p.Ref, "./", "https://local-api.viron.work:3000/", -1)
-			fmt.Printf("p:%s\n", p.Ref)
-		}
-	}
-	return nil
-}
-
-func convertT(src *openapi3.T) error {
-
-	for _, pathItem := range src.Paths {
-		if pathItem.Ref != "" && strings.Contains(pathItem.Ref, "./") {
-			pathItem.Ref = strings.Replace(pathItem.Ref, "./", "https://local-api.viron.work:3000/", -1)
-			fmt.Printf("%s\n", pathItem.Ref)
-		}
-		if pathItem.Get != nil {
-			convertP(pathItem.Get)
-		}
-		if pathItem.Post != nil {
-			convertP(pathItem.Post)
-		}
-		if pathItem.Put != nil {
-			convertP(pathItem.Put)
-		}
-		if pathItem.Delete != nil {
-			convertP(pathItem.Delete)
-		}
-	}
-	return nil
 }
 
 func merge(dist *openapi3.T, src *openapi3.T) error {
