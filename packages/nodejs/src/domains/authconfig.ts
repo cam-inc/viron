@@ -46,9 +46,9 @@ export type AuthConfigDefinitions = AuthConfigDefinition[];
 const getOperation = (
   method: ApiMethod,
   path: string,
-  apiDefinition: VironOpenAPIObject
+  oas: VironOpenAPIObject
 ): VironOperationObject => {
-  const pathItem = apiDefinition.paths[path];
+  const pathItem = oas.paths[path];
   if (!pathItem) {
     debug('oas undefined path: %s', path);
     throw oasUndefined();
@@ -66,9 +66,9 @@ const genAuthConfig = (
   type: AuthConfigType,
   method: ApiMethod,
   path: string,
-  apiDefinition: VironOpenAPIObject
+  oas: VironOpenAPIObject
 ): AuthConfig => {
-  const operationObject = getOperation(method, path, apiDefinition);
+  const operationObject = getOperation(method, path, oas);
   return {
     provider,
     type,
@@ -82,14 +82,14 @@ const genAuthConfig = (
 
 export const genAuthConfigs = (
   defs: AuthConfigDefinitions,
-  apiDefinition: VironOpenAPIObject
+  oas: VironOpenAPIObject
 ): VironAuthConfigList => {
   const { list, paths } = defs.reduce(
     (ret, def) => {
       const { provider, type, method, path } = def;
-      ret.list.push(genAuthConfig(provider, type, method, path, apiDefinition));
+      ret.list.push(genAuthConfig(provider, type, method, path, oas));
       ret.paths[path] = ret.paths[path] ?? {};
-      ret.paths[path][method] = getOperation(method, path, apiDefinition);
+      ret.paths[path][method] = getOperation(method, path, oas);
       return ret;
     },
     {
@@ -100,9 +100,9 @@ export const genAuthConfigs = (
   return {
     list,
     // 非ログイン状態で見られるため不要なものは消す
-    oas: Object.assign({}, apiDefinition, {
+    oas: Object.assign({}, oas, {
       paths,
-      info: Object.assign({}, apiDefinition.info, { [OAS_X_PAGES]: [] }),
+      info: Object.assign({}, oas.info, { [OAS_X_PAGES]: [] }),
     }),
   };
 };
