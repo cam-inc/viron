@@ -43,7 +43,7 @@ export const get = (mode: Mode): Config => {
       main: mode == MODE.MONGO ? mongo : mysql,
     },
     cors: {
-      allowOrigins: ['https://localhost:8000'],
+      allowOrigins: ['https://localhost:8000', 'https://viron.work'],
     },
     auth: {
       jwt: {

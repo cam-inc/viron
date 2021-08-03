@@ -18,7 +18,7 @@ type WhereOptionsWithUserIds = WhereOptions<domainsAdminUser.AdminUser> & {
 const getModel = (): storeDefinitions.mysql.adminUsers.AdminUserModelCtor => {
   const conn = repositoryContainer.conn as Sequelize;
   return conn.models
-    .auditlogs as storeDefinitions.mysql.adminUsers.AdminUserModelCtor;
+    .adminusers as storeDefinitions.mysql.adminUsers.AdminUserModelCtor;
 };
 
 const convertConditions = (

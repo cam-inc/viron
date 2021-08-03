@@ -65,8 +65,8 @@ export const normalizeMongoFilterQuery = <T>(
 
 // Mysql: クエリ用のオプションを生成
 export const getMysqlFindOptions = (
-  size: number = DEFAULT_PAGER_PAGE,
-  page: number = DEFAULT_PAGER_SIZE
+  size: number = DEFAULT_PAGER_SIZE,
+  page: number = DEFAULT_PAGER_PAGE
 ): MysqlFindOptions => {
   return {
     limit: size,
