@@ -40,10 +40,11 @@ const Signout: React.FC<Props> = ({
       if (!authconfig) {
         return null;
       }
-      const document = resolve(endpoint.authConfigs?.oas as Document);
+      let document = endpoint.authConfigs?.oas;
       if (!document) {
         return null;
       }
+      document = resolve(document);
       const getRequestResult = getRequest(document, {
         operationId: authconfig.operationId,
       });
@@ -112,10 +113,11 @@ const Signout: React.FC<Props> = ({
 
   const elm = useMemo<JSX.Element | null>(
     function () {
-      const document = resolve(endpoint.authConfigs?.oas as Document);
+      let document = endpoint.authConfigs?.oas;
       if (!document) {
         return null;
       }
+      document = resolve(document);
       return (
         <>
           <button

@@ -18,7 +18,6 @@ import { BaseError } from '$errors/index';
 import { remove, KEY, set } from '$storage/index';
 import { AuthConfig, Endpoint } from '$types/index';
 import {
-  Document,
   Request as RequestType,
   RequestParametersValue,
   RequestValue,
@@ -110,7 +109,10 @@ const OAuth: React.FC<{
   endpoint: Endpoint;
   authConfig: AuthConfig;
 }> = ({ endpoint, authConfig }) => {
-  const document = resolve(endpoint.authConfigs?.oas as Document);
+  let document = endpoint.authConfigs?.oas;
+  if (document) {
+    document = resolve(document);
+  }
   const request = useMemo<RequestType | null>(
     function () {
       if (!document) {
@@ -211,7 +213,10 @@ const Email: React.FC<{
   endpoint: Endpoint;
   authConfig: AuthConfig;
 }> = ({ endpoint, authConfig }) => {
-  const document = resolve(endpoint.authConfigs?.oas as Document);
+  let document = endpoint.authConfigs?.oas;
+  if (document) {
+    document = resolve(document);
+  }
 
   const request = useMemo<RequestType | null>(
     function () {
