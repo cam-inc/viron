@@ -22,6 +22,7 @@ import {
   constructRequestInit,
   constructRequestPayloads,
   getRequest,
+  resolve,
 } from '$utils/oas/index';
 import Appbar from './_parts/_appbar/index';
 import Navigation from './_parts/_navigation/index';
@@ -60,7 +61,7 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
       setIsPending(false);
       return;
     }
-    const document = endpoint.authConfigs.oas;
+    const document = resolve(endpoint.authConfigs.oas);
     const getRequestResult = getRequest(document, {
       operationId: authConfig.operationId,
     });

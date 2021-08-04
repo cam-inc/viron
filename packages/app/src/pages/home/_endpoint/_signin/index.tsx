@@ -18,6 +18,7 @@ import { BaseError } from '$errors/index';
 import { remove, KEY, set } from '$storage/index';
 import { AuthConfig, Endpoint } from '$types/index';
 import {
+  Document,
   Request as RequestType,
   RequestParametersValue,
   RequestValue,
@@ -29,6 +30,7 @@ import {
   constructRequestPayloads,
   getRequest,
   replaceEnvironmentalVariableOfDefaultRequestParametersValue,
+  resolve,
 } from '$utils/oas/index';
 
 type Props = {
@@ -108,7 +110,7 @@ const OAuth: React.FC<{
   endpoint: Endpoint;
   authConfig: AuthConfig;
 }> = ({ endpoint, authConfig }) => {
-  const document = endpoint.authConfigs?.oas;
+  const document = resolve(endpoint.authConfigs?.oas as Document);
   const request = useMemo<RequestType | null>(
     function () {
       if (!document) {
@@ -209,7 +211,7 @@ const Email: React.FC<{
   endpoint: Endpoint;
   authConfig: AuthConfig;
 }> = ({ endpoint, authConfig }) => {
-  const document = endpoint.authConfigs?.oas;
+  const document = resolve(endpoint.authConfigs?.oas as Document);
 
   const request = useMemo<RequestType | null>(
     function () {

@@ -1,10 +1,7 @@
 import { lint as _lint, LintReturn } from '@viron/linter';
 import { JSONPath } from 'jsonpath-plus';
 import _ from 'lodash';
-import {
-  EnvironmentalVariable,
-  ENVIRONMENTAL_VARIABLE,
-} from '$constants/index';
+import { EnvironmentalVariable } from '$constants/index';
 import { Failure, OASError, Result, Success } from '$errors/index';
 import { Endpoint, URL } from '$types/index';
 import {

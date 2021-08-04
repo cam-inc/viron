@@ -5,14 +5,14 @@ import Drawer, { useDrawer } from '$components/drawer';
 import Request from '$components/request';
 import { ON } from '$constants/index';
 import { AuthConfig, Endpoint } from '$types/index';
-import { Request as TypeRequest, RequestValue } from '$types/oas';
+import { Document, Request as TypeRequest, RequestValue } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 import {
-  constructFakeDocument,
   constructRequestInfo,
   constructRequestInit,
   constructRequestPayloads,
   getRequest,
+  resolve,
 } from '$utils/oas/index';
 
 type Props = {
@@ -40,7 +40,7 @@ const Signout: React.FC<Props> = ({
       if (!authconfig) {
         return null;
       }
-      const document = endpoint.authConfigs?.oas;
+      const document = resolve(endpoint.authConfigs?.oas as Document);
       if (!document) {
         return null;
       }
@@ -68,7 +68,7 @@ const Signout: React.FC<Props> = ({
       if (!authconfig || !request) {
         return null;
       }
-      const document = endpoint.authConfigs?.oas;
+      const document = resolve(endpoint.authConfigs?.oas as Document);
       if (!document) {
         return null;
       }
@@ -112,7 +112,7 @@ const Signout: React.FC<Props> = ({
 
   const elm = useMemo<JSX.Element | null>(
     function () {
-      const document = endpoint.authConfigs?.oas;
+      const document = resolve(endpoint.authConfigs?.oas as Document);
       if (!document) {
         return null;
       }
