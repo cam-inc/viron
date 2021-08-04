@@ -1,5 +1,6 @@
 import classnames from 'classnames';
 import { navigate, PageProps } from 'gatsby';
+import _ from 'lodash';
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -17,11 +18,11 @@ import { Document, Request as TypeRequest, RequestValue } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 import {
   cleanupRequestValue,
-  constructFakeDocument,
   constructRequestInfo,
   constructRequestInit,
   constructRequestPayloads,
   getRequest,
+  resolve,
 } from '$utils/oas/index';
 import Appbar from './_parts/_appbar/index';
 import Navigation from './_parts/_navigation/index';
@@ -50,7 +51,7 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
       setIsPending(false);
       return;
     }
-    const authConfig = endpoint.authConfigs.find(function (authConfig) {
+    const authConfig = endpoint.authConfigs.list.find(function (authConfig) {
       return authConfig.type === 'oauthcallback';
     });
     if (!authConfig) {
@@ -60,18 +61,27 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
       setIsPending(false);
       return;
     }
-    const { pathObject } = authConfig;
-    const document: Document = constructFakeDocument({ paths: pathObject });
-    const getRequestResult = getRequest(document);
+    const document = resolve(endpoint.authConfigs.oas);
+    const getRequestResult = getRequest(document, {
+      operationId: authConfig.operationId,
+    });
     if (getRequestResult.isFailure()) {
       setError(new BaseError('TODO'));
       setIsPending(false);
       return;
     }
     const request = getRequestResult.value;
-    const defaultValues = cleanupRequestValue(request, {
-      parameters: queries,
-    });
+    const defaultValues = _.merge(
+      {},
+      {
+        parameters: authConfig.defaultParametersValue,
+        requestBody: authConfig.defaultRequestBodyValue,
+      },
+      cleanupRequestValue(request, {
+        parameters: queries,
+        requestBody: queries,
+      })
+    );
     setDocument(document);
     setRequest(request);
     setDefaultValues(defaultValues);

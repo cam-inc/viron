@@ -5,14 +5,14 @@ import Drawer, { useDrawer } from '$components/drawer';
 import Request from '$components/request';
 import { ON } from '$constants/index';
 import { AuthConfig, Endpoint } from '$types/index';
-import { Request as TypeRequest, RequestValue } from '$types/oas';
+import { Document, Request as TypeRequest, RequestValue } from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 import {
-  constructFakeDocument,
   constructRequestInfo,
   constructRequestInit,
   constructRequestPayloads,
   getRequest,
+  resolve,
 } from '$utils/oas/index';
 
 type Props = {
@@ -27,7 +27,7 @@ const Signout: React.FC<Props> = ({
 }) => {
   const authconfig = useMemo<AuthConfig | null>(
     function () {
-      const _authconfig = _.find(endpoint.authConfigs, function (item) {
+      const _authconfig = _.find(endpoint.authConfigs?.list, function (item) {
         return item.type === 'signout';
       });
       return _authconfig || null;
@@ -40,15 +40,19 @@ const Signout: React.FC<Props> = ({
       if (!authconfig) {
         return null;
       }
-      const { pathObject } = authconfig;
-      const document = constructFakeDocument({ paths: pathObject });
-      const getRequestResult = getRequest(document);
+      const document = resolve(endpoint.authConfigs?.oas as Document);
+      if (!document) {
+        return null;
+      }
+      const getRequestResult = getRequest(document, {
+        operationId: authconfig.operationId,
+      });
       if (getRequestResult.isFailure()) {
         return null;
       }
       return getRequestResult.value;
     },
-    [authconfig]
+    [endpoint, authconfig]
   );
 
   const drawer = useDrawer();
@@ -64,11 +68,20 @@ const Signout: React.FC<Props> = ({
       if (!authconfig || !request) {
         return null;
       }
-      const { pathObject } = authconfig;
-      const document = constructFakeDocument({ paths: pathObject });
+      const document = resolve(endpoint.authConfigs?.oas as Document);
+      if (!document) {
+        return null;
+      }
       const requestPayloads = constructRequestPayloads(
         request.operation,
-        requestValue
+        _.merge(
+          {},
+          {
+            parameters: authconfig.defaultParametersValue,
+            requestBody: authconfig.defaultRequestBodyValue,
+          },
+          requestValue
+        )
       );
       const requestInfo: RequestInfo = constructRequestInfo(
         endpoint,
@@ -99,11 +112,10 @@ const Signout: React.FC<Props> = ({
 
   const elm = useMemo<JSX.Element | null>(
     function () {
-      if (!authconfig) {
+      const document = resolve(endpoint.authConfigs?.oas as Document);
+      if (!document) {
         return null;
       }
-      const { pathObject } = authconfig;
-      const document = constructFakeDocument({ paths: pathObject });
       return (
         <>
           <button
@@ -125,7 +137,7 @@ const Signout: React.FC<Props> = ({
         </>
       );
     },
-    [handleClick, authconfig, drawer, request, handleSubmit]
+    [endpoint, handleClick, drawer, request, handleSubmit]
   );
 
   if (!authconfig) {

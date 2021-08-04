@@ -9,7 +9,7 @@ import { ON, STATUS_CODE } from '$constants/index';
 import { HTTPUnexpectedError } from '$errors/index';
 import { listState as endpointListState } from '$store/atoms/endpoint';
 import {
-  AuthConfig,
+  AuthConfigsResponse,
   ClassName,
   Endpoint,
   EndpointID,
@@ -125,16 +125,15 @@ const Add: React.FC<Props> = () => {
           });
           return;
         }
-        // TODO: GET /authconfigsのレスポンスをフラットなAuthConfig[]に変更したい。
-        const authConfigs: { list: AuthConfig[] } =
+        const authConfigs: AuthConfigsResponse =
           await authconfigsResponse.json();
-        // TODO: authConfigs.list値の妥当性をチェックする。
+        // TODO: authConfigs値の妥当性をチェックする。
         setEndpointList(function (currVal) {
           const endpoint: Endpoint = {
             id: data.endpointId,
             url: data.url,
             isPrivate: true,
-            authConfigs: authConfigs.list,
+            authConfigs,
             document: null,
           };
           return [...currVal, endpoint];

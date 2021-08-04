@@ -1,4 +1,9 @@
-import { Document, Paths } from '$types/oas';
+import {
+  RequestParametersValue,
+  RequestRequestBodyValue,
+  Document,
+  OperationId,
+} from '$types/oas';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type JsonStringifiable = any;
@@ -11,7 +16,7 @@ export type Endpoint = {
   id: EndpointID;
   url: URL;
   isPrivate: boolean;
-  authConfigs: AuthConfig[] | null;
+  authConfigs: AuthConfigsResponse | null;
   document: Document | null;
 };
 export type EndpointForDistribution = Endpoint & {
@@ -24,8 +29,14 @@ export type ClassName = string;
 export type AuthConfig = {
   type: 'email' | 'oauth' | 'oauthcallback' | 'signout';
   provider: 'viron' | 'google' | 'signout';
-  // This object contains only one key-value pair.
-  pathObject: Paths;
+  operationId: OperationId;
+  defaultParametersValue?: RequestParametersValue;
+  defaultRequestBodyValue?: RequestRequestBodyValue;
+};
+
+export type AuthConfigsResponse = {
+  list: AuthConfig[];
+  oas: Document;
 };
 
 export type __AuthConfig = {

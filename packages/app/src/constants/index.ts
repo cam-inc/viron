@@ -1,3 +1,5 @@
+import { isSSR } from '$utils/index';
+
 export const ON = {
   BACKGROUND: 'background',
   SURFACE: 'surface',
@@ -20,10 +22,17 @@ export type Url = typeof URL[keyof typeof URL];
 
 export const ENVIRONMENTAL_VARIABLE = {
   AUTOCOMPLETE_VALUE: '${autocompleteValue}',
-  OAUTH_REDIRECT_URI: '${oauthRedirectURL}',
+  OAUTH_REDIRECT_URI: '${oauthRedirectURI}',
 } as const;
 export type EnvironmentalVariable =
   typeof ENVIRONMENTAL_VARIABLE[keyof typeof ENVIRONMENTAL_VARIABLE];
+
+export const OAUTH_REDIRECT_URI = (function () {
+  if (isSSR) {
+    return '';
+  }
+  return `${window.location.origin}/oauthredirect`;
+})();
 
 export const STATUS_CODE = {
   CONTINUE: 100,
