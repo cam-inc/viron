@@ -81,6 +81,7 @@ export const getGoogleOAuth2AuthorizationUrl = (
   const opts = {
     state,
     access_type: 'offline',
+    prompt: 'consent',
     scope: config.additionalScopes
       ? GOOGLE_OAUTH2_DEFAULT_SCOPES.concat(config.additionalScopes)
       : GOOGLE_OAUTH2_DEFAULT_SCOPES,
@@ -171,6 +172,7 @@ export const signinGoogleOAuth2 = async (
     throw signinFailed();
   }
 
+  debug('signinGoogleOAuth2 Sign jwt for user: %s', adminUser.id);
   return signJwt(adminUser.id);
 };
 
