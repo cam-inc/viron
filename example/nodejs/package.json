@@ -16,7 +16,7 @@
     "i18next-fs-backend": "^1.1.1",
     "i18next-http-middleware": "^3.1.0",
     "mime-types": "^2.1.31",
-    "mongoose": "5.13.4",
+    "mongoose": "5.12.6",
     "mysql2": "^2.2.5",
     "pino": "^6.11.0",
     "pino-http": "^5.5.0",
