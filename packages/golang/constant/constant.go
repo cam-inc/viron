@@ -67,6 +67,18 @@ const (
 	API_METHOD_DELETE = "delete"
 
 	/*
+		export const PERMISSION = {
+		  READ: 'read',
+		  WRITE: 'write',
+		  DENY: 'deny',
+		} as const;
+	*/
+
+	PERMISSION_READ  = "read"
+	PERMISSION_WRITE = "write"
+	PERMISSION_DENY  = "deny"
+
+	/*
 		export const AUTH_CONFIG_PROVIDER = {
 		  VIRON: 'viron',
 		  GOOGLE: 'google',
@@ -105,13 +117,33 @@ const (
 	SIGNOUT_PATH                     = "/signout"
 
 	/*
+		export const OAS_X_THUMBNAIL = 'x-thumbnail';
+		export const OAS_X_THEME = 'x-theme';
+		export const OAS_X_TAGS = 'x-tags';
+		export const OAS_X_TABLE = 'x-table';
+		export const OAS_X_PAGES = 'x-pages';
+		export const OAS_X_PAGE_CONTENTS = 'contents';
+		export const OAS_X_PAGE_CONTENT_RESOURCE_ID = 'resourceId';
+		export const OAS_X_AUTOCOMPLETE = 'x-autocomplete';
 		export const OAS_X_AUTHCONFIG_DEFAULT_PARAMETERS =
 		  'x-authconfig-default-parameters';
 		export const OAS_X_AUTHCONFIG_DEFAULT_REQUESTBODY =
 		  'x-authconfig-default-requestBody';
+			export const OAS_X_AUTHCONFIG_DEFAULT_PARAMETERS =
+			  'x-authconfig-default-parameters';
+			export const OAS_X_AUTHCONFIG_DEFAULT_REQUESTBODY =
+			  'x-authconfig-default-requestBody';
 
 	*/
 
+	OAS_X_THUMBNAIL                      = "x-thumbnail"
+	OAS_X_THEME                          = "x-theme"
+	OAS_X_TAGS                           = "x-tags"
+	OAS_X_TABLE                          = "x-table"
+	OAS_X_PAGES                          = "x-pages"
+	OAS_X_PAGE_CONTENTS                  = "contents"
+	OAS_X_PAGE_CONTENT_RESOURCE_ID       = "resourceId"
+	OAS_X_AUTOCOMPLETE                   = "x-autocomplete"
 	OAS_X_AUTHCONFIG_DEFAULT_PARAMETERS  = "x-authconfig-default-parameters"
 	OAS_X_AUTHCONFIG_DEFAULT_REQUESTBODY = "x-authconfig-default-requestBody"
 
@@ -197,5 +229,12 @@ var (
 		http.MethodDelete,
 		http.MethodHead,
 		http.MethodOptions,
+	}
+
+	API_METHODS = []string{
+		API_METHOD_GET,
+		API_METHOD_POST,
+		API_METHOD_PUT,
+		API_METHOD_DELETE,
 	}
 )

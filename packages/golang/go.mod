@@ -3,7 +3,9 @@ module github.com/cam-inc/viron/packages/golang
 go 1.16
 
 require (
+	github.com/Blank-Xu/sql-adapter v0.0.0-20210714092925-0bdd0d548758
 	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
+	github.com/casbin/casbin/v2 v2.34.2
 	github.com/deepmap/oapi-codegen v1.8.1
 	github.com/friendsofgo/errors v0.9.2
 	github.com/getkin/kin-openapi v0.66.0
@@ -13,6 +15,7 @@ require (
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/kat-co/vala v0.0.0-20170210184112-42e1d8b61f12
 	github.com/lestrrat-go/jwx v1.1.0
+	github.com/soongo/path-to-regexp v1.6.3
 	github.com/spf13/viper v1.8.1
 	github.com/volatiletech/null v8.0.0+incompatible // indirect
 	github.com/volatiletech/null/v8 v8.1.2
