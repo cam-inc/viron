@@ -1,7 +1,10 @@
 package helpers
 
 import (
+	"net/http"
 	"strings"
+
+	"github.com/cam-inc/viron/packages/golang/constant"
 
 	"github.com/getkin/kin-openapi/openapi3"
 )
@@ -91,6 +94,35 @@ func Ref(docRoot *openapi3.T, org string, rep string) error {
 		link.Ref = ref(link.Ref, org, rep)
 	}
 	return nil
+}
+
+func MethodNameLower(method string) string {
+	switch strings.ToLower(method) {
+	case constant.API_METHOD_GET:
+		return constant.API_METHOD_GET
+	case constant.API_METHOD_POST:
+		return constant.API_METHOD_POST
+	case constant.API_METHOD_PUT:
+		return constant.API_METHOD_PUT
+	case constant.API_METHOD_DELETE:
+		return constant.API_METHOD_DELETE
+	}
+	return ""
+}
+
+func MethodNameUpper(method string) string {
+	switch strings.ToUpper(method) {
+	case http.MethodGet:
+		return http.MethodGet
+	case http.MethodPost:
+		return http.MethodPost
+	case http.MethodPut:
+		return http.MethodPut
+	case http.MethodDelete:
+		return http.MethodDelete
+	}
+	return ""
+
 }
 
 /*
