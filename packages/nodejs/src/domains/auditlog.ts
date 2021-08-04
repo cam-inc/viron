@@ -49,9 +49,9 @@ export const createOne = async (
 export const isSkip = (
   uri: string,
   method: string,
-  apiDefinition: VironOpenAPIObject
+  oas: VironOpenAPIObject
 ): boolean => {
-  const { pathItem } = getPathItem(uri, apiDefinition);
+  const { pathItem } = getPathItem(uri, oas);
   const operation = pathItem?.[method.toLowerCase()];
   return !!operation?.[OAS_X_SKIP_AUDITLOG];
 };

@@ -1,6 +1,6 @@
 {
   "name": "@viron/lib",
-  "version": "0.0.1-alpha.8",
+  "version": "0.0.1-alpha.9",
   "scripts": {
     "build": "npm run clean && tsc --project tsconfig.json && cp -fr src/openapi dist/",
     "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",

@@ -4,11 +4,13 @@ import {
   ApiMethod,
   OAS_X_AUTHCONFIG_DEFAULT_PARAMETERS,
   OAS_X_AUTHCONFIG_DEFAULT_REQUESTBODY,
+  OAS_X_PAGES,
 } from '../constants';
 import { oasUndefined } from '../errors';
 import { getDebug } from '../logging';
 import {
   VironOpenAPIObject,
+  VironOperationObject,
   VironPathItemObject,
   VironPathsObject,
 } from './oas';
@@ -18,7 +20,7 @@ const debug = getDebug('domains:authconfig');
 export interface AuthConfig {
   provider: AuthConfigProvider;
   type: AuthConfigType;
-  pathObject: VironPathsObject;
+  operationId: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   defaultParametersValue?: Record<string, any>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,35 +29,80 @@ export interface AuthConfig {
 
 export type AuthConfigs = AuthConfig[];
 
-export const genAuthConfig = (
-  provider: AuthConfigProvider,
-  type: AuthConfigType,
+export interface VironAuthConfigList {
+  list: AuthConfigs;
+  oas: VironOpenAPIObject;
+}
+
+export interface AuthConfigDefinition {
+  provider: AuthConfigProvider;
+  type: AuthConfigType;
+  method: ApiMethod;
+  path: string;
+}
+
+export type AuthConfigDefinitions = AuthConfigDefinition[];
+
+const getOperation = (
   method: ApiMethod,
   path: string,
-  apiDefinition: VironOpenAPIObject
-): AuthConfig => {
-  const pathItem = apiDefinition.paths[path];
+  oas: VironOpenAPIObject
+): VironOperationObject => {
+  const pathItem = oas.paths[path];
   if (!pathItem) {
     debug('oas undefined path: %s', path);
     throw oasUndefined();
   }
   const operationObject = (pathItem as VironPathItemObject)[method];
-  if (!operationObject) {
+  if (!operationObject || !operationObject.operationId) {
     debug('oas undefined path: %s, method: %s', path, method);
     throw oasUndefined();
   }
+  return operationObject as VironOperationObject;
+};
 
+const genAuthConfig = (
+  provider: AuthConfigProvider,
+  type: AuthConfigType,
+  method: ApiMethod,
+  path: string,
+  oas: VironOpenAPIObject
+): AuthConfig => {
+  const operationObject = getOperation(method, path, oas);
   return {
     provider,
     type,
-    pathObject: {
-      [path]: {
-        [method]: operationObject,
-      },
-    },
+    operationId: operationObject.operationId,
     defaultParametersValue:
       operationObject[OAS_X_AUTHCONFIG_DEFAULT_PARAMETERS],
     defaultRequestBodyValue:
       operationObject[OAS_X_AUTHCONFIG_DEFAULT_REQUESTBODY],
+  };
+};
+
+export const genAuthConfigs = (
+  defs: AuthConfigDefinitions,
+  oas: VironOpenAPIObject
+): VironAuthConfigList => {
+  const { list, paths } = defs.reduce(
+    (ret, def) => {
+      const { provider, type, method, path } = def;
+      ret.list.push(genAuthConfig(provider, type, method, path, oas));
+      ret.paths[path] = ret.paths[path] ?? {};
+      ret.paths[path][method] = getOperation(method, path, oas);
+      return ret;
+    },
+    {
+      list: [],
+      paths: {},
+    } as { list: AuthConfigs; paths: VironPathsObject }
+  );
+  return {
+    list,
+    // 非ログイン状態で見られるため不要なものは消す
+    oas: Object.assign({}, oas, {
+      paths,
+      info: Object.assign({}, oas.info, { [OAS_X_PAGES]: [] }),
+    }),
   };
 };

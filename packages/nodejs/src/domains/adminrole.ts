@@ -215,9 +215,9 @@ export const hasPermission = async (
   userId: string,
   requestUri: string,
   requestMethod: ApiMethod,
-  apiDefinition: VironOpenAPIObject
+  oas: VironOpenAPIObject
 ): Promise<boolean> => {
-  const resourceId = getResourceId(requestUri, requestMethod, apiDefinition);
+  const resourceId = getResourceId(requestUri, requestMethod, oas);
   if (!resourceId) {
     // TODO: セキュリティ的にあまりよくないのであとでなんとかする
     return true;
@@ -230,10 +230,8 @@ export const hasPermission = async (
 };
 
 // リソース一覧
-export const listResourcesByOas = (
-  apiDefinitions: VironOpenAPIObject
-): string[] => {
-  const pages = apiDefinitions.info[OAS_X_PAGES];
+export const listResourcesByOas = (oas: VironOpenAPIObject): string[] => {
+  const pages = oas.info[OAS_X_PAGES];
   if (!pages?.length) {
     return [];
   }
@@ -250,10 +248,10 @@ export const listResourcesByOas = (
 
 // 管理ロール一覧
 export const listByOas = async (
-  apiDefinitions: VironOpenAPIObject
+  oas: VironOpenAPIObject
 ): Promise<ListWithPager<AdminRole>> => {
   const policies = await listPolicies();
-  const resourceIds = listResourcesByOas(apiDefinitions);
+  const resourceIds = listResourcesByOas(oas);
 
   const map = policies.reduce(
     (
@@ -306,7 +304,7 @@ export const removeOneById = async (roleId: string): Promise<void> => {
 
 // viewerロールを作成
 export const createViewer = async (
-  apiDefinitions: VironOpenAPIObject
+  oas: VironOpenAPIObject
 ): Promise<boolean> => {
   const policies = await listPolicies(ADMIN_ROLE.VIEWER);
   if (policies.length) {
@@ -321,7 +319,7 @@ export const createViewer = async (
     },
     {}
   );
-  const resourceIds = listResourcesByOas(apiDefinitions);
+  const resourceIds = listResourcesByOas(oas);
   const permissions = resourceIds.map((resourceId: string) => {
     return {
       resourceId,
