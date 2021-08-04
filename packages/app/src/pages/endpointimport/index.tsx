@@ -10,7 +10,11 @@ import { BaseError, getHTTPError, NetworkError, OASError } from '$errors/index';
 import useTheme from '$hooks/theme';
 import Layout, { Props as LayoutProps } from '$layouts/index';
 import { listState as endpointListState } from '$store/atoms/endpoint';
-import { AuthConfig, Endpoint, EndpointForDistribution } from '$types/index';
+import {
+  AuthConfigsResponse,
+  Endpoint,
+  EndpointForDistribution,
+} from '$types/index';
 import { promiseErrorHandler } from '$utils/index';
 import { lint, resolve } from '$utils/oas';
 import Appbar from './_parts/_appbar/index';
@@ -102,10 +106,9 @@ const EndpointImportPagge: React.FC<Props> = ({ location }) => {
             setIsPending(false);
             return;
           }
-          // TODO: GET /authconfigsのレスポンスをフラットなAuthConfig[]に変更したい。
-          const authConfigs: { list: AuthConfig[] } =
+          const authConfigs: AuthConfigsResponse =
             await authconfigsResponse.json();
-          // TODO: authConfigs.list値の妥当性をチェックする。
+          // TODO: authConfigs値の妥当性をチェックする。
           setEndpointList(function (currVal) {
             // ID duplication check.
             let { id } = endpoint;
@@ -120,7 +123,7 @@ const EndpointImportPagge: React.FC<Props> = ({ location }) => {
               ...endpoint,
               id,
               isPrivate: true,
-              authConfigs: authConfigs.list,
+              authConfigs,
               document: null,
             };
             return [...currVal, _endpoint];

@@ -9,17 +9,26 @@ import Button from '$components/button';
 import Error from '$components/error';
 import Drawer, { useDrawer } from '$components/drawer';
 import Request from '$components/request';
-import { ON } from '$constants/index';
+import {
+  ENVIRONMENTAL_VARIABLE,
+  OAUTH_REDIRECT_URI,
+  ON,
+} from '$constants/index';
+import { BaseError } from '$errors/index';
 import { remove, KEY, set } from '$storage/index';
 import { AuthConfig, Endpoint } from '$types/index';
-import { RequestValue } from '$types/oas';
+import {
+  Request as RequestType,
+  RequestParametersValue,
+  RequestValue,
+} from '$types/oas';
 import { promiseErrorHandler } from '$utils/index';
 import {
-  constructFakeDocument,
   constructRequestInfo,
   constructRequestInit,
   constructRequestPayloads,
   getRequest,
+  replaceEnvironmentalVariableOfDefaultRequestParametersValue,
 } from '$utils/oas/index';
 
 type Props = {
@@ -29,7 +38,7 @@ type Props = {
 const Signin: React.FC<Props> = ({ endpoint, isSigninRequired }) => {
   const authconfigOAuth = useMemo<AuthConfig | null>(
     function () {
-      const _authconfig = _.find(endpoint.authConfigs, function (item) {
+      const _authconfig = _.find(endpoint.authConfigs?.list, function (item) {
         return item.type === 'oauth';
       });
       return _authconfig || null;
@@ -39,7 +48,7 @@ const Signin: React.FC<Props> = ({ endpoint, isSigninRequired }) => {
 
   const authconfigEmail = useMemo<AuthConfig | null>(
     function () {
-      const _authconfig = _.find(endpoint.authConfigs, function (item) {
+      const _authconfig = _.find(endpoint.authConfigs?.list, function (item) {
         return item.type === 'email';
       });
       return _authconfig || null;
@@ -99,9 +108,22 @@ const OAuth: React.FC<{
   endpoint: Endpoint;
   authConfig: AuthConfig;
 }> = ({ endpoint, authConfig }) => {
-  const { pathObject } = authConfig;
-  const document = constructFakeDocument({ paths: pathObject });
-  const getRequestResult = getRequest(document);
+  const document = endpoint.authConfigs?.oas;
+  const request = useMemo<RequestType | null>(
+    function () {
+      if (!document) {
+        return null;
+      }
+      const getRequestResult = getRequest(document, {
+        operationId: authConfig.operationId,
+      });
+      if (getRequestResult.isFailure()) {
+        return null;
+      }
+      return getRequestResult.value;
+    },
+    [document, authConfig]
+  );
 
   let Icon: IconType = AiOutlineLogin;
   if (authConfig.provider === 'google') {
@@ -110,10 +132,12 @@ const OAuth: React.FC<{
 
   const handleSubmit = useCallback(
     async function (requestValue: RequestValue) {
-      if (getRequestResult.isFailure()) {
+      if (!document) {
         return;
       }
-      const request = getRequestResult.value;
+      if (!request) {
+        return;
+      }
       const requestPayloads = constructRequestPayloads(
         request.operation,
         requestValue
@@ -131,11 +155,34 @@ const OAuth: React.FC<{
         remove(KEY.OAUTH_ENDPOINT_ID);
       }
     },
-    [endpoint, document, getRequestResult]
+    [endpoint, document, request]
   );
 
-  if (getRequestResult.isFailure()) {
-    return <Error on={ON.SURFACE} error={getRequestResult.value} />;
+  const defaultValues = useMemo<RequestValue>(
+    function () {
+      return {
+        parameters: replaceEnvironmentalVariableOfDefaultRequestParametersValue(
+          authConfig.defaultParametersValue as RequestParametersValue,
+          {
+            [ENVIRONMENTAL_VARIABLE.OAUTH_REDIRECT_URI]: OAUTH_REDIRECT_URI,
+          }
+        ),
+        requestBody: authConfig.defaultRequestBodyValue,
+      };
+    },
+    [authConfig]
+  );
+
+  if (!document) {
+    return (
+      <Error on={ON.SURFACE} error={new BaseError('OAS document missing.')} />
+    );
+  }
+
+  if (!request) {
+    return (
+      <Error on={ON.SURFACE} error={new BaseError('Request object missing.')} />
+    );
   }
 
   return (
@@ -150,7 +197,8 @@ const OAuth: React.FC<{
         on={ON.SURFACE}
         endpoint={endpoint}
         document={document}
-        request={getRequestResult.value}
+        defaultValues={defaultValues}
+        request={request}
         onSubmit={handleSubmit}
       />
     </div>
@@ -161,16 +209,32 @@ const Email: React.FC<{
   endpoint: Endpoint;
   authConfig: AuthConfig;
 }> = ({ endpoint, authConfig }) => {
-  const { pathObject } = authConfig;
-  const document = constructFakeDocument({ paths: pathObject });
-  const getRequestResult = getRequest(document);
+  const document = endpoint.authConfigs?.oas;
+
+  const request = useMemo<RequestType | null>(
+    function () {
+      if (!document) {
+        return null;
+      }
+      const getRequestResult = getRequest(document, {
+        operationId: authConfig.operationId,
+      });
+      if (getRequestResult.isFailure()) {
+        return null;
+      }
+      return getRequestResult.value;
+    },
+    [document, authConfig]
+  );
 
   const handleSubmit = useCallback(
     async function (requestValue: RequestValue) {
-      if (getRequestResult.isFailure()) {
+      if (!document) {
         return;
       }
-      const request = getRequestResult.value;
+      if (!request) {
+        return;
+      }
       const requestPayloads = constructRequestPayloads(
         request.operation,
         requestValue
@@ -199,11 +263,29 @@ const Email: React.FC<{
       }
       navigate(`/endpoints/${endpoint.id}`);
     },
-    [endpoint, document, getRequestResult]
+    [endpoint, document, request]
   );
 
-  if (getRequestResult.isFailure()) {
-    return <Error on={ON.SURFACE} error={getRequestResult.value} />;
+  const defaultValues = useMemo<RequestValue>(
+    function () {
+      return {
+        parameters: authConfig.defaultParametersValue,
+        requestBody: authConfig.defaultRequestBodyValue,
+      };
+    },
+    [authConfig]
+  );
+
+  if (!document) {
+    return (
+      <Error on={ON.SURFACE} error={new BaseError('OAS document missing.')} />
+    );
+  }
+
+  if (!request) {
+    return (
+      <Error on={ON.SURFACE} error={new BaseError('Request object missing.')} />
+    );
   }
 
   return (
@@ -216,7 +298,8 @@ const Email: React.FC<{
         on={ON.SURFACE}
         endpoint={endpoint}
         document={document}
-        request={getRequestResult.value}
+        defaultValues={defaultValues}
+        request={request}
         onSubmit={handleSubmit}
       />
     </div>

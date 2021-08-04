@@ -14,7 +14,7 @@ import {
 } from '$errors/index';
 import { listState as endpointListState } from '$store/atoms/endpoint';
 import {
-  AuthConfig,
+  AuthConfigsResponse,
   ClassName,
   Endpoint,
   EndpointForDistribution,
@@ -133,10 +133,9 @@ const Import: React.FC<Props> = ({ className = '' }) => {
                 );
                 return;
               }
-              // TODO: GET /authconfigsのレスポンスをフラットなAuthConfig[]に変更したい。
-              const authConfigs: { list: AuthConfig[] } =
+              const authConfigs: AuthConfigsResponse =
                 await authconfigsResponse.json();
-              // TODO: authConfigs.list値の妥当性をチェックする。
+              // TODO: authConfigs値の妥当性をチェックする。
               setEndpointList(function (currVal) {
                 // ID duplication check.
                 let { id } = endpoint;
@@ -151,7 +150,7 @@ const Import: React.FC<Props> = ({ className = '' }) => {
                   ...endpoint,
                   id,
                   isPrivate: true,
-                  authConfigs: authConfigs.list,
+                  authConfigs,
                   document: null,
                 };
                 return [...currVal, _endpoint];
