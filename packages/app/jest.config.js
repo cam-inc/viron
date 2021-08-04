@@ -26,6 +26,7 @@ module.exports = {
   ],
   transformIgnorePatterns: [`node_modules/(?!(gatsby)/)`],
   globals: {
+    __NODE_ENV__: `development`,
     __PATH_PREFIX__: ``,
   },
   testURL: `https://localhost:8000/`,
