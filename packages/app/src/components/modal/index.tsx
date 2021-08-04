@@ -1,3 +1,4 @@
+import { BiXCircle } from '@react-icons/all-files/bi/BiXCircle';
 import classnames from 'classnames';
 import React, { useCallback, useEffect, useState } from 'react';
 import Portal from '$components/portal';
@@ -31,7 +32,7 @@ const Modal: React.FC<Props> = ({ isOpened, onRequestClose, children }) => {
 
   return (
     <Portal targetId={ID}>
-      <div className="absolute inset-0 pointer-events-auto">
+      <div className="absolute inset-0 pointer-events-auto backdrop-filter backdrop-blur-sm">
         <div
           className={classnames(
             'absolute inset-0 transition-opacity duration-300',
@@ -57,8 +58,10 @@ const Modal: React.FC<Props> = ({ isOpened, onRequestClose, children }) => {
             )}
           >
             <div className="relative flex-none h-0">
-              <div className="absolute right-0 bottom-0 left-0 flex justify-end">
-                <button onClick={handleCloseButtonClick}>close</button>
+              <div className="absolute right-0 bottom-[8px] left-0 flex justify-end">
+                <button onClick={handleCloseButtonClick}>
+                  <BiXCircle className="text-lg text-on-background" />
+                </button>
               </div>
             </div>
             <div className="min-h-0 flex-1 bg-surface-04dp shadow-04dp p-4 rounded overflow-y-scroll overscroll-y-contain">
@@ -85,12 +88,12 @@ export const useModal = function (): {
   const handleRequestClose = useCallback(function () {
     setIsOpened(false);
   }, []);
-  const open = function () {
+  const open = useCallback(function () {
     setIsOpened(true);
-  };
-  const close = function () {
+  }, []);
+  const close = useCallback(function () {
     setIsOpened(false);
-  };
+  }, []);
   return {
     open,
     close,

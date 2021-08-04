@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import React from 'react';
 import { FieldError } from 'react-hook-form';
 import { ClassName } from '$types/index';
@@ -8,6 +9,7 @@ type Bind = {
   list?: string;
 };
 type Props = {
+  className?: ClassName;
   type?: React.InputHTMLAttributes<HTMLInputElement>['type'];
   label?: string;
   description?: string;
@@ -19,6 +21,7 @@ type Props = {
 };
 
 const Textinput: React.FC<Props> = ({
+  className = '',
   type = 'text',
   label,
   description,
@@ -29,16 +32,16 @@ const Textinput: React.FC<Props> = ({
   const bind: Bind = {
     type,
     className:
-      'p-1 bg-background text-on-background border border-on-background-faint rounded focus:bg-surface focus:text-on-surface focus:outline-none focus:ring-2 focus:ring-on-surface',
+      'block w-full p-1 bg-background text-on-background border border-on-background-faint rounded focus:bg-surface focus:text-on-surface focus:outline-none focus:ring-2 focus:ring-on-surface',
   };
   if (autocompleteId) {
     bind.list = autocompleteId;
   }
   return (
-    <div>
+    <div className={classnames(className)}>
       {!!label && <div className="text-xs font-bold">{label}</div>}
       {!!description && <p>{description}</p>}
-      {!!error && <p>{error.message}</p>}
+      {!!error && <p className="text-xxs">{error.message}</p>}
       {render(bind)}
     </div>
   );

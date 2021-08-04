@@ -1,10 +1,10 @@
 import classnames from 'classnames';
 import React, { useMemo } from 'react';
 import Logo from '$components/logo';
-import { Endpoint } from '$types/index';
+import { ClassName, Endpoint } from '$types/index';
 
 type Props = {
-  className?: string;
+  className?: ClassName;
   endpoint: Endpoint;
 };
 const Thumbnail: React.FC<Props> = ({ className = '', endpoint }) => {
@@ -32,7 +32,7 @@ const Thumbnail: React.FC<Props> = ({ className = '', endpoint }) => {
   return (
     <div
       className={classnames(
-        'w-16 h-16 rounded bg-background border border-on-background-faint overflow-hidden',
+        'w-12 h-12 rounded bg-background border border-on-background-faint overflow-hidden',
         className
       )}
     >

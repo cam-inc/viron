@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import Error from '$components/error';
 import Metadata from '$components/metadata';
-import { StatusCode } from '$constants/index';
+import { ON, StatusCode } from '$constants/index';
 import { BaseError, getHTTPError, NetworkError, OASError } from '$errors/index';
 import useTheme from '$hooks/theme';
 import Layout, { Props as LayoutProps } from '$layouts/index';
@@ -206,7 +206,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
         return <div>TODO: pending...</div>;
       }
       if (error) {
-        return <Error error={error} />;
+        return <Error on={ON.BACKGROUND} error={error} />;
       }
       const page = _.find(document.info['x-pages'], function (page) {
         return page.id === selectedPageId;

@@ -72,6 +72,7 @@ const _Navigation: React.FC<Props> = ({
 
   return (
     <Navigation
+      on={ON.SURFACE}
       className={classnames(className, 'h-full')}
       renderHead={renderHead}
       renderBody={renderBody}

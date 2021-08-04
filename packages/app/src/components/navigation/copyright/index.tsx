@@ -15,7 +15,7 @@ const Copyright: React.FC<Props> = ({ on }) => {
         'text-on-complementary': on === ON.COMPLEMENTARY,
       })}
     >
-      © 2021 CAM, Inc
+      © {new Date().getFullYear()} CAM, Inc
     </div>
   );
 };

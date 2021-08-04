@@ -5,6 +5,7 @@ import ErrorBoundary from '$components/errorBoundary';
 import Notification, { useNotification } from '$components/notification';
 import Progress, { useProgress } from '$components/progress';
 //import Popover, { usePopover } from '$components/popover';
+import { ON } from '$constants/index';
 import useTheme from '$hooks/theme';
 import { screenState } from '$store/atoms/app';
 import { isBrowser } from '$utils/index';
@@ -85,7 +86,7 @@ const SamplePage: React.FC<Props> = () => {
       <div>
         <p>ErrorHandlingのテスト</p>
         <button onClick={handleCountupClick}>count up({count})</button>
-        <ErrorBoundary resetKeys={[count]}>
+        <ErrorBoundary on={ON.BACKGROUND} resetKeys={[count]}>
           <Count count={count} />
         </ErrorBoundary>
       </div>

@@ -1,6 +1,7 @@
 import { ImQrcode } from '@react-icons/all-files/im/ImQrcode';
 import qrcode from 'qrcode';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { ON } from '$constants/index';
 import Button from '$components/button';
 import Error from '$components/error';
 import Modal, { useModal } from '$components/modal';
@@ -64,7 +65,7 @@ const _QRCode: React.FC<{ endpoint: Endpoint }> = ({ endpoint }) => {
   );
 
   if (error) {
-    return <Error error={error} />;
+    return <Error on={ON.SURFACE} error={error} />;
   }
   return <canvas ref={canvasRef} />;
 };

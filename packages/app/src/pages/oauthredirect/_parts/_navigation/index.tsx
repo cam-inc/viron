@@ -48,6 +48,7 @@ const _Navigation: React.FC<Props> = ({ className = '' }) => {
 
   return (
     <Navigation
+      on={ON.SURFACE}
       className={classnames(className, 'h-full')}
       renderHead={renderHead}
       renderTail={renderTail}
