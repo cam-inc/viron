@@ -16,6 +16,7 @@ import { middlewareNotFound } from './middlewares/notfound';
 import { middlewareCors } from './middlewares/cors';
 import { middlewareAccessLog } from './middlewares/accesslog';
 import { middlewareAuditLog } from './middlewares/auditlog';
+import { middlewareCacheControl } from './middlewares/cachecontrol';
 import { ctx } from './context';
 
 interface RequestContext {
@@ -58,6 +59,7 @@ export const createApplication = async (): Promise<Express> => {
   const app = express();
 
   // Express configuration
+  app.disable('x-powered-by');
   app.set('host', process.env.SERVICE_HOST || 'localhost');
   app.set('port', process.env.SERVICE_PORT || 3000);
 
@@ -67,6 +69,7 @@ export const createApplication = async (): Promise<Express> => {
   app.use(cookieParser());
   app.use(middlewareAccessLog());
   app.use(middlewareI18n());
+  app.use(middlewareCacheControl());
   app.use(middlewareCors(ctx.config.cors));
   app.use(middlewareAuditLog());
 

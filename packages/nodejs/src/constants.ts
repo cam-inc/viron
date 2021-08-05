@@ -35,6 +35,7 @@ export const HTTP_HEADER = {
   ACCESS_CONTROL_ALLOW_METHODS: 'access-control-allow-methods',
   ACCESS_CONTROL_ALLOW_HEADERS: 'access-control-allow-headers',
   ACCESS_CONTROL_EXPOSE_HEADERS: 'access-control-expose-headers',
+  CACHE_CONTROL: 'cache-control',
   CONTENT_DISPOSITION: 'content-disposition',
   CONTENT_TYPE: 'content-type',
   LOCATION: 'location',
@@ -137,3 +138,7 @@ export type Theme = typeof THEME[keyof typeof THEME];
 export const TABLE_SORT_DELIMITER = ':';
 
 export const ADMIN_USER_ID_ME = 'me';
+
+export const CACHE_CONTROL = {
+  NO_STORE: 'no-store',
+} as const;
