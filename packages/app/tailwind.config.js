@@ -72,6 +72,7 @@ module.exports = {
         'on-error-faint': 'var(--color-on-error-faint)',
       },
       fontSize: {
+        em: '1em',
         xxs: ['0.625rem', '1rem'],
       },
       maxHeight: {
@@ -95,6 +96,7 @@ module.exports = {
         '75%': '75%',
       },
       spacing: {
+        em: '1em',
         15: '3.75rem',
         17: '4.25rem',
         18: '4.5rem',

@@ -4,7 +4,7 @@
 /* Follow Google Material Design principles. */
 /* @see: https://material.io/design/color/dark-theme.html */
 
-/* Non-themable pages like `/home` will apply default custom properties. */
+/* Non-themable pages like `/dashboard` will apply default custom properties. */
 body {
   --color-hue: 300;
 }

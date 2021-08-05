@@ -24,7 +24,10 @@ const _Navigation: React.FC<Props> = ({
   const renderHead = useCallback<NonNullable<NavigationProps['renderHead']>>(
     function () {
       return (
-        <Link to="/home" className="flex justify-center items-center h-[62px]">
+        <Link
+          to="/dashboard"
+          className="flex justify-center items-center h-[62px]"
+        >
           <Logo
             className="h-8 drop-shadow-01dp"
             left="text-primary"

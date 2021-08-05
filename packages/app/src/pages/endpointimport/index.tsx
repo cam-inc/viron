@@ -28,7 +28,7 @@ const EndpointImportPagge: React.FC<Props> = ({ location }) => {
   const [error, setError] = useState<BaseError | null>(null);
   const [isPending, setIsPending] = useState<boolean>(true);
 
-  // TODO: 良い感じにsrc/pages/home/_add/index.tsxと処理を統一したい。
+  // TODO: 良い感じにsrc/pages/dashboard/_add/index.tsxと処理を統一したい。
   useEffect(
     function () {
       const queries = parse(location.search);
@@ -83,7 +83,7 @@ const EndpointImportPagge: React.FC<Props> = ({ location }) => {
             };
             return [...currVal, _endpoint];
           });
-          navigate('/home');
+          navigate('/dashboard');
           return;
         }
         if (!response.ok && response.status === 401) {
@@ -128,7 +128,7 @@ const EndpointImportPagge: React.FC<Props> = ({ location }) => {
             };
             return [...currVal, _endpoint];
           });
-          navigate('/home');
+          navigate('/dashboard');
           return;
         }
         if (!response.ok) {

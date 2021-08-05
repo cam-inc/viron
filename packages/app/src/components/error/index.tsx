@@ -48,7 +48,7 @@ const Error: React.FC<Props> = ({ on, error }) => {
         <div>
           <div>TODO: 認証が必要よ。</div>
           <div>
-            <Link on={on} to="/home">
+            <Link on={on} to="/dashboard">
               home
             </Link>
           </div>
