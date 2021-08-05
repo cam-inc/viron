@@ -1,4 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import classnames from 'classnames';
 import React, { useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRecoilState } from 'recoil';
@@ -19,14 +20,15 @@ import { promiseErrorHandler } from '$utils/index';
 import { lint, resolve } from '$utils/oas';
 import { endpointId, url } from '$utils/v8n';
 
-type Props = {
+export type Props = {
   className?: ClassName;
+  onAdd: () => void;
 };
 type FormData = {
   endpointId: EndpointID;
   url: TypeURL;
 };
-const Add: React.FC<Props> = () => {
+const Add: React.FC<Props> = ({ onAdd, className = '' }) => {
   const schema = useMemo(function () {
     return yup.object().shape({
       endpointId: endpointId.required(),
@@ -94,6 +96,7 @@ const Add: React.FC<Props> = () => {
         });
         // Clear errors and input data.
         reset();
+        onAdd();
         return;
       }
 
@@ -139,6 +142,7 @@ const Add: React.FC<Props> = () => {
           return [...currVal, endpoint];
         });
         reset();
+        onAdd();
         return;
       }
 
@@ -151,13 +155,14 @@ const Add: React.FC<Props> = () => {
       });
       return;
     },
-    [endpointList, setEndpointList, reset, setError]
+    [endpointList, setEndpointList, reset, setError, onAdd]
   );
 
   return (
-    <div className="p-2">
+    <div className={classnames('p-2', className)}>
       <form onSubmit={handleSubmit(addEndpoint)}>
         <Textinput
+          on={ON.SURFACE}
           className="mb-2 last:mb-0"
           label="Endpoint Id"
           error={formState.errors.endpointId}
@@ -168,6 +173,7 @@ const Add: React.FC<Props> = () => {
           }}
         />
         <Textinput
+          on={ON.SURFACE}
           className="mb-2 last:mb-0"
           label="URL"
           error={formState.errors.url}

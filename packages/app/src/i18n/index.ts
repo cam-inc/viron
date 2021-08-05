@@ -1,6 +1,10 @@
 import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { initReactI18next } from 'react-i18next';
+import {
+  initReactI18next,
+  useTranslation as useTranslationI18n,
+} from 'react-i18next';
+import { isDevelopment } from '$utils/index';
 import resourceEn from './resources/en';
 import resourceJa from './resources/ja';
 
@@ -11,7 +15,7 @@ i18n
   .use(initReactI18next)
   // @see: https://www.i18next.com/overview/configuration-options
   .init({
-    debug: true,
+    debug: isDevelopment,
     fallbackLng: 'en',
     // Refer to README.md for more detail.
     resources: {
@@ -29,3 +33,5 @@ i18n
   });
 
 export default i18n;
+
+export const useTranslation = useTranslationI18n;

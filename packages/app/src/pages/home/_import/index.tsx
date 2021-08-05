@@ -188,7 +188,7 @@ const Import: React.FC<Props> = ({ className = '' }) => {
   return (
     <>
       <Button
-        variant="ghost"
+        variant="text"
         size="xs"
         on="primary"
         Icon={BiDownload}

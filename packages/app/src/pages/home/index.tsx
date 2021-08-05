@@ -1,15 +1,18 @@
+import { BiPlusCircle } from '@react-icons/all-files/bi/BiPlusCircle';
 import classnames from 'classnames';
 import { PageProps } from 'gatsby';
 import React, { useCallback } from 'react';
 import { useRecoilState } from 'recoil';
 import Metadata from '$components/metadata';
+import Modal, { useModal } from '$components/modal';
 import Notification, { useNotification } from '$components/notification';
 import Paper from '$components/paper';
 import useTheme from '$hooks/theme';
+import { useTranslation } from '$i18n/index';
 import Layout, { Props as LayoutProps } from '$layouts/index';
 import { listState as endpointListState } from '$store/atoms/endpoint';
 import { constructFakeDocument } from '$utils/oas';
-import Add from './_add/index';
+import Add, { Props as AddProps } from './_add/index';
 import Appbar from './_appbar';
 import Endpoint, { Props as EndpointProps } from './_endpoint';
 import Navigation from './_navigation';
@@ -49,28 +52,69 @@ const HomePage: React.FC<Props> = () => {
     [notification]
   );
 
+  const modal = useModal();
+  const handleAddButtonClick = useCallback(
+    function () {
+      modal.open();
+    },
+    [modal]
+  );
+
   const renderBody = useCallback<LayoutProps['renderBody']>(
     function ({ className }) {
       return (
-        <div className={classnames('p-2 grid grid-cols-1 gap-2', className)}>
+        <div
+          className={classnames('p-2', className)}
+          style={{
+            display: 'grid',
+            gridGap: '8px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gridAutoRows: 'auto',
+          }}
+        >
           {endpointList.map(function (endpoint) {
             return (
               <div key={endpoint.id}>
                 <Paper className="h-full" elevation={0} shadowElevation={0}>
-                  <Endpoint endpoint={endpoint} onRemove={handleRemove} />
+                  <Endpoint
+                    endpoint={endpoint}
+                    onRemove={handleRemove}
+                    className="h-full"
+                  />
                 </Paper>
               </div>
             );
           })}
           <div>
-            <Paper className="h-full" elevation={0} shadowElevation={0}>
-              <Add />
-            </Paper>
+            <button
+              className="block w-full h-full p-2 min-h-[160px] flex flex-col items-center justify-center border border-dashed border-on-background rounded text-on-background bg-on-background-faint"
+              onClick={handleAddButtonClick}
+            >
+              <BiPlusCircle
+                className="mb-2"
+                style={{
+                  fontSize: '48px',
+                }}
+              />
+              <div>ADD</div>
+            </button>
           </div>
+          {/* Fill with two blank grid items to adjust UI design. */}
+          <div />
+          <div />
         </div>
       );
     },
-    [endpointList]
+    [endpointList, handleAddButtonClick]
+  );
+
+  const { t } = useTranslation();
+
+  const handleAdd = useCallback<AddProps['onAdd']>(
+    function () {
+      modal.close();
+    },
+    [modal]
   );
 
   return (
@@ -81,8 +125,11 @@ const HomePage: React.FC<Props> = () => {
         renderNavigation={renderNavigation}
         renderBody={renderBody}
       />
+      <Modal {...modal.bind}>
+        <Add onAdd={handleAdd} />
+      </Modal>
       <Notification {...notification.bind}>
-        <div>TODO: deleted</div>
+        <div>{t('deleted')}</div>
       </Notification>
     </>
   );

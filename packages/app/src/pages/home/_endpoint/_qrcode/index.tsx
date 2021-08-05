@@ -67,5 +67,9 @@ const _QRCode: React.FC<{ endpoint: Endpoint }> = ({ endpoint }) => {
   if (error) {
     return <Error on={ON.SURFACE} error={error} />;
   }
-  return <canvas ref={canvasRef} />;
+  return (
+    <div className="flex justify-center">
+      <canvas ref={canvasRef} />
+    </div>
+  );
 };

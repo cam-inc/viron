@@ -1,10 +1,12 @@
 import { BiInfoCircle } from '@react-icons/all-files/bi/BiInfoCircle';
+import classnames from 'classnames';
 import React, { useCallback, useEffect, useState } from 'react';
 import Button from '$components/button';
 import Error from '$components/error';
+import Spinner from '$components/spinner';
 import { ON, STATUS_CODE } from '$constants/index';
 import { BaseError, HTTPUnexpectedError, NetworkError } from '$errors/index';
-import { Endpoint } from '$types/index';
+import { ClassName, Endpoint } from '$types/index';
 import { promiseErrorHandler } from '$utils/index';
 import Enter from './_enter';
 import QRCode from './_qrcode/index';
@@ -16,8 +18,9 @@ import Thumbnail from './_thumbnail';
 export type Props = {
   endpoint: Endpoint;
   onRemove: RemoveProps['onRemove'];
+  className?: ClassName;
 };
-const _Endpoint: React.FC<Props> = ({ endpoint, onRemove }) => {
+const _Endpoint: React.FC<Props> = ({ endpoint, onRemove, className = '' }) => {
   const [isPending, setIsPending] = useState<boolean>(true);
   const [isSigninRequired, setIsSigninRequired] = useState<boolean>(false);
   const [error, setError] = useState<BaseError | null>(null);
@@ -80,20 +83,24 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove }) => {
   );
 
   if (error) {
-    return <Error on={ON.SURFACE} error={error} />;
+    return (
+      <div className="p-2">
+        <Error on={ON.SURFACE} error={error} />
+      </div>
+    );
   }
 
   if (isPending) {
     return (
       <div className="p-2">
-        <div>Pending...</div>
+        <Spinner on={ON.SURFACE} className="w-4" />
       </div>
     );
   }
 
   return (
-    <div className="p-2">
-      <div className="flex items-center gap-2">
+    <div className={classnames('p-2 flex flex-col gap-2', className)}>
+      <div className="flex-none flex items-center gap-2">
         <div className="flex-none">
           <Thumbnail className="" endpoint={endpoint} />
         </div>
@@ -103,34 +110,30 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove }) => {
             {endpoint.document?.info.title || '---'}
           </div>
         </div>
-        <div className="flex-none">
-          <div className="flex items-center gap-2">
-            <Button
-              on={ON.SURFACE}
-              variant="text"
-              Icon={BiInfoCircle}
-              onClick={handleOpenerClick}
-            />
-            <QRCode endpoint={endpoint} />
-            <Remove endpoint={endpoint} onRemove={onRemove} />
-            <Enter endpoint={endpoint} isSigninRequired={isSigninRequired} />
-            <Signin endpoint={endpoint} isSigninRequired={isSigninRequired} />
-            <Signout
-              endpoint={endpoint}
-              isSigninRequired={isSigninRequired}
-              onSignout={handleSignout}
-            />
-          </div>
+      </div>
+      <div className="flex-1 py-2 border-t border-b border-dotted border-on-surface-faint">
+        <div className="text-on-surface-low text-xxs">{endpoint.url}</div>
+        <div className="text-xxs">
+          {endpoint.document?.info.description || '---'}
         </div>
       </div>
-      {isOpened && (
-        <div className="mt-2 pt-2 border-t border-on-surface-faint">
-          <div className="text-on-surface-low text-xxs">{endpoint.url}</div>
-          <div className="text-xxs">
-            {endpoint.document?.info.description || '---'}
-          </div>
-        </div>
-      )}
+      <div className="flex-none flex items-center justify-end gap-2">
+        <Button
+          on={ON.SURFACE}
+          variant="text"
+          Icon={BiInfoCircle}
+          onClick={handleOpenerClick}
+        />
+        <QRCode endpoint={endpoint} />
+        <Remove endpoint={endpoint} onRemove={onRemove} />
+        <Enter endpoint={endpoint} isSigninRequired={isSigninRequired} />
+        <Signin endpoint={endpoint} isSigninRequired={isSigninRequired} />
+        <Signout
+          endpoint={endpoint}
+          isSigninRequired={isSigninRequired}
+          onSignout={handleSignout}
+        />
+      </div>
     </div>
   );
 };

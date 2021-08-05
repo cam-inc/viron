@@ -40,7 +40,7 @@ const Export: React.FC<Props> = ({ className = '' }) => {
   return (
     <Button
       on="primary"
-      variant="ghost"
+      variant="text"
       size="xs"
       Icon={BiUpload}
       label="Export"

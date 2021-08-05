@@ -164,6 +164,7 @@ const SchemaOfTypeString: React.FC<Props> = ({
   return (
     <>
       <Textinput
+        on={on}
         type={(function () {
           if (schema.format === 'email') {
             return 'email';
