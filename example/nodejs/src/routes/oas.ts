@@ -9,5 +9,6 @@ export const getOas = async (context: RouteContext): Promise<void> => {
     ctx.config.oas.infoExtentions,
     context.user?.roleIds
   );
+
   context.res.json(oas);
 };
