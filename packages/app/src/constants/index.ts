@@ -13,8 +13,6 @@ export const URL = {
   BLOG: 'https://discovery.viron.app/blog/',
   RELEASE_NOTES: 'https://viron.app/TODO/release_notes/',
   HELP: 'https://viron.app/TODO/help/',
-  TERMS_OF_USE: 'https://viron.app/TODO/terms/',
-  PRIVACY_POLICY: 'https://viron.app/TODO/privacy_policy/',
   GITHUB: 'https://github.com/cam-inc/viron/',
   TWITTER: 'https://twitter.com/TODO',
 } as const;

@@ -14,6 +14,9 @@ module.exports = {
     },
     // Utilities by a-z order.
     extend: {
+      animation: {
+        'spin-slow': 'spin 3s linear infinite',
+      },
       colors: {
         background: 'var(--color-background)',
         'on-background': 'var(--color-on-background)',
@@ -136,5 +139,5 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/aspect-ratio')],
 };

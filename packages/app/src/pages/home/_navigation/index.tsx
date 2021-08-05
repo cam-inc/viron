@@ -2,9 +2,9 @@ import classnames from 'classnames';
 import React, { useCallback } from 'react';
 import Logo from '$components/logo';
 import Navigation, { Props as NavigationProps } from '$components/navigation';
-import NavigationCopyright from '$components/navigation/copyright';
 import NavigationLinks from '$components/navigation/links';
 import NavigationServices from '$components/navigation/services';
+import NavigationVersion from '$components/navigation/version';
 import { ON } from '$constants/index';
 import { Props as LayoutProps } from '$layouts/index';
 import { ClassName } from '$types/index';
@@ -16,12 +16,16 @@ const _Navigation: React.FC<Props> = ({ className = '' }) => {
   const renderHead = useCallback<NonNullable<NavigationProps['renderHead']>>(
     function () {
       return (
-        <div className="flex justify-center py-8">
+        <div className="flex flex-col items-center py-8">
           <Logo
-            className="h-12 drop-shadow-01dp"
+            className="h-12 drop-shadow-01dp mb-2"
             left="text-primary"
             right="text-primary-variant"
           />
+          <div className="text-on-surface text-xs font-bold text-center">
+            Give OAS, <br />
+            Get GUI.
+          </div>
         </div>
       );
     },
@@ -39,7 +43,7 @@ const _Navigation: React.FC<Props> = ({ className = '' }) => {
             <NavigationServices on={ON.SURFACE} />
           </div>
           <div className="flex justify-center py-2 border-t border-dotted border-on-surface-low">
-            <NavigationCopyright on={ON.SURFACE} />
+            <NavigationVersion on={ON.SURFACE} />
           </div>
         </div>
       );

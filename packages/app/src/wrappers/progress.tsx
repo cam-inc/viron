@@ -1,10 +1,11 @@
 import classnames from 'classnames';
 import React from 'react';
+import { ClassName } from '$types/index';
 
 export const ID = 'wrapper-progress';
 
 type Props = {
-  className?: string;
+  className?: ClassName;
 };
 const ProgressWrapper: React.FC<Props> = ({ className = '' }) => {
   return (

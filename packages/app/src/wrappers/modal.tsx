@@ -1,10 +1,11 @@
 import classnames from 'classnames';
 import React from 'react';
+import { ClassName } from '$types/index';
 
 export const ID = 'wrapper-modal';
 
 type Props = {
-  className?: string;
+  className?: ClassName;
 };
 const ModalWrapper: React.FC<Props> = ({ className = '' }) => {
   return (

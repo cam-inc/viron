@@ -3,9 +3,9 @@ import { Link } from 'gatsby';
 import React, { useCallback } from 'react';
 import Logo from '$components/logo';
 import Navigation, { Props as NavigationProps } from '$components/navigation';
-import NavigationCopyright from '$components/navigation/copyright';
 import NavigationLinks from '$components/navigation/links';
 import NavigationServices from '$components/navigation/services';
+import NavigationVersion from '$components/navigation/version';
 import { ON } from '$constants/index';
 import { Props as LayoutProps } from '$layouts/index';
 import Pages, { Props as PagesProps } from '../_pages';
@@ -62,7 +62,7 @@ const _Navigation: React.FC<Props> = ({
             <NavigationServices on={ON.SURFACE} />
           </div>
           <div className="flex justify-center py-2 border-t-2 border-on-surface-faint">
-            <NavigationCopyright on={ON.SURFACE} />
+            <NavigationVersion on={ON.SURFACE} />
           </div>
         </div>
       );

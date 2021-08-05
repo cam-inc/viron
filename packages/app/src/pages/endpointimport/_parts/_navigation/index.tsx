@@ -2,9 +2,9 @@ import classnames from 'classnames';
 import React, { useCallback } from 'react';
 import Logo from '$components/logo';
 import Navigation, { Props as NavigationProps } from '$components/navigation';
-import NavigationCopyright from '$components/navigation/copyright';
 import NavigationLinks from '$components/navigation/links';
 import NavigationServices from '$components/navigation/services';
+import NavigationVersion from '$components/navigation/version';
 import { ON } from '$constants/index';
 import { Props as LayoutProps } from '$layouts/index';
 
@@ -38,7 +38,7 @@ const _Navigation: React.FC<Props> = ({ className = '' }) => {
             <NavigationServices on={ON.SURFACE} />
           </div>
           <div className="flex justify-center py-2 border-t border-dotted border-on-surface-low">
-            <NavigationCopyright on={ON.SURFACE} />
+            <NavigationVersion on={ON.SURFACE} />
           </div>
         </div>
       );

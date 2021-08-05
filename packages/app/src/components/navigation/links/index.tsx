@@ -28,16 +28,6 @@ const Links: React.FC<Props> = ({ on }) => {
           Help
         </Link>
       </li>
-      <li className="mb-2 last:mb-0">
-        <Link on={on} to={URL.TERMS_OF_USE}>
-          Terms of Use
-        </Link>
-      </li>
-      <li className="mb-2 last:mb-0">
-        <Link on={on} to={URL.PRIVACY_POLICY}>
-          Privacy Policy
-        </Link>
-      </li>
     </ul>
   );
 };

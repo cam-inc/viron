@@ -43,8 +43,7 @@ const HomePage: React.FC<Props> = () => {
 
   const notification = useNotification();
   const handleRemove = useCallback<EndpointProps['onRemove']>(
-    function (endpoint) {
-      console.log(endpoint);
+    function (/*endpoint*/) {
       notification.open();
     },
     [notification]
