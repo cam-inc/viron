@@ -31,9 +31,13 @@ phases:
       - echo Pushing the Docker image...
       - docker push $REPOSITORY_URI:$COMMIT_ID
       - docker push $REPOSITORY_URI:latest
-
+      - >
+        printf '[{"name":"'${ENV}-viron-demo-task'","imageUri":"%s"}]'
+        $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$COMMIT_ID
+        > demo-imagedefinitions.json
+      - cat demo-imagedefinitions.json
 artifacts:
   files:
-    - codepipeline/demo-deployspec.yml
+    - demo-imagedefinitions.json
   name: viron-demo-artifact
   discard-paths: no
