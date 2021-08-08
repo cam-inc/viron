@@ -23,6 +23,7 @@ import (
 
 	"github.com/cam-inc/viron/example/golang/pkg/config"
 	"github.com/cam-inc/viron/example/golang/pkg/store"
+	packageDomains "github.com/cam-inc/viron/packages/golang/domains"
 	domainAuth "github.com/cam-inc/viron/packages/golang/domains/auth"
 	"github.com/cam-inc/viron/packages/golang/routes/auth"
 	"github.com/cam-inc/viron/packages/golang/routes/oas"
@@ -37,7 +38,9 @@ func New() http.Handler {
 	fmt.Printf("msyql: %v\n", mysqlConfig)
 	store.SetupMySQL(mysqlConfig)
 	domains.SetUpMySQL(store.GetMySQLConnection())
-
+	if err := packageDomains.NewMySQL(store.GetMySQLConnection()); err != nil {
+		panic(err)
+	}
 	definition := &openapi3.T{
 		ExtensionProps: openapi3.ExtensionProps{
 			Extensions: map[string]interface{}{},
@@ -51,6 +54,7 @@ func New() http.Handler {
 
 	routeRoot := chi.NewRouter()
 	routeRoot.Use(Cors(cfg.Cors))
+	routeRoot.Use(InjectConfig(cfg))
 	//routeRoot.Use(JWTSecurityHandler(cfg.Auth))
 
 	oasImpl := oas.New()
@@ -62,6 +66,15 @@ func New() http.Handler {
 		},
 	})
 	oasDoc, _ := oas.GetSwagger()
+
+	adminUserImpl := adminusers.New()
+	adminusers.HandlerWithOptions(adminUserImpl, adminusers.ChiServerOptions{
+		BaseRouter: routeRoot,
+		Middlewares: []adminusers.MiddlewareFunc{
+			InjectAPIDefinition(definition),
+			JWTSecurityHandler(cfg.Auth),
+		},
+	})
 
 	domainAuth.SetUp(cfg.Auth.JWT.Secret, cfg.Auth.JWT.Provider, cfg.Auth.JWT.ExpirationSec)
 	authImpl := auth.New()
@@ -81,6 +94,14 @@ func New() http.Handler {
 	routeRoot.Get("/ping", func(writer http.ResponseWriter, request *http.Request) {
 		writer.WriteHeader(http.StatusOK)
 		fmt.Fprint(writer, "pong")
+	})
+
+	rootImpl := root.New()
+	root.HandlerWithOptions(rootImpl, root.ChiServerOptions{
+		BaseRouter: routeRoot,
+		Middlewares: []root.MiddlewareFunc{
+			JWTSecurityHandler(cfg.Auth),
+		},
 	})
 
 	rootDoc, _ := root.GetSwagger()
@@ -137,13 +158,63 @@ func New() http.Handler {
 	if err := merge(definition, authDoc); err != nil {
 		panic(err)
 	}
+	/*
+		https://example.com/logo.png
+						if err := helpers.OasMerge(apiDef, &openapi3.T{Info: &openapi3.Info{ExtensionProps: openapi3.ExtensionProps{
+							Extensions: cfg.Oas.InfoExtensions,
+						}}})
+	*/
+	if err := merge(definition, &openapi3.T{Info: &openapi3.Info{ExtensionProps: openapi3.ExtensionProps{
+		Extensions: cfg.Oas.InfoExtensions,
+	}}}); err != nil {
+		panic(err)
+	}
 
 	helpers.Ref(definition, "./components.yaml", "")
 
 	return routeRoot
 }
 
+type (
+	/*
+		   - id: user
+						      group: 管理画面/ユーザー
+						      title: ユーザー情報
+						      description: ユーザー情報を閲覧/管理します
+						      contents:
+	*/
+
+	XPage struct {
+		ID          string        `json:"id"`
+		Group       string        `json:"group"`
+		Title       string        `json:"title"`
+		Description string        `json:"description"`
+		Contents    []interface{} `json:"contents"`
+	}
+	XTable struct {
+		ResponseListKey string      `json:"responseListKey"`
+		Pager           interface{} `json:"pager"`
+		Sort            interface{} `json:"sort"`
+	}
+	XAutoComplete struct {
+		ResponseLabelKey string `json:"responseLabelKey"`
+		ResponseValueKey string `json:"responseValueKey"`
+	}
+	Extensions struct {
+		XPages     []*XPage       `json:"x-pages"`
+		XTable     *XTable        `json:"x-table"`
+		XComplete  *XAutoComplete `json:"x-autocomplete"`
+		XTheme     string         `json:"x-theme"`
+		XThumbnail string         `json:"x-thumbnail"`
+		XTags      []string       `json:"x-tags"`
+	}
+)
+
 func merge(dist *openapi3.T, src *openapi3.T) error {
+	return helpers.OasMerge(dist, src)
+}
+
+func mergeold(dist *openapi3.T, src *openapi3.T) error {
 
 	fmt.Println("--")
 	if err := mergo.Merge(&dist.Security, src.Security); err != nil {
@@ -199,10 +270,73 @@ func merge(dist *openapi3.T, src *openapi3.T) error {
 		fmt.Printf("merge failed %v\n", err)
 	}
 
-	fmt.Println("--")
-	if err := mergo.Merge(&dist.Info.Extensions, src.Info.Extensions); err != nil {
-		fmt.Printf("merge failed %v\n", err)
+	fmt.Println("--Extensions")
+	if len(src.Info.Extensions) > 0 {
+
+		srcEx := &Extensions{
+			XPages:    []*XPage{},
+			XComplete: &XAutoComplete{},
+			XTable:    &XTable{},
+		}
+
+		srcJSONEx, _ := json.Marshal(src.Info.Extensions)
+		fmt.Printf("src info extensions %s\n", string(srcJSONEx))
+		fmt.Printf("srcEx %v, %v, %v\n", srcEx.XPages, srcEx.XTable, srcEx.XComplete)
+		fmt.Printf("xPages %d\n", len(srcEx.XPages))
+
+		if err := json.Unmarshal(srcJSONEx, srcEx); err != nil {
+			fmt.Printf("unmarshal err %v\n", err)
+		} else {
+			fmt.Println("unmarshal success")
+			fmt.Printf("srcEx %v, %v, %v\n", srcEx.XPages, srcEx.XTable, srcEx.XComplete)
+
+			distEx := &Extensions{
+				XPages:    []*XPage{},
+				XComplete: &XAutoComplete{},
+				XTable:    &XTable{},
+			}
+
+			if len(dist.Info.Extensions) > 0 {
+				distJSONEx, _ := json.Marshal(dist.Info.Extensions)
+				if err := json.Unmarshal(distJSONEx, distEx); err != nil {
+					fmt.Printf("dist json ex unmarshal err %v\n", err)
+				}
+			}
+
+			if distEx.XComplete == nil || distEx.XComplete.ResponseLabelKey == "" {
+				distEx.XComplete = srcEx.XComplete
+			}
+			if distEx.XTable == nil || distEx.XTable.ResponseListKey == "" {
+				distEx.XTable = srcEx.XTable
+			}
+			if len(srcEx.XPages) > 0 {
+				distEx.XPages = append(distEx.XPages, srcEx.XPages...)
+			}
+			if len(srcEx.XTags) > 0 {
+				distEx.XTags = append(distEx.XTags, srcEx.XTags...)
+			}
+			if distEx.XTheme == "" && srcEx.XTheme != "" {
+				distEx.XTheme = srcEx.XTheme
+			}
+			if distEx.XThumbnail == "" && srcEx.XThumbnail != "" {
+				distEx.XThumbnail = srcEx.XThumbnail
+			}
+
+			if distJSONExFixies, err := json.Marshal(distEx); err == nil {
+				distExtensions := map[string]interface{}{}
+				if err := json.Unmarshal(distJSONExFixies, &distExtensions); err != nil {
+					fmt.Printf("unmarshal failed%v\n", err)
+				} else {
+					dist.Info.Extensions = distExtensions
+				}
+			}
+
+			fmt.Printf("dist.info.extensions %+v\n", dist.Info.Extensions)
+		}
 	}
+
+	debugJ, _ := json.Marshal(dist)
+	fmt.Printf("debugJ %s\n", string(debugJ))
 
 	fmt.Println("--")
 	return nil

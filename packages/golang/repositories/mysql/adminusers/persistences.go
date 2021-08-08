@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/cam-inc/viron/packages/golang/repositories/mysql"
+
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
 	"github.com/volatiletech/null/v8"
@@ -24,8 +26,9 @@ type adminUsersPersistence struct {
 type AdminUserConditions struct {
 	ID        uint
 	Email     string
-	Limit     int
-	Offset    int
+	Size      int
+	Page      int
+	Sort      []string
 	LikeEmail string
 	IDs       []uint
 	Emails    []string
@@ -58,11 +61,14 @@ func (c *AdminUserConditions) ConvertConditionMySQL() []qm.QueryMod {
 		conditions = append(conditions, qm.WhereIn("email in ?", emails...))
 	}
 
-	if c.Limit != 0 {
-		conditions = append(conditions, qm.Limit(c.Limit))
+	if len(c.Sort) > 0 {
+		conditions = append(conditions, mysql.GetOrderBy(c.Sort))
 	}
 
-	conditions = append(conditions, qm.Offset(c.Offset))
+	pager := mysql.GetPager(c.Size, c.Page)
+
+	conditions = append(conditions, qm.Limit(pager.Limit))
+	conditions = append(conditions, qm.Offset(pager.Offset))
 
 	return conditions
 }

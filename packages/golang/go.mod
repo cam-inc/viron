@@ -13,6 +13,7 @@ require (
 	github.com/go-chi/jwtauth v1.2.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
+	github.com/imdario/mergo v0.3.12
 	github.com/kat-co/vala v0.0.0-20170210184112-42e1d8b61f12
 	github.com/lestrrat-go/jwx v1.1.0
 	github.com/soongo/path-to-regexp v1.6.3

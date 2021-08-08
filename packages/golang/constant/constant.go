@@ -182,6 +182,17 @@ const (
 	*/
 	COOKIE_KEY_VIRON_AUTHORIZATION = "viron_authorization"
 	COOKIE_KEY_OAUTH2_STATE        = "oauth2_state"
+
+	/*
+		export declare const THEME: {
+		    readonly STANDARD: "standard";
+		    readonly MIDNIGHT: "midnight";
+		    readonly TERMINAL: "terminal";
+	*/
+
+	THEME_STANDARD = "standard"
+	THEME_MIDNIGHT = "midnight"
+	THEME_TERMINAL = "terminal"
 )
 
 var (

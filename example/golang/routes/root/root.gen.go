@@ -102,11 +102,11 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/2SQsU4zMRCEX+U0tf/L5U/nig4hCiTa6ArrbhMc5WxrvQlEJ0uQa3gQKoREy/v4RZAv",
-	"dGlceHe+mdkRnR+Cd+QkQo9JwbqNhx7RU+zYBrHeQcMEW8VAnd3YzpS/CAWxsido3Bwte7egFzOEPf1z",
-	"vqddmR+J40Xe1E29RFLwgZwJFhqruqn/QyEYeSrWWJRnS3JtvvAmVvntJ0+feXrN5488feXzd57eMRN5",
-	"TnTXQ+OW5NF7gQJTDN5FmtmrZnmNfbhHSgqRugNbOUGvR+yeBXrdplYhHobB8AkaTL1l6qQSX5UspbrZ",
-	"Rug1uJi16cLhUnjGHHhfcqNw/lZHODOUa82S1KbfAAAA//9w10V9ewEAAA==",
+	"H4sIAAAAAAAC/2SQMU/DMBCF/0r0ZpOmdPPEhhADEmuVwXKvwSixLftSqCJL0Cz8ECaExMr/8R9BTtm6",
+	"3HC69733boJ2g3eWLEfIKQkYu3eQE3YUdTCejbOQUN5U0ZM2e6NV2UUIsOGeIHFzMMHZFb2qwfd01ble",
+	"2Q4CBwrxLG/qpl4jCThPVnkDiU3d1NcQ8IqfijVWZXTEl+Yrp2KV33/z/JXnt3z6zPN3Pv3k+QMLMSyJ",
+	"7naQuCV+dI4hECh6ZyMt7E2zvsQ+3CMlgUh6DIaPkNsJzy8MuW1TKxDHYVDhCIlAOxNIc8WuKllKddVF",
+	"yC1CMWvTmRNK4QUzhr7kRuH8n06waijfWiSpTX8BAAD//x+SXkR7AQAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
