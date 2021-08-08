@@ -108,13 +108,19 @@ func (a *authObj) SigninEmail(w http.ResponseWriter, r *http.Request) {
 		helpers.SendError(w, err.StatusCode(), err)
 		return
 	}
+
 	v := ctx.Value(constant.CTX_KEY_JWT_EXPIRATION_SEC)
 	var age int
 	if v != nil {
 		age, _ = v.(int)
 	}
+	fmt.Printf("CTX_KEY_JWT %d\n", age)
 	opts := &http.Cookie{
-		MaxAge: age,
+		MaxAge:   age,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+		Domain:   r.URL.Hostname(),
 	}
 	cookie := helpers.GenAuthorizationCookie(token, opts)
 	http.SetCookie(w, cookie)

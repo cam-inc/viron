@@ -9,7 +9,7 @@ require (
 	github.com/go-chi/cors v1.2.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang-migrate/migrate/v4 v4.14.1
-	github.com/imdario/mergo v0.3.8
+	github.com/imdario/mergo v0.3.12
 	github.com/spf13/cobra v1.2.1
 	go.uber.org/automaxprocs v1.4.0
 )

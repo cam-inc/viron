@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/cam-inc/viron/example/golang/pkg/constant"
+	pkgConstant "github.com/cam-inc/viron/packages/golang/constant"
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -68,7 +69,7 @@ type (
 	}
 
 	Oas struct {
-		InfoExtensions map[string]interface{}
+		InfoExtensions map[string]interface{} `json:"infoExtensions"`
 		/*
 			infoExtentions: {
 			        [OAS_X_THEME]: THEME.STANDARD,
@@ -117,6 +118,14 @@ func New() *Config {
 			Password:             os.Getenv(constant.MYSQL_PASSWORD),
 			DBName:               os.Getenv(constant.MYSQL_DATABASE),
 			AllowNativePasswords: true,
+			ParseTime:            true,
+		},
+		Oas: &Oas{
+			InfoExtensions: map[string]interface{}{
+				pkgConstant.OAS_X_THEME:     pkgConstant.THEME_STANDARD,
+				pkgConstant.OAS_X_THUMBNAIL: "https://example.com/logo.png",
+				pkgConstant.OAS_X_TAGS:      []string{"example", "golang"},
+			},
 		},
 	}
 }
