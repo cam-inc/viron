@@ -71,7 +71,7 @@ var (
 )
 
 func NewMySQL(conn *sql.DB) error {
-	a, err := sqladapter.NewAdapter(conn, "mysql", "casbin_rule")
+	a, err := sqladapter.NewAdapter(conn, "mysql", "casbin_rule_g")
 	if err != nil {
 		return err
 	}
@@ -166,6 +166,7 @@ export const listRoles = async (userId: string): Promise<string[]> => {
 func listRoles(userID string) []string {
 	roles, err := casbinInstance.GetRolesForUser(userID)
 	if err != nil {
+		fmt.Printf("listRoles -> %+v\n", err)
 		return []string{}
 	}
 	return roles

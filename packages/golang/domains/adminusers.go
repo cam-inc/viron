@@ -3,6 +3,8 @@ package domains
 import (
 	"context"
 	"fmt"
+	"math"
+	"time"
 
 	"github.com/cam-inc/viron/packages/golang/repositories/mysql/adminusers"
 
@@ -16,17 +18,35 @@ import (
 
 type (
 	AdminUser struct {
-		ID                       uint
-		Email                    string
-		AuthType                 string
-		Password                 *string
-		Salt                     *string
-		GoogleOAuth2AccessToken  *string
-		GoogleOAuth2ExpiryDate   *int
-		GoogleOAuth2IdToken      *string
-		GoogleOAuth2RefreshToken *string
-		GoogleOAuth2TokenType    *string
-		RoleIDs                  []string
+		ID                       uint     `json:"id"`
+		Email                    string   `json:"email"`
+		AuthType                 string   `json:"type"`
+		Password                 *string  `json:"password"`
+		Salt                     *string  `json:"salt"`
+		GoogleOAuth2AccessToken  *string  `json:"googleOAuth2AccessToken"`
+		GoogleOAuth2ExpiryDate   *int     `json:"googleOAuth2ExpiryDate"`
+		GoogleOAuth2IdToken      *string  `json:"googleOAuth2IdToken"`
+		GoogleOAuth2RefreshToken *string  `json:"googleOAuth2RefreshToken"`
+		GoogleOAuth2TokenType    *string  `json:"googleOAuth2TokenType"`
+		RoleIDs                  []string `json:"roleIds"`
+		CreatedAt                time.Time
+		UpdateAt                 time.Time
+	}
+
+	AdminUsersWithPager struct {
+		Page    int          `json:"currentPage"`
+		MaxPage int          `json:"maxPage"`
+		List    []*AdminUser `json:"list"`
+	}
+
+	AdminUserConditions struct {
+		ID       uint
+		Email    string
+		AuthType string
+		RoleID   string
+		Size     int
+		Page     int
+		Sort     []string
 	}
 )
 
@@ -35,6 +55,7 @@ func CreateOne(ctx context.Context, payload *AdminUser, authType string) (*Admin
 	adminUser := &repositories.AdminUser{}
 
 	if authType == constant.AUTH_TYPE_EMAIL {
+		adminUser.AuthType = authType
 		email := string(payload.Email)
 		adminUser.Email = email
 		if payload.Password == nil {
@@ -44,6 +65,7 @@ func CreateOne(ctx context.Context, payload *AdminUser, authType string) (*Admin
 		adminUser.Password = &password.Password
 		adminUser.Salt = &password.Salt
 	} else if authType == constant.AUTH_TYPE_GOOGLE {
+		adminUser.AuthType = authType
 		adminUser.GoogleOAuth2TokenType = payload.GoogleOAuth2TokenType
 		adminUser.GoogleOAuth2IdToken = payload.GoogleOAuth2IdToken
 		adminUser.GoogleOAuth2AccessToken = payload.GoogleOAuth2AccessToken
@@ -106,6 +128,89 @@ func FindByEmail(ctx context.Context, email string) *AdminUser {
 }
 
 /*
+// 一覧取得
+export const list = async (
+  conditions: FindConditions<AdminUser> & { roleId?: string } = {},
+  size?: number,
+  page?: number,
+  sort?: string[]
+): Promise<ListWithPager<AdminUserView>> => {
+  const repository = repositoryContainer.getAdminUserRepository();
+  if (conditions.roleId) {
+    const userIds = await listUsers(conditions.roleId);
+    conditions = Object.assign({}, conditions, { userIds });
+    delete conditions.roleId;
+  }
+  const result = await repository.findWithPager(conditions, size, page, sort);
+  const adminRoles = await Promise.all(
+    result.list.map((adminUser) => listRoles(adminUser.id))
+  );
+  return {
+    ...result,
+    list: result.list.map((adminUser) => format(adminUser, adminRoles.shift())),
+  };
+};
+
+*/
+
+func ListAdminUser(ctx context.Context, opts *AdminUserConditions) (*AdminUsersWithPager, error) {
+
+	repo := container.GetAdminUserRepository()
+
+	conditions := &adminusers.AdminUserConditions{}
+	if opts != nil {
+		conditions.ID = opts.ID
+		conditions.Email = opts.Email
+		conditions.Sort = opts.Sort
+		conditions.Page = opts.Page
+		conditions.Size = opts.Size
+	}
+	if conditions.Page <= 0 {
+		conditions.Page = constant.DEFAULT_PAGER_PAGE
+	}
+	if conditions.Size <= 0 {
+		conditions.Size = constant.DEFAULT_PAGER_SIZE
+	}
+
+	results, err := repo.Find(ctx, conditions)
+	if err != nil {
+		return nil, err
+	}
+
+	withPager := &AdminUsersWithPager{
+		List: []*AdminUser{},
+	}
+
+	for _, result := range results {
+		entity := &repositories.AdminUser{}
+		result.Bind(entity)
+		entity.RoleIDs = listRoles(fmt.Sprintf("%d", entity.ID))
+		withPager.List = append(withPager.List, &AdminUser{
+			ID:        entity.ID,
+			Email:     entity.Email,
+			AuthType:  entity.AuthType,
+			RoleIDs:   entity.RoleIDs,
+			CreatedAt: entity.CreatedAt,
+			UpdateAt:  entity.UpdatedAt,
+		})
+	}
+	withPager.Page = conditions.Page
+	count := Count(ctx)
+	if count > 0 {
+		withPager.MaxPage = int(math.Ceil(float64(count) / float64(conditions.Size)))
+	} else {
+		withPager.MaxPage = constant.DEFAULT_PAGER_SIZE
+	}
+	fmt.Printf("pager %+v\n", withPager)
+	/*
+		maxPage =
+		    numberOfList > 0 ? Math.ceil(numberOfList / size) : DEFAULT_PAGER_PAGE;
+	*/
+
+	return withPager, nil
+}
+
+/*
 // 1件作成
 export const createOne = async (
   payload: AdminUserCreatePayload,
@@ -143,28 +248,6 @@ const format = (adminUser: AdminUser, roleIds?: string[]): AdminUserView => {
   return Object.assign({}, adminUser, { roleIds: roleIds ?? [] });
 };
 
-// 一覧取得
-export const list = async (
-  conditions: FindConditions<AdminUser> & { roleId?: string } = {},
-  size?: number,
-  page?: number,
-  sort?: string[]
-): Promise<ListWithPager<AdminUserView>> => {
-  const repository = repositoryContainer.getAdminUserRepository();
-  if (conditions.roleId) {
-    const userIds = await listUsers(conditions.roleId);
-    conditions = Object.assign({}, conditions, { userIds });
-    delete conditions.roleId;
-  }
-  const result = await repository.findWithPager(conditions, size, page, sort);
-  const adminRoles = await Promise.all(
-    result.list.map((adminUser) => listRoles(adminUser.id))
-  );
-  return {
-    ...result,
-    list: result.list.map((adminUser) => format(adminUser, adminRoles.shift())),
-  };
-};
 
 
 

@@ -10,13 +10,11 @@ import (
 
 	"github.com/cam-inc/viron/packages/golang/domains/auth"
 
-	"github.com/cam-inc/viron/packages/golang/helpers"
-
 	"github.com/cam-inc/viron/example/golang/pkg/config"
-	"github.com/go-chi/cors"
-
 	"github.com/cam-inc/viron/packages/golang/constant"
+	"github.com/cam-inc/viron/packages/golang/helpers"
 	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/go-chi/cors"
 )
 
 const (
@@ -32,6 +30,43 @@ func InjectAPIDefinition(apiDef *openapi3.T) func(http.HandlerFunc) http.Handler
 		}
 		return fn
 
+	}
+}
+
+/*
+func (c *Cors) Handler(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodOptions && r.Header.Get("Access-Control-Request-Method") != "" {
+			c.logf("Handler: Preflight request")
+			c.handlePreflight(w, r)
+			// Preflight requests are standalone and should stop the chain as some other
+			// middleware may not handle OPTIONS requests correctly. One typical example
+			// is authentication middleware ; OPTIONS requests won't carry authentication
+			// headers (see #1)
+			if c.optionPassthrough {
+				next.ServeHTTP(w, r)
+			} else {
+				w.WriteHeader(http.StatusOK)
+			}
+		} else {
+			c.logf("Handler: Actual request")
+			c.handleActualRequest(w, r)
+			next.ServeHTTP(w, r)
+		}
+	})
+}
+*/
+
+func InjectConfig(cfg *config.Config) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// 前処理
+			ctx := r.Context()
+			expire := cfg.Auth.JWT.ExpirationSec
+			ctx = context.WithValue(ctx, constant.CTX_KEY_JWT_EXPIRATION_SEC, expire)
+			next.ServeHTTP(w, r.WithContext(ctx))
+			// 後処理
+		})
 	}
 }
 
@@ -67,6 +102,7 @@ func JWTSecurityHandler(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFun
 			}
 
 			cookie, _ := r.Cookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION)
+			fmt.Printf("authrization cookie %+v\n", cookie)
 			if cookie == nil {
 				w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
 				cookie = helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
