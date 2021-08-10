@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/getkin/kin-openapi/openapi3filter"
-
 	"github.com/cam-inc/viron/packages/golang/helpers"
 
 	"github.com/cam-inc/viron/example/golang/pkg/domains"
@@ -183,7 +181,8 @@ func New() http.Handler {
 
 	helpers.Ref(definition, "./components.yaml", "")
 
-	routeRoot.Use(OpenAPI3Validator(definition, &openapi3filter.Options{}))
+	// TODO: デバッグ中
+	//routeRoot.Use(OpenAPI3Validator(definition, &openapi3filter.Options{}))
 
 	return routeRoot
 }
