@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/cam-inc/viron/packages/golang/helpers"
+
 	"github.com/getkin/kin-openapi/openapi3"
 
 	"github.com/cam-inc/viron/packages/golang/constant"
@@ -18,25 +20,25 @@ type (
 	/*
 		export interface AdminRolePermission {
 		  resourceId: string;
-		  permission: Permission;
+		  Permission: Permission;
 		}
 	*/
 
-	adminRolePermission struct {
-		resourceID string
-		permission string
+	AdminRolePermission struct {
+		ResourceID string
+		Permission string
 	}
 
 	/*
 		export interface AdminRole {
-		  id: string;
-		  permissions: AdminRolePermissions;
+		  ID: string;
+		  Permissions: AdminRolePermissions;
 		}
 	*/
 
-	adminRole struct {
-		id          string
-		permissions []*adminRolePermission
+	AdminRole struct {
+		ID          string
+		Permissions []*AdminRolePermission
 	}
 )
 
@@ -70,6 +72,19 @@ var (
 	}
 )
 
+func new(params ...interface{}) error {
+	if casbinInstance != nil {
+		return nil
+	}
+	enforcer, err := casbin.NewEnforcer(params...)
+	if err != nil {
+		return err
+	}
+
+	casbinInstance = enforcer
+	return nil
+}
+
 func NewMySQL(conn *sql.DB) error {
 	a, err := sqladapter.NewAdapter(conn, "mysql", "casbin_rule_g")
 	if err != nil {
@@ -79,18 +94,36 @@ func NewMySQL(conn *sql.DB) error {
 	if err != nil {
 		return err
 	}
-	enforcer, err := casbin.NewEnforcer(m, a)
+	//enforcer, err := casbin.NewEnforcer(m, a)
+	//if err != nil {
+	//	return err
+	//}
+
+	//casbinInstance = enforcer
+	//return nil
+	return new(m, a)
+}
+
+func NewFile(filePath string) error {
+	if casbinInstance != nil {
+		return nil
+	}
+	m, err := model.NewModelFromString(modelText)
 	if err != nil {
 		return err
 	}
-
-	casbinInstance = enforcer
-	return nil
+	//enforcer, err := casbin.NewEnforcer(m, filePath)
+	//if err != nil {
+	//	return err
+	//}
+	//casbinInstance = enforcer
+	//return nil
+	return new(m, filePath)
 }
 
 /*
-const getPermissions = (permissions?: Permission[]): Permission[] =>
-  permissions?.length ? permissions : Object.values(PERMISSION);
+const getPermissions = (Permissions?: Permission[]): Permission[] =>
+  Permissions?.length ? Permissions : Object.values(PERMISSION);
 */
 
 func getPermissions(permissions []string) []string {
@@ -108,8 +141,8 @@ func getPermissions(permissions []string) []string {
 const genPolicy = (
   roleId: string,
   resourceId: string,
-  permission: Permission
-): Policy => [roleId, resourceId, permission];
+  Permission: Permission
+): Policy => [roleId, resourceId, Permission];
 */
 func genPolicy(roleID, resourceID, permission string) []string {
 	return []string{
@@ -201,7 +234,7 @@ export const addRoleForUser = async (
 };
 
 */
-func addRoleForUser(userID, roleID string) bool {
+func AddRoleForUser(userID, roleID string) bool {
 	ok, err := casbinInstance.AddRoleForUser(userID, roleID)
 	return ok && err == nil
 }
@@ -253,12 +286,12 @@ func RevokeRoleForUser(userID, roleID string) bool {
 export const revokePermissionForRole = async (
   roleId: string,
   resourceId: string,
-  permissions?: Permission[]
+  Permissions?: Permission[]
 ): Promise<boolean> => {
   const casbin = repositoryContainer.getCasbin();
-  permissions = getPermissions(permissions);
-  const policies = permissions.map((permission: Permission) =>
-    genPolicy(roleId, resourceId, permission)
+  Permissions = getPermissions(Permissions);
+  const policies = Permissions.map((Permission: Permission) =>
+    genPolicy(roleId, resourceId, Permission)
   );
   await Promise.all(policies.map((policy) => casbin.removePolicy(...policy)));
   return true;
@@ -283,12 +316,12 @@ func RevokePermissionForRole(roleID, resourceID string, permissions []string) bo
 // ロールの権限を更新する
 export const updatePermissionsForRole = async (
   roleId: string,
-  permissions: AdminRolePermissions
+  Permissions: AdminRolePermissions
 ): Promise<boolean> => {
   const casbin = repositoryContainer.getCasbin();
-  const policies = permissions.map(
-    ({ resourceId, permission }): Policy =>
-      genPolicy(roleId, resourceId, permission)
+  const policies = Permissions.map(
+    ({ resourceId, Permission }): Policy =>
+      genPolicy(roleId, resourceId, Permission)
   );
   await removeRole(roleId);
   await Promise.all(policies.map((policy) => casbin.addPolicy(...policy)));
@@ -296,10 +329,10 @@ export const updatePermissionsForRole = async (
 };
 */
 
-func updatePermissionsForRole(roleID string, permissions []*adminRolePermission) {
+func updatePermissionsForRole(roleID string, permissions []*AdminRolePermission) {
 	policies := [][]string{}
 	for _, permission := range permissions {
-		policies = append(policies, genPolicy(roleID, permission.resourceID, permission.permission))
+		policies = append(policies, genPolicy(roleID, permission.ResourceID, permission.Permission))
 	}
 	removeRole(roleID)
 	casbinInstance.AddPolicies(policies)
@@ -321,14 +354,14 @@ func removeRole(roleID string) bool {
 /*
 // idがリソースを操作する権限を持っているかチェック
 export const hasPermissionByResourceId = async (
-  id: string,
+  ID: string,
   resourceId: string,
-  permissions: Permission[]
+  Permissions: Permission[]
 ): Promise<boolean> => {
   const casbin = repositoryContainer.getCasbin();
   await sync();
-  const tasks = permissions.map((permission) =>
-    casbin.enforce(id, resourceId, permission)
+  const tasks = Permissions.map((Permission) =>
+    casbin.enforce(ID, resourceId, Permission)
   );
   for await (const allowed of tasks) {
     if (allowed) {
@@ -336,10 +369,10 @@ export const hasPermissionByResourceId = async (
     }
   }
   debug(
-    'Don`t have permission to access. id: %s, resourceId: %s, permissions: %O',
-    id,
+    'Don`t have Permission to access. ID: %s, resourceId: %s, Permissions: %O',
+    ID,
     resourceId,
-    permissions
+    Permissions
   );
   return false;
 };
@@ -385,6 +418,120 @@ func hasPermission(userID, requestURI, requestMethod string, apiDef *openapi3.T)
 	return hasPermissionByResourceID(userID, resourceID, method2Permissions(requestMethod))
 }
 
+func ListResourcesByOas(apiDef *openapi3.T) []string {
+	/*
+		// リソース一覧
+		export const listResourcesByOas = (
+		  apiDefinitions: VironOpenAPIObject
+		): string[] => {
+		  const pages = apiDefinitions.info[OAS_X_PAGES];
+		  if (!pages?.length) {
+		    return [];
+		  }
+		  const result = pages
+		    .map((page) =>
+		      (page?.[OAS_X_PAGE_CONTENTS] ?? []).map(
+		        (content) => content[OAS_X_PAGE_CONTENT_RESOURCE_ID]
+		      )
+		    )
+		    .flat()
+		    .sort();
+		  return result;
+		};
+
+	*/
+
+	// apiDef.Info.ExtensionProps.Extensions[constant.OAS_X_PAGES]
+
+	extentions := helpers.ConvertExtentions(apiDef)
+	resources := []string{}
+	if extentions != nil {
+		if len(extentions.XPages) > 0 {
+			for _, page := range extentions.XPages {
+				for _, content := range page.Contents {
+					resources = append(resources, content.ResourceID)
+				}
+			}
+		}
+	}
+
+	return resources
+}
+
+/*
+// 管理ロール一覧
+export const listByOas = async (
+  apiDefinitions: VironOpenAPIObject
+): Promise<ListWithPager<AdminRole>> => {
+  const policies = await listPolicies();
+  const resourceIds = listResourcesByOas(apiDefinitions);
+
+  const map = policies.reduce(
+    (
+      ret: Record<string, Record<string, Permission>>,
+      { roleId, resourceId, Permission }
+    ) => {
+      ret[roleId] = ret[roleId] || {};
+      ret[roleId][resourceId] = Permission;
+      return ret;
+    },
+    {}
+  );
+  const result = Object.keys(map).map((roleId) => {
+    return {
+      ID: roleId,
+      Permissions: resourceIds.map((resourceId: string) => {
+        return {
+          resourceId,
+          Permission: map[roleId][resourceId] ?? PERMISSION.DENY,
+        };
+      }),
+    };
+  });
+  return paging(result, result.length);
+};
+*/
+
+func ListByOas(apiDef *openapi3.T) *helpers.PagerResults {
+	policies := listPolicies("")
+	resources := ListResourcesByOas(apiDef)
+
+	policyMap := map[string]map[string]string{}
+	for _, policy := range policies {
+		if _, exists := policyMap[policy[0]]; !exists {
+			policyMap[policy[0]] = map[string]string{}
+		}
+		if len(policy) != 3 || len(policy[2]) == 0 {
+			policyMap[policy[0]][policy[1]] = constant.PERMISSION_DENY
+		} else {
+			policyMap[policy[0]][policy[1]] = policy[2]
+		}
+	}
+
+	result := []*AdminRole{}
+	for roleID, _ := range policyMap {
+		role := &AdminRole{
+			ID:          roleID,
+			Permissions: []*AdminRolePermission{},
+		}
+		for _, resourceID := range resources {
+			permission, exists := policyMap[roleID][resourceID]
+			if !exists {
+				permission = constant.PERMISSION_DENY
+			}
+			adminRolePermission := &AdminRolePermission{
+				ResourceID: resourceID,
+				Permission: permission,
+			}
+			role.Permissions = append(role.Permissions, adminRolePermission)
+		}
+		result = append(result, role)
+	}
+
+	return helpers.Paging(result, len(result), constant.DEFAULT_PAGER_PAGE)
+
+}
+
 /*
 
        this.casbin = await newEnforcer(
@@ -416,14 +563,14 @@ const debug = getDebug('domains:adminrole');
 
 export interface AdminRolePermission {
   resourceId: string;
-  permission: Permission;
+  Permission: Permission;
 }
 
 export type AdminRolePermissions = AdminRolePermission[];
 
 export interface AdminRole {
-  id: string;
-  permissions: AdminRolePermissions;
+  ID: string;
+  Permissions: AdminRolePermissions;
 }
 
 export type Policy = [string, string, Permission];
@@ -431,7 +578,7 @@ export type Policy = [string, string, Permission];
 interface ParsedPolicy {
   roleId: string;
   resourceId: string;
-  permission: Permission;
+  Permission: Permission;
 }
 
 
@@ -443,7 +590,7 @@ const parsePolicy = (policy: Policy): ParsedPolicy => {
   return {
     roleId: policy[0],
     resourceId: policy[1],
-    permission: policy[2],
+    Permission: policy[2],
   };
 };
 
@@ -477,74 +624,26 @@ const sync = async (now = Date.now()): Promise<void> => {
 
 
 
-// リソース一覧
-export const listResourcesByOas = (
-  apiDefinitions: VironOpenAPIObject
-): string[] => {
-  const pages = apiDefinitions.info[OAS_X_PAGES];
-  if (!pages?.length) {
-    return [];
-  }
-  const result = pages
-    .map((page) =>
-      (page?.[OAS_X_PAGE_CONTENTS] ?? []).map(
-        (content) => content[OAS_X_PAGE_CONTENT_RESOURCE_ID]
-      )
-    )
-    .flat()
-    .sort();
-  return result;
-};
 
-// 管理ロール一覧
-export const listByOas = async (
-  apiDefinitions: VironOpenAPIObject
-): Promise<ListWithPager<AdminRole>> => {
-  const policies = await listPolicies();
-  const resourceIds = listResourcesByOas(apiDefinitions);
 
-  const map = policies.reduce(
-    (
-      ret: Record<string, Record<string, Permission>>,
-      { roleId, resourceId, permission }
-    ) => {
-      ret[roleId] = ret[roleId] || {};
-      ret[roleId][resourceId] = permission;
-      return ret;
-    },
-    {}
-  );
-  const result = Object.keys(map).map((roleId) => {
-    return {
-      id: roleId,
-      permissions: resourceIds.map((resourceId: string) => {
-        return {
-          resourceId,
-          permission: map[roleId][resourceId] ?? PERMISSION.DENY,
-        };
-      }),
-    };
-  });
-  return paging(result, result.length);
-};
 
 // 1件作成
 export const createOne = async (obj: AdminRole): Promise<AdminRole> => {
-  const roleId = obj.id;
+  const roleId = obj.ID;
   const policies = await listPolicies(roleId);
   if (policies?.length) {
     throw roleIdAlreadyExists();
   }
-  await updatePermissionsForRole(roleId, obj.permissions);
+  await updatePermissionsForRole(roleId, obj.Permissions);
   return obj;
 };
 
 // IDで1件更新
 export const updateOneById = async (
   roleId: string,
-  permissions: AdminRolePermissions
+  Permissions: AdminRolePermissions
 ): Promise<void> => {
-  await updatePermissionsForRole(roleId, permissions);
+  await updatePermissionsForRole(roleId, Permissions);
 };
 
 // IDで1件削除
@@ -565,18 +664,18 @@ export const createViewer = async (
 
   const map = policies.reduce(
     (ret: Record<string, Permission>, policy: ParsedPolicy) => {
-      ret[policy.resourceId] = policy.permission;
+      ret[policy.resourceId] = policy.Permission;
       return ret;
     },
     {}
   );
-  const permissions = resourceIds.map((resourceId: string) => {
+  const Permissions = resourceIds.map((resourceId: string) => {
     return {
       resourceId,
-      permission: map[resourceId] ?? PERMISSION.READ,
+      Permission: map[resourceId] ?? PERMISSION.READ,
     };
   });
-  await updatePermissionsForRole(ADMIN_ROLE.VIEWER, permissions);
+  await updatePermissionsForRole(ADMIN_ROLE.VIEWER, Permissions);
   return true;
 };
 

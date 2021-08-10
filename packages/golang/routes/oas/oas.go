@@ -1,9 +1,12 @@
 package oas
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/cam-inc/viron/packages/golang/helpers"
+
+	"github.com/cam-inc/viron/packages/golang/domains"
 
 	"github.com/cam-inc/viron/packages/golang/constant"
 
@@ -14,7 +17,19 @@ type oas struct{}
 
 func (o *oas) GetOas(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	oas := ctx.Value(constant.CTX_KEY_API_DEFINITION)
+	ctxApiDef := ctx.Value(constant.CTX_KEY_API_DEFINITION)
+	apiDef, exists := ctxApiDef.(*openapi3.T)
+	if !exists {
+		helpers.SendError(w, http.StatusInternalServerError, fmt.Errorf("api-definition notfound"))
+		return
+	}
+	ctxUser := ctx.Value(constant.CTX_KEY_ADMINUSER)
+	user, exists := ctxUser.(*domains.AdminUser)
+	if !exists {
+		helpers.SendError(w, http.StatusInternalServerError, fmt.Errorf("adminuser notfound"))
+		return
+	}
+	clone := domains.GetOas(apiDef, user.RoleIDs)
 
 	// DEBUG
 	if v := ctx.Value(JwtScopes); v == nil {
@@ -24,9 +39,7 @@ func (o *oas) GetOas(w http.ResponseWriter, r *http.Request) {
 	}
 	// DEBUG
 
-	b, _ := json.Marshal(oas)
-	w.WriteHeader(http.StatusOK)
-	w.Write(b)
+	helpers.Send(w, http.StatusOK, clone)
 }
 
 func (o *oas) LoadOas() *openapi3.T {

@@ -8,6 +8,11 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/getkin/kin-openapi/openapi3filter"
+	legacyrouter "github.com/getkin/kin-openapi/routers/legacy"
+
+	"github.com/cam-inc/viron/packages/golang/domains"
+
 	"github.com/cam-inc/viron/packages/golang/domains/auth"
 
 	"github.com/cam-inc/viron/example/golang/pkg/config"
@@ -21,6 +26,43 @@ const (
 	JwtScopes = "jwt.Scopes"
 )
 
+// OpenAPI3Validator kin-openapiを利用したvalidator
+func OpenAPI3Validator(apiDef *openapi3.T, op *openapi3filter.Options) func(http.Handler) http.Handler {
+	router, err := legacyrouter.NewRouter(apiDef)
+	if err != nil {
+		panic(err)
+	}
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			url := r.URL
+
+			// リクエストのバリデーション
+			route, pathParams, err := router.FindRoute(r)
+			if err != nil {
+				fmt.Printf("router.FindRoute err=%v, url=%v", err, url)
+				next.ServeHTTP(w, r.WithContext(ctx))
+				return
+			}
+			requestValidationInput := &openapi3filter.RequestValidationInput{Request: r,
+				PathParams: pathParams,
+				Route:      route,
+				Options:    op,
+			}
+			if err := openapi3filter.ValidateRequest(ctx, requestValidationInput); err != nil {
+				fmt.Printf("openapi3filter.ValidateRequest err:%v", err)
+				http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+				return
+			}
+
+			// next
+			req := r.WithContext(ctx)
+			next.ServeHTTP(w, req)
+
+		})
+	}
+}
+
 func InjectAPIDefinition(apiDef *openapi3.T) func(http.HandlerFunc) http.HandlerFunc {
 	return func(handlerFunc http.HandlerFunc) http.HandlerFunc {
 		fn := func(w http.ResponseWriter, r *http.Request) {
@@ -32,30 +74,6 @@ func InjectAPIDefinition(apiDef *openapi3.T) func(http.HandlerFunc) http.Handler
 
 	}
 }
-
-/*
-func (c *Cors) Handler(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodOptions && r.Header.Get("Access-Control-Request-Method") != "" {
-			c.logf("Handler: Preflight request")
-			c.handlePreflight(w, r)
-			// Preflight requests are standalone and should stop the chain as some other
-			// middleware may not handle OPTIONS requests correctly. One typical example
-			// is authentication middleware ; OPTIONS requests won't carry authentication
-			// headers (see #1)
-			if c.optionPassthrough {
-				next.ServeHTTP(w, r)
-			} else {
-				w.WriteHeader(http.StatusOK)
-			}
-		} else {
-			c.logf("Handler: Actual request")
-			c.handleActualRequest(w, r)
-			next.ServeHTTP(w, r)
-		}
-	})
-}
-*/
 
 func InjectConfig(cfg *config.Config) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
@@ -83,8 +101,6 @@ func Cors(cfg *config.Cors) func(http.Handler) http.Handler {
 func JWTSecurityHandler(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFunc {
 	return func(handlerFunc http.HandlerFunc) http.HandlerFunc {
 
-		// TODO: oas security 'jwt' check and through
-
 		fn := func(w http.ResponseWriter, r *http.Request) {
 
 			// DEBUG
@@ -101,11 +117,22 @@ func JWTSecurityHandler(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFun
 				fmt.Println("jwtScope is not nil.")
 			}
 
-			cookie, _ := r.Cookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION)
-			fmt.Printf("authrization cookie %+v\n", cookie)
-			if cookie == nil {
+			token, err := helpers.GetCookieToken(r)
+			if err != nil {
 				w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
-				cookie = helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
+				cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
+					MaxAge: 0,
+				})
+				http.SetCookie(w, cookie)
+				http.Error(w, `{"message":"Unauthorized"}`, http.StatusUnauthorized)
+				return
+			}
+
+			claim, err := auth.Verify(token)
+			if err != nil {
+				fmt.Println(err)
+				w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
+				cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
 					Expires: time.Unix(0, 0),
 				})
 				http.SetCookie(w, cookie)
@@ -113,8 +140,21 @@ func JWTSecurityHandler(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFun
 				return
 			}
 
-			//claim, err := auth.Verify(cookie.Value)
-			auth.Verify(cookie.Value)
+			userID := claim.Sub
+			user := domains.FindByID(ctx, userID)
+			if user == nil {
+				fmt.Println("user notfound")
+				w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
+				cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
+					Expires: time.Unix(0, 0),
+				})
+				http.SetCookie(w, cookie)
+				http.Error(w, `{"message":"Unauthorized"}`, http.StatusUnauthorized)
+				return
+			}
+
+			ctx = context.WithValue(ctx, constant.CTX_KEY_AUTH, claim)
+			ctx = context.WithValue(ctx, constant.CTX_KEY_ADMINUSER, user)
 			handlerFunc.ServeHTTP(w, r.WithContext(ctx))
 		}
 		return fn

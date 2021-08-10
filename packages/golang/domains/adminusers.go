@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"strconv"
 	"time"
 
 	"github.com/cam-inc/viron/packages/golang/repositories/mysql/adminusers"
@@ -18,7 +19,7 @@ import (
 
 type (
 	AdminUser struct {
-		ID                       uint     `json:"id"`
+		ID                       uint     `json:"ID"`
 		Email                    string   `json:"email"`
 		AuthType                 string   `json:"type"`
 		Password                 *string  `json:"password"`
@@ -99,13 +100,8 @@ func Count(ctx context.Context) int {
 	*/
 }
 
-func FindByEmail(ctx context.Context, email string) *AdminUser {
+func findOne(ctx context.Context, conditions *adminusers.AdminUserConditions) *AdminUser {
 	repo := container.GetAdminUserRepository()
-
-	conditions := &adminusers.AdminUserConditions{
-		Email: email,
-	}
-
 	result, err := repo.Find(ctx, conditions)
 	if err != nil || len(result) == 0 {
 		fmt.Println(err)
@@ -116,15 +112,59 @@ func FindByEmail(ctx context.Context, email string) *AdminUser {
 
 	result[0].Bind(user)
 
-	// user.RoleIDs = listRoles(ctx, user.ID)
+	user.RoleIDs = listRoles(fmt.Sprintf("%d", user.ID))
 
 	auser := &AdminUser{
-		Email:    user.Email,
-		Password: user.Password,
-		AuthType: user.AuthType,
+		Email:                    user.Email,
+		Password:                 user.Password,
+		AuthType:                 user.AuthType,
+		GoogleOAuth2AccessToken:  user.GoogleOAuth2AccessToken,
+		GoogleOAuth2ExpiryDate:   user.GoogleOAuth2ExpiryDate,
+		GoogleOAuth2IdToken:      user.GoogleOAuth2IdToken,
+		GoogleOAuth2RefreshToken: user.GoogleOAuth2RefreshToken,
+		GoogleOAuth2TokenType:    user.GoogleOAuth2TokenType,
+		CreatedAt:                user.CreatedAt,
+		UpdateAt:                 user.UpdatedAt,
+	}
+	return auser
+}
+
+func FindByEmail(ctx context.Context, email string) *AdminUser {
+
+	conditions := &adminusers.AdminUserConditions{
+		Email: email,
 	}
 
-	return auser
+	return findOne(ctx, conditions)
+}
+
+/*
+// IDで1件取得
+export const findOneById = async (
+  ID: string
+): Promise<AdminUserView | null> => {
+  const repository = repositoryContainer.getAdminUserRepository();
+  const user = await repository.findOneById(ID);
+  if (!user) {
+    return null;
+  }
+  const roleIds = await listRoles(user.ID);
+  return format(user, roleIds);
+};
+*/
+
+func FindByID(ctx context.Context, userID string) *AdminUser {
+
+	userIDInt, err := strconv.Atoi(userID)
+	if err != nil {
+		return nil
+	}
+
+	conditions := &adminusers.AdminUserConditions{
+		ID: uint(userIDInt),
+	}
+
+	return findOne(ctx, conditions)
 }
 
 /*
@@ -143,7 +183,7 @@ export const list = async (
   }
   const result = await repository.findWithPager(conditions, size, page, sort);
   const adminRoles = await Promise.all(
-    result.list.map((adminUser) => listRoles(adminUser.id))
+    result.list.map((adminUser) => listRoles(adminUser.ID))
   );
   return {
     ...result,
@@ -237,7 +277,7 @@ export const createOne = async (
   const user = await repository.createOne(obj);
 
   if (roleIds?.length) {
-    await updateRolesForUser(user.id, roleIds);
+    await updateRolesForUser(user.ID, roleIds);
   }
   return format(user, roleIds);
 };
@@ -253,11 +293,11 @@ const format = (adminUser: AdminUser, roleIds?: string[]): AdminUserView => {
 
 // IDで1件更新
 export const updateOneById = async (
-  id: string,
+  ID: string,
   payload: AdminUserUpdatePayload
 ): Promise<void> => {
   const repository = repositoryContainer.getAdminUserRepository();
-  const user = await findOneById(id);
+  const user = await findOneById(ID);
   if (!user) {
     throw adminUserNotFound();
   }
@@ -267,42 +307,31 @@ export const updateOneById = async (
     const adminUserEmail = adminUser as AdminUserEmailUpdatePayload;
     if (adminUserEmail.password) {
       await repository.updateOneById(
-        id,
+        ID,
         genPasswordHash(adminUserEmail.password)
       );
     }
   } else {
     const adminUserGoogle = adminUser as AdminUserGoogleUpdatePayload;
-    await repository.updateOneById(id, adminUserGoogle);
+    await repository.updateOneById(ID, adminUserGoogle);
   }
 
   if (roleIds?.length) {
-    await updateRolesForUser(id, roleIds);
+    await updateRolesForUser(ID, roleIds);
   }
 };
 
 // IDで1件削除
-export const removeOneById = async (id: string): Promise<void> => {
+export const removeOneById = async (ID: string): Promise<void> => {
   const repository = repositoryContainer.getAdminUserRepository();
-  const user = await findOneById(id);
+  const user = await findOneById(ID);
   if (!user) {
     throw adminUserNotFound();
   }
-  await Promise.all([repository.removeOneById(id), revokeRoleForUser(id)]);
+  await Promise.all([repository.removeOneById(ID), revokeRoleForUser(ID)]);
 };
 
-// IDで1件取得
-export const findOneById = async (
-  id: string
-): Promise<AdminUserView | null> => {
-  const repository = repositoryContainer.getAdminUserRepository();
-  const user = await repository.findOneById(id);
-  if (!user) {
-    return null;
-  }
-  const roleIds = await listRoles(user.id);
-  return format(user, roleIds);
-};
+
 
 // emailで1件取得
 export const findOneByEmail = async (
@@ -313,7 +342,7 @@ export const findOneByEmail = async (
   if (!user) {
     return null;
   }
-  const roleIds = await listRoles(user.id);
+  const roleIds = await listRoles(user.ID);
   return format(user, roleIds);
 };
 

@@ -136,7 +136,20 @@ func (a *authObj) Oauth2GoogleCallback(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *authObj) Signout(w http.ResponseWriter, r *http.Request) {
-	panic("implement me")
+	token, _ := helpers.GetCookieToken(r)
+	if token == "" {
+		helpers.Send(w, http.StatusNoContent, nil)
+	}
+
+	if auth.SignOut(r.Context(), token) {
+		fmt.Println("signount failed.")
+	}
+
+	cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
+		MaxAge: 0,
+	})
+	http.SetCookie(w, cookie)
+	helpers.Send(w, http.StatusNoContent, nil)
 }
 
 func (a *authObj) LoadOas() *openapi3.T {
