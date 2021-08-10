@@ -1,6 +1,7 @@
 package domains
 
 import (
+	"encoding/json"
 	"strings"
 
 	"github.com/cam-inc/viron/packages/golang/constant"
@@ -56,13 +57,122 @@ type (
 		Actions     []*Action `json:"actions"`
 	}
 	XPages struct {
-		ID          string     `json:"id"`
+		ID          string     `json:"ID"`
 		Title       string     `json:"title"`
 		Group       string     `json:"group"`
 		Description string     `json:"description"`
 		Contents    []*Content `json:"contents"`
 	}
 )
+
+func GetOas(apiDef *openapi3.T, roleIDs []string) *openapi3.T {
+	clone := &openapi3.T{}
+	if buf, err := json.Marshal(apiDef); err != nil {
+		return nil
+	} else {
+		if err := json.Unmarshal(buf, clone); err != nil {
+			return nil
+		}
+	}
+
+	extentions := helpers.ConvertExtentions(clone)
+	rewritedPages := []*helpers.XPage{}
+	for _, page := range extentions.XPages {
+		granted := []*helpers.XContent{}
+		for _, content := range page.Contents {
+			pathMethod := findPathMethodByOperationID(content.OperationID, clone)
+			if pathMethod == nil || pathMethod.method == "" {
+				continue
+			}
+
+			for _, roleID := range roleIDs {
+				if hasPermissionByResourceID(roleID, content.ResourceID, method2Permissions(pathMethod.method)) {
+					granted = append(granted, content)
+				}
+			}
+		}
+
+		if len(granted) > 0 {
+			page.Contents = granted
+			rewritedPages = append(rewritedPages, page)
+		}
+	}
+	clone.Extensions[constant.OAS_X_PAGES] = rewritedPages
+	return clone
+}
+
+/*
+// oas取得
+export const getOas = async (context: RouteContext): Promise<void> => {
+  const oas = await domainsOas.get(
+    context.req._context.apiDefinition,
+    ctx.config.oas.infoExtentions,
+    context.user?.roleIds
+  );
+  context.res.json(oas);
+};
+
+
+// oasを取得
+export const get = async (
+  oas: VironOpenAPIObject,
+  infoExtentions: VironInfoObjectExtentions = {},
+  roleIds: string[] = []
+): Promise<VironOpenAPIObject> => {
+  // viewerが未作成の場合は作成する
+  await createViewer(oas);
+
+  // 参照破壊しないようにDeepCopy
+  const clonedApiDefinition = copy(oas);
+  Object.assign(clonedApiDefinition.info, infoExtentions);
+
+  // x-pages[].contents[]を書き換える
+  const rewriteContent = async (
+    content: OasXPageContent
+  ): Promise<OasXPageContent | null> => {
+    const { resourceId, operationId } = content;
+    // 権限のないcontentは削除する(nullを返す)
+    const { method } = findPathMethodByOperationId(operationId, oas) ?? {};
+    if (!method) {
+      // contentに書かれているoperationIdが不正
+      debug('operation isn`t exists. operationId: %s', operationId);
+      return null;
+    }
+    const tasks = roleIds.map((roleId) =>
+      hasPermissionByResourceId(roleId, resourceId, method2Permissions(method))
+    );
+    for await (const hasPermission of tasks) {
+      if (hasPermission) {
+        return content;
+      }
+    }
+    return null;
+  };
+
+  // x-pages[]を書き換える
+  const rewritePage = async (page: OasXPage): Promise<OasXPage | null> => {
+    const contents = await Promise.all(page.contents.map(rewriteContent));
+    page.contents = contents.filter(Boolean) as OasXPageContents;
+    // contentsが0件になった場合はpageごと消す
+    return page.contents.length ? page : null;
+  };
+
+  // x-pagesを書き換える
+  const pages = await Promise.all(
+    (clonedApiDefinition.info[OAS_X_PAGES] ?? []).map(rewritePage)
+  );
+  clonedApiDefinition.info[OAS_X_PAGES] = pages.filter(Boolean) as OasXPages;
+
+  // validation
+  const { isValid, errors } = lint(clonedApiDefinition);
+  if (!isValid) {
+    debug('OAS validation failure. errors:');
+    (errors ?? []).forEach((error, i) => debug('%s: %o', i, error));
+    throw oasValidationFailure();
+  }
+  return clonedApiDefinition;
+};
+*/
 
 /*
 // uriにヒットするとpathとpathItemをoasから取得する
@@ -340,8 +450,8 @@ export const getResourceId = (
   }
 
   /**
-   * リクエストURIが `/foo/{id}/bar` のとき
-   * `/foo/{id}/bar` > `/foo/{id}` > `/foo` の順にresourceIdを検索する
+   * リクエストURIが `/foo/{ID}/bar` のとき
+   * `/foo/{ID}/bar` > `/foo/{ID}` > `/foo` の順にresourceIdを検索する
 
   let lastIndex, parentResourceId;
   let parentUri = uri;
@@ -479,7 +589,7 @@ export interface OasXPageContent {
 export type OasXPageContents = OasXPageContent[];
 
 export interface OasXPage {
-  id: string;
+  ID: string;
   group: string;
   title: string;
   description: string;

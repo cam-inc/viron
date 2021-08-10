@@ -15,7 +15,9 @@ func SendError(w http.ResponseWriter, code int, err error) {
 
 func Send(w http.ResponseWriter, code int, send interface{}) {
 	w.WriteHeader(code)
-	if err := json.NewEncoder(w).Encode(send); err != nil {
-		fmt.Printf("sendError err=%v\n", err)
+	if send != nil {
+		if err := json.NewEncoder(w).Encode(send); err != nil {
+			fmt.Printf("sendError err=%v\n", err)
+		}
 	}
 }

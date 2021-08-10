@@ -14,26 +14,33 @@ import (
 )
 
 type (
-	xPage struct {
-		ID          string        `json:"id"`
-		Group       string        `json:"group"`
-		Title       string        `json:"title"`
-		Description string        `json:"description"`
-		Contents    []interface{} `json:"contents"`
+	XContent struct {
+		OperationID string   `json:"operationId"`
+		ResourceID  string   `json:"resourceId"`
+		Query       []string `json:"query"`
+		ContentType string   `json:"type"`
+		Sort        []string `json:"sort"`
 	}
-	xTable struct {
+	XPage struct {
+		ID          string      `json:"id"`
+		Group       string      `json:"group"`
+		Title       string      `json:"title"`
+		Description string      `json:"description"`
+		Contents    []*XContent `json:"contents"`
+	}
+	XTable struct {
 		ResponseListKey string      `json:"responseListKey"`
 		Pager           interface{} `json:"pager"`
 		Sort            interface{} `json:"sort"`
 	}
-	xAutoComplete struct {
+	XAutoComplete struct {
 		ResponseLabelKey string `json:"responseLabelKey"`
 		ResponseValueKey string `json:"responseValueKey"`
 	}
-	extensions struct {
-		XPages     []*xPage       `json:"x-pages"`
-		XTable     *xTable        `json:"x-table"`
-		XComplete  *xAutoComplete `json:"x-autocomplete"`
+	Extensions struct {
+		XPages     []*XPage       `json:"x-pages"`
+		XTable     *XTable        `json:"x-table"`
+		XComplete  *XAutoComplete `json:"x-autocomplete"`
 		XTheme     string         `json:"x-theme"`
 		XThumbnail string         `json:"x-thumbnail"`
 		XTags      []string       `json:"x-tags"`
@@ -225,14 +232,14 @@ func OasMerge(dist *openapi3.T, src *openapi3.T) error {
 	fmt.Println("--Extensions")
 	if len(src.Info.Extensions) > 0 {
 
-		srcEx := &extensions{
-			XPages:    []*xPage{},
-			XComplete: &xAutoComplete{},
-			XTable:    &xTable{},
+		srcEx := &Extensions{
+			XPages:    []*XPage{},
+			XComplete: &XAutoComplete{},
+			XTable:    &XTable{},
 		}
 
 		srcJSONEx, _ := json.Marshal(src.Info.Extensions)
-		fmt.Printf("src info extensions %s\n", string(srcJSONEx))
+		fmt.Printf("src info Extensions %s\n", string(srcJSONEx))
 		fmt.Printf("srcEx %v, %v, %v\n", srcEx.XPages, srcEx.XTable, srcEx.XComplete)
 		fmt.Printf("xPages %d\n", len(srcEx.XPages))
 
@@ -243,10 +250,10 @@ func OasMerge(dist *openapi3.T, src *openapi3.T) error {
 			fmt.Println("unmarshal success")
 			fmt.Printf("srcEx %v, %v, %v\n", srcEx.XPages, srcEx.XTable, srcEx.XComplete)
 
-			distEx := &extensions{
-				XPages:    []*xPage{},
-				XComplete: &xAutoComplete{},
-				XTable:    &xTable{},
+			distEx := &Extensions{
+				XPages:    []*XPage{},
+				XComplete: &XAutoComplete{},
+				XTable:    &XTable{},
 			}
 
 			if len(dist.Info.Extensions) > 0 {
@@ -286,7 +293,7 @@ func OasMerge(dist *openapi3.T, src *openapi3.T) error {
 				}
 			}
 
-			fmt.Printf("dist.info.extensions %+v\n", dist.Info.Extensions)
+			fmt.Printf("dist.info.Extensions %+v\n", dist.Info.Extensions)
 		}
 	}
 
@@ -295,6 +302,25 @@ func OasMerge(dist *openapi3.T, src *openapi3.T) error {
 
 	fmt.Println("--")
 	return nil
+}
+
+func ConvertExtentions(apiDef *openapi3.T) *Extensions {
+	distEx := &Extensions{
+		XPages:    []*XPage{},
+		XComplete: &XAutoComplete{},
+		XTable:    &XTable{},
+	}
+
+	if len(apiDef.Info.Extensions) > 0 {
+		distJSONEx, _ := json.Marshal(apiDef.Info.Extensions)
+		if err := json.Unmarshal(distJSONEx, distEx); err != nil {
+			fmt.Printf("dist json ex unmarshal err %v\n", err)
+			return nil
+		}
+	} else {
+		return nil
+	}
+	return distEx
 }
 
 /*
