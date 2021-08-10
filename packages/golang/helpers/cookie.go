@@ -1,7 +1,9 @@
 package helpers
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/cam-inc/viron/packages/golang/constant"
 )
@@ -86,3 +88,22 @@ export const genAuthorizationCookie = (
   return genCookie(COOKIE_KEY.VIRON_AUTHORIZATION, token, opts);
 };
 */
+
+func GetCookieToken(r *http.Request) (string, error) {
+	cookie, err := r.Cookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION)
+	if err != nil {
+		return "", err
+	}
+
+	if cookie == nil {
+		return "", fmt.Errorf("cookie notfound")
+	}
+
+	tokens := strings.Split(cookie.Value, " ")
+	if len(tokens) != 2 || tokens[0] != constant.AUTH_SCHEME {
+		return "", fmt.Errorf("token invalid")
+	}
+
+	return tokens[1], nil
+
+}

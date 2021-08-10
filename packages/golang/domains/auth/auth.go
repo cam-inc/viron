@@ -2,6 +2,9 @@ package auth
 
 import (
 	"context"
+	"fmt"
+
+	"github.com/cam-inc/viron/packages/golang/constant"
 
 	"github.com/cam-inc/viron/packages/golang/domains"
 )
@@ -15,10 +18,9 @@ func createFirstAdminUser(ctx context.Context, payload *domains.AdminUser, authT
 		return nil, err
 	}
 
-	/*
-
-		await addRoleForUser(user.id, ADMIN_ROLE.SUPER);
-	*/
+	if ret := domains.AddRoleForUser(fmt.Sprintf("%d", user.ID), constant.ADMIN_ROLE_SUPER); !ret {
+		return nil, fmt.Errorf("AddRoleForUser return %v", ret)
+	}
 
 	return user, nil
 
