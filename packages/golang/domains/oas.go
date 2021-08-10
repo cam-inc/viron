@@ -51,7 +51,8 @@ type (
 
 	Content struct {
 		OperationID string    `json:"operationId"`
-		Query       []string  `json:"query"`
+		Query       []string  `json:"query,omitempty"`
+		Sort        []string  `json:"sort,omitempty"`
 		ResourceID  string    `json:"resourceId"`
 		ContentType string    `json:"type"`
 		Actions     []*Action `json:"actions"`
