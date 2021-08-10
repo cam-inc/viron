@@ -146,7 +146,7 @@ func (a *authObj) Signout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
-		MaxAge: 0,
+		MaxAge: -1,
 	})
 	http.SetCookie(w, cookie)
 	helpers.Send(w, http.StatusNoContent, nil)

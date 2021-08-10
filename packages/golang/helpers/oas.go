@@ -17,9 +17,9 @@ type (
 	XContent struct {
 		OperationID string   `json:"operationId"`
 		ResourceID  string   `json:"resourceId"`
-		Query       []string `json:"query"`
+		Query       []string `json:"query,omitempty"`
 		ContentType string   `json:"type"`
-		Sort        []string `json:"sort"`
+		Sort        []string `json:"sort,omitempty"`
 	}
 	XPage struct {
 		ID          string      `json:"id"`

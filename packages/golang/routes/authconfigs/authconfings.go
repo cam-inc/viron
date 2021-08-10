@@ -35,11 +35,20 @@ func (a *authConfigs) ListVironAuthconfigs(w http.ResponseWriter, r *http.Reques
 	list := []*domains.AuthConfig{}
 	paths := map[string]*openapi3.PathItem{}
 	apiDef := apiDefCtx.(*openapi3.T)
+	clone := &openapi3.T{}
+	if buf, err := json.Marshal(apiDef); err != nil {
+		helpers.SendError(w, 400, fmt.Errorf("DAMEEEEE"))
+	} else {
+		if err := json.Unmarshal(buf, clone); err != nil {
+			helpers.SendError(w, 400, fmt.Errorf("DAMEEEEE"))
+		}
+	}
+
 	if r, pathItem, err := domains.GenAuthConfig(constant.AUTH_CONFIG_PROVIDER_VIRON,
 		constant.AUTH_TYPE_EMAIL,
 		http.MethodPost,
 		constant.EMAIL_SIGNIN_PATH,
-		apiDef); err != nil {
+		clone); err != nil {
 		helpers.SendError(w, err.StatusCode(), err)
 		return
 	} else {
@@ -50,7 +59,7 @@ func (a *authConfigs) ListVironAuthconfigs(w http.ResponseWriter, r *http.Reques
 		constant.AUTH_CONFIG_TYPE_OAUTH,
 		http.MethodGet,
 		constant.OAUTH2_GOOGLE_AUTHORIZATION_PATH,
-		apiDef); err != nil {
+		clone); err != nil {
 		helpers.SendError(w, err.StatusCode(), err)
 		return
 	} else {
@@ -61,7 +70,7 @@ func (a *authConfigs) ListVironAuthconfigs(w http.ResponseWriter, r *http.Reques
 		constant.AUTH_CONFIG_TYPE_OAUTH_CALLBACK,
 		http.MethodPost,
 		constant.OAUTH2_GOOGLE_CALLBACK_PATH,
-		apiDef); err != nil {
+		clone); err != nil {
 		helpers.SendError(w, err.StatusCode(), err)
 		return
 	} else {
@@ -72,7 +81,7 @@ func (a *authConfigs) ListVironAuthconfigs(w http.ResponseWriter, r *http.Reques
 		constant.AUTH_CONFIG_TYPE_SIGNOUT,
 		http.MethodPost,
 		constant.SIGNOUT_PATH,
-		apiDef); err != nil {
+		clone); err != nil {
 		helpers.SendError(w, err.StatusCode(), err)
 		return
 	} else {
@@ -80,12 +89,14 @@ func (a *authConfigs) ListVironAuthconfigs(w http.ResponseWriter, r *http.Reques
 		paths[constant.SIGNOUT_PATH] = pathItem
 	}
 
+	extentions := helpers.ConvertExtentions(clone)
+	clone.Extensions[constant.OAS_X_PAGES] = extentions.XPages
 	res := &authConfigResponse{
 		List: list,
 		Oas: &openapi3.T{
-			OpenAPI:    apiDef.OpenAPI,
-			Info:       apiDef.Info,
-			Components: apiDef.Components,
+			OpenAPI:    clone.OpenAPI,
+			Info:       clone.Info,
+			Components: clone.Components,
 			Paths:      paths,
 		},
 	}

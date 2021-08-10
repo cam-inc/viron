@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/cam-inc/viron/packages/golang v0.0.0-00010101000000-000000000000
 	github.com/getkin/kin-openapi v0.66.0
+	github.com/go-chi/chi v1.5.1
 	github.com/go-chi/chi/v5 v5.0.3
 	github.com/go-chi/cors v1.2.0
 	github.com/go-sql-driver/mysql v1.6.0

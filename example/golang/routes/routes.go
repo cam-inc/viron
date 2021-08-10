@@ -27,6 +27,7 @@ import (
 	domainAuth "github.com/cam-inc/viron/packages/golang/domains/auth"
 	"github.com/cam-inc/viron/packages/golang/routes/auth"
 	"github.com/cam-inc/viron/packages/golang/routes/oas"
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/imdario/mergo"
 )
@@ -55,6 +56,7 @@ func New() http.Handler {
 	routeRoot := chi.NewRouter()
 	routeRoot.Use(Cors(cfg.Cors))
 	routeRoot.Use(InjectConfig(cfg))
+	routeRoot.Use(middleware.Logger)
 	//routeRoot.Use(JWTSecurityHandler(cfg.Auth))
 
 	oasImpl := oas.New()
@@ -107,10 +109,8 @@ func New() http.Handler {
 
 	rootImpl := root.New()
 	root.HandlerWithOptions(rootImpl, root.ChiServerOptions{
-		BaseRouter: routeRoot,
-		Middlewares: []root.MiddlewareFunc{
-			JWTSecurityHandler(cfg.Auth),
-		},
+		BaseRouter:  routeRoot,
+		Middlewares: []root.MiddlewareFunc{},
 	})
 
 	rootDoc, _ := root.GetSwagger()
@@ -180,7 +180,6 @@ func New() http.Handler {
 	}
 
 	helpers.Ref(definition, "./components.yaml", "")
-
 	// TODO: デバッグ中
 	//routeRoot.Use(OpenAPI3Validator(definition, &openapi3filter.Options{}))
 

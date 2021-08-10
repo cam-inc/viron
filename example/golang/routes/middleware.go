@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"reflect"
 	"runtime"
-	"time"
 
 	"github.com/getkin/kin-openapi/openapi3filter"
 	legacyrouter "github.com/getkin/kin-openapi/routers/legacy"
@@ -119,9 +118,10 @@ func JWTSecurityHandler(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFun
 
 			token, err := helpers.GetCookieToken(r)
 			if err != nil {
+				fmt.Println(err)
 				w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
 				cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
-					MaxAge: 0,
+					MaxAge: -1,
 				})
 				http.SetCookie(w, cookie)
 				http.Error(w, `{"message":"Unauthorized"}`, http.StatusUnauthorized)
@@ -133,7 +133,7 @@ func JWTSecurityHandler(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFun
 				fmt.Println(err)
 				w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
 				cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
-					Expires: time.Unix(0, 0),
+					MaxAge: -1,
 				})
 				http.SetCookie(w, cookie)
 				http.Error(w, `{"message":"Unauthorized"}`, http.StatusUnauthorized)
@@ -146,7 +146,7 @@ func JWTSecurityHandler(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFun
 				fmt.Println("user notfound")
 				w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
 				cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
-					Expires: time.Unix(0, 0),
+					MaxAge: -1,
 				})
 				http.SetCookie(w, cookie)
 				http.Error(w, `{"message":"Unauthorized"}`, http.StatusUnauthorized)
