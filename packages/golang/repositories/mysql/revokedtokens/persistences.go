@@ -3,6 +3,7 @@ package revokedtokens
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -82,6 +83,8 @@ func (r *revokedTokensPersistence) CreateOne(ctx context.Context, entity reposit
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
+
+	fmt.Printf("debug %+v\n", model)
 	if err := model.Insert(ctx, r.conn, boil.Infer()); err != nil {
 		return nil, err
 	}
