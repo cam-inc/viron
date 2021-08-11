@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/cam-inc/viron/packages/golang/repositories"
@@ -32,18 +33,20 @@ export const isSignedout = async (token?: string | null): Promise<boolean> => {
 */
 
 func SignOut(ctx context.Context, token string) bool {
-	if token != "" {
+	if token == "" {
+		fmt.Printf("debug token is empty\n")
 		return false
 	}
 
 	repo := container.GetRevokedTokensRepository()
-
+	fmt.Printf("now = %+v\n", time.Now())
 	revokedToken := &repositories.RevokedToken{
 		Token:     token,
 		RevokedAt: time.Now(),
 	}
 
 	if _, err := repo.CreateOne(ctx, revokedToken); err != nil {
+		fmt.Printf("debug %s\n", err)
 		return false
 	}
 

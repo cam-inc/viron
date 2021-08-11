@@ -9,20 +9,15 @@ import (
 )
 
 func GenCookie(key string, value string, opts *http.Cookie) *http.Cookie {
-	/*
-		cookie := &http.Cookie{
-			Name:     constant.ClientIDCookieName,
-			Expires:  expires,
-			Path:     "/",
-			SameSite: http.SameSiteNoneMode,
-			Secure:   true,
-		}
-	*/
+
+	if opts == nil {
+		opts = &http.Cookie{}
+	}
 
 	if opts.Path == "" {
 		opts.Path = "/"
 	}
-	if opts.SameSite == http.SameSiteDefaultMode {
+	if opts.SameSite == http.SameSiteDefaultMode || opts.SameSite == 0 {
 		opts.SameSite = http.SameSiteNoneMode
 	}
 
