@@ -141,13 +141,18 @@ func (a *authObj) Signout(w http.ResponseWriter, r *http.Request) {
 		helpers.Send(w, http.StatusNoContent, nil)
 	}
 
-	if auth.SignOut(r.Context(), token) {
+	if !auth.SignOut(r.Context(), token) {
 		fmt.Println("signount failed.")
 	}
 
 	cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
-		MaxAge: -1,
+		MaxAge:   -1,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+		Domain:   r.URL.Hostname(),
 	})
+	fmt.Printf("cookie %+v\n", cookie)
 	http.SetCookie(w, cookie)
 	helpers.Send(w, http.StatusNoContent, nil)
 }

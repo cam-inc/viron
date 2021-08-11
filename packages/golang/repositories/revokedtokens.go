@@ -22,11 +22,11 @@ type (
 )
 
 func (revoked *RevokedToken) Bind(b interface{}) error {
-	revoked, ok := b.(*RevokedToken)
+	d, ok := b.(*RevokedToken)
 	if !ok {
 		return fmt.Errorf("revoked bind failed")
 	}
-	*revoked = *revoked
+	*d = *revoked
 	return nil
 }
 

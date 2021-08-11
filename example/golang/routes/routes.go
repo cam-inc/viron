@@ -8,7 +8,7 @@ import (
 	"github.com/cam-inc/viron/packages/golang/helpers"
 
 	"github.com/cam-inc/viron/example/golang/pkg/domains"
-
+	"github.com/cam-inc/viron/example/golang/pkg/migrate"
 	"github.com/cam-inc/viron/example/golang/routes/root"
 
 	"github.com/cam-inc/viron/example/golang/routes/components"
@@ -38,7 +38,13 @@ func New() http.Handler {
 	mysqlConfig := cfg.StoreMySQL
 	fmt.Printf("msyql: %v\n", mysqlConfig)
 	store.SetupMySQL(mysqlConfig)
-	domains.SetUpMySQL(store.GetMySQLConnection())
+	if err := domains.SetUpMySQL(store.GetMySQLConnection()); err != nil {
+		panic(err)
+	}
+	if err := migrate.InitMySQL(store.GetMySQLConnection(), cfg.StoreMySQL.DBName, "file:///viron/example/golang/pkg/migrate/sql"); err != nil {
+		panic(err)
+		//fmt.Println(err)
+	}
 	if err := packageDomains.NewMySQL(store.GetMySQLConnection()); err != nil {
 		panic(err)
 	}
