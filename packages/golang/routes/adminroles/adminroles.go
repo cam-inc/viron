@@ -62,13 +62,11 @@ func (a *adminroleImpl) ListVironAdminRoles(w http.ResponseWriter, r *http.Reque
 	ctxApiDef := r.Context().Value(constant.CTX_KEY_API_DEFINITION)
 	apiDef, exists := ctxApiDef.(*openapi3.T)
 	if !exists {
-		fmt.Println("debug adminroles 1")
 		helpers.SendError(w, http.StatusInternalServerError, fmt.Errorf(`{"code":%d,"message":"notfound api-definition in ctx"}`, http.StatusInternalServerError))
 		return
 	}
 	result := domains.ListByOas(apiDef)
 	if result == nil {
-		fmt.Println("debug adminroles 2")
 		helpers.SendError(w, http.StatusInternalServerError, fmt.Errorf(`{"code":%d,"message":"notfound roles"}`, http.StatusInternalServerError))
 		return
 	}

@@ -13,15 +13,12 @@ type Server struct {
 
 // Run server run
 func (s *Server) Run() error {
-	fmt.Println("INNER RUN")
 	addr := fmt.Sprintf(":%d", s.Port)
-	//addr := fmt.Sprintf("%s:%d", s.Host, s.Port)
 	fmt.Printf("Addr -> %s\n", addr)
 	return http.ListenAndServe(addr, s.handler)
 }
 
 func (s *Server) RunTLS() error {
-	fmt.Println("INNER RUN")
 	addr := fmt.Sprintf(":%d", s.Port)
 	//addr := fmt.Sprintf("%s:%d", s.Host, s.Port)
 	fmt.Printf("Addr -> %s\n", addr)
