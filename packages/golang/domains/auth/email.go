@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/cam-inc/viron/packages/golang/helpers"
+
 	"github.com/cam-inc/viron/packages/golang/errors"
 
 	"github.com/cam-inc/viron/packages/golang/constant"
@@ -85,6 +87,14 @@ func SigninEmail(ctx context.Context, email string, password string) (string, *e
 			fmt.Println(err)
 			return "", errors.SigninFailed
 		}
+	}
+
+	if user.AuthType != constant.AUTH_TYPE_EMAIL {
+		return "", errors.SigninFailed
+	}
+
+	if !helpers.VerifyPassword(password, *user.Password, *user.Salt) {
+		return "", errors.SigninFailed
 	}
 
 	return Sign(fmt.Sprintf("%d", user.ID)), nil

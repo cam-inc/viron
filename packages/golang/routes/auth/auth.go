@@ -1,9 +1,9 @@
 package auth
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
+
+	"github.com/cam-inc/viron/packages/golang/logging"
 
 	"github.com/cam-inc/viron/packages/golang/errors"
 
@@ -74,34 +74,19 @@ export const oauth2GoogleCallback = async (
 
 */
 
+// SigninEmail emailサインイン
 func (a *authObj) SigninEmail(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	/*
-		export const signinEmail = async (context: RouteContext): Promise<void> => {
-		  const { email, password } = context.requestBody;
-		  const token = await domainsAuth.signinEmail(email, password);
-		  context.res.setHeader(
-		    HTTP_HEADER.SET_COOKIE,
-		    genAuthorizationCookie(token, { maxAge: ctx.config.auth.jwt.expirationSec })
-		  );
-		  context.res.status(204).end();
-		};
-	*/
-
 	signinEmail := &SigninEmailPayload{}
-	if err := json.NewDecoder(r.Body).Decode(signinEmail); err != nil {
-		fmt.Println("DEBUG JSON DECODE FAILED")
+	if err := helpers.BodyDecode(r, signinEmail); err != nil {
 		helpers.SendError(w, http.StatusBadRequest, err)
 		return
 	}
 
 	if signinEmail == nil {
-		fmt.Println("DEBUG signin email failed")
 		helpers.SendError(w, http.StatusBadRequest, errors.SigninFailed)
 		return
 	}
-
-	fmt.Printf("DEBUG:%v\n", signinEmail.Email)
 
 	token, err := auth.SigninEmail(ctx, string(signinEmail.Email), signinEmail.Password)
 	if err != nil {
@@ -114,7 +99,6 @@ func (a *authObj) SigninEmail(w http.ResponseWriter, r *http.Request) {
 	if v != nil {
 		age, _ = v.(int)
 	}
-	fmt.Printf("CTX_KEY_JWT %d\n", age)
 	opts := &http.Cookie{
 		MaxAge:   age,
 		Secure:   true,
@@ -142,7 +126,7 @@ func (a *authObj) Signout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !auth.SignOut(r.Context(), token) {
-		fmt.Println("signount failed.")
+		logging.GetDefaultLogger().Warn("signount failed.")
 	}
 
 	cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
@@ -152,7 +136,6 @@ func (a *authObj) Signout(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteNoneMode,
 		Domain:   r.URL.Hostname(),
 	})
-	fmt.Printf("cookie %+v\n", cookie)
 	http.SetCookie(w, cookie)
 	helpers.Send(w, http.StatusNoContent, nil)
 }

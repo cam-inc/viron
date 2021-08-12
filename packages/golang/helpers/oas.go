@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/cam-inc/viron/packages/golang/logging"
+
 	"github.com/imdario/mergo"
 
 	"github.com/cam-inc/viron/packages/golang/constant"
@@ -165,73 +167,50 @@ func MethodNameUpper(method string) string {
 
 func OasMerge(dist *openapi3.T, src *openapi3.T) error {
 
-	fmt.Println("--")
-
 	if len(src.Security) > 0 {
 		dist.Security = append(dist.Security, src.Security...)
 	}
 
-	fmt.Println("--")
-	fmt.Printf("dist tags%+v, src tags%+v\n", dist.Tags, src.Tags)
 	if len(src.Tags) > 0 {
 		dist.Tags = append(dist.Tags, src.Tags...)
 	}
-	fmt.Println("--")
 	if err := mergo.Merge(&dist.Components.Headers, src.Components.Headers); err != nil {
-		fmt.Printf("merge failed %v\n", err)
 		return err
 	}
 
-	fmt.Println("--")
 	if err := mergo.Merge(&dist.Components.Schemas, src.Components.Schemas); err != nil {
-		fmt.Printf("merge failed %v\n", err)
 		return err
 	}
 
-	fmt.Println("--")
 	if err := mergo.Merge(&dist.Components.Parameters, src.Components.Parameters); err != nil {
-		fmt.Printf("merge failed %v\n", err)
 		return err
 	}
 
-	fmt.Println("--")
 	if err := mergo.Merge(&dist.Components.Responses, src.Components.Responses); err != nil {
-		fmt.Printf("merge failed %v\n", err)
 		return err
 	}
 
-	fmt.Println("--")
 	if err := mergo.Merge(&dist.Components.SecuritySchemes, src.Components.SecuritySchemes); err != nil {
-		fmt.Printf("merge failed %v\n", err)
 		return err
 	}
 
-	fmt.Println("--")
 	if err := mergo.Merge(&dist.Components.Links, src.Components.Links); err != nil {
-		fmt.Printf("merge failed %v\n", err)
 		return err
 	}
 
-	fmt.Println("--")
 	if err := mergo.Merge(&dist.Components.Callbacks, src.Components.Callbacks); err != nil {
-		fmt.Printf("merge failed %v\n", err)
 		return err
 	}
-	fmt.Println("--")
+
 	if err := mergo.Merge(&dist.Components.Examples, src.Components.Examples); err != nil {
-		fmt.Printf("merge failed %v\n", err)
 		return err
 	}
 
-	fmt.Println("--")
 	if err := mergo.Merge(&dist.Paths, src.Paths); err != nil {
-		fmt.Printf("merge failed %v\n", err)
 		return err
 	}
 
-	fmt.Println("--Extensions")
 	if len(src.Info.Extensions) > 0 {
-
 		srcEx := &Extensions{
 			XPages:    []*XPage{},
 			XComplete: &XAutoComplete{},
@@ -239,17 +218,10 @@ func OasMerge(dist *openapi3.T, src *openapi3.T) error {
 		}
 
 		srcJSONEx, _ := json.Marshal(src.Info.Extensions)
-		fmt.Printf("src info Extensions %s\n", string(srcJSONEx))
-		fmt.Printf("srcEx %v, %v, %v\n", srcEx.XPages, srcEx.XTable, srcEx.XComplete)
-		fmt.Printf("xPages %d\n", len(srcEx.XPages))
-
 		if err := json.Unmarshal(srcJSONEx, srcEx); err != nil {
-			fmt.Printf("unmarshal err %v\n", err)
+			err = fmt.Errorf("unmarshal err %v\n", err)
 			return err
 		} else {
-			fmt.Println("unmarshal success")
-			fmt.Printf("srcEx %v, %v, %v\n", srcEx.XPages, srcEx.XTable, srcEx.XComplete)
-
 			distEx := &Extensions{
 				XPages:    []*XPage{},
 				XComplete: &XAutoComplete{},
@@ -259,7 +231,7 @@ func OasMerge(dist *openapi3.T, src *openapi3.T) error {
 			if len(dist.Info.Extensions) > 0 {
 				distJSONEx, _ := json.Marshal(dist.Info.Extensions)
 				if err := json.Unmarshal(distJSONEx, distEx); err != nil {
-					fmt.Printf("dist json ex unmarshal err %v\n", err)
+					err = fmt.Errorf("dist json ex unmarshal err %v\n", err)
 					return err
 				}
 			}
@@ -286,21 +258,15 @@ func OasMerge(dist *openapi3.T, src *openapi3.T) error {
 			if distJSONExFixies, err := json.Marshal(distEx); err == nil {
 				distExtensions := map[string]interface{}{}
 				if err := json.Unmarshal(distJSONExFixies, &distExtensions); err != nil {
-					fmt.Printf("unmarshal failed%v\n", err)
+					err = fmt.Errorf("unmarshal failed%v\n", err)
 					return err
 				} else {
 					dist.Info.Extensions = distExtensions
 				}
 			}
-
-			fmt.Printf("dist.info.Extensions %+v\n", dist.Info.Extensions)
 		}
 	}
 
-	debugJ, _ := json.Marshal(dist)
-	fmt.Printf("debugJ %s\n", string(debugJ))
-
-	fmt.Println("--")
 	return nil
 }
 
@@ -314,7 +280,7 @@ func ConvertExtentions(apiDef *openapi3.T) *Extensions {
 	if len(apiDef.Info.Extensions) > 0 {
 		distJSONEx, _ := json.Marshal(apiDef.Info.Extensions)
 		if err := json.Unmarshal(distJSONEx, distEx); err != nil {
-			fmt.Printf("dist json ex unmarshal err %v\n", err)
+			logging.GetDefaultLogger().Debugf("dist json ex unmarshal err %v\n", err)
 			return nil
 		}
 	} else {
@@ -322,11 +288,3 @@ func ConvertExtentions(apiDef *openapi3.T) *Extensions {
 	}
 	return distEx
 }
-
-/*
-func HasJWT(docRoot *openapi3.T) bool {
-	for _, path := range docRoot.Paths {
-		path.Get
-	}
-}
-*/

@@ -30,15 +30,6 @@ func (o *oas) GetOas(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	clone := domains.GetOas(apiDef, user.RoleIDs)
-
-	// DEBUG
-	if v := ctx.Value(JwtScopes); v == nil {
-		fmt.Println("jwtScopes is nil")
-	} else {
-		fmt.Println(v)
-	}
-	// DEBUG
-
 	helpers.Send(w, http.StatusOK, clone)
 }
 

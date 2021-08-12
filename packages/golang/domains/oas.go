@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/cam-inc/viron/packages/golang/logging"
+
 	"github.com/cam-inc/viron/packages/golang/constant"
 	"github.com/cam-inc/viron/packages/golang/helpers"
 	"github.com/getkin/kin-openapi/jsoninfo"
@@ -74,6 +76,10 @@ func GetOas(apiDef *openapi3.T, roleIDs []string) *openapi3.T {
 		if err := json.Unmarshal(buf, clone); err != nil {
 			return nil
 		}
+	}
+
+	if err := CreateViewerRole(clone); err != nil {
+		logging.GetDefaultLogger().Errorf("CreateViewerRole error(%+v)", err)
 	}
 
 	extentions := helpers.ConvertExtentions(clone)

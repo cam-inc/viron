@@ -8,19 +8,6 @@ import (
 )
 
 type (
-	/*
-		// Mysql: クエリ用のオプションを生成
-		export const getMysqlFindOptions = (
-		  size: number = DEFAULT_PAGER_SIZE,
-		  page: number = DEFAULT_PAGER_PAGE
-		): MysqlFindOptions => {
-		  return {
-		    limit: size,
-		    offset: (page - 1) * size,
-		  };
-		};
-	*/
-
 	Pager struct {
 		Limit  int
 		Offset int

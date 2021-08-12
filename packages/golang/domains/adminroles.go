@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/cam-inc/viron/packages/golang/logging"
+
 	"github.com/cam-inc/viron/packages/golang/helpers"
 
 	"github.com/getkin/kin-openapi/openapi3"
@@ -25,8 +27,8 @@ type (
 	*/
 
 	AdminRolePermission struct {
-		ResourceID string
-		Permission string
+		ResourceID string `json:"resourceId"`
+		Permission string `json:"permission"`
 	}
 
 	/*
@@ -37,8 +39,8 @@ type (
 	*/
 
 	AdminRole struct {
-		ID          string
-		Permissions []*AdminRolePermission
+		ID          string                 `json:"id"`
+		Permissions []*AdminRolePermission `json:"permissions,omitempty"`
 	}
 )
 
@@ -80,7 +82,7 @@ func new(params ...interface{}) error {
 	if err != nil {
 		return err
 	}
-
+	enforcer.LoadPolicy()
 	casbinInstance = enforcer
 	return nil
 }
@@ -167,6 +169,7 @@ export const listPolicies = async (
 
 */
 
+// listPolicies policy structure is [roleID, resourceID, permission] all string. this func return type policy slice
 func listPolicies(roleID string) [][]string {
 	var policies [][]string
 	if roleID == "" {
@@ -329,13 +332,24 @@ export const updatePermissionsForRole = async (
 };
 */
 
-func updatePermissionsForRole(roleID string, permissions []*AdminRolePermission) {
+func updatePermissionsForRole(roleID string, permissions []*AdminRolePermission) error {
 	policies := [][]string{}
 	for _, permission := range permissions {
 		policies = append(policies, genPolicy(roleID, permission.ResourceID, permission.Permission))
 	}
-	removeRole(roleID)
-	casbinInstance.AddPolicies(policies)
+
+	var err error
+
+	if !removeRole(roleID) {
+		err = fmt.Errorf("revokeRole failed. ")
+	}
+	if ok, err := casbinInstance.AddPolicies(policies); err != nil {
+		err = fmt.Errorf("AddPolicies err(%v).", err)
+	} else if !ok {
+		err = fmt.Errorf("AddPolicies failed.")
+	}
+
+	return err
 }
 
 /*
@@ -493,8 +507,14 @@ export const listByOas = async (
 */
 
 func ListByOas(apiDef *openapi3.T) *helpers.PagerResults {
+
+	log := logging.GetDefaultLogger()
+
 	policies := listPolicies("")
+	log.Debugf("policies=%+v", policies)
+
 	resources := ListResourcesByOas(apiDef)
+	log.Debugf("resources=%+v", resources)
 
 	policyMap := map[string]map[string]string{}
 	for _, policy := range policies {
@@ -507,6 +527,8 @@ func ListByOas(apiDef *openapi3.T) *helpers.PagerResults {
 			policyMap[policy[0]][policy[1]] = policy[2]
 		}
 	}
+
+	log.Debugf("policyMap=%+v", policyMap)
 
 	result := []*AdminRole{}
 	for roleID, _ := range policyMap {
@@ -530,6 +552,72 @@ func ListByOas(apiDef *openapi3.T) *helpers.PagerResults {
 
 	return helpers.Paging(result, len(result), constant.DEFAULT_PAGER_PAGE)
 
+}
+
+/*
+// viewerロールを作成
+export const createViewer = async (
+  apiDefinitions: VironOpenAPIObject
+): Promise<boolean> => {
+  const policies = await listPolicies(ADMIN_ROLE.VIEWER);
+  const resourceIds = listResourcesByOas(apiDefinitions);
+  if (policies.length === resourceIds.length) {
+    // 更新するものがないので何もしない
+    return false;
+  }
+
+  const map = policies.reduce(
+    (ret: Record<string, Permission>, policy: ParsedPolicy) => {
+      ret[policy.resourceId] = policy.Permission;
+      return ret;
+    },
+    {}
+  );
+  const Permissions = resourceIds.map((resourceId: string) => {
+    return {
+      resourceId,
+      Permission: map[resourceId] ?? PERMISSION.READ,
+    };
+  });
+  await updatePermissionsForRole(ADMIN_ROLE.VIEWER, Permissions);
+  return true;
+};
+*/
+
+func CreateViewerRole(apiDef *openapi3.T) error {
+	policies := listPolicies(constant.ADMIN_ROLE_VIEWER)
+	resourceIDs := ListResourcesByOas(apiDef)
+	if len(policies) == len(resourceIDs) {
+		// 更新するものがない
+		logging.GetDefaultLogger().Debug("len(policies) == len(resourceIDs)")
+		return nil
+	}
+
+	policyMap := map[string]string{}
+	for _, policy := range policies {
+		// map[resourceID]=permission
+		policyMap[policy[1]] = policy[2]
+	}
+
+	permissions := []*AdminRolePermission{}
+
+	for _, resourceID := range resourceIDs {
+		if _, exists := policyMap[resourceID]; exists {
+			permissions = append(permissions, &AdminRolePermission{
+				ResourceID: resourceID,
+				Permission: policyMap[resourceID],
+			})
+		} else {
+			permissions = append(permissions, &AdminRolePermission{
+				ResourceID: resourceID,
+				Permission: constant.PERMISSION_READ,
+			})
+		}
+	}
+	if err := updatePermissionsForRole(constant.ADMIN_ROLE_VIEWER, permissions); err != nil {
+		return err
+	}
+	return nil
 }
 
 /*
@@ -651,32 +739,6 @@ export const removeOneById = async (roleId: string): Promise<void> => {
   await removeRole(roleId);
 };
 
-// viewerロールを作成
-export const createViewer = async (
-  apiDefinitions: VironOpenAPIObject
-): Promise<boolean> => {
-  const policies = await listPolicies(ADMIN_ROLE.VIEWER);
-  const resourceIds = listResourcesByOas(apiDefinitions);
-  if (policies.length === resourceIds.length) {
-    // 更新するものがないので何もしない
-    return false;
-  }
 
-  const map = policies.reduce(
-    (ret: Record<string, Permission>, policy: ParsedPolicy) => {
-      ret[policy.resourceId] = policy.Permission;
-      return ret;
-    },
-    {}
-  );
-  const Permissions = resourceIds.map((resourceId: string) => {
-    return {
-      resourceId,
-      Permission: map[resourceId] ?? PERMISSION.READ,
-    };
-  });
-  await updatePermissionsForRole(ADMIN_ROLE.VIEWER, Permissions);
-  return true;
-};
 
 */

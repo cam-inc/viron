@@ -2,7 +2,9 @@ package store
 
 import (
 	"database/sql"
-	"fmt"
+
+	"github.com/cam-inc/viron/example/golang/pkg/constant"
+	"github.com/cam-inc/viron/packages/golang/logging"
 
 	"github.com/cam-inc/viron/example/golang/pkg/config"
 )
@@ -13,21 +15,18 @@ var (
 
 func NewMySQL(config *config.MySQL) *sql.DB {
 	dsn := config.ToDriverConfig().FormatDSN()
-	fmt.Printf("mysql dsn: %s\n", dsn)
+	log := logging.GetLogger(constant.LOG_NAME, logging.DebugLevel)
 	db, err := sql.Open(config.Dialect, dsn)
 	if err != nil {
-		fmt.Printf("MySQL connection failed %v", err)
+		log.Errorf("MySQL connection failed %v", err)
 		panic(err)
 	}
 
 	if err := db.Ping(); err != nil {
-		fmt.Printf("MySQL connection(ping) failed %v\n", err)
-		//panic(err)
+		log.Errorf("MySQL connection(ping) failed %v\n", err)
 	} else {
-		fmt.Println("mysql connect success")
+		log.Debug("MySQL connect success")
 	}
-
-	fmt.Println("DEBUG")
 
 	//db.SetMaxOpenConns()
 	//db.SetMaxIdleConns()

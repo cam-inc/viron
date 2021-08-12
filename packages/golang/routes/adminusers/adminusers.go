@@ -19,17 +19,6 @@ type (
 )
 
 func (a *adminuser) ListVironAdminUsers(w http.ResponseWriter, r *http.Request, params ListVironAdminUsersParams) {
-	/*
-		// 管理ユーザー一覧
-		export const listVironAdminUsers = async (
-		  context: RouteContext
-		): Promise<void> => {
-		  const { size, page, sort, ...conditions } = context.params.query;
-		  const result = await domainsAdminUser.list(conditions, size, page, sort);
-		  context.res.json(result);
-		};
-
-	*/
 
 	conditions := &domains.AdminUserConditions{}
 	if params.Size != nil {
@@ -56,29 +45,9 @@ func (a *adminuser) ListVironAdminUsers(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
-	jresults := VironAdminUserListWithPager{
-		VironPager: externalRef0.VironPager{
-			CurrentPage: results.Page,
-			MaxPage:     results.MaxPage,
-		},
-		List: VironAdminUserList{},
-	}
+	pager := PagerToVironAdminUserListWithPager(results.Page, results.MaxPage, results.List)
 
-	for i, r := range results.List {
-		jresults.List = append(jresults.List, VironAdminUser{
-			AuthType: r.AuthType,
-			Email:    openapi_types.Email(r.Email),
-			Id:       fmt.Sprintf("%d", r.ID),
-			RoleIds:  &r.RoleIDs,
-		})
-
-		createdAtInt64 := r.CreatedAt.Unix()
-		updatedAtInt64 := r.UpdateAt.Unix()
-		jresults.List[i].CreatedAt = &createdAtInt64
-		jresults.List[i].UpdatedAt = &updatedAtInt64
-	}
-
-	helpers.Send(w, http.StatusOK, jresults)
+	helpers.Send(w, http.StatusOK, pager)
 
 }
 
@@ -96,4 +65,30 @@ func (a *adminuser) UpdateVironAdminUser(w http.ResponseWriter, r *http.Request,
 
 func New() ServerInterface {
 	return &adminuser{}
+}
+
+func PagerToVironAdminUserListWithPager(currentPage, maxPage int, users []*domains.AdminUser) VironAdminUserListWithPager {
+	vironPager := VironAdminUserListWithPager{
+		VironPager: externalRef0.VironPager{
+			CurrentPage: currentPage,
+			MaxPage:     maxPage,
+		},
+		List: VironAdminUserList{},
+	}
+
+	for i, adminUser := range users {
+		vironPager.List = append(vironPager.List, VironAdminUser{
+			AuthType: adminUser.AuthType,
+			Email:    openapi_types.Email(adminUser.Email),
+			Id:       fmt.Sprintf("%d", adminUser.ID),
+			RoleIds:  &adminUser.RoleIDs,
+		})
+
+		createdAtInt64 := adminUser.CreatedAt.Unix()
+		updatedAtInt64 := adminUser.UpdateAt.Unix()
+		vironPager.List[i].CreatedAt = &createdAtInt64
+		vironPager.List[i].UpdatedAt = &updatedAtInt64
+	}
+
+	return vironPager
 }

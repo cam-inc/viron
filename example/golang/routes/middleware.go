@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"reflect"
-	"runtime"
+
+	"github.com/cam-inc/viron/packages/golang/logging"
 
 	"github.com/getkin/kin-openapi/openapi3filter"
 	legacyrouter "github.com/getkin/kin-openapi/routers/legacy"
@@ -15,6 +15,7 @@ import (
 	"github.com/cam-inc/viron/packages/golang/domains/auth"
 
 	"github.com/cam-inc/viron/example/golang/pkg/config"
+	exContext "github.com/cam-inc/viron/example/golang/pkg/context"
 	"github.com/cam-inc/viron/packages/golang/constant"
 	"github.com/cam-inc/viron/packages/golang/helpers"
 	"github.com/getkin/kin-openapi/openapi3"
@@ -97,15 +98,24 @@ func Cors(cfg *config.Cors) func(http.Handler) http.Handler {
 	})
 }
 
+func InjectLogger() func(handler http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			logger := exContext.Log(r.Context())
+			if logger == nil {
+				rr := exContext.SetLogger(r, logging.DebugLevel)
+				next.ServeHTTP(w, rr)
+			} else {
+				next.ServeHTTP(w, r)
+			}
+		})
+	}
+}
+
 func JWTSecurityHandler(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFunc {
 	return func(handlerFunc http.HandlerFunc) http.HandlerFunc {
 
 		fn := func(w http.ResponseWriter, r *http.Request) {
-
-			// DEBUG
-			fv := reflect.ValueOf(handlerFunc)
-			fmt.Printf("[%+v]\n", runtime.FuncForPC(fv.Pointer()).Name())
-			// DEBUG
 
 			ctx := r.Context()
 			if ctx.Value(JwtScopes) == nil {
@@ -160,72 +170,3 @@ func JWTSecurityHandler(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFun
 		return fn
 	}
 }
-
-/*
-
-const authFailure = (err: VironError): AuthenticationFailure => {
-  return {
-    type: AUTHENTICATION_RESULT_TYPE.INVALID,
-    status: err.statusCode,
-    message: err.message,
-  };
-};
-
-const authSuccess = (
-  user: domainsAdminUser.AdminUserView
-): AuthenticationSuccess => {
-  return { type: AUTHENTICATION_RESULT_TYPE.SUCCESS, user };
-};
-
-export const jwt = async (
-  context: ExegesisPluginContext
-): Promise<AuthenticationResult> => {
-  const pContext = context as PluginContext;
-  const token = pContext.req.cookies[COOKIE_KEY.VIRON_AUTHORIZATION];
-  const claims = await domainsAuth.verifyJwt(token);
-
-  if (claims) {
-    const userId = claims.sub;
-
-    if (
-      !(await domainsAdminRole.hasPermission(
-        userId,
-        pContext.req.path,
-        (pContext.req.method as string).toLowerCase() as ApiMethod,
-        pContext.req._context.apiDefinition
-      ))
-    ) {
-      return authFailure(forbidden());
-    }
-
-    const user = await domainsAdminUser.findOneById(userId);
-    if (user) {
-      switch (user.authType) {
-        case AUTH_TYPE.GOOGLE: {
-          // Google認証の場合はアクセストークンの検証
-          if (
-            await domainsAuth.verifyGoogleOAuth2AccessToken(
-              userId,
-              user,
-              ctx.config.auth.googleOAuth2
-            )
-          ) {
-            return authSuccess(user);
-          }
-          break;
-        }
-        default:
-          return authSuccess(user);
-      }
-    }
-  }
-
-  pContext.origRes.clearCookie(COOKIE_KEY.VIRON_AUTHORIZATION);
-  pContext.res.header(
-    HTTP_HEADER.X_VIRON_AUTHTYPES_PATH,
-    VIRON_AUTHCONFIGS_PATH
-  );
-  return authFailure(unauthorized());
-};
-
-*/
