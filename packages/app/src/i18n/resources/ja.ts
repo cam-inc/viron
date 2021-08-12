@@ -1,5 +1,4 @@
+// TODO
 export default {
-  aa: {
-    bb: 'こんにちはぁ',
-  },
+  deleted: '削除しました。',
 };

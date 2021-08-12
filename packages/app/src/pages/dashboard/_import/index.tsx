@@ -57,7 +57,7 @@ const Import: React.FC<Props> = ({ className = '' }) => {
         setError(new FileReaderError('Invalid file data.'));
         return;
       }
-      // TODO: 良い感じにsrc/pages/home/_add/index.tsxと処理を統一したい。
+      // TODO: 良い感じにsrc/pages/dashboard/_add/index.tsxと処理を統一したい。
       Promise.all(
         endpointList.map<Promise<void>>(function (endpoint) {
           const f = async function () {
@@ -188,7 +188,7 @@ const Import: React.FC<Props> = ({ className = '' }) => {
   return (
     <>
       <Button
-        variant="ghost"
+        variant="text"
         size="xs"
         on="primary"
         Icon={BiDownload}

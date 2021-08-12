@@ -1,3 +1,4 @@
+import { BiXCircle } from '@react-icons/all-files/bi/BiXCircle';
 import classsnames from 'classnames';
 import React, { useCallback, useEffect, useState } from 'react';
 import Portal from '$components/portal';
@@ -58,7 +59,7 @@ const Notification: React.FC<Props> = ({
       <div className="flex justify-end mb-4 last:mb-0">
         <div
           className={classsnames(
-            'relative p-4 rounded shadow-04dp bg-surface-04dp text-on-surface transition duration-300 transform pointer-events-auto',
+            'relative p-2 rounded shadow-04dp bg-surface-04dp text-on-surface transition duration-300 transform pointer-events-auto',
             {
               'opacity-0': !isVisible,
               'translate-x-4': !isVisible,
@@ -67,7 +68,11 @@ const Notification: React.FC<Props> = ({
             }
           )}
         >
-          <button onClick={handleCloseButtonClick}>close</button>
+          <div className="flex justify-end mb-2">
+            <button onClick={handleCloseButtonClick}>
+              <BiXCircle className="text-lg text-on-surface" />
+            </button>
+          </div>
           <div>{children}</div>
         </div>
       </div>

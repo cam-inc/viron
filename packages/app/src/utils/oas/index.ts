@@ -42,6 +42,7 @@ export const lint = function (document: Record<string, unknown>): LintReturn {
 
 // TODO: To support $ref values not starting with a # letter.
 export const resolve = function (document: Record<string, unknown>): Document {
+  document = _.cloneDeep(document);
   // Look for all reference objects(those that contains a $ref property.) and insert actual referenced data.
   JSONPath({
     path: '$..[?(@.$ref)]',

@@ -35,9 +35,10 @@ const Error: React.FC<Props> = ({ on, error }) => {
         'text-on-complementary': on === ON.COMPLEMENTARY,
       })}
     >
-      <div>code: {error.code}</div>
-      <div>name: {error.name}</div>
-      {error.message && <div>{error.message}</div>}
+      <div>
+        Error[{error.code}]: {error.name}
+      </div>
+      {error.message && <div className="text-xxs">{error.message}</div>}
       {error instanceof NetworkError && (
         <div>
           <div>TODO: NetworkError</div>
@@ -47,7 +48,7 @@ const Error: React.FC<Props> = ({ on, error }) => {
         <div>
           <div>TODO: 認証が必要よ。</div>
           <div>
-            <Link on={on} to="/home">
+            <Link on={on} to="/dashboard">
               home
             </Link>
           </div>

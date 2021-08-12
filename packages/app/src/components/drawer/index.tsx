@@ -47,10 +47,13 @@ const Drawer: React.FC<Props> = ({
         onClick={handleClick}
       >
         <div
-          className={classnames('absolute inset-0 transition duration-300', {
-            'opacity-75': isVisible,
-            'opacity-0': !isVisible,
-          })}
+          className={classnames(
+            'absolute inset-0 transition duration-300 backdrop-filter backdrop-blur-sm',
+            {
+              'opacity-75': isVisible,
+              'opacity-0': !isVisible,
+            }
+          )}
           onClick={handleBGClick}
         >
           <div className="absolute inset-0 bg-background" />
@@ -63,10 +66,10 @@ const Drawer: React.FC<Props> = ({
             }
           )}
         >
-          <div className="flex-none w-24" />
+          <div className="flex-1 w-24" style={{ flexGrow: 1 }} />
           <div
             className={classnames(
-              'flex-1 w-0 bg-surface-04dp shadow-04dp overflow-y-scroll overscroll-y-contain pointer-events-auto transform transition duration-300',
+              'flex-auto w-[240px] max-w-[960px] bg-surface-04dp shadow-04dp overflow-y-scroll overscroll-y-contain pointer-events-auto transform transition duration-300',
               {
                 'translate-x-0': isVisible,
                 'opacity-100': isVisible,
@@ -75,6 +78,7 @@ const Drawer: React.FC<Props> = ({
                 'opacity-0': !isVisible,
               }
             )}
+            style={{ flexGrow: 3 }}
           >
             {children}
           </div>

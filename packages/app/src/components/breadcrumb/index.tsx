@@ -23,7 +23,7 @@ const Breadcrumb: React.FC<Props> = ({ on, list, className = '' }) => {
     >
       <div className="flex items-center">
         <div className="mr-1 last:mr-0">
-          <Link className="block" on={on} to="/home">
+          <Link className="block" on={on} to="/dashboard">
             <BiHomeSmile />
           </Link>
         </div>

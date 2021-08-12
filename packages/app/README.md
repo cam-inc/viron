@@ -69,7 +69,7 @@ We decided to not use [i18next-http-backend](https://github.com/i18next/i18next-
 Ideally it's better to serve a html file per language (i.e. use different URLs for different language versions) like [gatsby-plugin-i18n](https://github.com/angeloocana/gatsby-plugin-i18n) does. Just for now, we stick to the multilingual-page system.
 
 ### Theme and prefers-color-scheme
-Viron offers a function for users to switch color themes so they can easily recognize which environment they are editing (e.g. local, staging, production, etc.). On the other hand, as many of you probably know, there is a color-related idea in the client-side world: `Light Mode` and `Dark Mode`. This makes it a bit tricky to handle color themes when dealing with them considering Light/Dark modes. Here is our strategy for it.
+Viron offers a function for users to switch color themes so they can easily recognize which environment they are editing (e.g. local, staging, production, etc.). On the other hand, there is a color-related idea in the client-side world: `Light Mode` and `Dark Mode`. This makes it a bit tricky to handle color themes when dealing with them considering Light/Dark modes. Here is our strategy for it.
 
 - One theme consists of two sets of color palettes. One for light mode and the other for dark mode. For example, a theme named `terminal` will have a color palette for light mode (terminal-light) and a color palette for dark mode (erminal-dark).
 - We use the [tailwind's function](https://tailwindcss.com/docs/dark-mode) to switch between light and dark mode.

@@ -1,11 +1,12 @@
 import classnames from 'classnames';
 import React from 'react';
 import { ON, On } from '$constants/index';
+import pkg from '../../../../package.json';
 
 type Props = {
   on: On;
 };
-const Copyright: React.FC<Props> = ({ on }) => {
+const Version: React.FC<Props> = ({ on }) => {
   return (
     <div
       className={classnames('text-xxs', {
@@ -15,8 +16,8 @@ const Copyright: React.FC<Props> = ({ on }) => {
         'text-on-complementary': on === ON.COMPLEMENTARY,
       })}
     >
-      © {new Date().getFullYear()} CAM, Inc
+      ver. {pkg.version}
     </div>
   );
 };
-export default Copyright;
+export default Version;

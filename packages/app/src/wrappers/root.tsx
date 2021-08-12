@@ -7,11 +7,12 @@ import { RecoilRoot, useRecoilState } from 'recoil';
 import resolveConfig from 'tailwindcss/resolveConfig';
 import { TailwindConfig } from 'tailwindcss/tailwind-config';
 import ErrorBoundary from '$components/errorBoundary';
-import Logo from '$components/logo';
+import Spinner from '$components/spinner';
 import { ON } from '$constants/index';
 import '$i18n/index';
 import { isLaunchedState, screenState, themeState } from '$store/atoms/app';
 import '$styles/global.css';
+import { ClassName } from '$types/index';
 import DrawerWrapper from '$wrappers/drawer';
 import ModalWrapper from '$wrappers/modal';
 import NotificationWrapper from '$wrappers/notification';
@@ -26,13 +27,13 @@ type Props = {
 const RootWrapper: React.FC<Props> = (props) => {
   return (
     <React.Fragment>
-      {/* Use StrictMode to find potential problems. */}
-      {/* @see: https://reactjs.org/docs/strict-mode.html*/}
+      {/* Use StrictMode to find potential problems. Only run in development mode. */}
+      {/* @see: https://reactjs.org/docs/strict-mode.html */}
       <React.StrictMode>
         <HelmetProvider>
           <RecoilRoot>
             <ErrorBoundary on={ON.BACKGROUND}>
-              {/* Need to wrap a component to encapsulate all state related processes inside the RecoilRoot component.*/}
+              {/* Need to wrap a react component to encapsulate all state related processes inside the RecoilRoot component. */}
               <Root {...props} />
             </ErrorBoundary>
           </RecoilRoot>
@@ -45,6 +46,7 @@ export default RootWrapper;
 
 // the name doesn't matter. It's just a local component.
 const Root: React.FC<Props> = ({ children }) => {
+  // App launching.
   const [isLaunched, setIsLaunched] = useRecoilState(isLaunchedState);
   useEffect(
     function () {
@@ -56,19 +58,20 @@ const Root: React.FC<Props> = ({ children }) => {
     [setIsLaunched]
   );
 
+  // Theme switching.
   const [theme] = useRecoilState(themeState);
   useEffect(
     function () {
-      const _theme = theme || '';
       const bodyElm = document.querySelector('body');
       if (!bodyElm) {
         return;
       }
-      bodyElm.dataset.theme = _theme;
+      bodyElm.dataset.theme = theme || '';
     },
     [theme]
   );
 
+  // Screen info.
   const [, setScreen] = useRecoilState(screenState);
   useEffect(
     function () {
@@ -128,25 +131,27 @@ const Root: React.FC<Props> = ({ children }) => {
       <PopoverWrapper className="fixed inset-0 z-wrapper-popover" />
       <NotificationWrapper className="fixed left-0 right-0 bottom-0 pr-4 pb-4 z-wrapper-notification" />
       <ProgressWrapper className="fixed inset-0 z-wrapper-progress" />
-      {!isLaunched && <Splash className="fixed inset-0 z-splash" />}
+      <Splash isActive={!isLaunched} className="fixed inset-0 z-splash" />
     </div>
   );
 };
 
-const Splash: React.FC<{ className?: string }> = ({ className = '' }) => {
-  // TODO
+const Splash: React.FC<{ isActive: boolean; className?: ClassName }> = ({
+  isActive,
+  className = '',
+}) => {
   return (
     <div
       className={classnames(
-        'flex justify-center items-center bg-primary',
+        'flex items-center justify-center bg-surface transition',
+        {
+          'opacity-100 scale-100 pointer-events-auto': isActive,
+          'opacity-0 scale-110 pointer-events-none': !isActive,
+        },
         className
       )}
     >
-      <Logo
-        className="h-24 drop-shadow-zenith-01dp"
-        left="text-on-primary"
-        right="text-on-primary-variant"
-      />
+      <Spinner className="flex-none w-12" on={ON.SURFACE} />
     </div>
   );
 };

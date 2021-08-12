@@ -1,5 +1,4 @@
+// TODO: Namespace使う。
 export default {
-  aa: {
-    bb: 'hello',
-  },
+  deleted: 'Deleted.',
 };

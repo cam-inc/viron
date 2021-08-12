@@ -221,10 +221,11 @@ const Cell: React.FC<{ on: On; column: Column; value: Value }> = ({
   column,
   value,
 }) => {
+  // TODO: typeofして最適な見せ方に。
   return (
     <div>
       <div className="text-xxs">[{column.type}]</div>
-      <div>{value}</div>
+      <div>{JSON.stringify(value)}</div>
     </div>
   );
 };
