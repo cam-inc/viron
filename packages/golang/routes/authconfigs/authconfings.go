@@ -27,8 +27,7 @@ func (a *authConfigs) ListVironAuthconfigs(w http.ResponseWriter, r *http.Reques
 	ctx := r.Context()
 	apiDefCtx := ctx.Value(constant.CTX_KEY_API_DEFINITION)
 	if apiDefCtx == nil {
-		// ?
-		helpers.SendError(w, 400, fmt.Errorf("DAMEEEEE"))
+		helpers.SendError(w, http.StatusInternalServerError, fmt.Errorf("api-definition notfound"))
 		return
 	}
 
@@ -37,10 +36,10 @@ func (a *authConfigs) ListVironAuthconfigs(w http.ResponseWriter, r *http.Reques
 	apiDef := apiDefCtx.(*openapi3.T)
 	clone := &openapi3.T{}
 	if buf, err := json.Marshal(apiDef); err != nil {
-		helpers.SendError(w, 400, fmt.Errorf("DAMEEEEE"))
+		helpers.SendError(w, http.StatusInternalServerError, fmt.Errorf("api-definition notfound"))
 	} else {
 		if err := json.Unmarshal(buf, clone); err != nil {
-			helpers.SendError(w, 400, fmt.Errorf("DAMEEEEE"))
+			helpers.SendError(w, http.StatusInternalServerError, fmt.Errorf("api-definition notfound"))
 		}
 	}
 
@@ -101,9 +100,7 @@ func (a *authConfigs) ListVironAuthconfigs(w http.ResponseWriter, r *http.Reques
 		},
 	}
 
-	response, _ := json.Marshal(res)
-	fmt.Fprintln(w, string(response))
-
+	helpers.Send(w, http.StatusOK, res)
 }
 
 func New() ServerInterface {

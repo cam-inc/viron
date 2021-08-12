@@ -19,19 +19,22 @@ import (
 
 type (
 	AdminUser struct {
-		ID                       uint     `json:"ID"`
-		Email                    string   `json:"email"`
-		AuthType                 string   `json:"type"`
-		Password                 *string  `json:"password"`
-		Salt                     *string  `json:"salt"`
-		GoogleOAuth2AccessToken  *string  `json:"googleOAuth2AccessToken"`
-		GoogleOAuth2ExpiryDate   *int     `json:"googleOAuth2ExpiryDate"`
-		GoogleOAuth2IdToken      *string  `json:"googleOAuth2IdToken"`
-		GoogleOAuth2RefreshToken *string  `json:"googleOAuth2RefreshToken"`
-		GoogleOAuth2TokenType    *string  `json:"googleOAuth2TokenType"`
-		RoleIDs                  []string `json:"roleIds"`
-		CreatedAt                time.Time
-		UpdateAt                 time.Time
+		ID                       uint      `json:"-"`
+		UID                      string    `json:"id"`
+		Email                    string    `json:"email"`
+		AuthType                 string    `json:"authType"`
+		Password                 *string   `json:"password,omitempty"`
+		Salt                     *string   `json:"salt,omitempty"`
+		GoogleOAuth2AccessToken  *string   `json:"googleOAuth2AccessToken,omitempty"`
+		GoogleOAuth2ExpiryDate   *int      `json:"googleOAuth2ExpiryDate,omitempty"`
+		GoogleOAuth2IdToken      *string   `json:"googleOAuth2IdToken,omitempty"`
+		GoogleOAuth2RefreshToken *string   `json:"googleOAuth2RefreshToken,omitempty"`
+		GoogleOAuth2TokenType    *string   `json:"googleOAuth2TokenType,omitempty"`
+		RoleIDs                  []string  `json:"roleIds"`
+		CreatedAt                time.Time `json:"-"`
+		UpdateAt                 time.Time `json:"-"`
+		CreatedAtInt             int64     `json:"createdAt"`
+		UpdateAtInt              int64     `json:"updatedAt"`
 	}
 
 	AdminUsersWithPager struct {
@@ -115,9 +118,11 @@ func findOne(ctx context.Context, conditions *adminusers.AdminUserConditions) *A
 	user.RoleIDs = listRoles(fmt.Sprintf("%d", user.ID))
 
 	auser := &AdminUser{
+		ID:                       user.ID,
 		Email:                    user.Email,
 		Password:                 user.Password,
 		AuthType:                 user.AuthType,
+		Salt:                     user.Salt,
 		GoogleOAuth2AccessToken:  user.GoogleOAuth2AccessToken,
 		GoogleOAuth2ExpiryDate:   user.GoogleOAuth2ExpiryDate,
 		GoogleOAuth2IdToken:      user.GoogleOAuth2IdToken,
@@ -226,12 +231,17 @@ func ListAdminUser(ctx context.Context, opts *AdminUserConditions) (*AdminUsersW
 		result.Bind(entity)
 		entity.RoleIDs = listRoles(fmt.Sprintf("%d", entity.ID))
 		withPager.List = append(withPager.List, &AdminUser{
-			ID:        entity.ID,
-			Email:     entity.Email,
-			AuthType:  entity.AuthType,
-			RoleIDs:   entity.RoleIDs,
-			CreatedAt: entity.CreatedAt,
-			UpdateAt:  entity.UpdatedAt,
+			ID:           entity.ID,
+			UID:          fmt.Sprintf("%d", entity.ID),
+			Email:        entity.Email,
+			Password:     entity.Password,
+			Salt:         entity.Salt,
+			AuthType:     entity.AuthType,
+			RoleIDs:      entity.RoleIDs,
+			CreatedAt:    entity.CreatedAt,
+			CreatedAtInt: entity.CreatedAt.Unix(),
+			UpdateAt:     entity.UpdatedAt,
+			UpdateAtInt:  entity.UpdatedAt.Unix(),
 		})
 	}
 	withPager.Page = conditions.Page

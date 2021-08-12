@@ -156,9 +156,10 @@ func (a *adminUsersPersistence) UpdateByID(ctx context.Context, id string, entit
 	iID, _ := strconv.ParseUint(id, 10, 0)
 
 	adminUser := models.Adminuser{
-		ID:       uint(iID),
-		Email:    up.Email,
-		AuthType: up.AuthType,
+		ID:        uint(iID),
+		Email:     up.Email,
+		AuthType:  up.AuthType,
+		UpdatedAt: time.Now(),
 	}
 
 	if up.Password != nil {

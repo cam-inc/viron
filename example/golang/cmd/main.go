@@ -47,12 +47,7 @@ func main() {
 
 // run cobra.commandで実行される(RunE)関数
 func run(o *options) error {
-
 	s := server.New(routes.New(), o.host, o.port)
-
-	fmt.Println("RUN")
-
-	//return s.Run()
 	return s.RunTLS()
 }
 
