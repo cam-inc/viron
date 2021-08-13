@@ -12,6 +12,7 @@ require (
 	github.com/golang-migrate/migrate/v4 v4.14.1
 	github.com/imdario/mergo v0.3.12
 	github.com/spf13/cobra v1.2.1
+	github.com/volatiletech/sqlboiler/v4 v4.6.0
 	go.uber.org/automaxprocs v1.4.0
 )
 

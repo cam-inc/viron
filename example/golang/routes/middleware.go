@@ -1,9 +1,13 @@
 package routes
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"strings"
 
 	"github.com/cam-inc/viron/packages/golang/logging"
 
@@ -19,6 +23,7 @@ import (
 	"github.com/cam-inc/viron/packages/golang/constant"
 	"github.com/cam-inc/viron/packages/golang/helpers"
 	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
 )
 
@@ -119,16 +124,12 @@ func JWTSecurityHandler(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFun
 
 			ctx := r.Context()
 			if ctx.Value(JwtScopes) == nil {
-				fmt.Println("jwtScope is nil.")
 				handlerFunc.ServeHTTP(w, r.WithContext(ctx))
 				return
-			} else {
-				fmt.Println("jwtScope is not nil.")
 			}
 
 			token, err := helpers.GetCookieToken(r)
 			if err != nil {
-				fmt.Println(err)
 				w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
 				cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
 					MaxAge: -1,
@@ -140,7 +141,6 @@ func JWTSecurityHandler(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFun
 
 			claim, err := auth.Verify(token)
 			if err != nil {
-				fmt.Println(err)
 				w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
 				cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
 					MaxAge: -1,
@@ -153,7 +153,6 @@ func JWTSecurityHandler(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFun
 			userID := claim.Sub
 			user := domains.FindByID(ctx, userID)
 			if user == nil {
-				fmt.Println("user notfound")
 				w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
 				cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
 					MaxAge: -1,
@@ -165,8 +164,83 @@ func JWTSecurityHandler(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFun
 
 			ctx = context.WithValue(ctx, constant.CTX_KEY_AUTH, claim)
 			ctx = context.WithValue(ctx, constant.CTX_KEY_ADMINUSER, user)
-			handlerFunc.ServeHTTP(w, r.WithContext(ctx))
+			ctx = context.WithValue(ctx, constant.CTX_KEY_ADMINUSER_ID, fmt.Sprintf("%d", user.ID))
+			rr := r.WithContext(ctx)
+			handlerFunc.ServeHTTP(w, rr)
 		}
 		return fn
 	}
+}
+
+func InjectAuditLog(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
+		rBody := []byte{}
+		if r.Body != nil {
+			rBody, _ = io.ReadAll(r.Body)
+			r.Body = io.NopCloser(bytes.NewBuffer(rBody))
+		}
+		defer func(w http.ResponseWriter, r *http.Request, body string) {
+			var userID string
+
+			if body != "" {
+				j := map[string]interface{}{}
+				if err := json.Unmarshal([]byte(body), &j); err == nil {
+					for k, v := range j {
+						fmt.Printf("k %+v\n", k)
+						if strings.Contains(k, "pass") {
+							j[k] = "xxxxxx"
+						}
+						jv, exists := v.(map[string]interface{})
+						if exists {
+							for kk, vv := range jv {
+								fmt.Printf("kk %+v\n", kk)
+								if strings.Contains(kk, "pass") {
+									jv[kk] = "xxxxxx"
+								}
+								jvv, exists := vv.(map[string]interface{})
+								if exists {
+									for kkk, _ := range jvv {
+										if strings.Contains(kkk, "pass") {
+											jvv[kkk] = "xxxxxx"
+										}
+									}
+								}
+							}
+						}
+					}
+					if b, err := json.Marshal(j); err != nil {
+						fmt.Printf("json marshal error %+v\n", err)
+					} else {
+						body = string(b)
+					}
+				} else {
+					fmt.Printf("json unmarshal error %+vn", err)
+				}
+			}
+
+			if token, err := helpers.GetCookieToken(r); err == nil {
+				if claim, err := auth.Verify(token); err == nil {
+					userID = claim.Sub
+				}
+			}
+
+			sourceIP := r.Header.Get("x-forwarded-for")
+
+			status := uint(ww.Status())
+
+			audit := &domains.AuditLog{
+				UserId:        &userID,
+				RequestMethod: &r.Method,
+				RequestUri:    &r.RequestURI,
+				SourceIp:      &sourceIP,
+				RequestBody:   &body,
+				StatusCode:    &status,
+			}
+
+			domains.CreateAuditLog(r.Context(), audit)
+		}(ww, r, string(rBody))
+
+		next.ServeHTTP(ww, r)
+	})
 }

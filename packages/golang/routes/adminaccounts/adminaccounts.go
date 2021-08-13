@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/cam-inc/viron/packages/golang/logging"
+
 	"github.com/cam-inc/viron/packages/golang/errors"
 	"github.com/cam-inc/viron/packages/golang/helpers"
 
@@ -78,14 +80,15 @@ export const updateVironAdminAccount = async (
 */
 func (a *adminaccountsImpl) UpdateVironAdminAccount(w http.ResponseWriter, r *http.Request, id externalRef0.VironIdPathParam) {
 	ctx := r.Context()
+	log := logging.GetDefaultLogger()
 	ctxUser := ctx.Value(constant.CTX_KEY_ADMINUSER)
 	if ctxUser == nil {
-		helpers.SendError(w, http.StatusInternalServerError, errors.AdminUserNotfound)
+		helpers.SendError(w, errors.AdminUserNotfound.StatusCode(), errors.AdminUserNotfound)
 		return
 	}
 	user, exists := ctxUser.(*domains.AdminUser)
 	if !exists {
-		helpers.SendError(w, http.StatusInternalServerError, errors.AdminUserNotfound)
+		helpers.SendError(w, errors.AdminUserNotfound.StatusCode(), errors.AdminUserNotfound)
 		return
 	}
 
@@ -96,14 +99,17 @@ func (a *adminaccountsImpl) UpdateVironAdminAccount(w http.ResponseWriter, r *ht
 
 	payload := &VironAdminAccountUpdatePayload{}
 	if err := helpers.BodyDecode(r, payload); err != nil {
+		log.Errorf("bodyDecode %+v", err)
 		helpers.SendError(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	if err := domains.UpdateAccountByID(ctx, string(id), &domains.AdminAccount{Password: &payload.Password}); err != nil {
+		log.Errorf("updateAccountById %+v", err)
 		helpers.SendError(w, http.StatusInternalServerError, err)
 		return
 	}
+	helpers.Send(w, http.StatusNoContent, nil)
 }
 
 /*
