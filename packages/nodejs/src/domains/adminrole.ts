@@ -1,5 +1,5 @@
 import { newModel } from 'casbin';
-import { roleIdAlreadyExists } from '../errors';
+import { roleIdAlreadyExists, unableToDeleteRole } from '../errors';
 import {
   ADMIN_ROLE,
   API_METHOD,
@@ -299,6 +299,11 @@ export const updateOneById = async (
 
 // IDで1件削除
 export const removeOneById = async (roleId: string): Promise<void> => {
+  const users = await listUsers(roleId);
+  if (users.length) {
+    // ユーザーに紐づけられているロールは削除できない
+    throw unableToDeleteRole();
+  }
   await removeRole(roleId);
 };
 

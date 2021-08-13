@@ -17,6 +17,16 @@ import { ctx } from '../../context';
 const getModel = (): PurchaseModel =>
   ctx.stores.main.models.purchases as PurchaseModel;
 
+const convertConditions = (
+  conditions: FilterQuery<Purchase>
+): FilterQuery<Purchase> => {
+  if (conditions.id) {
+    conditions._id = conditions.id;
+    delete conditions.id;
+  }
+  return conditions;
+};
+
 export const findOneById = async (id: string): Promise<Purchase | null> => {
   const model = getModel();
   const doc = await model.findById(id);
@@ -32,7 +42,7 @@ export const find = async (
   options = options ?? {};
   options.sort = getMongoSortOptions(sort);
   const docs = await model.find(
-    normalizeMongoFilterQuery(conditions),
+    normalizeMongoFilterQuery(convertConditions(conditions)),
     null,
     options
   );
@@ -60,7 +70,9 @@ export const findOne = async (
   conditions: FilterQuery<Purchase> = {}
 ): Promise<Purchase | null> => {
   const model = getModel();
-  const doc = await model.findOne(normalizeMongoFilterQuery(conditions));
+  const doc = await model.findOne(
+    normalizeMongoFilterQuery(convertConditions(conditions))
+  );
   return doc ? doc.toJSON() : null;
 };
 
@@ -68,7 +80,9 @@ export const count = async (
   conditions: FilterQuery<Purchase> = {}
 ): Promise<number> => {
   const model = getModel();
-  return await model.countDocuments(normalizeMongoFilterQuery(conditions));
+  return await model.countDocuments(
+    normalizeMongoFilterQuery(convertConditions(conditions))
+  );
 };
 
 export const createOne = async (

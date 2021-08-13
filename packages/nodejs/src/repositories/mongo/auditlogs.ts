@@ -16,6 +16,16 @@ const getModel = (): storeDefinitions.mongo.auditLogs.AuditLogModel => {
     .auditlogs as storeDefinitions.mongo.auditLogs.AuditLogModel;
 };
 
+const convertConditions = (
+  conditions: FilterQuery<domainsAuditLog.AuditLog>
+): FilterQuery<domainsAuditLog.AuditLog> => {
+  if (conditions.id) {
+    conditions._id = conditions.id;
+    delete conditions.id;
+  }
+  return conditions;
+};
+
 export const findOneById = async (
   id: string
 ): Promise<domainsAuditLog.AuditLog | null> => {
@@ -33,7 +43,7 @@ export const find = async (
   options = options ?? {};
   options.sort = getMongoSortOptions(sort);
   const docs = await model.find(
-    normalizeMongoFilterQuery(conditions),
+    normalizeMongoFilterQuery(convertConditions(conditions)),
     null,
     options
   );
@@ -61,7 +71,9 @@ export const count = async (
   conditions: FilterQuery<domainsAuditLog.AuditLog> = {}
 ): Promise<number> => {
   const model = getModel();
-  return await model.countDocuments(normalizeMongoFilterQuery(conditions));
+  return await model.countDocuments(
+    normalizeMongoFilterQuery(convertConditions(conditions))
+  );
 };
 
 export const createOne = async (

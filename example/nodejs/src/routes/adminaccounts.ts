@@ -5,7 +5,7 @@ import { RouteContext } from '../application';
 export const listVironAdminAccounts = async (
   context: RouteContext
 ): Promise<void> => {
-  const result = await domainsAdminAccount.listById(context.user?.userId);
+  const result = await domainsAdminAccount.listById(context.user?.id);
   context.res.json(result);
 };
 
@@ -13,7 +13,7 @@ export const listVironAdminAccounts = async (
 export const updateVironAdminAccount = async (
   context: RouteContext
 ): Promise<void> => {
-  if (context.user?.userId !== context.params.path.id) {
+  if (context.user?.id !== context.params.path.id) {
     throw forbidden();
   }
 
