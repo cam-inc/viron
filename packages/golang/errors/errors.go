@@ -13,7 +13,7 @@ type (
 )
 
 func (v *VironError) Error() string {
-	return fmt.Sprintf("statusCode:%d err:%v", v.code, v.err)
+	return fmt.Sprintf(`{"statusCode":%d,"message":"%v"}`, v.code, v.err)
 }
 
 func (v *VironError) MarshalJSON() ([]byte, error) {
@@ -43,6 +43,7 @@ var (
 	JwtUninitialized        = initialize(500, "Uninitialized jwt is not available")
 	RoleIdAlreadyExists     = initialize(400, "The role-id is already exists.")
 	SigninFailed            = initialize(400, "Signin failed")
+	UnAuthorized            = initialize(401, "Unauthorized")
 	OasUndefined            = initialize(404, "OAS is undefined")
 	AdminUserNotfound       = initialize(404, "Admin User not found.")
 	Forbidden               = initialize(403, "Forbidden")
