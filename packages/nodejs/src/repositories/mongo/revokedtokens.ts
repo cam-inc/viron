@@ -16,6 +16,16 @@ const getModel = (): storeDefinitions.mongo.revokedTokens.RevokedTokenModel => {
     .revokedtokens as storeDefinitions.mongo.revokedTokens.RevokedTokenModel;
 };
 
+const convertConditions = (
+  conditions: FilterQuery<domainsAuth.RevokedToken>
+): FilterQuery<domainsAuth.RevokedToken> => {
+  if (conditions.id) {
+    conditions._id = conditions.id;
+    delete conditions.id;
+  }
+  return conditions;
+};
+
 export const findOneById = async (
   id: string
 ): Promise<domainsAuth.RevokedToken | null> => {
@@ -33,7 +43,7 @@ export const find = async (
   options = options ?? {};
   options.sort = getMongoSortOptions(sort);
   const docs = await model.find(
-    normalizeMongoFilterQuery(conditions),
+    normalizeMongoFilterQuery(convertConditions(conditions)),
     null,
     options
   );
@@ -61,7 +71,9 @@ export const findOne = async (
   conditions: FilterQuery<domainsAuth.RevokedToken> = {}
 ): Promise<domainsAuth.RevokedToken | null> => {
   const model = getModel();
-  const doc = await model.findOne(normalizeMongoFilterQuery(conditions));
+  const doc = await model.findOne(
+    normalizeMongoFilterQuery(convertConditions(conditions))
+  );
   return doc ? doc.toJSON() : null;
 };
 
@@ -69,7 +81,9 @@ export const count = async (
   conditions: FilterQuery<domainsAuth.RevokedToken> = {}
 ): Promise<number> => {
   const model = getModel();
-  return await model.countDocuments(normalizeMongoFilterQuery(conditions));
+  return await model.countDocuments(
+    normalizeMongoFilterQuery(convertConditions(conditions))
+  );
 };
 
 export const createOne = async (

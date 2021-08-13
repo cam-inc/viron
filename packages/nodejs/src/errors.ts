@@ -54,3 +54,7 @@ export const mismatchState = (): VironError => {
 export const oasValidationFailure = (): VironError => {
   return new VironError('OAS validation failure.', 500);
 };
+
+export const unableToDeleteRole = (): VironError => {
+  return new VironError('Unable to Delete Role.', 400);
+};

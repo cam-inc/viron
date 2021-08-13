@@ -23,10 +23,14 @@ const getModel = (): storeDefinitions.mongo.adminUsers.AdminUserModel => {
 const convertConditions = (
   conditions: FilterQueryWithUserIds
 ): FilterQuery<domainsAdminUser.AdminUser> => {
+  if (conditions.id) {
+    conditions._id = conditions.id;
+    delete conditions.id;
+  }
   if (!conditions.userIds) {
     return conditions;
   }
-  conditions = Object.assign({}, { id: { $in: conditions.userIds } });
+  conditions = Object.assign({}, { _id: { $in: conditions.userIds } });
   delete conditions.userIds;
   return conditions;
 };
@@ -76,7 +80,9 @@ export const findOne = async (
   conditions: FilterQuery<domainsAdminUser.AdminUser> = {}
 ): Promise<domainsAdminUser.AdminUser | null> => {
   const model = getModel();
-  const doc = await model.findOne(normalizeMongoFilterQuery(conditions));
+  const doc = await model.findOne(
+    normalizeMongoFilterQuery(convertConditions(conditions))
+  );
   return doc ? doc.toJSON() : null;
 };
 

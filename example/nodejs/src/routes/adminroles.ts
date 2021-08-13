@@ -8,6 +8,7 @@ export const listVironAdminRoles = async (
   const result = await domainsAdminRole.listByOas(
     context.req._context.apiDefinition
   );
+
   context.res.json(result);
 };
 

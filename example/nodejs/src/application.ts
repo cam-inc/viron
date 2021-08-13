@@ -1,6 +1,5 @@
 import http from 'http';
 import express, { Express } from 'express';
-import errorHandler from 'errorhandler';
 import compression from 'compression';
 import { json, urlencoded } from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -17,6 +16,7 @@ import { middlewareCors } from './middlewares/cors';
 import { middlewareAccessLog } from './middlewares/accesslog';
 import { middlewareAuditLog } from './middlewares/auditlog';
 import { middlewareCacheControl } from './middlewares/cachecontrol';
+import { middlewareErrorHandler } from './middlewares/errorhandler';
 import { ctx } from './context';
 
 interface RequestContext {
@@ -77,7 +77,7 @@ export const createApplication = async (): Promise<Express> => {
   await register(app);
 
   app.use(middlewareNotFound());
-  app.use(errorHandler());
+  app.use(middlewareErrorHandler());
 
   return app;
 };
