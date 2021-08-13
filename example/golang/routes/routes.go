@@ -191,6 +191,7 @@ func New() http.Handler {
 
 	// $refの置換
 	helpers.Ref(definition, "./components.yaml", "")
+	helpers.Ref(definition, "./adminusers.yaml", "")
 	// TODO: デバッグ中
 	//routeRoot.Use(OpenAPI3Validator(definition, &openapi3filter.Options{}))
 

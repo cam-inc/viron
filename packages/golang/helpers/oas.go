@@ -74,6 +74,13 @@ func opeRef(ope *openapi3.Operation, org string, rep string) error {
 	}
 	for _, r := range ope.Responses {
 		r.Ref = ref(r.Ref, org, rep)
+		if r.Value != nil {
+			for _, c := range r.Value.Content {
+				if c.Schema != nil {
+					c.Schema.Ref = ref(c.Schema.Ref, org, rep)
+				}
+			}
+		}
 	}
 	for _, p := range ope.Parameters {
 		p.Ref = ref(p.Ref, org, rep)
