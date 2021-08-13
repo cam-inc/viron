@@ -23,6 +23,7 @@ type adminUsersPersistence struct {
 	conn *sql.DB
 }
 
+// TODO: repositoriesパッケージに移動する
 type AdminUserConditions struct {
 	ID        uint
 	Email     string
@@ -34,6 +35,9 @@ type AdminUserConditions struct {
 	Emails    []string
 }
 
+func (c *AdminUserConditions) ConvertConditionMongoDB() []interface{} {
+	panic("no implements")
+}
 func (c *AdminUserConditions) ConvertConditionMySQL() []qm.QueryMod {
 
 	conditions := []qm.QueryMod{}
@@ -162,28 +166,37 @@ func (a *adminUsersPersistence) UpdateByID(ctx context.Context, id string, entit
 		UpdatedAt: time.Now(),
 	}
 
+	columns := []string{models.AdminuserColumns.UpdatedAt}
+	//boil.Whitelist()
+
 	if up.Password != nil {
 		adminUser.Password = null.NewString(*up.Password, true)
+		columns = append(columns, models.AdminuserColumns.Password)
 	}
 
 	if up.Salt != nil {
 		adminUser.Salt = null.NewString(*up.Salt, true)
+		columns = append(columns, models.AdminuserColumns.Salt)
 	}
 
 	if up.GoogleOAuth2AccessToken != nil {
 		adminUser.GoogleOAuth2AccessToken = null.NewString(*up.GoogleOAuth2AccessToken, true)
+		columns = append(columns, models.AdminuserColumns.GoogleOAuth2AccessToken)
 	}
 	if up.GoogleOAuth2ExpiryDate != nil {
 		adminUser.GoogleOAuth2ExpiryDate = null.NewInt(*up.GoogleOAuth2ExpiryDate, true)
+		columns = append(columns, models.AdminuserColumns.GoogleOAuth2ExpiryDate)
 	}
 	if up.GoogleOAuth2RefreshToken != nil {
 		adminUser.GoogleOAuth2RefreshToken = null.NewString(*up.GoogleOAuth2RefreshToken, true)
+		columns = append(columns, models.AdminuserColumns.GoogleOAuth2RefreshToken)
 	}
 	if up.GoogleOAuth2TokenType != nil {
 		adminUser.GoogleOAuth2TokenType = null.NewString(*up.GoogleOAuth2TokenType, true)
+		columns = append(columns, models.AdminuserColumns.GoogleOAuth2TokenType)
 	}
 
-	_, err := adminUser.Update(ctx, a.conn, boil.Infer())
+	_, err := adminUser.Update(ctx, a.conn, boil.Whitelist(columns...))
 	return err
 }
 

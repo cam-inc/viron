@@ -6,6 +6,7 @@ const (
 	CTX_KEY_API_DEFINITION     = "apiDefinition"
 	CTX_KEY_JWT_EXPIRATION_SEC = "jwtExpirationSec"
 	CTX_KEY_ADMINUSER          = "adminUser"
+	CTX_KEY_ADMINUSER_ID       = "userId"
 	CTX_KEY_AUTH               = "auth"
 
 	/*

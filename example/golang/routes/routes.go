@@ -68,6 +68,7 @@ func New() http.Handler {
 	routeRoot.Use(middleware.Logger)
 	routeRoot.Use(middleware.Recoverer)
 	routeRoot.Use(InjectLogger())
+	routeRoot.Use(InjectAuditLog)
 
 	oasImpl := oas.New()
 	oas.HandlerWithOptions(oasImpl, oas.ChiServerOptions{

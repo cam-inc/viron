@@ -21,6 +21,9 @@ type RevokedTokenConditions struct {
 	Token string
 }
 
+func (r *RevokedTokenConditions) ConvertConditionMongoDB() []interface{} {
+	panic("no implements")
+}
 func (r *RevokedTokenConditions) ConvertConditionMySQL() []qm.QueryMod {
 	return []qm.QueryMod{qm.Where("token = ?", r.Token)}
 }

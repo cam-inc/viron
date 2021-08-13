@@ -3,6 +3,8 @@ package store
 import (
 	"database/sql"
 
+	"github.com/volatiletech/sqlboiler/v4/boil"
+
 	"github.com/cam-inc/viron/example/golang/pkg/constant"
 	"github.com/cam-inc/viron/packages/golang/logging"
 
@@ -32,6 +34,8 @@ func NewMySQL(config *config.MySQL) *sql.DB {
 	//db.SetMaxIdleConns()
 	//db.SetConnMaxIdleTime()
 	//db.SetConnMaxLifetime()
+
+	boil.DebugMode = true
 
 	return db
 }
