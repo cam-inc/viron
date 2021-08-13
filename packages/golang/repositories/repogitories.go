@@ -9,6 +9,7 @@ import (
 type (
 	Conditions interface {
 		ConvertConditionMySQL() []qm.QueryMod
+		ConvertConditionMongoDB() []interface{}
 	}
 
 	Entity interface {
