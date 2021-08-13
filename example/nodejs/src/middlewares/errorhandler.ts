@@ -17,7 +17,7 @@ export const middlewareErrorHandler = (): ErrorRequestHandler => {
       res.statusCode = err.statusCode;
     }
     if (err.status) {
-      res.statusCode = err.statusCode;
+      res.statusCode = err.status;
     }
     if (res.statusCode < 400) {
       res.statusCode = 500;
