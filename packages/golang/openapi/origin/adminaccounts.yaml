@@ -65,6 +65,6 @@ components:
           description: パスワード
           type: string
           format: password
-          pattern: "^(?=.*?[a-zA-Z])(?=.*?\\d)[a-zA-Z\\d!?#$%&@*+/-_<=>]{8,}"
+          pattern: "^.*?[a-zA-Z\\d!?#$%&@*+/-_<=>]{8,}"
       required:
         - password
