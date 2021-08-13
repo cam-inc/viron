@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/cam-inc/viron/packages/golang/errors"
+
 	"github.com/cam-inc/viron/packages/golang/logging"
 
 	"github.com/getkin/kin-openapi/openapi3filter"
@@ -45,7 +47,7 @@ func OpenAPI3Validator(apiDef *openapi3.T, op *openapi3filter.Options) func(http
 			// リクエストのバリデーション
 			route, pathParams, err := router.FindRoute(r)
 			if err != nil {
-				fmt.Printf("router.FindRoute err=%v, url=%v", err, url)
+				fmt.Printf("router.FindRoute err=%v, url=%v\n", err, url)
 				next.ServeHTTP(w, r.WithContext(ctx))
 				return
 			}
@@ -55,7 +57,7 @@ func OpenAPI3Validator(apiDef *openapi3.T, op *openapi3filter.Options) func(http
 				Options:    op,
 			}
 			if err := openapi3filter.ValidateRequest(ctx, requestValidationInput); err != nil {
-				fmt.Printf("openapi3filter.ValidateRequest err:%v", err)
+				fmt.Printf("openapi3filter.ValidateRequest err:%v\n", err)
 				http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 				return
 			}
@@ -68,9 +70,44 @@ func OpenAPI3Validator(apiDef *openapi3.T, op *openapi3filter.Options) func(http
 	}
 }
 
+// OpenAPI3Validator kin-openapiを利用したvalidator
+func OpenAPI3ValidatorHandlerFunc(apiDef *openapi3.T, op *openapi3filter.Options) func(http.HandlerFunc) http.HandlerFunc {
+	router, err := legacyrouter.NewRouter(apiDef)
+	if err != nil {
+		panic(err)
+	}
+	return func(handlerFunc http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
+			url := r.URL
+
+			// リクエストのバリデーション
+			route, pathParams, err := router.FindRoute(r)
+			if err != nil {
+				fmt.Printf("router.FindRoute err=%v, url=%v\n", err, url)
+				handlerFunc.ServeHTTP(w, r.WithContext(ctx))
+				return
+			}
+			requestValidationInput := &openapi3filter.RequestValidationInput{Request: r,
+				PathParams: pathParams,
+				Route:      route,
+				Options:    op,
+			}
+			if err := openapi3filter.ValidateRequest(ctx, requestValidationInput); err != nil {
+				fmt.Printf("openapi3filter.ValidateRequest err:%v\n", err)
+				http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+				return
+			}
+			req := r.WithContext(ctx)
+			handlerFunc.ServeHTTP(w, req)
+		}
+	}
+}
+
 func InjectAPIDefinition(apiDef *openapi3.T) func(http.HandlerFunc) http.HandlerFunc {
 	return func(handlerFunc http.HandlerFunc) http.HandlerFunc {
 		fn := func(w http.ResponseWriter, r *http.Request) {
+			fmt.Println("InjectAPIDefinition")
 			ctx := r.Context()
 			ctx = context.WithValue(ctx, constant.CTX_KEY_API_DEFINITION, apiDef)
 			handlerFunc.ServeHTTP(w, r.WithContext(ctx))
@@ -117,7 +154,52 @@ func InjectLogger() func(handler http.Handler) http.Handler {
 	}
 }
 
-func JWTSecurityHandler(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFunc {
+func AuthenticationFunc(ctx context.Context, input *openapi3filter.AuthenticationInput) error {
+	if ctx.Value(JwtScopes) == nil {
+		return nil
+	}
+	if ctx.Value(constant.CTX_KEY_AUTH) == nil {
+		fmt.Println(constant.CTX_KEY_AUTH, "nil")
+		return errors.UnAuthorized
+	}
+	fmt.Println("AuthenticationFunc")
+	return nil
+}
+
+// func(context.Context, *AuthenticationInput) error
+func JWTAuthHandlerFunc() func(http.HandlerFunc) http.HandlerFunc {
+	return func(handlerFunc http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			fmt.Printf("DEBUG1 uri=%s\n", r.RequestURI)
+			ctx := r.Context()
+			if ctx.Value(JwtScopes) == nil {
+				handlerFunc.ServeHTTP(w, r.WithContext(ctx))
+				return
+			}
+			fmt.Println("DEBUG1")
+			token, err := helpers.GetCookieToken(r)
+			if err != nil {
+				fmt.Println(err)
+				handlerFunc.ServeHTTP(w, r.WithContext(ctx))
+				return
+			}
+			fmt.Println("DEBUG1")
+			claim, err := auth.Verify(token)
+			if err != nil {
+				fmt.Println(err)
+				handlerFunc.ServeHTTP(w, r.WithContext(ctx))
+				return
+			}
+			fmt.Println("DEBUG1")
+			ctx = context.WithValue(ctx, constant.CTX_KEY_AUTH, claim)
+			rr := r.WithContext(ctx)
+			cctx := rr.Context()
+			fmt.Println(cctx.Value(constant.CTX_KEY_AUTH))
+			handlerFunc.ServeHTTP(w, rr)
+		}
+	}
+}
+func JWTSecurityHandlerFunc(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFunc {
 	return func(handlerFunc http.HandlerFunc) http.HandlerFunc {
 
 		fn := func(w http.ResponseWriter, r *http.Request) {
@@ -127,26 +209,27 @@ func JWTSecurityHandler(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFun
 				handlerFunc.ServeHTTP(w, r.WithContext(ctx))
 				return
 			}
-
 			token, err := helpers.GetCookieToken(r)
 			if err != nil {
+				fmt.Println(err)
 				w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
 				cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
 					MaxAge: -1,
 				})
 				http.SetCookie(w, cookie)
-				http.Error(w, `{"message":"Unauthorized"}`, http.StatusUnauthorized)
+				http.Error(w, errors.UnAuthorized.Error(), errors.UnAuthorized.StatusCode())
 				return
 			}
-
+			fmt.Printf("DEBUG2 uri=%s\n", r.RequestURI)
 			claim, err := auth.Verify(token)
 			if err != nil {
+				fmt.Println(err)
 				w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
 				cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
 					MaxAge: -1,
 				})
 				http.SetCookie(w, cookie)
-				http.Error(w, `{"message":"Unauthorized"}`, http.StatusUnauthorized)
+				http.Error(w, errors.UnAuthorized.Error(), errors.UnAuthorized.StatusCode())
 				return
 			}
 
@@ -158,14 +241,14 @@ func JWTSecurityHandler(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFun
 					MaxAge: -1,
 				})
 				http.SetCookie(w, cookie)
-				http.Error(w, `{"message":"Unauthorized"}`, http.StatusUnauthorized)
+				http.Error(w, errors.UnAuthorized.Error(), errors.UnAuthorized.StatusCode())
+				fmt.Println("user == nil")
 				return
 			}
-
-			ctx = context.WithValue(ctx, constant.CTX_KEY_AUTH, claim)
-			ctx = context.WithValue(ctx, constant.CTX_KEY_ADMINUSER, user)
-			ctx = context.WithValue(ctx, constant.CTX_KEY_ADMINUSER_ID, fmt.Sprintf("%d", user.ID))
-			rr := r.WithContext(ctx)
+			ctx2 := context.WithValue(ctx, constant.CTX_KEY_AUTH, claim)
+			ctx3 := context.WithValue(ctx2, constant.CTX_KEY_ADMINUSER, user)
+			ctx4 := context.WithValue(ctx3, constant.CTX_KEY_ADMINUSER_ID, fmt.Sprintf("%d", user.ID))
+			rr := r.WithContext(ctx4)
 			handlerFunc.ServeHTTP(w, rr)
 		}
 		return fn
@@ -175,7 +258,7 @@ func JWTSecurityHandler(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFun
 func InjectAuditLog(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
-		rBody := []byte{}
+		var rBody []byte
 		if r.Body != nil {
 			rBody, _ = io.ReadAll(r.Body)
 			r.Body = io.NopCloser(bytes.NewBuffer(rBody))
@@ -186,27 +269,10 @@ func InjectAuditLog(next http.Handler) http.Handler {
 			if body != "" {
 				j := map[string]interface{}{}
 				if err := json.Unmarshal([]byte(body), &j); err == nil {
-					for k, v := range j {
+					for k, _ := range j {
 						fmt.Printf("k %+v\n", k)
 						if strings.Contains(k, "pass") {
-							j[k] = "xxxxxx"
-						}
-						jv, exists := v.(map[string]interface{})
-						if exists {
-							for kk, vv := range jv {
-								fmt.Printf("kk %+v\n", kk)
-								if strings.Contains(kk, "pass") {
-									jv[kk] = "xxxxxx"
-								}
-								jvv, exists := vv.(map[string]interface{})
-								if exists {
-									for kkk, _ := range jvv {
-										if strings.Contains(kkk, "pass") {
-											jvv[kkk] = "xxxxxx"
-										}
-									}
-								}
-							}
+							j[k] = "***************************"
 						}
 					}
 					if b, err := json.Marshal(j); err != nil {
@@ -224,11 +290,8 @@ func InjectAuditLog(next http.Handler) http.Handler {
 					userID = claim.Sub
 				}
 			}
-
 			sourceIP := r.Header.Get("x-forwarded-for")
-
 			status := uint(ww.Status())
-
 			audit := &domains.AuditLog{
 				UserId:        &userID,
 				RequestMethod: &r.Method,
@@ -237,7 +300,6 @@ func InjectAuditLog(next http.Handler) http.Handler {
 				RequestBody:   &body,
 				StatusCode:    &status,
 			}
-
 			domains.CreateAuditLog(r.Context(), audit)
 		}(ww, r, string(rBody))
 

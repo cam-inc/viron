@@ -3,6 +3,8 @@ package routes
 import (
 	"net/http"
 
+	"github.com/getkin/kin-openapi/openapi3filter"
+
 	"github.com/cam-inc/viron/example/golang/pkg/constant"
 	"github.com/cam-inc/viron/packages/golang/logging"
 
@@ -61,76 +63,6 @@ func New() http.Handler {
 			},
 		},
 	}
-
-	routeRoot := chi.NewRouter()
-	routeRoot.Use(Cors(cfg.Cors))
-	routeRoot.Use(InjectConfig(cfg))
-	routeRoot.Use(middleware.Logger)
-	routeRoot.Use(middleware.Recoverer)
-	routeRoot.Use(InjectLogger())
-	routeRoot.Use(InjectAuditLog)
-
-	oasImpl := oas.New()
-	oas.HandlerWithOptions(oasImpl, oas.ChiServerOptions{
-		BaseRouter: routeRoot,
-		Middlewares: []oas.MiddlewareFunc{
-			InjectAPIDefinition(definition),
-			JWTSecurityHandler(cfg.Auth),
-		},
-	})
-
-	adminUserImpl := adminusers.New()
-	adminusers.HandlerWithOptions(adminUserImpl, adminusers.ChiServerOptions{
-		BaseRouter: routeRoot,
-		Middlewares: []adminusers.MiddlewareFunc{
-			InjectAPIDefinition(definition),
-			JWTSecurityHandler(cfg.Auth),
-		},
-	})
-
-	adminAccountImpl := adminaccounts.New()
-	adminaccounts.HandlerWithOptions(adminAccountImpl, adminaccounts.ChiServerOptions{
-		BaseRouter: routeRoot,
-		Middlewares: []adminaccounts.MiddlewareFunc{
-			InjectAPIDefinition(definition),
-			JWTSecurityHandler(cfg.Auth),
-		},
-	})
-
-	adminRoleImpl := adminroles.New()
-	adminroles.HandlerWithOptions(adminRoleImpl, adminroles.ChiServerOptions{
-		BaseRouter: routeRoot,
-		Middlewares: []adminroles.MiddlewareFunc{
-			InjectAPIDefinition(definition),
-			JWTSecurityHandler(cfg.Auth),
-		},
-	})
-
-	if err := domainAuth.SetUp(cfg.Auth.JWT.Secret, cfg.Auth.JWT.Provider, cfg.Auth.JWT.ExpirationSec); err != nil {
-		panic(err)
-	}
-	authImpl := auth.New()
-	auth.HandlerFromMux(authImpl, routeRoot)
-
-	authconfigImp := authconfigs.New()
-	authconfigs.HandlerWithOptions(authconfigImp, authconfigs.ChiServerOptions{
-		BaseRouter: routeRoot,
-		Middlewares: []authconfigs.MiddlewareFunc{
-			InjectAPIDefinition(definition),
-			JWTSecurityHandler(cfg.Auth),
-		},
-	})
-
-	routeRoot.Get("/ping", func(w http.ResponseWriter, request *http.Request) {
-		helpers.Send(w, http.StatusOK, "pong")
-	})
-
-	rootImpl := root.New()
-	root.HandlerWithOptions(rootImpl, root.ChiServerOptions{
-		BaseRouter:  routeRoot,
-		Middlewares: []root.MiddlewareFunc{},
-	})
-
 	rootDoc, _ := root.GetSwagger()
 	definition.OpenAPI = rootDoc.OpenAPI
 	definition.Servers = rootDoc.Servers
@@ -193,8 +125,91 @@ func New() http.Handler {
 	// $refの置換
 	helpers.Ref(definition, "./components.yaml", "")
 	helpers.Ref(definition, "./adminusers.yaml", "")
-	// TODO: デバッグ中
-	//routeRoot.Use(OpenAPI3Validator(definition, &openapi3filter.Options{}))
+
+	routeRoot := chi.NewRouter()
+	routeRoot.Use(Cors(cfg.Cors))
+	routeRoot.Use(InjectConfig(cfg))
+	routeRoot.Use(middleware.Logger)
+	routeRoot.Use(middleware.Recoverer)
+	routeRoot.Use(InjectLogger())
+	routeRoot.Use(InjectAuditLog)
+
+	oasImpl := oas.New()
+	oas.HandlerWithOptions(oasImpl, oas.ChiServerOptions{
+		BaseRouter: routeRoot,
+		Middlewares: []oas.MiddlewareFunc{
+			InjectAPIDefinition(definition),
+			JWTAuthHandlerFunc(),
+			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
+				AuthenticationFunc: AuthenticationFunc,
+			}),
+			JWTSecurityHandlerFunc(cfg.Auth),
+		},
+	})
+
+	adminUserImpl := adminusers.New()
+	adminusers.HandlerWithOptions(adminUserImpl, adminusers.ChiServerOptions{
+		BaseRouter: routeRoot,
+		Middlewares: []adminusers.MiddlewareFunc{
+			InjectAPIDefinition(definition),
+			JWTSecurityHandlerFunc(cfg.Auth),
+			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
+				AuthenticationFunc: AuthenticationFunc,
+			}),
+			JWTSecurityHandlerFunc(cfg.Auth),
+		},
+	})
+
+	adminAccountImpl := adminaccounts.New()
+	adminaccounts.HandlerWithOptions(adminAccountImpl, adminaccounts.ChiServerOptions{
+		BaseRouter: routeRoot,
+		Middlewares: []adminaccounts.MiddlewareFunc{
+			InjectAPIDefinition(definition),
+			JWTSecurityHandlerFunc(cfg.Auth),
+			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
+				AuthenticationFunc: AuthenticationFunc,
+			}),
+			JWTSecurityHandlerFunc(cfg.Auth),
+		},
+	})
+
+	adminRoleImpl := adminroles.New()
+	adminroles.HandlerWithOptions(adminRoleImpl, adminroles.ChiServerOptions{
+		BaseRouter: routeRoot,
+		Middlewares: []adminroles.MiddlewareFunc{
+			InjectAPIDefinition(definition),
+			JWTSecurityHandlerFunc(cfg.Auth),
+			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
+				AuthenticationFunc: AuthenticationFunc,
+			}),
+			JWTSecurityHandlerFunc(cfg.Auth),
+		},
+	})
+
+	if err := domainAuth.SetUp(cfg.Auth.JWT.Secret, cfg.Auth.JWT.Provider, cfg.Auth.JWT.ExpirationSec); err != nil {
+		panic(err)
+	}
+	authImpl := auth.New()
+	auth.HandlerFromMux(authImpl, routeRoot)
+
+	authconfigImp := authconfigs.New()
+	authconfigs.HandlerWithOptions(authconfigImp, authconfigs.ChiServerOptions{
+		BaseRouter: routeRoot,
+		Middlewares: []authconfigs.MiddlewareFunc{
+			InjectAPIDefinition(definition),
+			JWTSecurityHandlerFunc(cfg.Auth),
+		},
+	})
+
+	routeRoot.Get("/ping", func(w http.ResponseWriter, request *http.Request) {
+		helpers.Send(w, http.StatusOK, "pong")
+	})
+
+	rootImpl := root.New()
+	root.HandlerWithOptions(rootImpl, root.ChiServerOptions{
+		BaseRouter:  routeRoot,
+		Middlewares: []root.MiddlewareFunc{},
+	})
 
 	return routeRoot
 }
