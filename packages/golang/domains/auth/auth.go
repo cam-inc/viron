@@ -13,7 +13,7 @@ func createFirstAdminUser(ctx context.Context, payload *domains.AdminUser, authT
 	if domains.Count(ctx) != 0 {
 		return nil, nil
 	}
-	user, err := domains.CreateOne(ctx, payload, authType)
+	user, err := domains.CreateAdminUser(ctx, payload, authType)
 	if err != nil {
 		return nil, err
 	}

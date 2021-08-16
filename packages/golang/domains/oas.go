@@ -69,6 +69,7 @@ type (
 )
 
 func GetOas(apiDef *openapi3.T, roleIDs []string) *openapi3.T {
+	log := logging.GetDefaultLogger()
 	clone := &openapi3.T{}
 	if buf, err := json.Marshal(apiDef); err != nil {
 		return nil
@@ -78,8 +79,10 @@ func GetOas(apiDef *openapi3.T, roleIDs []string) *openapi3.T {
 		}
 	}
 
+	log.Debugf("roleIDs %+v", roleIDs)
+
 	if err := CreateViewerRole(clone); err != nil {
-		logging.GetDefaultLogger().Errorf("CreateViewerRole error(%+v)", err)
+		log.Errorf("CreateViewerRole error(%+v)", err)
 	}
 
 	extentions := helpers.ConvertExtentions(clone)
@@ -92,19 +95,27 @@ func GetOas(apiDef *openapi3.T, roleIDs []string) *openapi3.T {
 				continue
 			}
 
+			log.Debugf("findPathMethodByOperationID %+v", pathMethod)
+
 			for _, roleID := range roleIDs {
+				log.Debugf("roleId %s resourceId %s method2Permissions(pathMethod.method) %+v", roleID, content.ResourceID, method2Permissions(pathMethod.method))
 				if hasPermissionByResourceID(roleID, content.ResourceID, method2Permissions(pathMethod.method)) {
 					granted = append(granted, content)
 				}
 			}
+
 		}
+		log.Debugf("granted %+v", granted)
 
 		if len(granted) > 0 {
 			page.Contents = granted
 			rewritedPages = append(rewritedPages, page)
 		}
 	}
-	clone.Extensions[constant.OAS_X_PAGES] = rewritedPages
+
+	log.Debugf("rewritedPages %+v", rewritedPages)
+
+	clone.Info.Extensions[constant.OAS_X_PAGES] = rewritedPages
 	return clone
 }
 

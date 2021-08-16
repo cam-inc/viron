@@ -3,6 +3,10 @@ package domains
 import (
 	"database/sql"
 	"fmt"
+	"net/http"
+	"time"
+
+	"github.com/cam-inc/viron/packages/golang/errors"
 
 	"github.com/cam-inc/viron/packages/golang/logging"
 
@@ -66,6 +70,8 @@ m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act || g(r.sub, "super")
 var (
 	casbinInstance *casbin.Enforcer
 
+	syncedTime int64
+
 	permissionMap = map[string][]string{
 		constant.API_METHOD_GET:    []string{constant.PERMISSION_READ, constant.PERMISSION_WRITE},
 		constant.API_METHOD_POST:   []string{constant.PERMISSION_WRITE},
@@ -84,6 +90,7 @@ func new(params ...interface{}) error {
 	}
 	enforcer.LoadPolicy()
 	casbinInstance = enforcer
+	sync()
 	return nil
 }
 
@@ -151,6 +158,30 @@ func genPolicy(roleID, resourceID, permission string) []string {
 		roleID,
 		resourceID,
 		permission,
+	}
+}
+
+/*
+// casbinインスタンスとDBの差異を解消するために同期する
+const sync = async (now = Date.now()): Promise<void> => {
+  const casbin = repositoryContainer.getCasbin();
+  if (repositoryContainer.casbinSyncedTime + CASBIN_SYNC_INTERVAL_MSEC > now) {
+    await casbin.loadPolicy();
+    repositoryContainer.casbinSyncedTime = now;
+  }
+};
+*/
+
+func sync() {
+	if casbinInstance == nil {
+		return
+	}
+	now := time.Now().Unix()
+	if syncedTime+constant.CASBIN_SYNC_INTERVAL_MSEC > now {
+		if err := casbinInstance.LoadPolicy(); err != nil {
+			logging.GetDefaultLogger().Error(err)
+		}
+		syncedTime = now
 	}
 }
 
@@ -239,6 +270,9 @@ export const addRoleForUser = async (
 */
 func AddRoleForUser(userID, roleID string) bool {
 	ok, err := casbinInstance.AddRoleForUser(userID, roleID)
+	if err != nil {
+		fmt.Printf("DEBUG AddRoleForUser %+v\n", err)
+	}
 	return ok && err == nil
 }
 
@@ -255,9 +289,11 @@ export const updateRolesForUser = async (
 };
 */
 func updateRolesForUser(userID string, roleIDs []string) {
+	RevokeRoleForUser(userID, "")
 	for _, roleID := range roleIDs {
-		RevokeRoleForUser(userID, roleID)
+		AddRoleForUser(userID, roleID)
 	}
+
 }
 
 /*
@@ -278,8 +314,14 @@ func RevokeRoleForUser(userID, roleID string) bool {
 	var err error
 	if roleID == "" {
 		ok, err = casbinInstance.DeleteUser(userID)
+		if err != nil {
+			fmt.Printf("DEBUG RevokeRoleForUser(%s) %+v\n", userID, err)
+		}
 	} else {
 		ok, err = casbinInstance.DeleteRoleForUser(userID, roleID)
+		if err != nil {
+			fmt.Printf("DEBUG RevokeRoleForUser(%s,%s) %+v\n", userID, roleID, err)
+		}
 	}
 	return ok && err == nil
 }
@@ -317,7 +359,7 @@ func RevokePermissionForRole(roleID, resourceID string, permissions []string) bo
 
 /*
 // ロールの権限を更新する
-export const updatePermissionsForRole = async (
+export const UpdatePermissionsForRole = async (
   roleId: string,
   Permissions: AdminRolePermissions
 ): Promise<boolean> => {
@@ -332,24 +374,20 @@ export const updatePermissionsForRole = async (
 };
 */
 
-func updatePermissionsForRole(roleID string, permissions []*AdminRolePermission) error {
+func UpdatePermissionsForRole(roleID string, permissions []*AdminRolePermission) *errors.VironError {
 	policies := [][]string{}
 	for _, permission := range permissions {
 		policies = append(policies, genPolicy(roleID, permission.ResourceID, permission.Permission))
 	}
 
-	var err error
-
-	if !removeRole(roleID) {
-		err = fmt.Errorf("revokeRole failed. ")
+	if _, err := removeRole(roleID); err != nil {
+		return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("removeRole %+v", err))
 	}
-	if ok, err := casbinInstance.AddPolicies(policies); err != nil {
-		err = fmt.Errorf("AddPolicies err(%v).", err)
-	} else if !ok {
-		err = fmt.Errorf("AddPolicies failed.")
+	if _, err := casbinInstance.AddPolicies(policies); err != nil {
+		return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("AddPolicies(%+v) %+v", policies, err))
 	}
 
-	return err
+	return nil
 }
 
 /*
@@ -360,9 +398,9 @@ export const removeRole = async (roleId: string): Promise<boolean> => {
 };
 */
 
-func removeRole(roleID string) bool {
+func removeRole(roleID string) (bool, error) {
 	ok, err := casbinInstance.DeleteRole(roleID)
-	return ok && err == nil
+	return ok, err
 }
 
 /*
@@ -393,13 +431,17 @@ export const hasPermissionByResourceId = async (
 */
 
 func hasPermissionByResourceID(id, resourceID string, permissions []string) bool {
+	log := logging.GetDefaultLogger()
+	log.Debug("hasPermissionByResourceID called")
 	for _, permission := range permissions {
-		if ok, err := casbinInstance.Enforce(id, resourceID, permission); !ok || err != nil {
-			return false
+		if ok, err := casbinInstance.Enforce(id, resourceID, permission); err != nil {
+			log.Debugf("Enforce %+v", err)
+		} else if ok {
+			return true
 		}
 	}
-	fmt.Println("")
-	return true
+	log.Debugf("no Permission %s %s %+v", id, resourceID, permissions)
+	return false
 }
 
 /*
@@ -579,7 +621,7 @@ export const createViewer = async (
       Permission: map[resourceId] ?? PERMISSION.READ,
     };
   });
-  await updatePermissionsForRole(ADMIN_ROLE.VIEWER, Permissions);
+  await UpdatePermissionsForRole(ADMIN_ROLE.VIEWER, Permissions);
   return true;
 };
 */
@@ -614,10 +656,64 @@ func CreateViewerRole(apiDef *openapi3.T) error {
 			})
 		}
 	}
-	if err := updatePermissionsForRole(constant.ADMIN_ROLE_VIEWER, permissions); err != nil {
+	if err := UpdatePermissionsForRole(constant.ADMIN_ROLE_VIEWER, permissions); err != nil {
 		return err
 	}
 	return nil
+}
+
+/*
+// 1件作成
+export const createOne = async (obj: AdminRole): Promise<AdminRole> => {
+  const roleId = obj.ID;
+  const policies = await listPolicies(roleId);
+  if (policies?.length) {
+    throw roleIdAlreadyExists();
+  }
+  await UpdatePermissionsForRole(roleId, obj.Permissions);
+  return obj;
+};
+*/
+func CreateAdminRoleOne(role *AdminRole) (*AdminRole, *errors.VironError) {
+	policies := listPolicies(role.ID)
+	if len(policies) > 0 {
+		return nil, errors.AdminRoleExists
+	}
+
+	if err := UpdatePermissionsForRole(role.ID, role.Permissions); err != nil {
+		return nil, err
+	}
+	return role, nil
+}
+
+/*
+// IDで1件削除
+export const removeOneById = async (roleId: string): Promise<void> => {
+  await removeRole(roleId);
+};
+
+*/
+func RemoveAdminRoleOne(roleID string) *errors.VironError {
+	if ok, err := removeRole(roleID); !ok {
+		return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("removeRole %+v", err))
+	}
+	return nil
+}
+
+/*
+// IDで1件更新
+export const updateOneById = async (
+  roleId: string,
+  Permissions: AdminRolePermissions
+): Promise<void> => {
+  await UpdatePermissionsForRole(roleId, Permissions);
+};
+
+
+*/
+
+func UpdateAdminRoleByID(roleID string, permissions []*AdminRolePermission) *errors.VironError {
+	return UpdatePermissionsForRole(roleID, permissions)
 }
 
 /*
@@ -715,29 +811,8 @@ const sync = async (now = Date.now()): Promise<void> => {
 
 
 
-// 1件作成
-export const createOne = async (obj: AdminRole): Promise<AdminRole> => {
-  const roleId = obj.ID;
-  const policies = await listPolicies(roleId);
-  if (policies?.length) {
-    throw roleIdAlreadyExists();
-  }
-  await updatePermissionsForRole(roleId, obj.Permissions);
-  return obj;
-};
 
-// IDで1件更新
-export const updateOneById = async (
-  roleId: string,
-  Permissions: AdminRolePermissions
-): Promise<void> => {
-  await updatePermissionsForRole(roleId, Permissions);
-};
 
-// IDで1件削除
-export const removeOneById = async (roleId: string): Promise<void> => {
-  await removeRole(roleId);
-};
 
 
 
