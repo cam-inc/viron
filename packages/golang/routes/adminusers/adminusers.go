@@ -5,6 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/cam-inc/viron/packages/golang/logging"
+
+	"github.com/cam-inc/viron/packages/golang/constant"
+
 	openapi_types "github.com/deepmap/oapi-codegen/pkg/types"
 
 	"github.com/cam-inc/viron/packages/golang/helpers"
@@ -52,7 +56,25 @@ func (a *adminuser) ListVironAdminUsers(w http.ResponseWriter, r *http.Request, 
 }
 
 func (a *adminuser) CreateVironAdminUser(w http.ResponseWriter, r *http.Request) {
-	panic("implement me")
+
+	payload := VironAdminUserCreatePayload{}
+	if err := helpers.BodyDecode(r, &payload); err != nil {
+		helpers.SendError(w, err.StatusCode(), err)
+		return
+	}
+	user := &domains.AdminUser{
+		Email:    string(payload.Email),
+		Password: &payload.Password,
+		AuthType: constant.AUTH_TYPE_EMAIL,
+	}
+	created, err := domains.CreateAdminUser(r.Context(), user, user.AuthType)
+	if err != nil {
+		fmt.Println(err)
+		helpers.SendError(w, http.StatusInternalServerError, err)
+		return
+	}
+	helpers.Send(w, http.StatusCreated, created)
+
 }
 
 func (a *adminuser) RemoveVironAdminUser(w http.ResponseWriter, r *http.Request, id externalRef0.VironIdPathParam) {
@@ -60,7 +82,41 @@ func (a *adminuser) RemoveVironAdminUser(w http.ResponseWriter, r *http.Request,
 }
 
 func (a *adminuser) UpdateVironAdminUser(w http.ResponseWriter, r *http.Request, id externalRef0.VironIdPathParam) {
-	panic("implement me")
+	/*
+		// 管理ユーザー更新
+		export const updateVironAdminUser = async (
+		  context: RouteContext
+		): Promise<void> => {
+		  await domainsAdminUser.updateOneById(
+		    context.params.path.id,
+		    context.requestBody
+		  );
+		  context.res.status(204).end();
+		};
+	*/
+
+	log := logging.GetDefaultLogger()
+
+	payload := VironAdminUserUpdatePayload{}
+	if err := helpers.BodyDecode(r, &payload); err != nil {
+		helpers.SendError(w, err.StatusCode(), err)
+		return
+	}
+
+	user := &domains.AdminUser{
+		Password: payload.Password,
+	}
+	if payload.RoleIds != nil {
+		user.RoleIDs = *payload.RoleIds
+	}
+
+	log.Debugf("payload %+v", payload)
+
+	if err := domains.UpdateAdminUserByID(r.Context(), string(id), user); err != nil {
+		helpers.SendError(w, err.StatusCode(), err)
+		return
+	}
+	helpers.Send(w, http.StatusNoContent, nil)
 }
 
 func New() ServerInterface {

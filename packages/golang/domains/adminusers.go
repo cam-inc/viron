@@ -4,8 +4,13 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/cam-inc/viron/packages/golang/logging"
+
+	"github.com/cam-inc/viron/packages/golang/errors"
 
 	"github.com/cam-inc/viron/packages/golang/repositories/mysql/adminusers"
 
@@ -54,16 +59,15 @@ type (
 	}
 )
 
-func CreateOne(ctx context.Context, payload *AdminUser, authType string) (*AdminUser, error) {
+func CreateAdminUser(ctx context.Context, payload *AdminUser, authType string) (*AdminUser, *errors.VironError) {
 
 	adminUser := &repositories.AdminUser{}
 
 	if authType == constant.AUTH_TYPE_EMAIL {
 		adminUser.AuthType = authType
-		email := string(payload.Email)
-		adminUser.Email = email
+		adminUser.Email = string(payload.Email)
 		if payload.Password == nil {
-			return nil, fmt.Errorf("password is nill")
+			return nil, errors.Initialize(http.StatusBadRequest, "password is nil.")
 		}
 		password := helpers.GenPassword(*payload.Password, "")
 		adminUser.Password = &password.Password
@@ -77,19 +81,18 @@ func CreateOne(ctx context.Context, payload *AdminUser, authType string) (*Admin
 		adminUser.GoogleOAuth2ExpiryDate = payload.GoogleOAuth2ExpiryDate
 	}
 
-	fmt.Printf("DEGBU CREATE ADMINUSER %+v\n", adminUser)
-	fmt.Printf("DEBUG PASS %s\n", *adminUser.Password)
-
 	entity, err := container.GetAdminUserRepository().CreateOne(ctx, adminUser)
 	if err != nil {
-		return nil, err
+		return nil, errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("adminUser createOne %+v", err))
 	}
 	entity.Bind(adminUser)
 
 	payload.ID = adminUser.ID
 
 	// Role update
-	// repositories.GetCasbinRepository()
+	if len(payload.RoleIDs) > 0 {
+		updateRolesForUser(fmt.Sprintf("%d", payload.ID), payload.RoleIDs)
+	}
 
 	return payload, nil
 }
@@ -117,6 +120,8 @@ func findOne(ctx context.Context, conditions *adminusers.AdminUserConditions) *A
 
 	user.RoleIDs = listRoles(fmt.Sprintf("%d", user.ID))
 
+	fmt.Printf("id %d email %s roleIds %+v\n", user.ID, user.Email, user.RoleIDs)
+
 	auser := &AdminUser{
 		ID:                       user.ID,
 		Email:                    user.Email,
@@ -130,6 +135,7 @@ func findOne(ctx context.Context, conditions *adminusers.AdminUserConditions) *A
 		GoogleOAuth2TokenType:    user.GoogleOAuth2TokenType,
 		CreatedAt:                user.CreatedAt,
 		UpdateAt:                 user.UpdatedAt,
+		RoleIDs:                  user.RoleIDs,
 	}
 	return auser
 }
@@ -261,6 +267,75 @@ func ListAdminUser(ctx context.Context, opts *AdminUserConditions) (*AdminUsersW
 }
 
 /*
+// IDで1件更新
+export const updateOneById = async (
+  ID: string,
+  payload: AdminUserUpdatePayload
+): Promise<void> => {
+  const repository = repositoryContainer.getAdminUserRepository();
+  const user = await findOneById(ID);
+  if (!user) {
+    throw adminUserNotFound();
+  }
+
+  const { roleIds, ...adminUser } = payload;
+  if (user.authType === AUTH_TYPE.EMAIL) {
+    const adminUserEmail = adminUser as AdminUserEmailUpdatePayload;
+    if (adminUserEmail.password) {
+      await repository.updateOneById(
+        ID,
+        genPasswordHash(adminUserEmail.password)
+      );
+    }
+  } else {
+    const adminUserGoogle = adminUser as AdminUserGoogleUpdatePayload;
+    await repository.updateOneById(ID, adminUserGoogle);
+  }
+
+  if (roleIds?.length) {
+    await updateRolesForUser(ID, roleIds);
+  }
+};
+*/
+
+func UpdateAdminUserByID(ctx context.Context, id string, payload *AdminUser) *errors.VironError {
+	user := FindByID(ctx, id)
+	if user == nil {
+		return errors.AdminUserNotfound
+	}
+	repo := container.GetAdminUserRepository()
+
+	if user.AuthType == constant.AUTH_TYPE_EMAIL {
+		if payload.Password != nil {
+			pass := helpers.GenPassword(*payload.Password, *user.Salt)
+			if pass == nil {
+				return errors.Initialize(http.StatusInternalServerError, "password gen failed.")
+			}
+
+			entity := &repositories.AdminUser{
+				ID:       user.ID,
+				Email:    user.Email,
+				AuthType: user.AuthType,
+				Password: &pass.Password,
+			}
+			if err := repo.UpdateByID(ctx, id, entity); err != nil {
+				return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("adminUser update failed. %+v", err))
+			}
+		}
+	} else {
+		// TODO: google auth type update
+	}
+
+	log := logging.GetDefaultLogger()
+	log.Debugf("roleIds %+v", payload.RoleIDs)
+
+	if len(payload.RoleIDs) > 0 {
+		updateRolesForUser(id, payload.RoleIDs)
+	}
+	return nil
+}
+
+/*
 // 1件作成
 export const createOne = async (
   payload: AdminUserCreatePayload,
@@ -301,35 +376,7 @@ const format = (adminUser: AdminUser, roleIds?: string[]): AdminUserView => {
 
 
 
-// IDで1件更新
-export const updateOneById = async (
-  ID: string,
-  payload: AdminUserUpdatePayload
-): Promise<void> => {
-  const repository = repositoryContainer.getAdminUserRepository();
-  const user = await findOneById(ID);
-  if (!user) {
-    throw adminUserNotFound();
-  }
 
-  const { roleIds, ...adminUser } = payload;
-  if (user.authType === AUTH_TYPE.EMAIL) {
-    const adminUserEmail = adminUser as AdminUserEmailUpdatePayload;
-    if (adminUserEmail.password) {
-      await repository.updateOneById(
-        ID,
-        genPasswordHash(adminUserEmail.password)
-      );
-    }
-  } else {
-    const adminUserGoogle = adminUser as AdminUserGoogleUpdatePayload;
-    await repository.updateOneById(ID, adminUserGoogle);
-  }
-
-  if (roleIds?.length) {
-    await updateRolesForUser(ID, roleIds);
-  }
-};
 
 // IDで1件削除
 export const removeOneById = async (ID: string): Promise<void> => {

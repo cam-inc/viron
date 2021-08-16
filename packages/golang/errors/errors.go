@@ -31,7 +31,7 @@ func (v *VironError) StatusCode() int {
 	return v.code
 }
 
-func initialize(code int, message string) *VironError {
+func Initialize(code int, message string) *VironError {
 	return &VironError{
 		code: code,
 		err:  fmt.Errorf(message),
@@ -39,14 +39,16 @@ func initialize(code int, message string) *VironError {
 }
 
 var (
-	RepositoryUninitialized = initialize(500, "Uninitialized repository is not available")
-	JwtUninitialized        = initialize(500, "Uninitialized jwt is not available")
-	RoleIdAlreadyExists     = initialize(400, "The role-id is already exists.")
-	SigninFailed            = initialize(400, "Signin failed")
-	UnAuthorized            = initialize(401, "Unauthorized")
-	OasUndefined            = initialize(404, "OAS is undefined")
-	AdminUserNotfound       = initialize(404, "Admin User not found.")
-	Forbidden               = initialize(403, "Forbidden")
+	RepositoryUninitialized = Initialize(500, "Uninitialized repository is not available")
+	JwtUninitialized        = Initialize(500, "Uninitialized jwt is not available")
+	RequestBodyDecodeFailed = Initialize(400, "RequestBody decode failed.")
+	RoleIdAlreadyExists     = Initialize(400, "The role-id is already exists.")
+	SigninFailed            = Initialize(400, "Signin failed")
+	AdminRoleExists         = Initialize(400, "The role-id is already exists.")
+	UnAuthorized            = Initialize(401, "Unauthorized")
+	OasUndefined            = Initialize(404, "OAS is undefined")
+	AdminUserNotfound       = Initialize(404, "Admin User not found.")
+	Forbidden               = Initialize(403, "Forbidden")
 )
 
 /**

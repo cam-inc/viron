@@ -72,8 +72,6 @@ export const listRoles = async (userId: string): Promise<string[]> => {
 */
 
 func SigninEmail(ctx context.Context, email string, password string) (string, *errors.VironError) {
-	//repositories.GetAdminUserRepository().Find(ctx)
-
 	user := domains.FindByEmail(ctx, email)
 	if user == nil {
 		payload := &domains.AdminUser{
@@ -84,7 +82,6 @@ func SigninEmail(ctx context.Context, email string, password string) (string, *e
 		var err error
 		user, err = createFirstAdminUser(ctx, payload, payload.AuthType)
 		if err != nil || user == nil {
-			fmt.Println(err)
 			return "", errors.SigninFailed
 		}
 	}
