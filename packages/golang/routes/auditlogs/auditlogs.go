@@ -3,6 +3,8 @@ package auditlogs
 import (
 	"net/http"
 
+	"github.com/cam-inc/viron/packages/golang/constant"
+
 	"github.com/cam-inc/viron/packages/golang/helpers"
 
 	"github.com/cam-inc/viron/packages/golang/domains"
@@ -56,9 +58,27 @@ func (params ListVironAuditlogsParams) convertToDomainsAuditLog() *domains.Audit
 		StatusCode:    params.StatusCode.intPtr(),
 	}
 }
+func (params ListVironAuditlogsParams) page() int {
+	if params.Page == nil {
+		return constant.DEFAULT_PAGER_PAGE
+	}
+	return params.Page.Page()
+}
+func (params ListVironAuditlogsParams) size() int {
+	if params.Size == nil {
+		return constant.DEFAULT_PAGER_SIZE
+	}
+	return params.Size.Size()
+}
+func (params ListVironAuditlogsParams) sort() []string {
+	if params.Sort == nil {
+		return []string{}
+	}
+	return params.Sort.Sort()
+}
 
 func (a auditlogsImpl) ListVironAuditlogs(w http.ResponseWriter, r *http.Request, params ListVironAuditlogsParams) {
-	pager := domains.ListAuditLog(r.Context(), params.convertToDomainsAuditLog(), params.Page.Page(), params.Size.Size(), params.Sort.Sort())
+	pager := domains.ListAuditLog(r.Context(), params.convertToDomainsAuditLog(), params.page(), params.size(), params.sort())
 	helpers.Send(w, http.StatusOK, pager)
 }
 

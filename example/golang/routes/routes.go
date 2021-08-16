@@ -201,6 +201,15 @@ func New() http.Handler {
 		},
 	})
 
+	auditlogImp := auditlogs.New()
+	auditlogs.HandlerWithOptions(auditlogImp, auditlogs.ChiServerOptions{
+		BaseRouter: routeRoot,
+		Middlewares: []auditlogs.MiddlewareFunc{
+			InjectAPIDefinition(definition),
+			JWTSecurityHandlerFunc(cfg.Auth),
+		},
+	})
+
 	routeRoot.Get("/ping", func(w http.ResponseWriter, request *http.Request) {
 		helpers.Send(w, http.StatusOK, "pong")
 	})
