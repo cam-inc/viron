@@ -2,7 +2,10 @@ package helpers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+
+	"github.com/cam-inc/viron/packages/golang/errors"
 
 	"github.com/cam-inc/viron/packages/golang/logging"
 )
@@ -23,9 +26,9 @@ func Send(w http.ResponseWriter, code int, send interface{}) {
 	}
 }
 
-func BodyDecode(r *http.Request, value interface{}) error {
+func BodyDecode(r *http.Request, value interface{}) *errors.VironError {
 	if err := json.NewDecoder(r.Body).Decode(value); err != nil {
-		return err
+		return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("requestBody json decode failed %+v", err))
 	}
 	return nil
 }

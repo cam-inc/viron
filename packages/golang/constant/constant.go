@@ -176,6 +176,8 @@ const (
 
 	DEFAULT_JWT_EXPIRATION_SEC = 24 * 60 * 60
 
+	CASBIN_SYNC_INTERVAL_MSEC = 1 * 60 * 1000
+
 	/*
 		export const COOKIE_KEY = {
 		  VIRON_AUTHORIZATION: 'viron_authorization',
