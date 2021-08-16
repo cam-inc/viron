@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
+
 	"github.com/volatiletech/sqlboiler/v4/boil"
 
 	"github.com/volatiletech/null/v8"
@@ -54,7 +56,15 @@ func (a *auditLogsPersistence) Find(ctx context.Context, conditions repositories
 }
 
 func (a *auditLogsPersistence) Count(ctx context.Context, conditions repositories.Conditions) int {
-	panic("implement me")
+	var mods []qm.QueryMod
+	if conditions != nil {
+		mods = conditions.ConvertConditionMySQL()
+	}
+	count, err := models.Auditlogs(mods...).Count(ctx, a.conn)
+	if err != nil {
+		return 0
+	}
+	return int(count)
 }
 
 func (a *auditLogsPersistence) CreateOne(ctx context.Context, entity repositories.Entity) (repositories.Entity, error) {

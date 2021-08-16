@@ -78,6 +78,10 @@ func ListAuditLog(ctx context.Context, audit *AuditLog, page, size int, sort []s
 		}
 		res.List = append(res.List, entityToAuditlog(a))
 	}
+
+	count := repo.Count(ctx, nil)
+	res.Pager = Pagging(count, size, page)
+
 	return res
 }
 
