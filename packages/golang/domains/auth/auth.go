@@ -10,7 +10,7 @@ import (
 )
 
 func createFirstAdminUser(ctx context.Context, payload *domains.AdminUser, authType string) (*domains.AdminUser, error) {
-	if domains.Count(ctx) != 0 {
+	if domains.CountAdminUser(ctx) != 0 {
 		return nil, nil
 	}
 	user, err := domains.CreateAdminUser(ctx, payload, authType)

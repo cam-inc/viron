@@ -10,28 +10,6 @@ import (
 	"github.com/cam-inc/viron/packages/golang/repositories/container"
 )
 
-/*
-// サインアウト - tokenを無効化
-export const signout = async (token?: string | null): Promise<boolean> => {
-  if (!token) {
-    return false;
-  }
-  const repository = repositoryContainer.getRevokedTokenRepository();
-  await repository.createOne({ token, revokedAt: new Date() });
-  debug('Signout token: %s', token);
-  return true;
-};
-
-// サインアウト済みか検証
-export const isSignedout = async (token?: string | null): Promise<boolean> => {
-  if (!token) {
-    return false;
-  }
-  const repository = repositoryContainer.getRevokedTokenRepository();
-  return !!(await repository.findOne({ token }));
-};
-*/
-
 func SignOut(ctx context.Context, token string) bool {
 	if token == "" {
 		fmt.Printf("debug token is empty\n")

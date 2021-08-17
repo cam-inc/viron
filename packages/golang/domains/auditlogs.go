@@ -85,14 +85,6 @@ func ListAuditLog(ctx context.Context, audit *AuditLog, page, size int, sort []s
 	return res
 }
 
-/*
-export const createOne = async (
-  payload: AuditLogCreateAttributes
-): Promise<AuditLog> => {
-  const repository = repositoryContainer.getAuditLogRepository();
-  return await repository.createOne(payload);
-};
-*/
 func CreateAuditLog(ctx context.Context, audit *AuditLog) error {
 	repo := container.GetAuditLogRepository()
 	if _, err := repo.CreateOne(ctx, auditLogToEntity(audit)); err != nil {

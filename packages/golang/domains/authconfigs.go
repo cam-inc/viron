@@ -33,42 +33,12 @@ func GenAuthConfig(provider string, authConfigType string, method string, path s
 	xDefautlRequestBody, _ := ope.Extensions[constant.OAS_X_AUTHCONFIG_DEFAULT_REQUESTBODY]
 
 	return &AuthConfig{
-			Provider:       provider,
-			AuthConfigType: authConfigType,
-			OperationID:    helpers.UpperCamelToLowerCamel(ope.OperationID),
-			//PathObject: map[string]map[string]*openapi3.Operation{
-			//	path: map[string]*openapi3.Operation{
-			//		method: ope,
-			//	},
-			//},
+			Provider:                provider,
+			AuthConfigType:          authConfigType,
+			OperationID:             helpers.UpperCamelToLowerCamel(ope.OperationID),
 			DefaultParametersValue:  xDefautlParameters,
 			DefaultRequestBodyValue: xDefautlRequestBody,
 		},
 		pathItem,
 		nil
 }
-
-/*
-export interface AuthConfig {
-  provider: AuthConfigProvider;
-  type: AuthConfigType;
-  pathObject: VironPathsObject;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  defaultParametersValue?: Record<string, any>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  defaultRequestBodyValue?: any;
-}
-
-export type AuthConfigs = AuthConfig[];
-
-export const genAuthConfig = (
-  provider: AuthConfigProvider,
-  type: AuthConfigType,
-  method: ApiMethod,
-  path: string,
-  apiDefinition: VironOpenAPIObject
-): AuthConfig => {
-
-};
-
-*/

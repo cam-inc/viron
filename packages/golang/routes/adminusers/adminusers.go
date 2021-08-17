@@ -49,7 +49,7 @@ func (a *adminuser) ListVironAdminUsers(w http.ResponseWriter, r *http.Request, 
 		return
 	}
 
-	pager := PagerToVironAdminUserListWithPager(results.Page, results.MaxPage, results.List)
+	pager := PagerToVironAdminUserListWithPager(results.CurrentPage, results.MaxPage, results.List)
 
 	helpers.Send(w, http.StatusOK, pager)
 
@@ -82,18 +82,6 @@ func (a *adminuser) RemoveVironAdminUser(w http.ResponseWriter, r *http.Request,
 }
 
 func (a *adminuser) UpdateVironAdminUser(w http.ResponseWriter, r *http.Request, id externalRef0.VironIdPathParam) {
-	/*
-		// 管理ユーザー更新
-		export const updateVironAdminUser = async (
-		  context: RouteContext
-		): Promise<void> => {
-		  await domainsAdminUser.updateOneById(
-		    context.params.path.id,
-		    context.requestBody
-		  );
-		  context.res.status(204).end();
-		};
-	*/
 
 	log := logging.GetDefaultLogger()
 
