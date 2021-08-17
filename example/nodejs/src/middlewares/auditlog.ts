@@ -1,5 +1,6 @@
 import { domainsAuditLog } from '@viron/lib';
 import { RequestHandler, Request, Response, NextFunction } from 'express';
+import { logger } from '../context';
 
 const getSourceIp = (req: Request): string | null => {
   return (
@@ -24,23 +25,24 @@ export const middlewareAuditLog = (): RequestHandler => {
     ): void => {
       res.end = originalEnd;
 
-      if (
-        !domainsAuditLog.isSkip(
+      const log = {
+        requestMethod: req.method,
+        requestUri: req.path,
+        sourceIp: getSourceIp(req),
+        userId: req._context.auth?.sub || '',
+        statusCode: res.statusCode,
+      };
+      domainsAuditLog
+        .createOneWithMasking(
           req.path,
           req.method,
-          req._context.apiDefinition
+          req._context.apiDefinition,
+          log,
+          req.body
         )
-      ) {
-        const log = {
-          requestMethod: req.method,
-          requestUri: req.path,
-          sourceIp: getSourceIp(req),
-          userId: req._context.auth?.sub || '',
-          requestBody: JSON.stringify(req.body || {}),
-          statusCode: res.statusCode,
-        };
-        domainsAuditLog.createOne(log);
-      }
+        .catch((e) => {
+          logger.warn('AuditLog Create fail. %o', e);
+        });
 
       if (cb) {
         res.end(chunk, encoding as BufferEncoding, cb);
