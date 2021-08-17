@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import copy from 'fast-copy';
 import jsonPointer from 'json-pointer';
 import traverse from 'json-schema-traverse';
@@ -35,7 +36,6 @@ const schemaPathToRegExp = (
 
 const defaultFilter = (): boolean => true;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type SchemaFilter = (value: any, schemaPath: string) => boolean;
 
 // json-schemaに対してfilterにmatchするschemaPathの正規表現取得
@@ -44,7 +44,6 @@ export const listSchemaPathRegExp = (
   filter: SchemaFilter = defaultFilter
 ): RegExp[] => {
   const list: RegExp[] = [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   traverse(jsonSchema, (value: any, schemaPath: string): void => {
     schemaPath &&
       filter(value, schemaPath) &&
@@ -53,20 +52,16 @@ export const listSchemaPathRegExp = (
   return list;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type SchemaReplacer = (value: any) => any;
 
 // value内の正規表現に一致する値に対しreplacerを実行する
 export const replaceSchemaValueByRegExp = (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: Record<string, any>,
   regexps: RegExp | RegExp[],
   replacer: SchemaReplacer
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Record<string, any> => {
   const matchers = Array.isArray(regexps) ? regexps : [regexps];
   const newValue = copy(value);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   jsonPointer.walk(newValue, (v: any, p: string): void => {
     if (matchers.some((reg) => reg.test(p))) {
       jsonPointer.set(newValue, p, replacer(v));
