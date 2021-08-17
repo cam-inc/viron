@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -68,7 +69,9 @@ func Verify(token string) (*Claim, error) {
 		return nil, errors.JwtUninitialized
 	}
 
-	// TODO: token revoked check
+	if IsSignedOut(context.Background(), token) {
+		return nil, fmt.Errorf("this token is revoked %s", token)
+	}
 
 	jwtToken, err := jwtauth.VerifyToken(jwt.jwtAuth, token)
 	if err != nil {
@@ -86,22 +89,3 @@ func Verify(token string) (*Claim, error) {
 
 	return claim, nil
 }
-
-/*
-// JWT検証
-export const verifyJwt = async (
-  token?: string | null
-): Promise<JwtClaims | null> => {
-  if (!jwt) {
-    throw jwtUninitialized();
-  }
-  if (!token) {
-    return null;
-  }
-  if (await isSignedout(token)) {
-    debug('Already signed out. token: %s', token);
-    return null;
-  }
-  return await jwt.verify(token);
-};
-*/

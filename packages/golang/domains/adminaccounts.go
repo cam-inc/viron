@@ -22,54 +22,39 @@ type (
 		Salt     *string  `json:"salt"`
 		RoleIDs  []string `json:"roleIds"`
 	}
+
+	/*
+		AdminUsersWithPager struct {
+				Pager
+				List []*AdminUser `json:"list"`
+			}
+	*/
+	AdminAccountsWithPager struct {
+		Pager
+		List []*AdminAccount `json:"list"`
+	}
 )
 
-/*
-// 一覧取得(idを指定するので結果は必ず1件)
-export const listById = async (
-  id: string
-): Promise<ListWithPager<AdminUserView>> => {
-  const repository = repositoryContainer.getAdminUserRepository();
-  const result = await repository.findWithPager({ id });
-  const adminRoles = await Promise.all(
-    result.list.map((adminUser) => listRoles(adminUser.id))
-  );
-  return {
-    ...result,
-    list: result.list.map((adminUser) =>
-      formatAdminUser(adminUser, adminRoles.shift())
-    ),
-  };
-};
-*/
-
 // ListAccountByID 一覧取得(idを指定するので結果は必ず1件)
-func ListAccountByID(ctx context.Context, userID string) *helpers.PagerResults {
+func ListAccountByID(ctx context.Context, userID string) *AdminAccountsWithPager {
 	user := FindByID(ctx, userID)
-	return helpers.Paging([]interface{}{user}, 1, 1)
+	pager := &AdminAccountsWithPager{
+		List: []*AdminAccount{
+			&AdminAccount{
+				ID:       user.ID,
+				Email:    user.Email,
+				AuthType: user.AuthType,
+				Password: user.Password,
+				Salt:     user.Salt,
+				RoleIDs:  user.RoleIDs,
+			},
+		},
+	}
+	pager.Pager = Pagging(1, 1, 1)
+	return pager
 }
 
-/*
-// IDで1件更新
-export const updateOneById = async (
-  id: string,
-  payload: AdminAccountUpdatePayload
-): Promise<void> => {
-  const repository = repositoryContainer.getAdminUserRepository();
-  const user = await findOneById(id);
-  if (!user) {
-    throw adminUserNotFound();
-  }
-
-  if (user.authType === AUTH_TYPE.EMAIL) {
-    await repository.updateOneById(id, genPasswordHash(payload.password));
-  } else {
-    throw forbidden();
-  }
-};
-
-*/
-
+// UpdateAccountByID IDで1件更新
 func UpdateAccountByID(ctx context.Context, userID string, payload *AdminAccount) error {
 	user := FindByID(ctx, userID)
 	if user == nil {

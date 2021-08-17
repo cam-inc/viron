@@ -3,7 +3,6 @@ package domains
 import (
 	"context"
 	"fmt"
-	"math"
 	"net/http"
 	"strconv"
 	"time"
@@ -43,9 +42,8 @@ type (
 	}
 
 	AdminUsersWithPager struct {
-		Page    int          `json:"currentPage"`
-		MaxPage int          `json:"maxPage"`
-		List    []*AdminUser `json:"list"`
+		Pager
+		List []*AdminUser `json:"list"`
 	}
 
 	AdminUserConditions struct {
@@ -59,6 +57,7 @@ type (
 	}
 )
 
+// CreateAdminUser adminUser insert
 func CreateAdminUser(ctx context.Context, payload *AdminUser, authType string) (*AdminUser, *errors.VironError) {
 
 	adminUser := &repositories.AdminUser{}
@@ -97,13 +96,10 @@ func CreateAdminUser(ctx context.Context, payload *AdminUser, authType string) (
 	return payload, nil
 }
 
-func Count(ctx context.Context) int {
+// CountAdminUser adminUserレコード数をカウント
+func CountAdminUser(ctx context.Context) int {
 	repo := container.GetAdminUserRepository()
 	return repo.Count(ctx, nil)
-	/*
-	    const repository = repositoryContainer.getAdminUserRepository();
-	  return await repository.count();
-	*/
 }
 
 func findOne(ctx context.Context, conditions *adminusers.AdminUserConditions) *AdminUser {
@@ -119,8 +115,6 @@ func findOne(ctx context.Context, conditions *adminusers.AdminUserConditions) *A
 	result[0].Bind(user)
 
 	user.RoleIDs = listRoles(fmt.Sprintf("%d", user.ID))
-
-	fmt.Printf("id %d email %s roleIds %+v\n", user.ID, user.Email, user.RoleIDs)
 
 	auser := &AdminUser{
 		ID:                       user.ID,
@@ -140,6 +134,7 @@ func findOne(ctx context.Context, conditions *adminusers.AdminUserConditions) *A
 	return auser
 }
 
+// FindByEmail emailで1件取得
 func FindByEmail(ctx context.Context, email string) *AdminUser {
 
 	conditions := &adminusers.AdminUserConditions{
@@ -149,21 +144,7 @@ func FindByEmail(ctx context.Context, email string) *AdminUser {
 	return findOne(ctx, conditions)
 }
 
-/*
-// IDで1件取得
-export const findOneById = async (
-  ID: string
-): Promise<AdminUserView | null> => {
-  const repository = repositoryContainer.getAdminUserRepository();
-  const user = await repository.findOneById(ID);
-  if (!user) {
-    return null;
-  }
-  const roleIds = await listRoles(user.ID);
-  return format(user, roleIds);
-};
-*/
-
+// FindByID IDで1件取得
 func FindByID(ctx context.Context, userID string) *AdminUser {
 
 	userIDInt, err := strconv.Atoi(userID)
@@ -178,32 +159,7 @@ func FindByID(ctx context.Context, userID string) *AdminUser {
 	return findOne(ctx, conditions)
 }
 
-/*
-// 一覧取得
-export const list = async (
-  conditions: FindConditions<AdminUser> & { roleId?: string } = {},
-  size?: number,
-  page?: number,
-  sort?: string[]
-): Promise<ListWithPager<AdminUserView>> => {
-  const repository = repositoryContainer.getAdminUserRepository();
-  if (conditions.roleId) {
-    const userIds = await listUsers(conditions.roleId);
-    conditions = Object.assign({}, conditions, { userIds });
-    delete conditions.roleId;
-  }
-  const result = await repository.findWithPager(conditions, size, page, sort);
-  const adminRoles = await Promise.all(
-    result.list.map((adminUser) => listRoles(adminUser.ID))
-  );
-  return {
-    ...result,
-    list: result.list.map((adminUser) => format(adminUser, adminRoles.shift())),
-  };
-};
-
-*/
-
+// ListAdminUser 一覧取得
 func ListAdminUser(ctx context.Context, opts *AdminUserConditions) (*AdminUsersWithPager, error) {
 
 	repo := container.GetAdminUserRepository()
@@ -250,54 +206,13 @@ func ListAdminUser(ctx context.Context, opts *AdminUserConditions) (*AdminUsersW
 			UpdateAtInt:  entity.UpdatedAt.Unix(),
 		})
 	}
-	withPager.Page = conditions.Page
-	count := Count(ctx)
-	if count > 0 {
-		withPager.MaxPage = int(math.Ceil(float64(count) / float64(conditions.Size)))
-	} else {
-		withPager.MaxPage = constant.DEFAULT_PAGER_SIZE
-	}
-	fmt.Printf("pager %+v\n", withPager)
-	/*
-		maxPage =
-		    numberOfList > 0 ? Math.ceil(numberOfList / size) : DEFAULT_PAGER_PAGE;
-	*/
-
+	count := CountAdminUser(ctx)
+	pager := Pagging(count, conditions.Size, conditions.Page)
+	withPager.Pager = pager
 	return withPager, nil
 }
 
-/*
-// IDで1件更新
-export const updateOneById = async (
-  ID: string,
-  payload: AdminUserUpdatePayload
-): Promise<void> => {
-  const repository = repositoryContainer.getAdminUserRepository();
-  const user = await findOneById(ID);
-  if (!user) {
-    throw adminUserNotFound();
-  }
-
-  const { roleIds, ...adminUser } = payload;
-  if (user.authType === AUTH_TYPE.EMAIL) {
-    const adminUserEmail = adminUser as AdminUserEmailUpdatePayload;
-    if (adminUserEmail.password) {
-      await repository.updateOneById(
-        ID,
-        genPasswordHash(adminUserEmail.password)
-      );
-    }
-  } else {
-    const adminUserGoogle = adminUser as AdminUserGoogleUpdatePayload;
-    await repository.updateOneById(ID, adminUserGoogle);
-  }
-
-  if (roleIds?.length) {
-    await updateRolesForUser(ID, roleIds);
-  }
-};
-*/
-
+// UpdateAdminUserByID IDで1件更新
 func UpdateAdminUserByID(ctx context.Context, id string, payload *AdminUser) *errors.VironError {
 	user := FindByID(ctx, id)
 	if user == nil {
@@ -334,79 +249,3 @@ func UpdateAdminUserByID(ctx context.Context, id string, payload *AdminUser) *er
 	}
 	return nil
 }
-
-/*
-// 1件作成
-export const createOne = async (
-  payload: AdminUserCreatePayload,
-  authType: AuthType = AUTH_TYPE.EMAIL
-): Promise<AdminUserView> => {
-  const repository = repositoryContainer.getAdminUserRepository();
-  const { roleIds, ...adminUser } = payload;
-
-  let obj;
-  if (authType === AUTH_TYPE.EMAIL) {
-    const adminUserEmail = adminUser as AdminUserEmailCreatePayload;
-    obj = {
-      authType: AUTH_TYPE.EMAIL,
-      ...adminUserEmail,
-      ...genPasswordHash(adminUserEmail.password),
-    } as AdminUserEmailCreateAttributes;
-  } else {
-    const adminUserGoogle = adminUser as AdminUserGoogleCreatePayload;
-    obj = {
-      authType: AUTH_TYPE.GOOGLE,
-      ...adminUserGoogle,
-    } as AdminUserGoogleCreateAttributes;
-  }
-  const user = await repository.createOne(obj);
-
-  if (roleIds?.length) {
-    await updateRolesForUser(user.ID, roleIds);
-  }
-  return format(user, roleIds);
-};
-*/
-
-/*
-const format = (adminUser: AdminUser, roleIds?: string[]): AdminUserView => {
-  return Object.assign({}, adminUser, { roleIds: roleIds ?? [] });
-};
-
-
-
-
-
-
-// IDで1件削除
-export const removeOneById = async (ID: string): Promise<void> => {
-  const repository = repositoryContainer.getAdminUserRepository();
-  const user = await findOneById(ID);
-  if (!user) {
-    throw adminUserNotFound();
-  }
-  await Promise.all([repository.removeOneById(ID), revokeRoleForUser(ID)]);
-};
-
-
-
-// emailで1件取得
-export const findOneByEmail = async (
-  email: string
-): Promise<AdminUserView | null> => {
-  const repository = repositoryContainer.getAdminUserRepository();
-  const user = await repository.findOne({ email });
-  if (!user) {
-    return null;
-  }
-  const roleIds = await listRoles(user.ID);
-  return format(user, roleIds);
-};
-
-// 件数取得
-export const count = async (): Promise<number> => {
-  const repository = repositoryContainer.getAdminUserRepository();
-  return await repository.count();
-};
-
-*/

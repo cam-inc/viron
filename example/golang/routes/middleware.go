@@ -286,7 +286,7 @@ func InjectAuditLog(next http.Handler) http.Handler {
 			}
 
 			if token, err := helpers.GetCookieToken(r); err == nil {
-				if claim, err := auth.Verify(token); err == nil {
+				if claim, err := auth.Verify(token); err == nil && claim != nil {
 					userID = claim.Sub
 				}
 			}
