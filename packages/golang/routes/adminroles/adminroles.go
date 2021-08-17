@@ -94,16 +94,6 @@ func (a *adminroleImpl) ListVironAdminRoles(w http.ResponseWriter, r *http.Reque
 
 }
 
-/*
-// 管理ロール作成
-export const createVironAdminRole = async (
-  context: RouteContext
-): Promise<void> => {
-  const result = await domainsAdminRole.createOne(context.requestBody);
-  context.res.status(201).json(result);
-};
-*/
-
 func (a *adminroleImpl) CreateVironAdminRole(w http.ResponseWriter, r *http.Request) {
 	role := &domains.AdminRole{}
 	if err := helpers.BodyDecode(r, role); err != nil {
@@ -121,16 +111,6 @@ func (a *adminroleImpl) CreateVironAdminRole(w http.ResponseWriter, r *http.Requ
 }
 
 func (a *adminroleImpl) RemoveVironAdminRole(w http.ResponseWriter, r *http.Request, id externalRef0.VironIdPathParam) {
-	/*
-		// 管理ロール削除
-		export const removeVironAdminRole = async (
-		  context: RouteContext
-		): Promise<void> => {
-		  await domainsAdminRole.removeOneById(context.params.path.id);
-		  context.res.status(204).end();
-		};
-
-	*/
 
 	if err := domains.RemoveAdminRoleOne(string(id)); err != nil {
 		helpers.SendError(w, err.StatusCode(), err)
@@ -140,18 +120,6 @@ func (a *adminroleImpl) RemoveVironAdminRole(w http.ResponseWriter, r *http.Requ
 }
 
 func (a *adminroleImpl) UpdateVironAdminRole(w http.ResponseWriter, r *http.Request, id externalRef0.VironIdPathParam) {
-	/*
-		// 管理ロール更新
-		export const updateVironAdminRole = async (
-		  context: RouteContext
-		): Promise<void> => {
-		  await domainsAdminRole.updateOneById(
-		    context.params.path.id,
-		    context.requestBody.permissions
-		  );
-		  context.res.status(204).end();
-		};
-	*/
 
 	payload := VironAdminRoleUpdatePayload{}
 	if err := helpers.BodyDecode(r, &payload); err != nil {

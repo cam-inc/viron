@@ -14,21 +14,6 @@ type (
 	}
 )
 
-/*
-func getPagerResults(listNum, size, page int) *PagerResults {
-	maxPage := constant.DEFAULT_PAGER_PAGE
-
-	if listNum > 0 {
-		maxPage = int(math.Ceil(float64(listNum) / float64(size)))
-	}
-
-	return &PagerResults{
-		CurrentPage: page,
-		MaxPage:     maxPage,
-	}
-}
-*/
-
 func Pagging(listNum, size, page int) Pager {
 	maxPage := constant.DEFAULT_PAGER_PAGE
 

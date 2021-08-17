@@ -23,28 +23,19 @@ import (
 )
 
 type (
-	/*
-		export interface AdminRolePermission {
-		  resourceId: string;
-		  Permission: Permission;
-		}
-	*/
-
 	AdminRolePermission struct {
 		ResourceID string `json:"resourceId"`
 		Permission string `json:"permission"`
 	}
 
-	/*
-		export interface AdminRole {
-		  ID: string;
-		  Permissions: AdminRolePermissions;
-		}
-	*/
-
 	AdminRole struct {
 		ID          string                 `json:"id"`
 		Permissions []*AdminRolePermission `json:"permissions,omitempty"`
+	}
+
+	AdminRolesWithPager struct {
+		Pager
+		List []*AdminRole `json:"list"`
 	}
 )
 
@@ -130,11 +121,6 @@ func NewFile(filePath string) error {
 	return new(m, filePath)
 }
 
-/*
-const getPermissions = (Permissions?: Permission[]): Permission[] =>
-  Permissions?.length ? Permissions : Object.values(PERMISSION);
-*/
-
 func getPermissions(permissions []string) []string {
 	if len(permissions) == 0 {
 		return []string{
@@ -146,13 +132,6 @@ func getPermissions(permissions []string) []string {
 	return permissions
 }
 
-/*
-const genPolicy = (
-  roleId: string,
-  resourceId: string,
-  Permission: Permission
-): Policy => [roleId, resourceId, Permission];
-*/
 func genPolicy(roleID, resourceID, permission string) []string {
 	return []string{
 		roleID,
@@ -161,17 +140,7 @@ func genPolicy(roleID, resourceID, permission string) []string {
 	}
 }
 
-/*
-// casbinインスタンスとDBの差異を解消するために同期する
-const sync = async (now = Date.now()): Promise<void> => {
-  const casbin = repositoryContainer.getCasbin();
-  if (repositoryContainer.casbinSyncedTime + CASBIN_SYNC_INTERVAL_MSEC > now) {
-    await casbin.loadPolicy();
-    repositoryContainer.casbinSyncedTime = now;
-  }
-};
-*/
-
+// sync casbinインスタンスとDBの差異を解消するために同期する
 func sync() {
 	if casbinInstance == nil {
 		return
@@ -185,21 +154,6 @@ func sync() {
 	}
 }
 
-/*
-// ポリシー一覧を取得
-export const listPolicies = async (
-  roleId?: string
-): Promise<ParsedPolicy[]> => {
-  const casbin = repositoryContainer.getCasbin();
-  await sync();
-  const policies = roleId
-    ? await casbin.getFilteredPolicy(0, roleId)
-    : await casbin.getPolicy();
-  return policies.map((policy) => parsePolicy(policy as Policy));
-};
-
-*/
-
 // listPolicies policy structure is [roleID, resourceID, permission] all string. this func return type policy slice
 func listPolicies(roleID string) [][]string {
 	var policies [][]string
@@ -211,25 +165,12 @@ func listPolicies(roleID string) [][]string {
 	return policies
 }
 
-/*
-// APIメソッドをPermissionに変換
-export const method2Permissions = (method: ApiMethod): Permission[] =>
-  permissionMap[method];
-*/
-
+// method2Permissions APIメソッドをPermissionに変換
 func method2Permissions(method string) []string {
 	return permissionMap[method]
 }
 
-/*
-// ロール一覧を取得
-export const listRoles = async (userId: string): Promise<string[]> => {
-  const casbin = repositoryContainer.getCasbin();
-  await sync();
-  return await casbin.getRolesForUser(userId);
-};
-*/
-
+// listRoles ロール一覧を取得
 func listRoles(userID string) []string {
 	roles, err := casbinInstance.GetRolesForUser(userID)
 	if err != nil {
@@ -239,16 +180,7 @@ func listRoles(userID string) []string {
 	return roles
 }
 
-/*
-// 指定したロールを持つユーザーの一覧を取得
-export const listUsers = async (roleId: string): Promise<string[]> => {
-  const casbin = repositoryContainer.getCasbin();
-  await sync();
-  return await casbin.getUsersForRole(roleId);
-};
-
-*/
-
+// listUser 指定したロールを持つユーザーの一覧を取得
 func listUsers(roleID string) []string {
 	userIDs, err := casbinInstance.GetUsersForRole(roleID)
 	if err != nil {
@@ -257,17 +189,7 @@ func listUsers(roleID string) []string {
 	return userIDs
 }
 
-/*
-// ユーザーにロールを付与する
-export const addRoleForUser = async (
-  userId: string,
-  roleId: string
-): Promise<boolean> => {
-  const casbin = repositoryContainer.getCasbin();
-  return casbin.addRoleForUser(userId, roleId);
-};
-
-*/
+// AddRoleForUser ユーザーにロールを付与する
 func AddRoleForUser(userID, roleID string) bool {
 	ok, err := casbinInstance.AddRoleForUser(userID, roleID)
 	if err != nil {
@@ -276,18 +198,7 @@ func AddRoleForUser(userID, roleID string) bool {
 	return ok && err == nil
 }
 
-/*
-// ユーザーのロールを更新する
-export const updateRolesForUser = async (
-  userId: string,
-  roleIds: string[]
-): Promise<void> => {
-  await revokeRoleForUser(userId);
-  await Promise.all(
-    roleIds.map((roleId: string) => addRoleForUser(userId, roleId))
-  );
-};
-*/
+// updateRolesForUser ユーザーのロールを更新する
 func updateRolesForUser(userID string, roleIDs []string) {
 	RevokeRoleForUser(userID, "")
 	for _, roleID := range roleIDs {
@@ -296,19 +207,7 @@ func updateRolesForUser(userID string, roleIDs []string) {
 
 }
 
-/*
-// ユーザーからロールを剥奪する
-export const revokeRoleForUser = async (
-  userId: string,
-  roleId?: string
-): Promise<boolean> => {
-  const casbin = repositoryContainer.getCasbin();
-  return roleId
-    ? await casbin.deleteRoleForUser(userId, roleId)
-    : await casbin.deleteUser(userId);
-};
-*/
-
+// RevekeRoleForUser ユーザーからロールを剥奪する
 func RevokeRoleForUser(userID, roleID string) bool {
 	var ok bool
 	var err error
@@ -326,23 +225,7 @@ func RevokeRoleForUser(userID, roleID string) bool {
 	return ok && err == nil
 }
 
-/*
-// ロールから権限を剥奪する
-export const revokePermissionForRole = async (
-  roleId: string,
-  resourceId: string,
-  Permissions?: Permission[]
-): Promise<boolean> => {
-  const casbin = repositoryContainer.getCasbin();
-  Permissions = getPermissions(Permissions);
-  const policies = Permissions.map((Permission: Permission) =>
-    genPolicy(roleId, resourceId, Permission)
-  );
-  await Promise.all(policies.map((policy) => casbin.removePolicy(...policy)));
-  return true;
-};
-*/
-
+// RevekePermissionForRole ロールから権限を剥奪する
 func RevokePermissionForRole(roleID, resourceID string, permissions []string) bool {
 	permissions = getPermissions(permissions)
 	policies := [][]string{}
@@ -357,23 +240,7 @@ func RevokePermissionForRole(roleID, resourceID string, permissions []string) bo
 	return ok
 }
 
-/*
-// ロールの権限を更新する
-export const UpdatePermissionsForRole = async (
-  roleId: string,
-  Permissions: AdminRolePermissions
-): Promise<boolean> => {
-  const casbin = repositoryContainer.getCasbin();
-  const policies = Permissions.map(
-    ({ resourceId, Permission }): Policy =>
-      genPolicy(roleId, resourceId, Permission)
-  );
-  await removeRole(roleId);
-  await Promise.all(policies.map((policy) => casbin.addPolicy(...policy)));
-  return true;
-};
-*/
-
+// UpdatePermissionsForRole ロールの権限を更新する
 func UpdatePermissionsForRole(roleID string, permissions []*AdminRolePermission) *errors.VironError {
 	policies := [][]string{}
 	for _, permission := range permissions {
@@ -390,46 +257,13 @@ func UpdatePermissionsForRole(roleID string, permissions []*AdminRolePermission)
 	return nil
 }
 
-/*
-// ロールを削除する
-export const removeRole = async (roleId: string): Promise<boolean> => {
-  const casbin = repositoryContainer.getCasbin();
-  return await casbin.deleteRole(roleId);
-};
-*/
-
+// removeRole ロールを削除する
 func removeRole(roleID string) (bool, error) {
 	ok, err := casbinInstance.DeleteRole(roleID)
 	return ok, err
 }
 
-/*
-// idがリソースを操作する権限を持っているかチェック
-export const hasPermissionByResourceId = async (
-  ID: string,
-  resourceId: string,
-  Permissions: Permission[]
-): Promise<boolean> => {
-  const casbin = repositoryContainer.getCasbin();
-  await sync();
-  const tasks = Permissions.map((Permission) =>
-    casbin.enforce(ID, resourceId, Permission)
-  );
-  for await (const allowed of tasks) {
-    if (allowed) {
-      return true;
-    }
-  }
-  debug(
-    'Don`t have Permission to access. ID: %s, resourceId: %s, Permissions: %O',
-    ID,
-    resourceId,
-    Permissions
-  );
-  return false;
-};
-*/
-
+// hasPermissionByResourceID idがリソースを操作する権限を持っているかチェック
 func hasPermissionByResourceID(id, resourceID string, permissions []string) bool {
 	log := logging.GetDefaultLogger()
 	log.Debug("hasPermissionByResourceID called")
@@ -444,28 +278,7 @@ func hasPermissionByResourceID(id, resourceID string, permissions []string) bool
 	return false
 }
 
-/*
-// ユーザーがリソースを操作する権限を持っているかチェック
-export const hasPermission = async (
-  userId: string,
-  requestUri: string,
-  requestMethod: ApiMethod,
-  apiDefinition: VironOpenAPIObject
-): Promise<boolean> => {
-  const resourceId = getResourceId(requestUri, requestMethod, apiDefinition);
-  if (!resourceId) {
-    // TODO: セキュリティ的にあまりよくないのであとでなんとかする
-    return true;
-  }
-  return await hasPermissionByResourceId(
-    userId,
-    resourceId,
-    method2Permissions(requestMethod)
-  );
-};
-
-*/
-
+// hasPermission ユーザーがリソースを操作する権限を持っているかチェック
 func hasPermission(userID, requestURI, requestMethod string, apiDef *openapi3.T) bool {
 	resourceID := getResourceID(requestURI, requestMethod, apiDef)
 	if resourceID == "" {
@@ -474,30 +287,8 @@ func hasPermission(userID, requestURI, requestMethod string, apiDef *openapi3.T)
 	return hasPermissionByResourceID(userID, resourceID, method2Permissions(requestMethod))
 }
 
+// ListResourcesByOas resource一覧
 func ListResourcesByOas(apiDef *openapi3.T) []string {
-	/*
-		// リソース一覧
-		export const listResourcesByOas = (
-		  apiDefinitions: VironOpenAPIObject
-		): string[] => {
-		  const pages = apiDefinitions.info[OAS_X_PAGES];
-		  if (!pages?.length) {
-		    return [];
-		  }
-		  const result = pages
-		    .map((page) =>
-		      (page?.[OAS_X_PAGE_CONTENTS] ?? []).map(
-		        (content) => content[OAS_X_PAGE_CONTENT_RESOURCE_ID]
-		      )
-		    )
-		    .flat()
-		    .sort();
-		  return result;
-		};
-
-	*/
-
-	// apiDef.Info.ExtensionProps.Extensions[constant.OAS_X_PAGES]
 
 	extentions := helpers.ConvertExtentions(apiDef)
 	resources := []string{}
@@ -514,41 +305,8 @@ func ListResourcesByOas(apiDef *openapi3.T) []string {
 	return resources
 }
 
-/*
-// 管理ロール一覧
-export const listByOas = async (
-  apiDefinitions: VironOpenAPIObject
-): Promise<ListWithPager<AdminRole>> => {
-  const policies = await listPolicies();
-  const resourceIds = listResourcesByOas(apiDefinitions);
-
-  const map = policies.reduce(
-    (
-      ret: Record<string, Record<string, Permission>>,
-      { roleId, resourceId, Permission }
-    ) => {
-      ret[roleId] = ret[roleId] || {};
-      ret[roleId][resourceId] = Permission;
-      return ret;
-    },
-    {}
-  );
-  const result = Object.keys(map).map((roleId) => {
-    return {
-      ID: roleId,
-      Permissions: resourceIds.map((resourceId: string) => {
-        return {
-          resourceId,
-          Permission: map[roleId][resourceId] ?? PERMISSION.DENY,
-        };
-      }),
-    };
-  });
-  return paging(result, result.length);
-};
-*/
-
-func ListByOas(apiDef *openapi3.T) *helpers.PagerResults {
+// ListByOas 管理ロール一覧
+func ListByOas(apiDef *openapi3.T) *AdminRolesWithPager {
 
 	log := logging.GetDefaultLogger()
 
@@ -592,40 +350,16 @@ func ListByOas(apiDef *openapi3.T) *helpers.PagerResults {
 		result = append(result, role)
 	}
 
-	return helpers.Paging(result, len(result), constant.DEFAULT_PAGER_PAGE)
+	//helpers.Paging(result, len(result), constant.DEFAULT_PAGER_PAGE)
+	pager := &AdminRolesWithPager{
+		List: result,
+	}
+	pager.Pager = Pagging(len(result), len(result), constant.DEFAULT_PAGER_PAGE)
+	return pager
 
 }
 
-/*
-// viewerロールを作成
-export const createViewer = async (
-  apiDefinitions: VironOpenAPIObject
-): Promise<boolean> => {
-  const policies = await listPolicies(ADMIN_ROLE.VIEWER);
-  const resourceIds = listResourcesByOas(apiDefinitions);
-  if (policies.length === resourceIds.length) {
-    // 更新するものがないので何もしない
-    return false;
-  }
-
-  const map = policies.reduce(
-    (ret: Record<string, Permission>, policy: ParsedPolicy) => {
-      ret[policy.resourceId] = policy.Permission;
-      return ret;
-    },
-    {}
-  );
-  const Permissions = resourceIds.map((resourceId: string) => {
-    return {
-      resourceId,
-      Permission: map[resourceId] ?? PERMISSION.READ,
-    };
-  });
-  await UpdatePermissionsForRole(ADMIN_ROLE.VIEWER, Permissions);
-  return true;
-};
-*/
-
+// CreateViewerRole viewerロールを作成
 func CreateViewerRole(apiDef *openapi3.T) error {
 	policies := listPolicies(constant.ADMIN_ROLE_VIEWER)
 	resourceIDs := ListResourcesByOas(apiDef)
@@ -662,18 +396,7 @@ func CreateViewerRole(apiDef *openapi3.T) error {
 	return nil
 }
 
-/*
-// 1件作成
-export const createOne = async (obj: AdminRole): Promise<AdminRole> => {
-  const roleId = obj.ID;
-  const policies = await listPolicies(roleId);
-  if (policies?.length) {
-    throw roleIdAlreadyExists();
-  }
-  await UpdatePermissionsForRole(roleId, obj.Permissions);
-  return obj;
-};
-*/
+// CreateAdminRoleOne 1件作成
 func CreateAdminRoleOne(role *AdminRole) (*AdminRole, *errors.VironError) {
 	policies := listPolicies(role.ID)
 	if len(policies) > 0 {
@@ -686,13 +409,7 @@ func CreateAdminRoleOne(role *AdminRole) (*AdminRole, *errors.VironError) {
 	return role, nil
 }
 
-/*
-// IDで1件削除
-export const removeOneById = async (roleId: string): Promise<void> => {
-  await removeRole(roleId);
-};
-
-*/
+// RemoveAdminRoleOne IDで1件削除
 func RemoveAdminRoleOne(roleID string) *errors.VironError {
 	if ok, err := removeRole(roleID); !ok {
 		return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("removeRole %+v", err))
@@ -700,120 +417,7 @@ func RemoveAdminRoleOne(roleID string) *errors.VironError {
 	return nil
 }
 
-/*
-// IDで1件更新
-export const updateOneById = async (
-  roleId: string,
-  Permissions: AdminRolePermissions
-): Promise<void> => {
-  await UpdatePermissionsForRole(roleId, Permissions);
-};
-
-
-*/
-
+// UpdateAdminRoleByID IDで1件更新
 func UpdateAdminRoleByID(roleID string, permissions []*AdminRolePermission) *errors.VironError {
 	return UpdatePermissionsForRole(roleID, permissions)
 }
-
-/*
-
-       this.casbin = await newEnforcer(
-          domainsAdminRole.rbacModel,
-          casbinSequelizeAdapter
-        );
-
-
-
-import { newModel } from 'casbin';
-import { roleIdAlreadyExists } from '../errors';
-import {
-  ADMIN_ROLE,
-  API_METHOD,
-  ApiMethod,
-  PERMISSION,
-  Permission,
-  OAS_X_PAGES,
-  OAS_X_PAGE_CONTENTS,
-  OAS_X_PAGE_CONTENT_RESOURCE_ID,
-  CASBIN_SYNC_INTERVAL_MSEC,
-} from '../constants';
-import { ListWithPager, paging } from '../helpers';
-import { repositoryContainer } from '../repositories';
-import { getResourceId, VironOpenAPIObject } from './oas';
-import { getDebug } from '../logging';
-
-const debug = getDebug('domains:adminrole');
-
-export interface AdminRolePermission {
-  resourceId: string;
-  Permission: Permission;
-}
-
-export type AdminRolePermissions = AdminRolePermission[];
-
-export interface AdminRole {
-  ID: string;
-  Permissions: AdminRolePermissions;
-}
-
-export type Policy = [string, string, Permission];
-
-interface ParsedPolicy {
-  roleId: string;
-  resourceId: string;
-  Permission: Permission;
-}
-
-
-
-
-
-
-const parsePolicy = (policy: Policy): ParsedPolicy => {
-  return {
-    roleId: policy[0],
-    resourceId: policy[1],
-    Permission: policy[2],
-  };
-};
-
-// casbinインスタンスとDBの差異を解消するために同期する
-const sync = async (now = Date.now()): Promise<void> => {
-  const casbin = repositoryContainer.getCasbin();
-  if (repositoryContainer.casbinSyncedTime + CASBIN_SYNC_INTERVAL_MSEC > now) {
-    await casbin.loadPolicy();
-    repositoryContainer.casbinSyncedTime = now;
-  }
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-*/
