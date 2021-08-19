@@ -7,8 +7,7 @@ import { Config, MongoConfig } from '.';
 export const get = (): Config => {
   const mongo: MongoConfig = {
     type: 'mongo',
-    openUri:
-      'mongodb://development-docdb-cluster.in.viron.work:27017?replicaSet=rs0&readPreference=secondaryPreferred',
+    openUri: process.env.MONGODB_CONNECTION_URI || '',
     connectOptions: {
       // MongoDB Options
       dbName: 'viron_example',
@@ -38,7 +37,7 @@ export const get = (): Config => {
     auth: {
       jwt: {
         secret: process.env.JWT_SECRET ?? '',
-        provider: 'viron-example-nodejs',
+        provider: 'dev-viron-example-nodejs',
         expirationSec: 24 * 60 * 60,
       },
       googleOAuth2: {
