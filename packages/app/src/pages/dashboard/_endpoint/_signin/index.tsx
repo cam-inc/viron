@@ -8,7 +8,7 @@ import React, { useCallback, useMemo } from 'react';
 import Button from '$components/button';
 import Error from '$components/error';
 import Drawer, { useDrawer } from '$components/drawer';
-import Request from '$components/request';
+import Request, { Props as RequestProps } from '$components/request';
 import {
   ENVIRONMENTAL_VARIABLE,
   OAUTH_REDIRECT_URI,
@@ -57,28 +57,52 @@ const Signin: React.FC<Props> = ({ endpoint, isSigninRequired }) => {
     [endpoint]
   );
 
-  const drawer = useDrawer();
-  const handleClick = useCallback(
+  const drawerOAuth = useDrawer();
+  const handleOAuthClick = useCallback(
     function () {
-      drawer.open();
+      drawerOAuth.open();
     },
-    [drawer]
+    [drawerOAuth]
   );
+
+  const drawerEmail = useDrawer();
+  const handleEmailClick = useCallback(
+    function () {
+      drawerEmail.open();
+    },
+    [drawerEmail]
+  );
+
   const elm = useMemo<JSX.Element>(
     function () {
       return (
         <>
-          <Button
-            on="surface"
-            Icon={AiFillApi}
-            label="Signin"
-            size="xs"
-            onClick={handleClick}
-          />
-          <Drawer {...drawer.bind}>
+          <div className="flex items-center gap-2">
+            {authconfigOAuth && (
+              <Button
+                on="surface"
+                Icon={AiFillApi}
+                label="Signin(OAuth)"
+                size="xs"
+                onClick={handleOAuthClick}
+              />
+            )}
+            {authconfigEmail && (
+              <Button
+                on="surface"
+                Icon={AiFillApi}
+                label="Signin(Email)"
+                size="xs"
+                onClick={handleEmailClick}
+              />
+            )}
+          </div>
+          <Drawer {...drawerOAuth.bind}>
             {authconfigOAuth && (
               <OAuth endpoint={endpoint} authConfig={authconfigOAuth} />
             )}
+          </Drawer>
+          <Drawer {...drawerEmail.bind}>
             {authconfigEmail && (
               <Email endpoint={endpoint} authConfig={authconfigEmail} />
             )}
@@ -86,7 +110,15 @@ const Signin: React.FC<Props> = ({ endpoint, isSigninRequired }) => {
         </>
       );
     },
-    [endpoint, authconfigOAuth, authconfigEmail, handleClick, drawer]
+    [
+      endpoint,
+      authconfigOAuth,
+      authconfigEmail,
+      handleOAuthClick,
+      handleEmailClick,
+      drawerOAuth,
+      drawerEmail,
+    ]
   );
 
   if (!endpoint.isPrivate) {
@@ -97,7 +129,7 @@ const Signin: React.FC<Props> = ({ endpoint, isSigninRequired }) => {
     return null;
   }
 
-  if (!authconfigOAuth || !authconfigEmail) {
+  if (!authconfigOAuth && !authconfigEmail) {
     return null;
   }
 
@@ -177,6 +209,18 @@ const OAuth: React.FC<{
     [authConfig]
   );
 
+  const renderHead = useCallback<NonNullable<RequestProps['renderHead']>>(
+    function () {
+      return (
+        <div className="flex items-center text-on-surface">
+          <Icon className="mr-1" />
+          <div className="text-xs">OAuth</div>
+        </div>
+      );
+    },
+    [Icon]
+  );
+
   if (!document) {
     return (
       <Error on={ON.SURFACE} error={new BaseError('OAS document missing.')} />
@@ -190,22 +234,16 @@ const OAuth: React.FC<{
   }
 
   return (
-    <div>
-      <div className="flex items-center mb-2">
-        <Icon className="mr-1" />
-        <div className="text-xs">
-          OAuth({`https://localhost:8000/oauthredirect`})
-        </div>
-      </div>
-      <Request
-        on={ON.SURFACE}
-        endpoint={endpoint}
-        document={document}
-        defaultValues={defaultValues}
-        request={request}
-        onSubmit={handleSubmit}
-      />
-    </div>
+    <Request
+      on={ON.SURFACE}
+      endpoint={endpoint}
+      document={document}
+      defaultValues={defaultValues}
+      request={request}
+      onSubmit={handleSubmit}
+      className="h-full"
+      renderHead={renderHead}
+    />
   );
 };
 
@@ -283,6 +321,18 @@ const Email: React.FC<{
     [authConfig]
   );
 
+  const renderHead = useCallback<NonNullable<RequestProps['renderHead']>>(
+    function () {
+      return (
+        <div className="flex items-center text-on-surface">
+          <AiOutlineLogin className="mr-1" />
+          <div className="text-xs">Email</div>
+        </div>
+      );
+    },
+    []
+  );
+
   if (!document) {
     return (
       <Error on={ON.SURFACE} error={new BaseError('OAS document missing.')} />
@@ -296,19 +346,15 @@ const Email: React.FC<{
   }
 
   return (
-    <div>
-      <div className="flex items-center mb-2">
-        <AiOutlineLogin className="mr-1" />
-        <div className="text-xs">Email</div>
-      </div>
-      <Request
-        on={ON.SURFACE}
-        endpoint={endpoint}
-        document={document}
-        defaultValues={defaultValues}
-        request={request}
-        onSubmit={handleSubmit}
-      />
-    </div>
+    <Request
+      on={ON.SURFACE}
+      endpoint={endpoint}
+      document={document}
+      defaultValues={defaultValues}
+      request={request}
+      onSubmit={handleSubmit}
+      className="h-full"
+      renderHead={renderHead}
+    />
   );
 };

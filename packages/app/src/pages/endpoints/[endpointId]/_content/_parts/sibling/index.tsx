@@ -60,6 +60,7 @@ const Sibling: React.FC<Props> = ({
           request={sibling.request}
           defaultValues={sibling.defaultValues}
           onSubmit={handleRequestSubmit}
+          className="h-full"
         />
       </Drawer>
     </>

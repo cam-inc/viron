@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { UseFormReturn } from 'react-hook-form';
+import { FieldError, UseFormReturn } from 'react-hook-form';
 import { ENVIRONMENTAL_VARIABLE } from '$constants/index';
 import { Endpoint } from '$types/index';
 import { Document, Schema } from '$types/oas';
@@ -117,6 +117,23 @@ export const useEliminate = function (): UseEliminateReturn {
     ref,
     execute,
   };
+};
+
+export const useError = function ({
+  schema,
+  name,
+  errors,
+}: {
+  schema: Schema;
+  name: string;
+  errors: UseFormReturn['formState']['errors'];
+}): FieldError | null {
+  const nameForError = useNameForError({ schema, name });
+  const error = _.get(errors, nameForError);
+  if (!error) {
+    return null;
+  }
+  return error as FieldError;
 };
 
 export const useNameForError = function ({

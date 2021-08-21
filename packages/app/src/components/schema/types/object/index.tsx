@@ -69,7 +69,14 @@ const SchemaOfTypeObject: React.FC<Props> = ({
 
   return (
     <>
-      <ul className="ml-2">
+      <ul
+        style={{
+          display: 'grid',
+          gridGap: '8px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gridAutoRows: 'auto',
+        }}
+      >
         {_.map(schema.properties, function (_schema, _name) {
           return (
             <li key={_name}>

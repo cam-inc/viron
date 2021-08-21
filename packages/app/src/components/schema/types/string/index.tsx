@@ -92,6 +92,7 @@ const SchemaOfTypeString: React.FC<Props> = ({
   if (isDynamicEnumEnabled) {
     return (
       <Select<string>
+        on={on}
         list={dynamicEnumList}
         Select={function ({ className, children }) {
           return (
@@ -121,6 +122,7 @@ const SchemaOfTypeString: React.FC<Props> = ({
   if (schema.enum) {
     return (
       <Select<string>
+        on={on}
         list={schema.enum}
         Select={function ({ className, children }) {
           return (

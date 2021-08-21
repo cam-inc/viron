@@ -167,9 +167,7 @@ const Add: React.FC<Props> = ({ onAdd, className = '' }) => {
           label="Endpoint Id"
           error={formState.errors.endpointId}
           render={function (bind) {
-            return (
-              <input defaultValue="" {...bind} {...register('endpointId')} />
-            );
+            return <input {...bind} {...register('endpointId')} />;
           }}
         />
         <Textinput
@@ -178,7 +176,7 @@ const Add: React.FC<Props> = ({ onAdd, className = '' }) => {
           label="URL"
           error={formState.errors.url}
           render={function (bind) {
-            return <input defaultValue="" {...bind} {...register('url')} />;
+            return <input {...bind} {...register('url')} />;
           }}
         />
         <Button on={ON.SURFACE} size="xs" type="submit" label="Add" />
