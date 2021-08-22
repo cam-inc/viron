@@ -46,6 +46,7 @@ const PopoverLg: React.FC<Props> = ({
   targetRef,
   children,
 }) => {
+  const [screen] = useRecoilState(screenState);
   const [isVisible, setIsVisible] = useState<boolean>(isOpened);
   useEffect(
     function () {
@@ -54,6 +55,7 @@ const PopoverLg: React.FC<Props> = ({
     [isOpened]
   );
 
+  // Auto closing.
   useEffect(
     function () {
       const cleanup = function () {
@@ -73,6 +75,12 @@ const PopoverLg: React.FC<Props> = ({
     },
     [targetRef.current, onRequestClose]
   );
+  useEffect(
+    function () {
+      onRequestClose();
+    },
+    [onRequestClose, screen.width, screen.height]
+  );
 
   // Stop event propagation.
   const handleClick = useCallback(function (e: React.MouseEvent) {
@@ -80,7 +88,7 @@ const PopoverLg: React.FC<Props> = ({
   }, []);
 
   // Placement
-  const [screen] = useRecoilState(screenState);
+
   const placement = useMemo<Placement>(
     function () {
       const targetElement = targetRef.current;
@@ -122,7 +130,7 @@ const PopoverLg: React.FC<Props> = ({
       }
       return PLACEMENT.TOP;
     },
-    [targetRef.current, screen.width, screen.height]
+    [targetRef.current, screen.width, screen.height, isOpened]
   );
 
   // Position
@@ -164,7 +172,7 @@ const PopoverLg: React.FC<Props> = ({
       }
       return position;
     },
-    [targetRef.current, placement]
+    [targetRef.current, placement, isOpened]
   );
 
   const content = useMemo<JSX.Element | null>(
