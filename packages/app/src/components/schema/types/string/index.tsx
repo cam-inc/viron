@@ -156,6 +156,7 @@ const SchemaOfTypeString: React.FC<Props> = ({
   if (schema.format === 'multiline') {
     return (
       <Textarea
+        on={on}
         render={function (bind) {
           return <textarea {...bind} {...register(name, registerOptions)} />;
         }}
