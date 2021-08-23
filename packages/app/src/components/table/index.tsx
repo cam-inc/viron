@@ -72,19 +72,6 @@ const Table: React.FC<Props> = ({
             })}
           >
             <Tr on={on}>
-              {renderActions && (
-                <Th
-                  on={on}
-                  column={{
-                    type: 'actions',
-                    name: 'actions',
-                    // TODO: 重複しないように。
-                    key: 'actions',
-                    isSortable: false,
-                    sort: TABLE_SORT.NONE,
-                  }}
-                />
-              )}
               {columns.map(function (column) {
                 return (
                   <React.Fragment key={column.key}>
@@ -96,6 +83,20 @@ const Table: React.FC<Props> = ({
                   </React.Fragment>
                 );
               })}
+              {renderActions && (
+                <Th
+                  on={on}
+                  column={{
+                    type: 'actions',
+                    name: 'actions',
+                    // TODO: 重複しないように。
+                    key: 'actions',
+                    isSortable: false,
+                    sort: TABLE_SORT.NONE,
+                  }}
+                  isSticky
+                />
+              )}
             </Tr>
           </thead>
           <tbody>
@@ -103,7 +104,6 @@ const Table: React.FC<Props> = ({
               return (
                 <React.Fragment key={idx}>
                   <Tr on={on} data={data} onClick={handleRowClick}>
-                    {renderActions && <Td on={on}>{renderActions(data)}</Td>}
                     {columns.map(function (column) {
                       return (
                         <React.Fragment key={column.key}>
@@ -117,6 +117,11 @@ const Table: React.FC<Props> = ({
                         </React.Fragment>
                       );
                     })}
+                    {renderActions && (
+                      <Td on={on} isSticky>
+                        {renderActions(data)}
+                      </Td>
+                    )}
                   </Tr>
                 </React.Fragment>
               );
@@ -143,8 +148,13 @@ const Tr: React.FC<TrProps> = ({ on, data, onClick, children }) => {
   );
   return (
     <tr
-      className={classnames('border-b', {
-        'border-on-surface-faint': on === ON.SURFACE,
+      className={classnames('border-b hover:bg-on-surface-faint', {
+        'border-on-background-faint hover:bg-on-background-faint':
+          on === ON.BACKGROUND,
+        'border-on-surface-faint hover:bg-on-surface-faint': on === ON.SURFACE,
+        'border-on-primary-faint hover:bg-on-primary-faint': on === ON.PRIMARY,
+        'border-on-complementary-faint hover:bg-on-complementary-faint':
+          on === ON.COMPLEMENTARY,
       })}
       onClick={handleClick}
     >
@@ -157,20 +167,30 @@ type ThProps = {
   on: On;
   column: Column;
   onClick?: (column: Column) => void;
+  isSticky?: boolean;
 };
-const Th: React.FC<ThProps> = ({ on, column, onClick }) => {
+const Th: React.FC<ThProps> = ({ on, column, onClick, isSticky = false }) => {
   const handleClick = useCallback(
     function () {
       onClick?.(column);
     },
     [column, onClick]
   );
-
+  const style: React.CSSProperties = {};
+  if (isSticky) {
+    style.background = `linear-gradient(to right, rgba(0,0,0,0) 0, var(--color-${on}) 20%, var(--color-${on}) 100%)`;
+  }
   return (
     <th
-      className={classnames('p-2 text-xs text-left', {
+      className={classnames('text-xs text-left', {
+        'p-2': !isSticky,
+        'pr-2 py-2 pl-4 sticky right-0': isSticky,
+        'text-on-background-high': on === ON.BACKGROUND,
         'text-on-surface-high': on === ON.SURFACE,
+        'text-on-primary-high': on === ON.PRIMARY,
+        'text-on-complementary-high': on === ON.COMPLEMENTARY,
       })}
+      style={style}
       onClick={handleClick}
     >
       <div className="flex items-center">
@@ -212,8 +232,26 @@ const Th: React.FC<ThProps> = ({ on, column, onClick }) => {
   );
 };
 
-const Td: React.FC<{ on: On }> = ({ /*on,*/ children }) => {
-  return <td className="p-2 hover:bg-on-surface-faint">{children}</td>;
+const Td: React.FC<{ on: On; isSticky?: boolean }> = ({
+  on,
+  isSticky = false,
+  children,
+}) => {
+  const style: React.CSSProperties = {};
+  if (isSticky) {
+    style.background = `linear-gradient(to right, rgba(0,0,0,0) 0, var(--color-${on}) 20%, var(--color-${on}) 100%)`;
+  }
+  return (
+    <td
+      className={classnames('p-2', {
+        'p-2': !isSticky,
+        'pr-2 py-2 pl-4 sticky right-0': isSticky,
+      })}
+      style={style}
+    >
+      {children}
+    </td>
+  );
 };
 
 const Cell: React.FC<{ on: On; column: Column; value: Value }> = ({
@@ -223,7 +261,7 @@ const Cell: React.FC<{ on: On; column: Column; value: Value }> = ({
 }) => {
   // TODO: typeofして最適な見せ方に。
   return (
-    <div>
+    <div className="whitespace-nowrap">
       <div className="text-xxs">[{column.type}]</div>
       <div>{JSON.stringify(value)}</div>
     </div>

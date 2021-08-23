@@ -82,7 +82,7 @@ const Button = function <T = null>({
       onClick={handleClick}
     >
       {Icon && <Icon className={classnames({ 'mr-1': !!label })} />}
-      {label && <div className="flex-1 min-w-0">{label}</div>}
+      {label && <div className="flex-1 min-w-0 whitespace-nowrap">{label}</div>}
     </button>
   );
 };
