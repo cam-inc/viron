@@ -6,7 +6,9 @@ import {
   AuditLogUpdateAttributes,
   createOne,
   list,
+  maskRequestBody,
 } from '../../src/domains/auditlog';
+import { VironOpenAPIObject } from '../../src/domains/oas';
 import { Repository, repositoryContainer } from '../../src/repositories';
 
 describe('domains/auditlog', () => {
@@ -74,6 +76,179 @@ describe('domains/auditlog', () => {
 
       const result = await createOne(data);
       assert.strictEqual(result.id, '1');
+    });
+  });
+
+  describe('maskRequestBody', () => {
+    it('using resolved oas', async () => {
+      const pathItemUsers = {
+        post: {
+          operationId: 'createUser',
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    name: {
+                      type: 'string',
+                    },
+                    email: {
+                      type: 'string',
+                      format: 'email',
+                    },
+                    password: {
+                      type: 'string',
+                      format: 'password',
+                    },
+                  },
+                  required: ['name', 'password'],
+                },
+              },
+            },
+          },
+          responses: {
+            '201': {
+              description: 'OK',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    additionalProperties: {},
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+
+      const oas: VironOpenAPIObject = {
+        openapi: '3.0.2',
+        info: {
+          title: 'test',
+          version: '0.0.1',
+        },
+        paths: {
+          '/users': pathItemUsers,
+        },
+      };
+
+      const result = await maskRequestBody('/users', 'post', oas, {
+        name: 'test',
+        password: 'xxxxxxxxxxxxxxxxxxxxxxxxxx',
+      });
+      assert.strictEqual(
+        result,
+        JSON.stringify({
+          name: 'test',
+          password: '**************************',
+        })
+      );
+    });
+
+    it('using $ref', async () => {
+      const pathItemUsers = {
+        post: {
+          operationId: 'createUser',
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  $ref: '#/components/schemas/UserCreatePayload',
+                },
+              },
+            },
+          },
+          responses: {
+            '201': {
+              description: 'OK',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    additionalProperties: {},
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+
+      const oas: VironOpenAPIObject = {
+        openapi: '3.0.2',
+        info: {
+          title: 'test',
+          version: '0.0.1',
+        },
+        paths: {
+          '/users': pathItemUsers,
+        },
+        components: {
+          schemas: {
+            UserCreatePayload: {
+              type: 'object',
+              properties: {
+                name: {
+                  type: 'string',
+                },
+                email: {
+                  type: 'string',
+                  format: 'email',
+                },
+                password: {
+                  type: 'string',
+                  format: 'password',
+                },
+                users: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      secret: {
+                        type: 'string',
+                        format: 'password',
+                      },
+                    },
+                  },
+                },
+              },
+              required: ['name', 'password'],
+            },
+          },
+        },
+      };
+
+      const result = await maskRequestBody('/users', 'post', oas, {
+        name: 'test',
+        password: 'xxxxxxxxxxxxxxxxxxxxxxxxxx',
+        users: [
+          {
+            secret: 'yyyy',
+          },
+          {
+            secret: 'zzzzzzzz',
+          },
+        ],
+      });
+      assert.strictEqual(
+        result,
+        JSON.stringify({
+          name: 'test',
+          password: '**************************',
+          users: [
+            {
+              secret: '****',
+            },
+            {
+              secret: '********',
+            },
+          ],
+        })
+      );
     });
   });
 });

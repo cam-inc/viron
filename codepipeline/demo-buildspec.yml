@@ -31,9 +31,14 @@ phases:
       - echo Pushing the Docker image...
       - docker push $REPOSITORY_URI:$COMMIT_ID
       - docker push $REPOSITORY_URI:latest
-
+      - printf '{"ImageURI":"%s"}' $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$COMMIT_ID > imageDetail.json
+      - aws ecs describe-task-definition --task-definition $ECS_TASK_DEF_NAME | jq '.taskDefinition' |jq '.containerDefinitions[0].image = "<IMAGE1_NAME>"' | jq 'del(.["taskDefinitionArn", "registeredBy", "registeredAt", "revision", "status"])' > taskdef.json
+      - cat taskdef.json
+      - cat imageDetail.json
 artifacts:
   files:
+    - imageDetail.json
+    - taskdef.json
     - codepipeline/demo-deployspec.yml
   name: viron-demo-artifact
   discard-paths: no

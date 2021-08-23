@@ -16,6 +16,16 @@ import { ctx } from '../../context';
 
 const getModel = (): UserModel => ctx.stores.main.models.users as UserModel;
 
+const convertConditions = (
+  conditions: FilterQuery<User>
+): FilterQuery<User> => {
+  if (conditions.id) {
+    conditions._id = conditions.id;
+    delete conditions.id;
+  }
+  return conditions;
+};
+
 export const findOneById = async (id: string): Promise<User | null> => {
   const model = getModel();
   const doc = await model.findById(id);
@@ -31,7 +41,7 @@ export const find = async (
   options = options ?? {};
   options.sort = getMongoSortOptions(sort);
   const docs = await model.find(
-    normalizeMongoFilterQuery(conditions),
+    normalizeMongoFilterQuery(convertConditions(conditions)),
     null,
     options
   );
@@ -59,7 +69,9 @@ export const findOne = async (
   conditions: FilterQuery<User> = {}
 ): Promise<User | null> => {
   const model = getModel();
-  const doc = await model.findOne(normalizeMongoFilterQuery(conditions));
+  const doc = await model.findOne(
+    normalizeMongoFilterQuery(convertConditions(conditions))
+  );
   return doc ? doc.toJSON() : null;
 };
 
@@ -67,7 +79,9 @@ export const count = async (
   conditions: FilterQuery<User> = {}
 ): Promise<number> => {
   const model = getModel();
-  return await model.countDocuments(normalizeMongoFilterQuery(conditions));
+  return await model.countDocuments(
+    normalizeMongoFilterQuery(convertConditions(conditions))
+  );
 };
 
 export const createOne = async (obj: UserCreateAttributes): Promise<User> => {

@@ -1,54 +1,43 @@
 import { OAS_X_TAGS, OAS_X_THEME, OAS_X_THUMBNAIL, THEME } from '@viron/lib';
-import { Config, MongoConfig, MysqlConfig } from '.';
-import { Mode, MODE } from '../constants';
+import { Config, MongoConfig } from '.';
 
 /**
  * Get configuration data.
  */
-export const get = (mode: Mode): Config => {
+export const get = (): Config => {
   const mongo: MongoConfig = {
     type: 'mongo',
-    openUri: 'mongodb://mongo:27017',
+    openUri: process.env.MONGODB_CONNECTION_URI || '',
     connectOptions: {
       // MongoDB Options
       dbName: 'viron_example',
       autoIndex: true,
-      user: 'root',
-      pass: 'password',
+      user: process.env.MONGODB_USER_NAME,
+      pass: process.env.MONGODB_USER_PASSWORD,
       useNewUrlParser: true,
       useCreateIndex: true,
       authSource: 'admin',
       useFindAndModify: false,
       useUnifiedTopology: true,
-    },
-  };
-
-  const mysql: MysqlConfig = {
-    type: 'mysql',
-    connectOptions: {
-      dialect: 'mysql',
-      database: 'viron_example',
-      username: 'root',
-      password: 'password',
-      host: 'mysql',
-      port: 3306,
-      ssl: false,
-      protocol: 'tcp',
-      logging: true,
+      ssl: true,
+      sslValidate: false,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      sslCA: process.env.DOCDB_SSL_CA,
     },
   };
 
   const ret: Config = {
     store: {
-      main: mode == MODE.MONGO ? mongo : mysql,
+      main: mongo,
     },
     cors: {
-      allowOrigins: ['https://localhost:8000', 'https://viron.work'],
+      allowOrigins: ['https://localhost:8000', 'https://staging-viron.work'],
     },
     auth: {
       jwt: {
-        secret: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-        provider: 'local-viron-example-nodejs',
+        secret: process.env.JWT_SECRET ?? '',
+        provider: 'stg-viron-example-nodejs',
         expirationSec: 24 * 60 * 60,
       },
       googleOAuth2: {
