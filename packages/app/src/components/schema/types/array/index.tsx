@@ -93,7 +93,14 @@ const SchemaOfTypeArray: React.FC<Props> = ({
   return (
     <>
       <p onClick={handlePrependClick}>+prepend</p>
-      <ul className="ml-2">
+      <ul
+        style={{
+          display: 'grid',
+          gridGap: '8px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gridAutoRows: 'auto',
+        }}
+      >
         {fields.map(function (field, index) {
           return (
             <li key={field.id}>

@@ -7,6 +7,7 @@ import { useDynamicEnum } from '../../hooks';
 import { Props } from '../../index';
 
 const SchemaOfTypeNumber: React.FC<Props> = ({
+  on,
   endpoint,
   document,
   name,
@@ -32,6 +33,7 @@ const SchemaOfTypeNumber: React.FC<Props> = ({
   if (isDynamicEnumEnabled) {
     return (
       <Select<number>
+        on={on}
         list={dynamicEnumList}
         Select={function ({ className, children }) {
           return (
@@ -61,6 +63,7 @@ const SchemaOfTypeNumber: React.FC<Props> = ({
   if (schema.enum) {
     return (
       <Select<number>
+        on={on}
         list={schema.enum}
         Select={function ({ className, children }) {
           return (
@@ -90,6 +93,7 @@ const SchemaOfTypeNumber: React.FC<Props> = ({
   return (
     <>
       <Numberinput
+        on={on}
         isFloat
         render={function (bind) {
           return <input {...bind} {...register(name, registerOptions)} />;

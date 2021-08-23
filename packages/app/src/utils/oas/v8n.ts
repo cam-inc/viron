@@ -147,6 +147,13 @@ export const setValueAs = function (
     if (schema.type === 'number') {
       return Number(value);
     }
+    if (schema.type === 'boolean') {
+      if (value === 'true') {
+        return true;
+      } else if (value === 'false') {
+        return false;
+      }
+    }
     return value;
   };
 };

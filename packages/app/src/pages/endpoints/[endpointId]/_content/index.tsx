@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import React, { useCallback, useState } from 'react';
 import Paper from '$components/paper/index';
 import { Endpoint } from '$types/index';
@@ -29,7 +30,7 @@ const _Content: React.FC<Props> = ({
     content
   );
 
-  const [isOpened, setIsOpened] = useState<boolean>(false);
+  const [isOpened, setIsOpened] = useState<boolean>(true);
   const handleOpen = useCallback(function () {
     setIsOpened(true);
   }, []);
@@ -65,25 +66,25 @@ const _Content: React.FC<Props> = ({
           omittedColumns={omittedColumns}
           onColumnsFilterChange={handleColumnsFilterChange}
         />
-        {isOpened && (
-          <>
-            <Body
-              className="p-2 border-t border-on-surface-faint"
-              endpoint={endpoint}
-              document={document}
-              content={content}
-              base={base}
-              descendants={descendants}
-              omittedColumns={omittedColumns}
-            />
-            <Tail
-              className="p-2 border-t border-on-surface-faint"
-              document={document}
-              content={content}
-              base={base}
-            />
-          </>
-        )}
+        <Body
+          className={classnames('p-2 border-t border-on-surface-faint', {
+            hidden: !isOpened,
+          })}
+          endpoint={endpoint}
+          document={document}
+          content={content}
+          base={base}
+          descendants={descendants}
+          omittedColumns={omittedColumns}
+        />
+        <Tail
+          className={classnames('p-2 border-t border-on-surface-faint', {
+            hidden: !isOpened,
+          })}
+          document={document}
+          content={content}
+          base={base}
+        />
       </div>
     </Paper>
   );

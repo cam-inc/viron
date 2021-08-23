@@ -1,6 +1,7 @@
 import { ImExit } from '@react-icons/all-files/im/ImExit';
 import _ from 'lodash';
 import React, { useCallback, useMemo } from 'react';
+import Button from '$components/button';
 import Drawer, { useDrawer } from '$components/drawer';
 import Request from '$components/request';
 import { ON } from '$constants/index';
@@ -120,13 +121,13 @@ const Signout: React.FC<Props> = ({
       document = resolve(document);
       return (
         <>
-          <button
-            className="p-2 rounded flex items-center bg-complementary text-on-complementary"
+          <Button
+            on="surface"
+            Icon={ImExit}
+            label="Signout"
+            size="xs"
             onClick={handleClick}
-          >
-            <ImExit className="mr-1" />
-            <div className="text-xs">Signout</div>
-          </button>
+          />
           <Drawer {...drawer.bind}>
             <Request
               on={ON.SURFACE}

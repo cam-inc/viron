@@ -164,12 +164,17 @@ const Import: React.FC<Props> = ({ className = '' }) => {
           };
           return f();
         })
-      ).catch(function (error: Error) {
-        setError(new FileReaderError(error.message));
-      });
+      )
+        .catch(function (error: Error) {
+          setError(new BaseError(error.message));
+        })
+        .finally(function () {
+          inputElement.value = '';
+        });
     };
     reader.onerror = function () {
       setError(new FileReaderError((reader.error as DOMException).message));
+      inputElement.value = '';
     };
   },
   []);

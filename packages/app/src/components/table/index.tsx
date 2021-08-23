@@ -213,7 +213,7 @@ const Th: React.FC<ThProps> = ({ on, column, onClick }) => {
 };
 
 const Td: React.FC<{ on: On }> = ({ /*on,*/ children }) => {
-  return <td className="p-2">{children}</td>;
+  return <td className="p-2 hover:bg-on-surface-faint">{children}</td>;
 };
 
 const Cell: React.FC<{ on: On; column: Column; value: Value }> = ({

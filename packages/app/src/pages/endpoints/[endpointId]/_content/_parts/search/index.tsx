@@ -39,6 +39,7 @@ const Search: React.FC<Props> = ({ endpoint, document, base }) => {
           request={base.request}
           defaultValues={base.requestValue}
           onSubmit={handleRequestSubmit}
+          className="h-full"
         />
       </Drawer>
     </>

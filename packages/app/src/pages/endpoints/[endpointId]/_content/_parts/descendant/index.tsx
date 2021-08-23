@@ -62,6 +62,7 @@ const Descendant: React.FC<Props> = ({
           request={descendant.request}
           defaultValues={descendant.getDefaultValues(data)}
           onSubmit={handleRequestSubmit}
+          className="h-full"
         />
       </Drawer>
     </>
