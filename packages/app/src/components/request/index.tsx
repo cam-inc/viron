@@ -212,7 +212,12 @@ const _Request: React.FC<Props> = ({
             'border-on-complementary-faint': on === ON.COMPLEMENTARY,
           })}
         >
-          <Button on="surface" size="xs" type="submit" label="submit" />
+          <Button
+            className="w-full"
+            on="primary"
+            type="submit"
+            label="submit"
+          />
         </div>
       </form>
     </div>

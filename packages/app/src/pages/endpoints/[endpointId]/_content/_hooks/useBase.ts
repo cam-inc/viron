@@ -8,7 +8,7 @@ import {
   Request as RequestType,
   RequestValue,
 } from '$types/oas';
-import { promiseErrorHandler } from '$utils/index';
+import { promiseErrorHandler, wait } from '$utils/index';
 import {
   cleanupRequestValue,
   constructRequestInfo,
@@ -33,7 +33,7 @@ const useBase = function (
   document: Document,
   content: Info['x-pages'][number]['contents'][number]
 ): UseBaseReturn {
-  const [isPending, setIsPending] = useState<boolean>(false);
+  const [isPending, setIsPending] = useState<boolean>(true);
   const [error, setError] = useState<BaseError | null>(null);
 
   const request = useMemo<RequestType>(
@@ -85,6 +85,9 @@ const useBase = function (
         setIsPending(true);
         setError(null);
         setData(null);
+
+        // Wait a bit to prevent from flashing.
+        await wait(500);
 
         const requestPayloads = constructRequestPayloads(
           request.operation,

@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import Error from '$components/error';
+import Spinner from '$components/spinner';
 import { ON } from '$constants/index';
 import { ClassName, Endpoint } from '$types/index';
 import { Document, Info, TableColumn } from '$types/oas';
@@ -43,7 +44,7 @@ const Body: React.FC<Props> = ({
   const elm = useMemo<JSX.Element>(
     function () {
       if (base.isPending) {
-        return <div>TODO: pending...</div>;
+        return <Spinner className="w-4" on={ON.SURFACE} />;
       }
       if (base.error) {
         return <Error on={ON.SURFACE} error={base.error} />;
