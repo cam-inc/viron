@@ -23,8 +23,15 @@ const Links: React.FC<Props> = ({ on }) => {
   );
 
   return (
-    <ul className="flex flex-col items-center text-xs">
-      <li className="mb-2 last:mb-0">
+    <ul className="flex flex-col gap-2 items-center text-xs">
+      <li>
+        <Link on={on} to="/dashboard">
+          <div className={classnames('flex gap-1 items-center', _className)}>
+            <div>Dashboard</div>
+          </div>
+        </Link>
+      </li>
+      <li>
         <Link on={on} to={URL.DOCUMENTATION}>
           <div className={classnames('flex gap-1 items-center', _className)}>
             <div>Documentation</div>
@@ -32,7 +39,7 @@ const Links: React.FC<Props> = ({ on }) => {
           </div>
         </Link>
       </li>
-      <li className="mb-2 last:mb-0">
+      <li>
         <Link on={on} to={URL.BLOG}>
           <div className={classnames('flex gap-1 items-center', _className)}>
             <div>Blog</div>
@@ -40,7 +47,7 @@ const Links: React.FC<Props> = ({ on }) => {
           </div>
         </Link>
       </li>
-      <li className="mb-2 last:mb-0">
+      <li>
         <Link on={on} to={URL.RELEASE_NOTES}>
           <div className={classnames('flex gap-1 items-center', _className)}>
             <div>Release Notes</div>
@@ -48,7 +55,7 @@ const Links: React.FC<Props> = ({ on }) => {
           </div>
         </Link>
       </li>
-      <li className="mb-2 last:mb-0">
+      <li>
         <Link on={on} to={URL.HELP}>
           <div className={classnames('flex gap-1 items-center', _className)}>
             <div>Help</div>
