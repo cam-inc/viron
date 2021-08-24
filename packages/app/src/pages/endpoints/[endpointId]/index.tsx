@@ -170,9 +170,17 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
       if (isPending || !endpoint || !document || error) {
         return null;
       }
-      return <Appbar {...args} endpoint={endpoint} document={document} />;
+      const page = _.find(document.info['x-pages'], function (page) {
+        return page.id === selectedPageId;
+      });
+      if (!page) {
+        return null;
+      }
+      return (
+        <Appbar {...args} endpoint={endpoint} document={document} page={page} />
+      );
     },
-    [endpoint, document, isPending, error]
+    [endpoint, document, isPending, error, selectedPageId]
   );
 
   const renderNavigation = useCallback<

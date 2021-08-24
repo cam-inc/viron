@@ -123,7 +123,7 @@ const Layout: React.FC<Props> = ({
               )}
             >
               {renderAppBar({
-                className: 'h-full',
+                className: 'h-full overflow-x-auto overscroll-x-contain',
                 openNavigation,
                 closeNavigation,
               })}

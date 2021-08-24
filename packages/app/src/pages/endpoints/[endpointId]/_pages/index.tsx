@@ -76,6 +76,7 @@ const _Pages: React.FC<Props> = ({ pages, selectedPageId, onSelect }) => {
 
   return (
     <GroupOrPage
+      pages={pages}
       depth={1}
       list={tree.children}
       selectedPageId={selectedPageId}
@@ -86,11 +87,12 @@ const _Pages: React.FC<Props> = ({ pages, selectedPageId, onSelect }) => {
 export default _Pages;
 
 const GroupOrPage: React.FC<{
+  pages: Info['x-pages'];
   depth: number;
   list: Partial['children'];
   selectedPageId: Info['x-pages'][number]['id'];
   onSelect: (pageId: Info['x-pages'][number]['id']) => void;
-}> = ({ depth, list, selectedPageId, onSelect }) => {
+}> = ({ pages, depth, list, selectedPageId, onSelect }) => {
   return (
     <ul>
       {list.map(function (item, idx) {
@@ -98,6 +100,7 @@ const GroupOrPage: React.FC<{
         if (typeof item === 'string') {
           content = (
             <Page
+              pages={pages}
               depth={depth}
               pageId={item}
               isSelected={item === selectedPageId}
@@ -107,6 +110,7 @@ const GroupOrPage: React.FC<{
         } else {
           content = (
             <Group
+              pages={pages}
               depth={depth}
               partial={item}
               selectedPageId={selectedPageId}
@@ -121,11 +125,12 @@ const GroupOrPage: React.FC<{
 };
 
 const Group: React.FC<{
+  pages: Info['x-pages'];
   depth: number;
   partial: Partial;
   selectedPageId: Info['x-pages'][number]['id'];
   onSelect: (pageId: Info['x-pages'][number]['id']) => void;
-}> = ({ depth, partial, selectedPageId, onSelect }) => {
+}> = ({ pages, depth, partial, selectedPageId, onSelect }) => {
   const [isOpened, setIsOpened] = useState<boolean>(true);
   const handleClick = function () {
     setIsOpened(!isOpened);
@@ -150,6 +155,7 @@ const Group: React.FC<{
         })}
       >
         <GroupOrPage
+          pages={pages}
           depth={depth + 1}
           list={partial.children}
           selectedPageId={selectedPageId}
@@ -161,14 +167,18 @@ const Group: React.FC<{
 };
 
 const Page: React.FC<{
+  pages: Info['x-pages'];
   depth: number;
   pageId: Info['x-pages'][number]['id'];
   isSelected: boolean;
   onSelect: (pageId: Info['x-pages'][number]['id']) => void;
-}> = ({ depth, pageId, isSelected, onSelect }) => {
+}> = ({ pages, depth, pageId, isSelected, onSelect }) => {
   const handleClick = function () {
     onSelect(pageId);
   };
+  const page = pages.find(function (page) {
+    return page.id === pageId;
+  });
   return (
     <button
       className={classnames(
@@ -185,7 +195,7 @@ const Page: React.FC<{
       }}
       onClick={handleClick}
     >
-      {pageId}
+      {page?.title || pageId}
     </button>
   );
 };
