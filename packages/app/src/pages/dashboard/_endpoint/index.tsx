@@ -137,7 +137,7 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove, className = '' }) => {
     return (
       <div
         className={classnames(
-          'p-2 flex items-center justify-center',
+          'min-h-[72px] p-2 flex items-center justify-center',
           className
         )}
       >
