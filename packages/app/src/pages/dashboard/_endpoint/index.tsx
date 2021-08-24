@@ -127,7 +127,7 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove, className = '' }) => {
 
   if (error) {
     return (
-      <div className="p-2">
+      <div className={classnames('p-2', className)}>
         <Error on={ON.SURFACE} error={error} />
       </div>
     );
@@ -135,7 +135,12 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove, className = '' }) => {
 
   if (isPending) {
     return (
-      <div className="p-2">
+      <div
+        className={classnames(
+          'p-2 flex items-center justify-center',
+          className
+        )}
+      >
         <Spinner on={ON.SURFACE} className="w-4" />
       </div>
     );
