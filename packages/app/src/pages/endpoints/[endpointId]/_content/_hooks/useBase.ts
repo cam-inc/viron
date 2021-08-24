@@ -8,7 +8,7 @@ import {
   Request as RequestType,
   RequestValue,
 } from '$types/oas';
-import { promiseErrorHandler, wait } from '$utils/index';
+import { promiseErrorHandler } from '$utils/index';
 import {
   cleanupRequestValue,
   constructRequestInfo,
@@ -85,9 +85,6 @@ const useBase = function (
         setIsPending(true);
         setError(null);
         setData(null);
-
-        // Wait a bit to prevent from flashing.
-        await wait(500);
 
         const requestPayloads = constructRequestPayloads(
           request.operation,

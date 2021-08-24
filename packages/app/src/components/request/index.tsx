@@ -104,7 +104,7 @@ const _Request: React.FC<Props> = ({
               'bg-on-surface-faint': on === ON.SURFACE,
             })}
           >
-            <button onClick={handleCommonHeadOpenerClick}>
+            <button type="button" onClick={handleCommonHeadOpenerClick}>
               {isCommonHeadOpened ? <BiCaretDown /> : <BiCaretRight />}
             </button>
           </div>

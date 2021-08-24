@@ -71,7 +71,7 @@ const Table: React.FC<Props> = ({
               'border-on-surface-faint': on === ON.SURFACE,
             })}
           >
-            <Tr on={on}>
+            <Tr on={on} isHead>
               {columns.map(function (column) {
                 return (
                   <React.Fragment key={column.key}>
@@ -138,8 +138,15 @@ type TrProps = {
   on: On;
   data?: Data;
   onClick?: (data: Data) => void;
+  isHead?: boolean;
 };
-const Tr: React.FC<TrProps> = ({ on, data, onClick, children }) => {
+const Tr: React.FC<TrProps> = ({
+  on,
+  data,
+  onClick,
+  isHead = false,
+  children,
+}) => {
   const handleClick = useCallback(
     function () {
       onClick?.(data as Data);
@@ -148,13 +155,15 @@ const Tr: React.FC<TrProps> = ({ on, data, onClick, children }) => {
   );
   return (
     <tr
-      className={classnames('border-b hover:bg-on-surface-faint', {
-        'border-on-background-faint hover:bg-on-background-faint':
-          on === ON.BACKGROUND,
-        'border-on-surface-faint hover:bg-on-surface-faint': on === ON.SURFACE,
-        'border-on-primary-faint hover:bg-on-primary-faint': on === ON.PRIMARY,
-        'border-on-complementary-faint hover:bg-on-complementary-faint':
-          on === ON.COMPLEMENTARY,
+      className={classnames('border-b', {
+        'border-on-background-faint': on === ON.BACKGROUND,
+        'hover:bg-on-background-faint': on === ON.BACKGROUND && !isHead,
+        'border-on-surface-faint': on === ON.SURFACE,
+        'hover:bg-on-surface-faint': on === ON.SURFACE && !isHead,
+        'border-on-primary-faint': on === ON.PRIMARY,
+        'hover:bg-on-primary-faint': on === ON.PRIMARY && !isHead,
+        'border-on-complementary-faint': on === ON.COMPLEMENTARY,
+        'hover:bg-on-complementary-faint': on === ON.COMPLEMENTARY && !isHead,
       })}
       onClick={handleClick}
     >
@@ -178,7 +187,7 @@ const Th: React.FC<ThProps> = ({ on, column, onClick, isSticky = false }) => {
   );
   const style: React.CSSProperties = {};
   if (isSticky) {
-    style.background = `linear-gradient(to right, rgba(0,0,0,0) 0, var(--color-${on}) 20%, var(--color-${on}) 100%)`;
+    style.background = `linear-gradient(to right, rgba(0,0,0,0) 0, var(--color-${on}) 8px, var(--color-${on}) 100%)`;
   }
   return (
     <th
@@ -239,7 +248,7 @@ const Td: React.FC<{ on: On; isSticky?: boolean }> = ({
 }) => {
   const style: React.CSSProperties = {};
   if (isSticky) {
-    style.background = `linear-gradient(to right, rgba(0,0,0,0) 0, var(--color-${on}) 20%, var(--color-${on}) 100%)`;
+    style.background = `linear-gradient(to right, rgba(0,0,0,0) 0, var(--color-${on}) 8px, var(--color-${on}) 100%)`;
   }
   return (
     <td
@@ -255,15 +264,17 @@ const Td: React.FC<{ on: On; isSticky?: boolean }> = ({
 };
 
 const Cell: React.FC<{ on: On; column: Column; value: Value }> = ({
-  /*on,*/
+  on,
   column,
   value,
 }) => {
   // TODO: typeofして最適な見せ方に。
   return (
-    <div className="whitespace-nowrap">
-      <div className="text-xxs">[{column.type}]</div>
-      <div>{JSON.stringify(value)}</div>
-    </div>
+    <>
+      <div className="whitespace-nowrap">
+        <div className="text-xxs">[{column.type}]</div>
+        <div>{JSON.stringify(value)}</div>
+      </div>
+    </>
   );
 };
