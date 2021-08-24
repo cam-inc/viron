@@ -1,7 +1,10 @@
-import { BiDownload } from '@react-icons/all-files/bi/BiDownload';
+import { BiListPlus } from '@react-icons/all-files/bi/BiListPlus';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useRecoilState } from 'recoil';
-import Button from '$components/button';
+import Button, {
+  SIZE as BUTTON_SIZE,
+  VARIANT as BUTTON_VARIANT,
+} from '$components/button';
 import Error from '$components/error';
 import Modal, { useModal } from '$components/modal';
 import { ON, STATUS_CODE } from '$constants/index';
@@ -193,10 +196,10 @@ const Import: React.FC<Props> = ({ className = '' }) => {
   return (
     <>
       <Button
-        variant="text"
-        size="xs"
-        on="primary"
-        Icon={BiDownload}
+        variant={BUTTON_VARIANT.TEXT}
+        size={BUTTON_SIZE.SM}
+        on={ON.PRIMARY}
+        Icon={BiListPlus}
         label="Import"
         className={className}
         onClick={handleButtonClick}

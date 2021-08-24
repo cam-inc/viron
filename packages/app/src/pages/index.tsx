@@ -1,7 +1,10 @@
 import classnames from 'classnames';
 import { navigate, PageProps } from 'gatsby';
 import React, { useCallback } from 'react';
-import Button from '$components/button';
+import Button, {
+  SIZE as BUTTON_SIZE,
+  VARIANT as BUTTON_VARIANT,
+} from '$components/button';
 import Logo from '$components/logo';
 import Metadata from '$components/metadata';
 import NavigationLinks from '$components/navigation/links';
@@ -59,13 +62,14 @@ const IndexPage: React.FC<Props> = () => {
             />{' '}
             !
           </div>
-          <div className="mb-8 max-w-75% text-sm">
+          <div className="mb-8 max-w-75% text-sm leading-10">
             Visit{' '}
             <Button
               className="inline-flex"
               on={ON.BACKGROUND}
+              variant={BUTTON_VARIANT.PAPER}
               label="Dashboard"
-              size="sm"
+              size={BUTTON_SIZE.SM}
               onClick={handleDashboardButtonClick}
             />{' '}
             to administrate your services. To learn more about Viron{' '}
@@ -78,16 +82,18 @@ const IndexPage: React.FC<Props> = () => {
             <Button
               className="inline-flex"
               on={ON.BACKGROUND}
+              variant={BUTTON_VARIANT.PAPER}
               label="Documentation"
-              size="sm"
+              size={BUTTON_SIZE.SM}
               onClick={handleDocumentationButtonClick}
             />
             . Your{' '}
             <Button
               className="inline-flex"
               on={ON.BACKGROUND}
+              variant={BUTTON_VARIANT.PAPER}
               label="Contributions"
-              size="sm"
+              size={BUTTON_SIZE.SM}
               onClick={handleContributionButtonClick}
             />{' '}
             are always welcomed.
