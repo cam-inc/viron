@@ -20,6 +20,7 @@ const _Navigation: React.FC<Props> = ({
   selectedPageId,
   onPageSelect,
   className,
+  closeNavigation,
 }) => {
   const renderHead = useCallback<NonNullable<NavigationProps['renderHead']>>(
     function () {
@@ -39,6 +40,13 @@ const _Navigation: React.FC<Props> = ({
     []
   );
 
+  const handlePageSelect = useCallback<Props['onPageSelect']>(
+    function (...args) {
+      closeNavigation();
+      onPageSelect(...args);
+    },
+    [onPageSelect]
+  );
   const renderBody = useCallback<NonNullable<NavigationProps['renderBody']>>(
     function () {
       return (
@@ -46,12 +54,12 @@ const _Navigation: React.FC<Props> = ({
           <Pages
             pages={pages}
             selectedPageId={selectedPageId}
-            onSelect={onPageSelect}
+            onSelect={handlePageSelect}
           />
         </div>
       );
     },
-    [pages, selectedPageId, onPageSelect]
+    [pages, selectedPageId, handlePageSelect]
   );
 
   const renderTail = useCallback<NonNullable<NavigationProps['renderTail']>>(
