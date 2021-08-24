@@ -6,15 +6,15 @@
 
 /* Non-themable pages like `/dashboard` will apply default custom properties. */
 body {
-  --color-hue: 300;
+  --color-hue: 0;
 }
 
 /* Themable pages like `/endpoints/[endpointId]` will apply overwritten custom properties. */
 body[data-theme="lime"] {
-  --color-hue: 300;
+  --color-hue: 0;
 }
 body[data-theme="deepOrange"] {
-  --color-hue: 300;
+  --color-hue: 0;
 }
 
 /* Light/Dark mode toggle. */
