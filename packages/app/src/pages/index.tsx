@@ -1,7 +1,10 @@
 import classnames from 'classnames';
 import { navigate, PageProps } from 'gatsby';
 import React, { useCallback } from 'react';
-import Button from '$components/button';
+import Button, {
+  SIZE as BUTTON_SIZE,
+  VARIANT as BUTTON_VARIANT,
+} from '$components/button';
 import Logo from '$components/logo';
 import Metadata from '$components/metadata';
 import NavigationLinks from '$components/navigation/links';
@@ -35,10 +38,7 @@ const IndexPage: React.FC<Props> = () => {
         <div className="flex-1 p-4 flex items-center justify-center min-w-0 bg-surface">
           <div className="flex-initial flex flex-col items-center">
             <div className="w-24 mb-4">
-              <Logo
-                left="text-on-surface-high"
-                right="text-on-surface-medium"
-              />
+              <Logo left="text-primary" right="text-primary-variant" />
             </div>
             <div className="text-on-surface text-xl font-bold mb-2">
               Give OAS, Get GUI.
@@ -59,13 +59,14 @@ const IndexPage: React.FC<Props> = () => {
             />{' '}
             !
           </div>
-          <div className="mb-8 max-w-75% text-sm">
+          <div className="mb-8 max-w-75% text-sm leading-10">
             Visit{' '}
             <Button
               className="inline-flex"
               on={ON.BACKGROUND}
+              variant={BUTTON_VARIANT.PAPER}
               label="Dashboard"
-              size="sm"
+              size={BUTTON_SIZE.SM}
               onClick={handleDashboardButtonClick}
             />{' '}
             to administrate your services. To learn more about Viron{' '}
@@ -78,16 +79,18 @@ const IndexPage: React.FC<Props> = () => {
             <Button
               className="inline-flex"
               on={ON.BACKGROUND}
+              variant={BUTTON_VARIANT.PAPER}
               label="Documentation"
-              size="sm"
+              size={BUTTON_SIZE.SM}
               onClick={handleDocumentationButtonClick}
             />
             . Your{' '}
             <Button
               className="inline-flex"
               on={ON.BACKGROUND}
+              variant={BUTTON_VARIANT.PAPER}
               label="Contributions"
-              size="sm"
+              size={BUTTON_SIZE.SM}
               onClick={handleContributionButtonClick}
             />{' '}
             are always welcomed.

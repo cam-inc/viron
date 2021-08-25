@@ -1,5 +1,5 @@
-import { AiOutlineDown } from '@react-icons/all-files/ai/AiOutlineDown';
-import { AiOutlineUp } from '@react-icons/all-files/ai/AiOutlineUp';
+import { BiChevronDown } from '@react-icons/all-files/bi/BiChevronDown';
+import { BiChevronRight } from '@react-icons/all-files/bi/BiChevronRight';
 import classnames from 'classnames';
 import React, { useMemo, useState } from 'react';
 import { Info } from '$types/oas';
@@ -76,6 +76,7 @@ const _Pages: React.FC<Props> = ({ pages, selectedPageId, onSelect }) => {
 
   return (
     <GroupOrPage
+      pages={pages}
       depth={1}
       list={tree.children}
       selectedPageId={selectedPageId}
@@ -86,11 +87,12 @@ const _Pages: React.FC<Props> = ({ pages, selectedPageId, onSelect }) => {
 export default _Pages;
 
 const GroupOrPage: React.FC<{
+  pages: Info['x-pages'];
   depth: number;
   list: Partial['children'];
   selectedPageId: Info['x-pages'][number]['id'];
   onSelect: (pageId: Info['x-pages'][number]['id']) => void;
-}> = ({ depth, list, selectedPageId, onSelect }) => {
+}> = ({ pages, depth, list, selectedPageId, onSelect }) => {
   return (
     <ul>
       {list.map(function (item, idx) {
@@ -98,6 +100,7 @@ const GroupOrPage: React.FC<{
         if (typeof item === 'string') {
           content = (
             <Page
+              pages={pages}
               depth={depth}
               pageId={item}
               isSelected={item === selectedPageId}
@@ -107,6 +110,7 @@ const GroupOrPage: React.FC<{
         } else {
           content = (
             <Group
+              pages={pages}
               depth={depth}
               partial={item}
               selectedPageId={selectedPageId}
@@ -121,11 +125,12 @@ const GroupOrPage: React.FC<{
 };
 
 const Group: React.FC<{
+  pages: Info['x-pages'];
   depth: number;
   partial: Partial;
   selectedPageId: Info['x-pages'][number]['id'];
   onSelect: (pageId: Info['x-pages'][number]['id']) => void;
-}> = ({ depth, partial, selectedPageId, onSelect }) => {
+}> = ({ pages, depth, partial, selectedPageId, onSelect }) => {
   const [isOpened, setIsOpened] = useState<boolean>(true);
   const handleClick = function () {
     setIsOpened(!isOpened);
@@ -133,15 +138,15 @@ const Group: React.FC<{
   return (
     <div>
       <button
-        className="w-full text-left flex justify-center py-2 pr-2 text-xs text-on-surface hover:text-on-surface-high focus:outline-none focus:ring-2 focus:ring-inset focus:ring-on-surface-high active:text-on-surface-high"
+        className="w-full text-left flex items-center gap-2 py-2 pr-2 text-xs text-on-surface hover:text-on-surface-high hover:bg-on-surface-faint focus:outline-none focus:ring-2 focus:ring-inset focus:ring-on-surface-high focus:text-on-surface-high focus:bg-on-surface-faint active:text-on-surface-high active:bg-on-surface-faint"
         style={{
           paddingLeft: `${depth * 8}px`,
         }}
         onClick={handleClick}
       >
         <div className="flex-1 min-w-0">{partial.group}</div>
-        <div className="flex-0 ml-2 flex items-center text-xxs">
-          {isOpened ? <AiOutlineDown /> : <AiOutlineUp />}
+        <div className="flex-0 flex items-center">
+          {isOpened ? <BiChevronDown /> : <BiChevronRight />}
         </div>
       </button>
       <div
@@ -150,6 +155,7 @@ const Group: React.FC<{
         })}
       >
         <GroupOrPage
+          pages={pages}
           depth={depth + 1}
           list={partial.children}
           selectedPageId={selectedPageId}
@@ -161,22 +167,26 @@ const Group: React.FC<{
 };
 
 const Page: React.FC<{
+  pages: Info['x-pages'];
   depth: number;
   pageId: Info['x-pages'][number]['id'];
   isSelected: boolean;
   onSelect: (pageId: Info['x-pages'][number]['id']) => void;
-}> = ({ depth, pageId, isSelected, onSelect }) => {
+}> = ({ pages, depth, pageId, isSelected, onSelect }) => {
   const handleClick = function () {
     onSelect(pageId);
   };
+  const page = pages.find(function (page) {
+    return page.id === pageId;
+  });
   return (
     <button
       className={classnames(
         'block w-full text-left py-1 pr-2 text-xs focus:outline-none focus:ring-2 focus:ring-inset',
         {
-          'text-on-surface hover:text-on-surface-high focus:ring-on-surface-high active:text-on-surface-high':
+          'text-on-surface hover:text-on-surface-high hover:bg-on-surface-faint focus:ring-on-surface-high focus:text-on-surface-high focus:bg-on-surface-faint active:text-on-surface-high active:bg-on-surface-faint':
             !isSelected,
-          'font-bold text-primary bg-on-primary border-r-[4px] border-primary hover:bg-on-primary-high hover:text-primary-high focus:ring-primary-high active:text-primary-high':
+          'font-bold text-on-primary bg-primary border-r-[4px] border-on-primary hover:bg-primary-variant hover:text-on-primary-variant hover:border-on-primary-variant focus:ring-primary-high active:bg-primary-variant active:text-on-primary-variant active:border-on-primary-variant':
             isSelected,
         }
       )}
@@ -185,7 +195,7 @@ const Page: React.FC<{
       }}
       onClick={handleClick}
     >
-      {pageId}
+      {page?.title || pageId}
     </button>
   );
 };

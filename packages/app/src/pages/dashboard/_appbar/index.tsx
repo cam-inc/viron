@@ -1,6 +1,11 @@
+import { BiSidebar } from '@react-icons/all-files/bi/BiSidebar';
 import React, { useCallback } from 'react';
 import { useRecoilState } from 'recoil';
-import Logo from '$components/logo';
+import Button, {
+  SIZE as BUTTON_SIZE,
+  VARIANT as BUTTON_VARIANT,
+} from '$components/button';
+import { ON } from '$constants/index';
 import { Props as LayoutProps } from '$layouts/index';
 import { screenState } from '$store/atoms/app';
 import Export from '../_export';
@@ -11,7 +16,7 @@ const Appbar: React.FC<Props> = ({ className = '', openNavigation }) => {
   const [screen] = useRecoilState(screenState);
   const { lg } = screen;
 
-  const handleLogoClick = useCallback(
+  const handleNavButtonClick = useCallback(
     function () {
       openNavigation();
     },
@@ -23,11 +28,13 @@ const Appbar: React.FC<Props> = ({ className = '', openNavigation }) => {
       <div className="flex justify-center items-center h-full px-4">
         <div className="flex-none">
           {!lg && (
-            <Logo
-              className="h-8"
-              left="text-on-complementary"
-              right="text-on-complementary-variant"
-              onClick={handleLogoClick}
+            <Button
+              variant={BUTTON_VARIANT.TEXT}
+              size={BUTTON_SIZE['2XL']}
+              on={ON.PRIMARY}
+              Icon={BiSidebar}
+              className={className}
+              onClick={handleNavButtonClick}
             />
           )}
         </div>

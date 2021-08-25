@@ -15,12 +15,16 @@ const _Navigation: React.FC<Props> = ({ className = '' }) => {
   const renderHead = useCallback<NonNullable<NavigationProps['renderHead']>>(
     function () {
       return (
-        <div className="flex justify-center py-8">
+        <div className="flex flex-col gap-2 items-center py-8">
           <Logo
             className="h-12 drop-shadow-01dp"
             left="text-primary"
             right="text-primary-variant"
           />
+          <div className="text-on-surface text-xs font-bold text-center">
+            Give OAS, <br />
+            Get GUI.
+          </div>
         </div>
       );
     },

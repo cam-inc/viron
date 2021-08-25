@@ -87,7 +87,7 @@ const HomePage: React.FC<Props> = () => {
           })}
           <div>
             <button
-              className="block w-full h-full p-2 min-h-[160px] flex flex-col items-center justify-center border border-dashed border-on-background rounded text-on-background bg-on-background-faint"
+              className="block w-full h-full p-2 min-h-[160px] flex flex-col items-center justify-center border border-dashed focus:outline-none focus:ring-2 border-on-background rounded text-on-background hover:bg-on-background-faint hover:text-on-background-high hover:border-on-background-high focus:bg-on-background-faint focus:ring-on-background-high active:bg-on-background-faint active:text-on-background-high"
               onClick={handleAddButtonClick}
             >
               <BiPlusCircle

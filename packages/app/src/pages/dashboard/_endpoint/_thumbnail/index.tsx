@@ -13,7 +13,10 @@ const Thumbnail: React.FC<Props> = ({ className = '', endpoint }) => {
       if (!endpoint?.document || !endpoint.document.info['x-thumbnail']) {
         return (
           <div className="h-full p-2 flex items-center">
-            <Logo left="text-on-background" right="text-on-background-low" />
+            <Logo
+              left="text-on-background-medium"
+              right="text-on-background-low"
+            />
           </div>
         );
       }
