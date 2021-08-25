@@ -38,10 +38,7 @@ const IndexPage: React.FC<Props> = () => {
         <div className="flex-1 p-4 flex items-center justify-center min-w-0 bg-surface">
           <div className="flex-initial flex flex-col items-center">
             <div className="w-24 mb-4">
-              <Logo
-                left="text-on-surface-high"
-                right="text-on-surface-medium"
-              />
+              <Logo left="text-primary" right="text-primary-variant" />
             </div>
             <div className="text-on-surface text-xl font-bold mb-2">
               Give OAS, Get GUI.

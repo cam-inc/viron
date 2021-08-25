@@ -118,7 +118,7 @@ const Header: React.FC<Props> = ({
           {!lg && (
             <div className="flex-none">
               <Button
-                variant={BUTTON_VARIANT.PAPER}
+                variant={BUTTON_VARIANT.TEXT}
                 size={BUTTON_SIZE['2XL']}
                 on={ON.PRIMARY}
                 Icon={BiSidebar}

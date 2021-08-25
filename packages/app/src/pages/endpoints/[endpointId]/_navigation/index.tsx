@@ -31,8 +31,8 @@ const _Navigation: React.FC<Props> = ({
         >
           <Logo
             className="h-8 drop-shadow-01dp"
-            left="text-on-surface-high"
-            right="text-on-surface-medium"
+            left="text-primary"
+            right="text-primary-variant"
           />
         </Link>
       );
