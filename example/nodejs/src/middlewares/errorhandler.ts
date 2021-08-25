@@ -1,6 +1,7 @@
 import { ErrorRequestHandler } from 'express';
 import accepts from 'accepts';
 import { HTTP_HEADER } from '@viron/lib';
+import { logger } from '../context';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const stringify = (val: any): string => {
@@ -22,6 +23,8 @@ export const middlewareErrorHandler = (): ErrorRequestHandler => {
     if (res.statusCode < 400) {
       res.statusCode = 500;
     }
+
+    logger.error('An error occured. %o', err);
 
     const accept = accepts(req);
     switch (accept.type(['json', 'text'])) {
