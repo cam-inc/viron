@@ -11,14 +11,15 @@ import { jwt } from '../security_handlers/jwt';
 import * as routesAdminAccounts from './adminaccounts';
 import * as routesAdminRoles from './adminroles';
 import * as routesAdminUsers from './adminusers';
+import * as routesArticles from './articles';
 import * as routesAuditLogs from './auditlogs';
 import * as routesAuth from './auth';
 import * as routesAuthconfigs from './authconfigs';
+import * as routesOas from './oas';
 import * as routesPing from './ping';
 import * as routesPurchases from './purchases';
 import * as routesResources from './resources';
 import * as routesRoot from './root';
-import * as routesOas from './oas';
 import * as routesUsers from './users';
 
 type Handler = (context: RouteContext) => Promise<void>;
@@ -50,6 +51,7 @@ const routes: Route[] = [
     handlers: routesResources,
   },
   { name: 'users', oasPath: oasPath('users'), handlers: routesUsers },
+  { name: 'articles', oasPath: oasPath('articles'), handlers: routesArticles },
   {
     name: 'adminaccounts',
     oasPath: domainsOas.getPath('adminaccounts'),
