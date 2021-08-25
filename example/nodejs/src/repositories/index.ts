@@ -21,6 +21,11 @@ import {
   PurchaseCreateAttributes,
   PurchaseUpdateAttributes,
 } from '../domains/purchase';
+import {
+  Article,
+  ArticleCreateAttributes,
+  ArticleUpdateAttributes,
+} from '../domains/article';
 import { MODE } from '../constants';
 
 export type FindConditions<Entity> =
@@ -75,3 +80,9 @@ export const getPurchaseRepository = (): Repository<
   PurchaseCreateAttributes,
   PurchaseUpdateAttributes
 > => getRepository('purchases');
+
+export const getArticleRepository = (): Repository<
+  Article,
+  ArticleCreateAttributes,
+  ArticleUpdateAttributes
+> => getRepository('articles');

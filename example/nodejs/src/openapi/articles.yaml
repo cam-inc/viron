@@ -1,0 +1,276 @@
+openapi: 3.0.2
+info:
+  version: 0.0.1
+  title: '@viron/example-nodejs articles'
+  description: articles api specifications
+  x-pages:
+    - id: article
+      group: 管理画面/入稿
+      title: 記事
+      description: 記事情報を閲覧/管理します
+      contents:
+        - operationId: listArticles
+          resourceId: article
+          type: table
+          pagination: true
+
+tags:
+  - name: article
+
+paths:
+  /articles:
+    get:
+      operationId: listArticles
+      tags:
+        - article
+      summary: list articles
+      description: 記事一覧
+      parameters:
+        - $ref: './components.yaml#/components/parameters/PagerSizeQueryParam'
+        - $ref: './components.yaml#/components/parameters/PagerPageQueryParam'
+        - $ref: './components.yaml#/components/parameters/SortQueryParam'
+        - $ref: '#/components/parameters/ArticleIdQueryParam'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArticleListWithPager'
+      security:
+        - jwt: []
+
+    post:
+      operationId: createArticle
+      tags:
+        - article
+      summary: create article
+      description: 記事作成
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArticleCreatePayload'
+      responses:
+        201:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+      security:
+        - jwt: []
+
+  /articles/{articleId}:
+    put:
+      operationId: updateArticle
+      tags:
+        - article
+      summary: update article
+      description: 記事更新
+      parameters:
+        - $ref: '#/components/parameters/ArticleIdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArticleUpdatePayload'
+      responses:
+        204:
+          description: OK
+      security:
+        - jwt: []
+
+    delete:
+      operationId: removeArticle
+      tags:
+        - article
+      summary: remove article
+      description: 記事削除
+      parameters:
+        - $ref: '#/components/parameters/ArticleIdPathParam'
+      responses:
+        204:
+          description: OK
+      security:
+        - jwt: []
+
+components:
+  parameters:
+    ArticleIdPathParam:
+      name: articleId
+      in: path
+      schema:
+        type: string
+      required: true
+
+    ArticleIdQueryParam:
+      name: articleId
+      in: query
+      schema:
+        type: string
+      required: false
+
+  schemas:
+    ArticleListWithPager:
+      allOf:
+        - $ref: './components.yaml#/components/schemas/Pager'
+        - type: object
+          properties:
+            list:
+              $ref: '#/components/schemas/ArticleList'
+          required:
+            - list
+
+    ArticleList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Article'
+
+    Article:
+      type: object
+      properties:
+        id:
+          description: ID
+          type: string
+        title:
+          description: タイトル
+          type: string
+        body:
+          $ref: '#/components/schemas/ArticleBody'
+        createdAt:
+          description: 作成日時
+          type: string
+          format: date-time
+        updatedAt:
+          description: 更新日時
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - body
+
+    ArticleCreatePayload:
+      type: object
+      properties:
+        title:
+          description: タイトル
+          type: string
+        body:
+          $ref: '#/components/schemas/ArticleBody'
+      required:
+        - title
+        - body
+
+    ArticleUpdatePayload:
+      type: object
+      properties:
+        title:
+          description: タイトル
+          type: string
+        body:
+          $ref: '#/components/schemas/ArticleBody'
+      required:
+        - title
+        - body
+
+    ArticleBody:
+      description: 本文
+      type: array
+      items:
+        oneOf:
+          - $ref: '#/components/schemas/ArticleLinkArea'
+          - $ref: '#/components/schemas/ArticleTextArea'
+          - $ref: '#/components/schemas/ArticleHeadingTextArea'
+          - $ref: '#/components/schemas/ArticleTextButtonArea'
+          - $ref: '#/components/schemas/ArticleRelatedArticleArea'
+
+    ArticleLinkArea:
+      type: object
+      properties:
+        linkArea:
+          type: string
+          description: リンクURL
+      required:
+        - linkArea
+
+    ArticleTextArea:
+      type: object
+      properties:
+        textArea:
+          type: string
+          description: テキストエリア
+      required:
+        - textArea
+
+    ArticleHeadingTextArea:
+      type: object
+      properties:
+        headingTextArea:
+          type: object
+          properties:
+            level:
+              type: string
+              description: レベル
+              enum:
+                - h2
+                - h3
+                - h4
+            text:
+              type: string
+              description: テキスト
+          description: 見出し文字
+          required:
+            - level
+            - text
+      required:
+        - headingTextArea
+
+    ArticleTextButtonArea:
+      type: object
+      properties:
+        textButtonArea:
+          type: object
+          properties:
+            text:
+              type: string
+              description: テキスト
+            link:
+              type: string
+              description: リンクURL
+          description: テキストボタン
+          required:
+            - text
+            - link
+      required:
+        - textButtonArea
+
+    ArticleRelatedArticleArea:
+      type: object
+      properties:
+        relatedArticleArea:
+          type: object
+          properties:
+            relatedArticles:
+              type: array
+              items:
+                type: object
+                properties:
+                  text:
+                    type: string
+                    description: 見出しテキスト
+                  link:
+                    type: string
+                    description: リンクURL
+                required:
+                  - text
+                  - link
+              minItems: 1
+              maxItems: 99
+          required:
+            - relatedArticles
+      required:
+        - relatedArticleArea
