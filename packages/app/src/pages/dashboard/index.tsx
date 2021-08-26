@@ -10,7 +10,6 @@ import useTheme from '$hooks/theme';
 import { useTranslation } from '$i18n/index';
 import Layout, { Props as LayoutProps } from '$layouts/index';
 import { listState as endpointListState } from '$store/atoms/endpoint';
-import { constructFakeDocument } from '$utils/oas';
 import Add, { Props as AddProps } from './_add/index';
 import Appbar from './_appbar';
 import Endpoint, { Props as EndpointProps } from './_endpoint';
@@ -18,14 +17,7 @@ import Navigation from './_navigation';
 
 type Props = PageProps;
 const HomePage: React.FC<Props> = () => {
-  const document = constructFakeDocument({
-    info: {
-      title: 'fake document',
-      version: '0.0.0',
-      'x-pages': [],
-    },
-  });
-  useTheme(document);
+  useTheme();
 
   const [endpointList] = useRecoilState(endpointListState);
 
