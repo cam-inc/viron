@@ -32,7 +32,7 @@ export const get = (): Config => {
       main: mongo,
     },
     cors: {
-      allowOrigins: ['https://viron.plus'],
+      allowOrigins: ['https://viron.plus', 'https://snapshot.viron.plus'],
     },
     auth: {
       jwt: {
