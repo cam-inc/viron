@@ -23,7 +23,6 @@ const HomePage: React.FC<Props> = () => {
       title: 'fake document',
       version: '0.0.0',
       'x-pages': [],
-      'x-theme': 'deepOrange',
     },
   });
   useTheme(document);

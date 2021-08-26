@@ -31,9 +31,8 @@ export type Info = {
   license?: License;
   // [extended] Be used on endpoint UI cards.
   'x-thumbnail'?: URL;
-  // [extended] Color theme for the endpoint page. Default to 'light'.
-  // TODO: 4パターンくらいまで増やすこと。
-  'x-theme'?: 'lime' | 'deepOrange';
+  // [extended] Color theme for the endpoint page. Default to 'red'.
+  'x-theme'?: X_Theme;
   // [extended] Be used on endpoint UI cards.
   'x-tags'?: string[];
   // [extended] Be used on endpoints page.
@@ -71,6 +70,35 @@ export type Info = {
   // [extended] Common setting for autocomplete function.
   'x-autocomplete'?: X_Autocomplete;
 };
+
+// [extended] All theme names.
+export const X_THEME = {
+  RED: 'red',
+  ULTIMATE_ORANGE: 'ultimate orange',
+  ORANGE_JUICE: 'orange juice',
+  AMBER: 'amber',
+  YELLOW: 'yellow',
+  LIMONCELLO: 'limoncello',
+  RADIUMM: 'radium',
+  HARLEQUIN: 'harlequin',
+  GREEN: 'green',
+  LUCENT_LIME: 'lucent lime',
+  GUPPIE_GREEN: 'guppie green',
+  MINTY_PARADISE: 'minty paradise',
+  AQUA: 'aqua',
+  CAPRI: 'capri',
+  BRESCIAN_BLUE: 'brescian blue',
+  RARE_BLUE: 'rare blue',
+  BLUE: 'blue',
+  ELECTRIC_ULTRAMARINE: 'electric ultramarine',
+  VIOLENT_VIOLET: 'violent violet',
+  ELECTRIC_PURPLE: 'electric purple',
+  MAGENDA: 'magenta',
+  BRUTAL_PINK: 'brutal pink',
+  NEON_ROSE: 'neon rose',
+  ELECTRIC_CRIMSON: 'electric crimson',
+} as const;
+export type X_Theme = typeof X_THEME[keyof typeof X_THEME];
 
 // [extended] Common setting for page contents that are type of table.
 export type X_Table = {
