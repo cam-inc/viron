@@ -32,7 +32,7 @@ export const get = (): Config => {
       main: mongo,
     },
     cors: {
-      allowOrigins: ['https://viron.plus'],
+      allowOrigins: ['https://viron.plus', 'https://snapshot.viron.plus'],
     },
     auth: {
       jwt: {
@@ -50,7 +50,7 @@ export const get = (): Config => {
     },
     oas: {
       infoExtentions: {
-        [OAS_X_THEME]: THEME.STANDARD,
+        [OAS_X_THEME]: THEME.BRUTAL_PINK,
         [OAS_X_THUMBNAIL]: 'https://example.com/logo.png',
         [OAS_X_TAGS]: ['example', 'nodejs'],
       },
