@@ -10,8 +10,7 @@ const useTheme = function (document: Document | null = null): void {
       if (document?.info['x-theme']) {
         setTheme(document.info['x-theme']);
       } else {
-        //setTheme(X_THEME.RED);
-        setTheme(X_THEME.BRUTAL_PINK);
+        setTheme(X_THEME.RED);
       }
     },
     [document, setTheme]
