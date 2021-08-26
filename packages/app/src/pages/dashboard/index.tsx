@@ -6,7 +6,6 @@ import { useRecoilState } from 'recoil';
 import Metadata from '$components/metadata';
 import Modal, { useModal } from '$components/modal';
 import Notification, { useNotification } from '$components/notification';
-import Paper from '$components/paper';
 import useTheme from '$hooks/theme';
 import { useTranslation } from '$i18n/index';
 import Layout, { Props as LayoutProps } from '$layouts/index';
@@ -75,13 +74,7 @@ const HomePage: React.FC<Props> = () => {
           {endpointList.map(function (endpoint) {
             return (
               <div key={endpoint.id}>
-                <Paper className="h-full" elevation={0} shadowElevation={0}>
-                  <Endpoint
-                    endpoint={endpoint}
-                    onRemove={handleRemove}
-                    className="h-full"
-                  />
-                </Paper>
+                <Endpoint endpoint={endpoint} onRemove={handleRemove} />
               </div>
             );
           })}
