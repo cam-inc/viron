@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { themeState } from '$store/atoms/app';
-import { Document } from '$types/oas';
+import { Document, X_THEME } from '$types/oas';
 
 const useTheme = function (document: Document | null = null): void {
   const [, setTheme] = useRecoilState(themeState);
@@ -10,7 +10,7 @@ const useTheme = function (document: Document | null = null): void {
       if (document?.info['x-theme']) {
         setTheme(document.info['x-theme']);
       } else {
-        setTheme(null);
+        setTheme(X_THEME.RED);
       }
     },
     [document, setTheme]

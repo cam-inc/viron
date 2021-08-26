@@ -10,11 +10,77 @@ body {
 }
 
 /* Themable pages like `/endpoints/[endpointId]` will apply overwritten custom properties. */
-body[data-theme="lime"] {
+body[data-theme="red"] {
   --color-hue: 0;
 }
-body[data-theme="deepOrange"] {
-  --color-hue: 0;
+body[data-theme="ultimate orange"] {
+  --color-hue: 15;
+}
+body[data-theme="orange juice"] {
+  --color-hue: 30;
+}
+body[data-theme="amber"] {
+  --color-hue: 45;
+}
+body[data-theme="yellow"] {
+  --color-hue: 60;
+}
+body[data-theme="limoncello"] {
+  --color-hue: 75;
+}
+body[data-theme="radium"] {
+  --color-hue: 90;
+}
+body[data-theme="harlequin"] {
+  --color-hue: 105;
+}
+body[data-theme="green"] {
+  --color-hue: 120;
+}
+body[data-theme="lucent lime"] {
+  --color-hue: 135;
+}
+body[data-theme="guppie green"] {
+  --color-hue: 150;
+}
+body[data-theme="minty paradise"] {
+  --color-hue: 165;
+}
+body[data-theme="aqua"] {
+  --color-hue: 180;
+}
+body[data-theme="capri"] {
+  --color-hue: 195;
+}
+body[data-theme="brescian blue"] {
+  --color-hue: 210;
+}
+body[data-theme="rare blue"] {
+  --color-hue: 225;
+}
+body[data-theme="blue"] {
+  --color-hue: 240;
+}
+body[data-theme="electric ultramarine"] {
+  --color-hue: 255;
+}
+body[data-theme="violent violet"] {
+  --color-hue: 270;
+}
+body[data-theme="electric purple"] {
+  --color-hue: 285;
+}
+body[data-theme="magenta"] {
+  --color-hue: 300;
+}
+body[data-theme="brutal pink"] {
+  --color-hue: 315;
+}
+body[data-theme="neon rose"] {
+  --color-hue: 330;
+}
+body[data-theme="electric crimson"] {
+  --color-hue: 345;
 }
 
 /* Light/Dark mode toggle. */

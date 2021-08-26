@@ -2,6 +2,8 @@ import classnames from 'classnames';
 import { PluginOptions } from 'gatsby';
 import _ from 'lodash';
 import React, { useEffect } from 'react';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import { HelmetProvider } from 'react-helmet-async';
 import { RecoilRoot, useRecoilState } from 'recoil';
 import resolveConfig from 'tailwindcss/resolveConfig';
@@ -31,12 +33,14 @@ const RootWrapper: React.FC<Props> = (props) => {
       {/* @see: https://reactjs.org/docs/strict-mode.html */}
       <React.StrictMode>
         <HelmetProvider>
-          <RecoilRoot>
-            <ErrorBoundary on={ON.BACKGROUND}>
-              {/* Need to wrap a react component to encapsulate all state related processes inside the RecoilRoot component. */}
-              <Root {...props} />
-            </ErrorBoundary>
-          </RecoilRoot>
+          <DndProvider backend={HTML5Backend}>
+            <RecoilRoot>
+              <ErrorBoundary on={ON.BACKGROUND}>
+                {/* Need to wrap a react component to encapsulate all state related processes inside the RecoilRoot component. */}
+                <Root {...props} />
+              </ErrorBoundary>
+            </RecoilRoot>
+          </DndProvider>
         </HelmetProvider>
       </React.StrictMode>
     </React.Fragment>

@@ -15,6 +15,10 @@ title: Theme
 }
 ```
 
+### テーマ名について
+[このサイト](https://colornamer.robertcooper.me/)で名前を決めた。
+`hsl([0~360の15%刻み], 100%, 50%)`。
+
 ### モードについて
 1テーマ毎にLightモードとDarkモードの2つのがあるよ。Light/Darkの切り替えはユーザのpreference設定に応じて適用されるよ。
 
