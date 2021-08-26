@@ -54,7 +54,7 @@ export const get = (): Config => {
     },
     oas: {
       infoExtentions: {
-        [OAS_X_THEME]: THEME.STANDARD,
+        [OAS_X_THEME]: THEME.BRESCIAN_BLUE,
         [OAS_X_THUMBNAIL]: 'https://example.com/logo.png',
         [OAS_X_TAGS]: ['example', 'nodejs'],
       },

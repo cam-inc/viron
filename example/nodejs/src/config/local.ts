@@ -65,7 +65,7 @@ export const get = (mode: Mode): Config => {
     },
     oas: {
       infoExtentions: {
-        [OAS_X_THEME]: THEME.STANDARD,
+        [OAS_X_THEME]: THEME.AMBER,
         [OAS_X_THUMBNAIL]: 'https://example.com/logo.png',
         [OAS_X_TAGS]: ['example', 'nodejs'],
       },
