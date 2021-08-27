@@ -19,4 +19,7 @@ phases:
       - echo E2E Testing...
       - cd $CODEBUILD_SRC_DIR/packages/app
       - npm install --no-progress --legacy-peer-deps
-      - [ "x${CYPRESS_BASE_URL}" != "x" ] && npm run test:e2e:record 
+      - |
+        if [ "x${CYPRESS_BASE_URL}" != "x" ]; then
+          npm run test:e2e:record
+        fi

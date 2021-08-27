@@ -129,9 +129,30 @@ export const GOOGLE_OAUTH2_DEFAULT_SCOPES = [
 ];
 
 export const THEME = {
-  STANDARD: 'standard',
-  MIDNIGHT: 'midnight',
-  TERMINAL: 'terminal',
+  RED: 'red',
+  ULTIMATE_ORANGE: 'ultimate orange',
+  ORANGE_JUICE: 'orange juice',
+  AMBER: 'amber',
+  YELLOW: 'yellow',
+  LIMONCELLO: 'limoncello',
+  RADIUMM: 'radium',
+  HARLEQUIN: 'harlequin',
+  GREEN: 'green',
+  LUCENT_LIME: 'lucent lime',
+  GUPPIE_GREEN: 'guppie green',
+  MINTY_PARADISE: 'minty paradise',
+  AQUA: 'aqua',
+  CAPRI: 'capri',
+  BRESCIAN_BLUE: 'brescian blue',
+  RARE_BLUE: 'rare blue',
+  BLUE: 'blue',
+  ELECTRIC_ULTRAMARINE: 'electric ultramarine',
+  VIOLENT_VIOLET: 'violent violet',
+  ELECTRIC_PURPLE: 'electric purple',
+  MAGENDA: 'magenta',
+  BRUTAL_PINK: 'brutal pink',
+  NEON_ROSE: 'neon rose',
+  ELECTRIC_CRIMSON: 'electric crimson',
 } as const;
 export type Theme = typeof THEME[keyof typeof THEME];
 
