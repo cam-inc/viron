@@ -4,7 +4,10 @@ import classnames from 'classnames';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { On, ON } from '$constants/index';
-import Button from '$components/button';
+import Button, {
+  SIZE as BUTTON_SIZE,
+  VARIANT as BUTTON_VARIANT,
+} from '$components/button';
 import Operation from '$components/operation';
 import Schema from '$components/schema';
 import { useEliminate } from '$components/schema/hooks/index';
@@ -214,7 +217,9 @@ const _Request: React.FC<Props> = ({
         >
           <Button
             className="w-full"
-            on="primary"
+            on={ON.SURFACE}
+            variant={BUTTON_VARIANT.PAPER}
+            size={BUTTON_SIZE.LG}
             type="submit"
             label="submit"
           />

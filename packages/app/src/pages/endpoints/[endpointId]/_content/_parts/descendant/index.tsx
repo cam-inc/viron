@@ -17,6 +17,7 @@ export type Props = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onOperationSuccess: (data: any) => void;
   onOperationFail: (error: BaseError) => void;
+  onClick?: () => void;
 };
 const Descendant: React.FC<Props> = ({
   endpoint,
@@ -25,6 +26,7 @@ const Descendant: React.FC<Props> = ({
   data,
   onOperationSuccess,
   onOperationFail,
+  onClick,
 }) => {
   const [isPending, setIsPending] = useState<boolean>(false);
   const drawer = useDrawer();
@@ -34,8 +36,9 @@ const Descendant: React.FC<Props> = ({
         return;
       }
       drawer.open();
+      onClick?.();
     },
-    [drawer, isPending]
+    [drawer, isPending, onClick]
   );
 
   const handleRequestSubmit = async function (requestValue: RequestValue) {

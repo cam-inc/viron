@@ -134,6 +134,7 @@ const Signout: React.FC<Props> = ({
               endpoint={endpoint}
               document={document}
               request={request as TypeRequest}
+              className="h-full"
               onSubmit={handleSubmit}
             />
           </Drawer>

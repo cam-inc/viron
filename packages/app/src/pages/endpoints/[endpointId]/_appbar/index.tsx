@@ -133,7 +133,7 @@ const Header: React.FC<Props> = ({
               ref={endpointPopover.targetRef}
               onClick={handleEndpointClick}
             >
-              <div className="w-10 h-10 bg-cover bg-background bg-center rounded overflow-hidden border border-on-primary-slight">
+              <div className="w-10 h-10 bg-cover bg-background bg-center rounded overflow-hidden border-2 border-on-primary-faint">
                 {thumbnail}
               </div>
               <div className="">
@@ -147,7 +147,7 @@ const Header: React.FC<Props> = ({
             </button>
           </div>
           <div className="flex-none">
-            <BiCaretRight className="text-on-primary-low" />
+            <BiCaretRight className="text-on-primary-slight" />
           </div>
           <div className="flex-none">
             <button
@@ -157,16 +157,16 @@ const Header: React.FC<Props> = ({
             >
               {!!breadcrumbList.length && (
                 <Breadcrumb
-                  className="text-xs"
+                  className="text-xxs"
                   on={ON.PRIMARY}
                   list={breadcrumbList}
                 />
               )}
-              <div className="text-xs">{page.title}</div>
+              <div className="text-xs text-on-primary">{page.title}</div>
             </button>
           </div>
           <div className="flex-none">
-            <BiCaretRight className="text-on-primary-low" />
+            <BiCaretRight className="text-on-primary-slight" />
           </div>
           <div className="flex-none">
             <div ref={contentsPopover.targetRef}>
