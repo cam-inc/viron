@@ -5,7 +5,10 @@ import { BiChevronsRight } from '@react-icons/all-files/bi/BiChevronsRight';
 import classnames from 'classnames';
 import _ from 'lodash';
 import React, { useCallback, useMemo } from 'react';
-import Button, { Props as ButtonProps } from '$components/button';
+import Button, {
+  Props as ButtonProps,
+  VARIANT as BUTTON_VARIANT,
+} from '$components/button';
 import { On } from '$constants/index';
 
 type Props = {
@@ -81,7 +84,7 @@ const Pagination: React.FC<Props> = ({ on, current, max, onRequestChange }) => {
         <div className="flex-none mr-2 last:mr-0">
           <Button
             on={on}
-            variant="text"
+            variant={BUTTON_VARIANT.TEXT}
             Icon={BiChevronsLeft}
             onClick={handleFirstClick}
           />
@@ -89,7 +92,7 @@ const Pagination: React.FC<Props> = ({ on, current, max, onRequestChange }) => {
         <div className="flex-none mr-2 last:mr-0">
           <Button
             on={on}
-            variant="text"
+            variant={BUTTON_VARIANT.TEXT}
             Icon={BiChevronLeft}
             onClick={handlePrevClick}
           />
@@ -99,7 +102,9 @@ const Pagination: React.FC<Props> = ({ on, current, max, onRequestChange }) => {
             <div key={page} className="flex-none mr-2 last:mr-0">
               <Button
                 on={on}
-                variant="text"
+                variant={
+                  page === current ? BUTTON_VARIANT.PAPER : BUTTON_VARIANT.TEXT
+                }
                 label={page.toString()}
                 data={page}
                 onClick={handlePageClick}
@@ -110,7 +115,7 @@ const Pagination: React.FC<Props> = ({ on, current, max, onRequestChange }) => {
         <div className="flex-none mr-2 last:mr-0">
           <Button
             on={on}
-            variant="text"
+            variant={BUTTON_VARIANT.TEXT}
             Icon={BiChevronRight}
             onClick={handleNextClick}
           />
@@ -118,7 +123,7 @@ const Pagination: React.FC<Props> = ({ on, current, max, onRequestChange }) => {
         <div className="flex-none mr-2 last:mr-0">
           <Button
             on={on}
-            variant="text"
+            variant={BUTTON_VARIANT.TEXT}
             Icon={BiChevronsRight}
             onClick={handleLastClick}
           />
