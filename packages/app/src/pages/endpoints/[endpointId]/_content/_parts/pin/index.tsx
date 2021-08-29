@@ -1,17 +1,21 @@
-import { AiOutlineReload } from '@react-icons/all-files/ai/AiOutlineReload';
+import { AiFillPushpin } from '@react-icons/all-files/ai/AiFillPushpin';
+import { AiOutlinePushpin } from '@react-icons/all-files/ai/AiOutlinePushpin';
 import React, { useCallback } from 'react';
 import Button from '$components/button';
 import Popover, { usePopover } from '$components/popover';
 import { ON } from '$constants/index';
-import { UseBaseReturn } from '../../_hooks/useBase';
 
-type Props = {
-  base: UseBaseReturn;
+export type Props = {
+  isActive: boolean;
+  onClick: () => void;
 };
-const Refresh: React.FC<Props> = ({ base }) => {
-  const handleButtonClick = function () {
-    base.refresh();
-  };
+const Pin: React.FC<Props> = ({ isActive, onClick }) => {
+  const handleButtonClick = useCallback(
+    function () {
+      onClick();
+    },
+    [onClick]
+  );
 
   const popover = usePopover<HTMLDivElement>();
   const handleMouseEnter = useCallback(
@@ -37,14 +41,16 @@ const Refresh: React.FC<Props> = ({ base }) => {
         <Button
           on={ON.SURFACE}
           variant="text"
-          Icon={AiOutlineReload}
+          Icon={isActive ? AiFillPushpin : AiOutlinePushpin}
           onClick={handleButtonClick}
         />
       </div>
       <Popover {...popover.bind}>
-        <div className="text-on-surface whitespace-nowrap">Refresh</div>
+        <div className="text-on-surface whitespace-nowrap">
+          {isActive ? 'Unpin' : 'Pin'}
+        </div>
       </Popover>
     </>
   );
 };
-export default Refresh;
+export default Pin;

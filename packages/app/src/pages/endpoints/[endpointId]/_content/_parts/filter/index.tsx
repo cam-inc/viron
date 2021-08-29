@@ -3,6 +3,7 @@ import classnames from 'classnames';
 import React, { useCallback, useMemo } from 'react';
 import Button from '$components/button';
 import Drawer, { useDrawer } from '$components/drawer';
+import Popover, { usePopover } from '$components/popover';
 import { ON } from '$constants/index';
 import { Document, Info, TableColumn } from '$types/oas';
 import { getTableColumns } from '$utils/oas';
@@ -15,11 +16,25 @@ export type Props = {
 };
 const Filter: React.FC<Props> = ({ document, content, omitted, onChange }) => {
   const drawer = useDrawer();
-  const handleClick = useCallback(
+  const handleButtonClick = useCallback(
     function () {
       drawer.open();
     },
     [drawer]
+  );
+
+  const popover = usePopover<HTMLDivElement>();
+  const handleMouseEnter = useCallback(
+    function () {
+      popover.open();
+    },
+    [popover]
+  );
+  const handleMouseLeave = useCallback(
+    function () {
+      popover.close();
+    },
+    [popover]
   );
 
   const columns = useMemo<TableColumn[]>(function () {
@@ -44,12 +59,18 @@ const Filter: React.FC<Props> = ({ document, content, omitted, onChange }) => {
 
   return (
     <>
-      <Button
-        on={ON.SURFACE}
-        variant="text"
-        Icon={BiFilterAlt}
-        onClick={handleClick}
-      />
+      <div
+        ref={popover.targetRef}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        <Button
+          on={ON.SURFACE}
+          variant="text"
+          Icon={BiFilterAlt}
+          onClick={handleButtonClick}
+        />
+      </div>
       <Drawer {...drawer.bind}>
         <div>
           {columns.map(function (column) {
@@ -71,6 +92,9 @@ const Filter: React.FC<Props> = ({ document, content, omitted, onChange }) => {
           })}
         </div>
       </Drawer>
+      <Popover {...popover.bind}>
+        <div className="text-on-surface whitespace-nowrap">Filter</div>
+      </Popover>
     </>
   );
 };
