@@ -56,7 +56,7 @@ const Descendant: React.FC<Props> = ({
 
   return (
     <>
-      <Action method={descendant.request.method} onClick={handleClick} />
+      <Action request={descendant.request} onClick={handleClick} />
       <Drawer {...drawer.bind}>
         <RequestComponent
           on={ON.SURFACE}
