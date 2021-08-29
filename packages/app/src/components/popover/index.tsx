@@ -391,7 +391,6 @@ const PopoverNotLg: React.FC<Props> = ({
 export const usePopover = function <T extends HTMLElement>(): {
   open: () => void;
   close: () => void;
-  hide: () => void;
   targetRef: React.RefObject<T>;
   bind: {
     isOpened: boolean;
@@ -409,15 +408,11 @@ export const usePopover = function <T extends HTMLElement>(): {
   const close = function () {
     setIsOpened(false);
   };
-  const hide = function () {
-    setIsOpened(false);
-  };
   const targetRef = useRef<T>(null);
 
   return {
     open,
     close,
-    hide,
     targetRef,
     bind: {
       isOpened,

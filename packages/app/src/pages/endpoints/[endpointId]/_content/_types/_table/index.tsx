@@ -1,11 +1,5 @@
-import { BiSpreadsheet } from '@react-icons/all-files/bi/BiSpreadsheet';
 import React, { useCallback, useMemo, useState } from 'react';
-import Button from '$components/button';
-import Popover, { usePopover } from '$components/popover';
-import Table, {
-  Props as TableProps,
-  Data as TableData,
-} from '$components/table';
+import Table, { Props as TableProps } from '$components/table';
 import { ON } from '$constants/index';
 import { Endpoint } from '$types/index';
 import { Document, Info, TableColumn, TABLE_SORT } from '$types/oas';
@@ -68,46 +62,26 @@ const _ContentTable: React.FC<Props> = ({
     [document, content, base]
   );
 
-  const Action = useMemo<React.FC<{ data: TableData }>>(
-    function () {
-      return ({ data }) => {
-        return null;
-        /*
-      const popover = usePopover<HTMLDivElement>();
-      const handleActionButtonClick = useCallback(function() {
-        popover.open();
-      }, [popover]);
-      const handleDescendantClick = useCallback(function() {
-        popover.hide();
-      }, [popover]);
+  const renderActions = useCallback<NonNullable<TableProps['renderActions']>>(
+    function (data) {
       return (
-        <>
-          <div className="flex items-center" ref={popover.targetRef}>
-            <Button on={ON.SURFACE} Icon={BiSpreadsheet} onClick={handleActionButtonClick} />
-          </div>
-          <Popover {...popover.bind}>
-            <div className="">
-              {descendants.map(function(descendant, idx) {
-                return (
-                  <div key={idx}>
-                    <Descendant
-                      endpoint={endpoint}
-                      document={document}
-                      descendant={descendant}
-                      data={data}
-                      onOperationSuccess={onDescendantOperationSuccess}
-                      onOperationFail={onDescendantOperationFail}
-                      onClick={handleDescendantClick}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </Popover>
-        </>
+        <div className="flex items-center">
+          {descendants.map(function (descendant, idx) {
+            return (
+              <div key={idx}>
+                <Descendant
+                  endpoint={endpoint}
+                  document={document}
+                  descendant={descendant}
+                  data={data}
+                  onOperationSuccess={onDescendantOperationSuccess}
+                  onOperationFail={onDescendantOperationFail}
+                />
+              </div>
+            );
+          })}
+        </div>
       );
-      */
-      };
     },
     [
       endpoint,
@@ -116,13 +90,6 @@ const _ContentTable: React.FC<Props> = ({
       onDescendantOperationSuccess,
       onDescendantOperationFail,
     ]
-  );
-
-  const renderActions = useCallback<NonNullable<TableProps['renderActions']>>(
-    function (data) {
-      return <Action data={data} />;
-    },
-    [Action]
   );
 
   const handleRequestSortChange = useCallback<
