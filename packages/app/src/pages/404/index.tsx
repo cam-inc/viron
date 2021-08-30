@@ -33,7 +33,7 @@ const NotfoundPage: React.FC<Props> = () => {
 
   return (
     <>
-      <Metadata title="404 | Viron" />
+      <Metadata title="NotFound" />
       <Layout
         renderAppBar={renderAppBar}
         renderNavigation={renderNavigation}

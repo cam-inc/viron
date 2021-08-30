@@ -176,7 +176,7 @@ const EndpointImportPagge: React.FC<Props> = ({ location }) => {
 
   return (
     <>
-      <Metadata title="Import | Viron" />
+      <Metadata title="Import" />
       <Layout
         renderAppBar={renderAppBar}
         renderNavigation={renderNavigation}
