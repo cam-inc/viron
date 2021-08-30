@@ -1,6 +1,4 @@
-import _ from 'lodash';
 import React, { useCallback, useMemo, useState } from 'react';
-import Drawer, { useDrawer } from '$components/drawer';
 import Table, { Props as TableProps } from '$components/table';
 import { ON } from '$constants/index';
 import { Endpoint } from '$types/index';
@@ -114,14 +112,6 @@ const _ContentTable: React.FC<Props> = ({
     [document, base, sorts]
   );
 
-  const drawer = useDrawer();
-  const handleTableRowClick = useCallback<TableProps['onRowClick']>(
-    function () {
-      drawer.open();
-    },
-    [drawer]
-  );
-
   return (
     <>
       <Table
@@ -130,9 +120,7 @@ const _ContentTable: React.FC<Props> = ({
         dataSource={dataSource}
         renderActions={descendants.length ? renderActions : undefined}
         onRequestSortChange={handleRequestSortChange}
-        onRowClick={handleTableRowClick}
       />
-      <Drawer {...drawer.bind}>TODO</Drawer>
     </>
   );
 };

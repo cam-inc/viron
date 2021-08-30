@@ -51,7 +51,7 @@ const Sibling: React.FC<Props> = ({
 
   return (
     <>
-      <Action method={sibling.request.method} onClick={handleClick} />
+      <Action request={sibling.request} onClick={handleClick} />
       <Drawer {...drawer.bind}>
         <RequestComponent
           on={ON.SURFACE}

@@ -73,7 +73,7 @@ const PopoverLg: React.FC<Props> = ({
       window.addEventListener('scroll', handler);
       return cleanup;
     },
-    [targetRef.current, onRequestClose]
+    [targetRef, onRequestClose]
   );
   useEffect(
     function () {
@@ -130,7 +130,7 @@ const PopoverLg: React.FC<Props> = ({
       }
       return PLACEMENT.TOP;
     },
-    [targetRef.current, screen.width, screen.height, isOpened]
+    [targetRef, screen.width, screen.height, isOpened]
   );
 
   // Position
@@ -172,14 +172,14 @@ const PopoverLg: React.FC<Props> = ({
       }
       return position;
     },
-    [targetRef.current, placement, isOpened]
+    [targetRef, placement, isOpened]
   );
 
   const content = useMemo<JSX.Element | null>(
     function () {
       const space = 8;
       const commonClassName =
-        'p-2 rounded bg-surface-04dp shadow-04dp overflow-scroll overscroll-contain';
+        'p-2 rounded bg-surface-05dp shadow-05dp overflow-scroll overscroll-contain';
       switch (placement) {
         case PLACEMENT.TOP_LEFT: {
           return (
@@ -373,7 +373,7 @@ const PopoverNotLg: React.FC<Props> = ({
           <div className="flex-1" />
           <div
             className={classnames(
-              'flex-none p-2 rounded-t bg-surface-04dp shadow-04dp overflow-y-scroll overscroll-y-contain pointer-events-auto transform transition duration-300',
+              'flex-none p-2 rounded-t bg-surface-05dp shadow-05dp overflow-y-scroll overscroll-y-contain pointer-events-auto transform transition duration-300',
               {
                 'opacity-100 translate-y-0': isVisible,
                 'opacity-0 translate-y-8': !isVisible,

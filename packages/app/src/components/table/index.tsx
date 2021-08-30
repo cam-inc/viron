@@ -9,7 +9,7 @@ import { TableColumn, TableSort, TABLE_SORT } from '$types/oas';
 type Key = string;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Value = any;
-type Data = Record<Key, Value>;
+export type Data = Record<Key, Value>;
 type Column = Omit<TableColumn, 'type'> & {
   type: TableColumn['type'] | 'actions';
   sort: TableSort;
@@ -21,7 +21,7 @@ export type Props = {
   columns: Column[];
   className?: ClassName;
   renderActions?: (data: Data) => JSX.Element;
-  onRowClick: (data: Data) => void;
+  onRowClick?: (data: Data) => void;
   onRequestSortChange?: (key: Column['key'], sort: Column['sort']) => void;
 };
 const Table: React.FC<Props> = ({
@@ -57,7 +57,7 @@ const Table: React.FC<Props> = ({
 
   const handleRowClick = useCallback<NonNullable<TrProps['onClick']>>(
     function (data) {
-      onRowClick(data);
+      onRowClick?.(data);
     },
     [onRowClick]
   );
@@ -207,28 +207,44 @@ const Th: React.FC<ThProps> = ({ on, column, onClick, isSticky = false }) => {
           <div className="flex-none mr-1">
             <div
               className={classnames({
-                'text-on-background-faint':
+                'text-on-background-slight':
                   on === ON.BACKGROUND && column.sort !== TABLE_SORT.ASC,
                 'text-on-background':
                   on === ON.BACKGROUND && column.sort === TABLE_SORT.ASC,
-                'text-on-surface-faint':
+                'text-on-surface-slight':
                   on === ON.SURFACE && column.sort !== TABLE_SORT.ASC,
                 'text-on-surface':
                   on === ON.SURFACE && column.sort === TABLE_SORT.ASC,
+                'text-on-primary-slight':
+                  on === ON.PRIMARY && column.sort !== TABLE_SORT.ASC,
+                'text-on-primary':
+                  on === ON.PRIMARY && column.sort === TABLE_SORT.ASC,
+                'text-on-complementary-slight':
+                  on === ON.COMPLEMENTARY && column.sort !== TABLE_SORT.ASC,
+                'text-on-complementary':
+                  on === ON.COMPLEMENTARY && column.sort === TABLE_SORT.ASC,
               })}
             >
               <BiCaretUp />
             </div>
             <div
               className={classnames({
-                'text-on-background-faint':
+                'text-on-background-slight':
                   on === ON.BACKGROUND && column.sort !== TABLE_SORT.DESC,
                 'text-on-background':
                   on === ON.BACKGROUND && column.sort === TABLE_SORT.DESC,
-                'text-on-surface-faint':
+                'text-on-surface-slight':
                   on === ON.SURFACE && column.sort !== TABLE_SORT.DESC,
                 'text-on-surface':
                   on === ON.SURFACE && column.sort === TABLE_SORT.DESC,
+                'text-on-primary-slight':
+                  on === ON.PRIMARY && column.sort !== TABLE_SORT.DESC,
+                'text-on-primary':
+                  on === ON.PRIMARY && column.sort === TABLE_SORT.DESC,
+                'text-on-complementary-slight':
+                  on === ON.COMPLEMENTARY && column.sort !== TABLE_SORT.DESC,
+                'text-on-complementary':
+                  on === ON.COMPLEMENTARY && column.sort === TABLE_SORT.DESC,
               })}
             >
               <BiCaretDown />
@@ -272,8 +288,26 @@ const Cell: React.FC<{ on: On; column: Column; value: Value }> = ({
   return (
     <>
       <div className="whitespace-nowrap">
-        <div className="text-xxs">[{column.type}]</div>
-        <div>{JSON.stringify(value)}</div>
+        <div
+          className={classnames('text-xxs', {
+            'text-on-background-slight': on === ON.BACKGROUND,
+            'text-on-surface-slight': on === ON.SURFACE,
+            'text-on-primary-slight': on === ON.PRIMARY,
+            'text-on-complementary-slight': on === ON.COMPLEMENTARY,
+          })}
+        >
+          [{column.type}]
+        </div>
+        <div
+          className={classnames('text-sm', {
+            'text-on-background': on === ON.BACKGROUND,
+            'text-on-surface': on === ON.SURFACE,
+            'text-on-primary': on === ON.PRIMARY,
+            'text-on-complementary': on === ON.COMPLEMENTARY,
+          })}
+        >
+          {JSON.stringify(value)}
+        </div>
       </div>
     </>
   );

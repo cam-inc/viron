@@ -190,7 +190,7 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove, className = '' }) => {
       });
       onRemove(endpoint);
     },
-    [endpoint, setEndpoints, menuPopover]
+    [endpoint, setEndpoints, menuPopover, onRemove]
   );
 
   // Data fetching.
@@ -278,7 +278,7 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove, className = '' }) => {
           <div
             className={classnames('flex-none w-4 relative', {
               'text-on-background-low': !droppablePrev.isOver,
-              'text-on-background-medium': droppablePrev.isOver,
+              'text-on-background-high': droppablePrev.isOver,
             })}
             ref={droppablePrevTargetRef}
           >
@@ -348,7 +348,7 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove, className = '' }) => {
           <div
             className={classnames('flex-none w-4 relative', {
               'text-on-background-low': !droppableNext.isOver,
-              'text-on-background-medium': droppableNext.isOver,
+              'text-on-background-high': droppableNext.isOver,
             })}
             ref={droppableNextTargetRef}
           >

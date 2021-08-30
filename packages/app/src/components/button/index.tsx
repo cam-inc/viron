@@ -31,7 +31,7 @@ export type Props<T> = {
   label?: string;
   className?: string;
   data?: T;
-  onClick?: (data: T) => void;
+  onClick?: (data: T, e: React.MouseEvent) => void;
 };
 const Button = function <T = null>({
   on,
@@ -46,8 +46,8 @@ const Button = function <T = null>({
   onClick,
 }: React.PropsWithChildren<Props<T>>): JSX.Element {
   const handleClick = useCallback(
-    function () {
-      onClick?.(data as T);
+    function (e) {
+      onClick?.(data as T, e);
     },
     [data, onClick]
   );
