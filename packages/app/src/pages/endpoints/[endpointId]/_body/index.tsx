@@ -22,10 +22,22 @@ const Body: React.FC<Props> = ({
 }) => {
   return (
     <div className={className}>
-      <div className="p-2">
+      <div
+        className="p-2"
+        style={{
+          display: 'grid',
+          gridGap: '8px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+          gridAutoRows: 'auto',
+        }}
+      >
         {page.contents.map(function (content) {
+          const style: React.CSSProperties = {};
+          if (content.type === 'table') {
+            style['gridColumn'] = '1/-1';
+          }
           return (
-            <div key={content.id} className="mb-2 last:mb-0">
+            <div key={content.id} style={style}>
               <Content
                 endpoint={endpoint}
                 document={document}
