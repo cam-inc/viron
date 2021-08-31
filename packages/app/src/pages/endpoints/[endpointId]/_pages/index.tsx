@@ -1,5 +1,7 @@
 import { BiChevronDown } from '@react-icons/all-files/bi/BiChevronDown';
 import { BiChevronRight } from '@react-icons/all-files/bi/BiChevronRight';
+import { BiFolder } from '@react-icons/all-files/bi/BiFolder';
+import { BiFolderOpen } from '@react-icons/all-files/bi/BiFolderOpen';
 import classnames from 'classnames';
 import React, { useMemo, useState } from 'react';
 import { Info } from '$types/oas';
@@ -144,6 +146,9 @@ const Group: React.FC<{
         }}
         onClick={handleClick}
       >
+        <div className="flex-0 flex items-center">
+          {isOpened ? <BiFolderOpen /> : <BiFolder />}
+        </div>
         <div className="flex-1 min-w-0">{partial.group}</div>
         <div className="flex-0 flex items-center">
           {isOpened ? <BiChevronDown /> : <BiChevronRight />}
