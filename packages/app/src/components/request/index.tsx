@@ -1,5 +1,5 @@
-import { BiCaretDown } from '@react-icons/all-files/bi/BiCaretDown';
-import { BiCaretRight } from '@react-icons/all-files/bi/BiCaretRight';
+import { BiCaretDownSquare } from '@react-icons/all-files/bi/BiCaretDownSquare';
+import { BiCaretRightSquare } from '@react-icons/all-files/bi/BiCaretRightSquare';
 import classnames from 'classnames';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -66,7 +66,7 @@ const _Request: React.FC<Props> = ({
   );
 
   // Common head open status.
-  const [isCommonHeadOpened, setIsCommonHeadOpened] = useState<boolean>(false);
+  const [isCommonHeadOpened, setIsCommonHeadOpened] = useState<boolean>(true);
   const handleCommonHeadOpenerClick = useCallback(
     function (e: React.MouseEvent<HTMLButtonElement>) {
       e.preventDefault();
@@ -107,12 +107,22 @@ const _Request: React.FC<Props> = ({
               'bg-on-surface-faint': on === ON.SURFACE,
             })}
           >
-            <button type="button" onClick={handleCommonHeadOpenerClick}>
-              {isCommonHeadOpened ? <BiCaretDown /> : <BiCaretRight />}
-            </button>
+            <div className="flex items-center h-[22px]">
+              <button
+                type="button"
+                className="text-sm"
+                onClick={handleCommonHeadOpenerClick}
+              >
+                {isCommonHeadOpened ? (
+                  <BiCaretDownSquare />
+                ) : (
+                  <BiCaretRightSquare />
+                )}
+              </button>
+            </div>
           </div>
           <div className="flex-1 p-2">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 text-sm">
               <div>{request.method.toUpperCase()}</div>
               <div>{request.path}</div>
             </div>
