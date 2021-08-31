@@ -2,7 +2,9 @@ import classnames from 'classnames';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
+import ErrorBoundary from '$components/errorBoundary';
 import Drawer, { useDrawer } from '$components/drawer';
+import { ON } from '$constants/index';
 import { screenState } from '$store/atoms/app';
 
 export type Props = {
@@ -122,23 +124,27 @@ const Layout: React.FC<Props> = ({
                 }
               )}
             >
-              {renderAppBar({
-                className: 'h-full overflow-x-auto overscroll-x-contain',
-                openNavigation,
-                closeNavigation,
-              })}
+              <ErrorBoundary on={ON.PRIMARY}>
+                {renderAppBar({
+                  className: 'h-full overflow-x-auto overscroll-x-contain',
+                  openNavigation,
+                  closeNavigation,
+                })}
+              </ErrorBoundary>
             </div>
           </div>
         )}
         {/* region: Navigation */}
         {renderNavigation && lg && (
           <div className="fixed z-layout-navigation top-[8px] left-0 bottom-0 w-[160px] bg-surface shadow-01dp border-r border-on-surface-faint overflow-y-scroll overscroll-y-contain">
-            {renderNavigation({
-              className: '',
-              openNavigation,
-              closeNavigation,
-              isOnDrawer: false,
-            })}
+            <ErrorBoundary on={ON.SURFACE}>
+              {renderNavigation({
+                className: '',
+                openNavigation,
+                closeNavigation,
+                isOnDrawer: false,
+              })}
+            </ErrorBoundary>
           </div>
         )}
         {/* region: Sub Body */}
@@ -152,7 +158,13 @@ const Layout: React.FC<Props> = ({
               }
             )}
           >
-            {renderSubBody({ className: '', openNavigation, closeNavigation })}
+            <ErrorBoundary on={ON.BACKGROUND}>
+              {renderSubBody({
+                className: '',
+                openNavigation,
+                closeNavigation,
+              })}
+            </ErrorBoundary>
           </div>
         )}
         {/* region: Body */}
@@ -167,17 +179,25 @@ const Layout: React.FC<Props> = ({
             }
           )}
         >
-          {renderBody({ className: 'flex-1', openNavigation, closeNavigation })}
+          <ErrorBoundary on={ON.BACKGROUND}>
+            {renderBody({
+              className: 'flex-1',
+              openNavigation,
+              closeNavigation,
+            })}
+          </ErrorBoundary>
         </div>
       </div>
       {renderNavigation && (
         <Drawer {...drawer.bind}>
-          {renderNavigation({
-            className: '',
-            openNavigation,
-            closeNavigation,
-            isOnDrawer: true,
-          })}
+          <ErrorBoundary on={ON.SURFACE}>
+            {renderNavigation({
+              className: '',
+              openNavigation,
+              closeNavigation,
+              isOnDrawer: true,
+            })}
+          </ErrorBoundary>
         </Drawer>
       )}
     </>
