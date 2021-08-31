@@ -6,7 +6,7 @@ import { useRecoilState } from 'recoil';
 import * as yup from 'yup';
 import Button from '$components/button';
 import Textinput from '$components/textinput';
-import { ON, STATUS_CODE } from '$constants/index';
+import { ON, HTTP_STATUS_CODE } from '$constants/index';
 import { HTTPUnexpectedError } from '$errors/index';
 import { listState as endpointListState } from '$store/atoms/endpoint';
 import {
@@ -102,7 +102,7 @@ const Add: React.FC<Props> = ({ onAdd, className = '' }) => {
 
       // The OAS document requires authentication.
       // The endpoint exists and it's not open to public.
-      if (!response.ok && response.status === STATUS_CODE.UNAUTHORIZED) {
+      if (!response.ok && response.status === HTTP_STATUS_CODE.UNAUTHORIZED) {
         const authconfigsPath = response.headers.get('x-viron-authtypes-path');
         // TODO: 値のundefinedチェックに加えて、値の妥当性もチェックすること。
         if (!authconfigsPath) {

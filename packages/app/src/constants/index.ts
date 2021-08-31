@@ -32,7 +32,7 @@ export const OAUTH_REDIRECT_URI = (function () {
   return `${window.location.origin}/oauthredirect`;
 })();
 
-export const STATUS_CODE = {
+export const HTTP_STATUS_CODE = {
   CONTINUE: 100,
   SWITCHING_PROTOCOL: 101,
   PROCESSING: 102,
@@ -66,9 +66,9 @@ export const STATUS_CODE = {
   CONFLICT: 409,
   GONE: 410,
   LENGTH_REQUIRED: 411,
-  PRECONDITION_FAILED: 413,
+  PRECONDITION_FAILED: 412,
   PAYLOAD_TOO_LARGE: 413,
-  URI_TOO_ONG: 414,
+  URI_TOO_LONG: 414,
   UNSUPPORTED_MEDIA_TYPE: 415,
   RANGE_NOT_SATISFIABLE: 416,
   EXPECTATION_FAILED: 417,
@@ -95,4 +95,257 @@ export const STATUS_CODE = {
   NOT_EXTENDED: 510,
   NETWORK_AUTHENTICATION_REQUIRED: 511,
 } as const;
-export type StatusCode = typeof STATUS_CODE[keyof typeof STATUS_CODE];
+export type HTTPStatusCode =
+  typeof HTTP_STATUS_CODE[keyof typeof HTTP_STATUS_CODE];
+
+export const HTTP_STATUS: Record<
+  HTTPStatusCode,
+  { name: string; message: string }
+> = {
+  100: {
+    name: 'Continue',
+    message: 'TODO',
+  },
+  101: {
+    name: 'Swithing Protocols',
+    message: 'TODO',
+  },
+  102: {
+    name: 'Processing',
+    message: 'TODO',
+  },
+  103: {
+    name: 'Early Hints',
+    message: 'TODO',
+  },
+  200: {
+    name: 'OK',
+    message: 'TODO',
+  },
+  201: {
+    name: 'Created',
+    message: 'TODO',
+  },
+  202: {
+    name: 'Accepted',
+    message: 'TODO',
+  },
+  203: {
+    name: 'Non-Authoritative information',
+    message: 'TODO',
+  },
+  204: {
+    name: 'No Content',
+    message: 'TODO',
+  },
+  205: {
+    name: 'Reset Content',
+    message: 'TODO',
+  },
+  206: {
+    name: 'Partial Content',
+    message: 'TODO',
+  },
+  207: {
+    name: 'Multi Status',
+    message: 'TODO',
+  },
+  208: {
+    name: 'Already Reported',
+    message: 'TODO',
+  },
+  226: {
+    name: 'IM Used',
+    message: 'TODO',
+  },
+  300: {
+    name: 'Multiple Choice',
+    message: 'TODO',
+  },
+  301: {
+    name: 'Moved Permanently',
+    message: 'TODO',
+  },
+  302: {
+    name: 'Found',
+    message: 'TODO',
+  },
+  303: {
+    name: 'See Other',
+    message: 'TODO',
+  },
+  304: {
+    name: 'Not Modified',
+    message: 'TODO',
+  },
+  307: {
+    name: 'Temporary Redirect',
+    message: 'TODO',
+  },
+  308: {
+    name: 'Permanent Redirect',
+    message: 'TODO',
+  },
+  400: {
+    name: 'Bad Request',
+    message:
+      'The request could not be understood by the server due to malformed request payload syntax.',
+  },
+  401: {
+    name: 'Unauthorized',
+    message: 'TODO',
+  },
+  402: {
+    name: 'Payment Required',
+    message: 'TODO',
+  },
+  403: {
+    name: 'Forbidden',
+    message: 'TODO',
+  },
+  404: {
+    name: 'Not Found',
+    message: 'TODO',
+  },
+  405: {
+    name: 'Method Not Allowed',
+    message: 'TODO',
+  },
+  406: {
+    name: 'Not Acceptable',
+    message: 'TODO',
+  },
+  407: {
+    name: 'Proxy Authentication Required',
+    message: 'TODO',
+  },
+  408: {
+    name: 'Request Timeout',
+    message: 'TODO',
+  },
+  409: {
+    name: 'Conflict',
+    message: 'TODO',
+  },
+  410: {
+    name: 'Gone',
+    message: 'TODO',
+  },
+  411: {
+    name: 'Length Required',
+    message: 'TODO',
+  },
+  412: {
+    name: 'Precondition Failed',
+    message: 'TODO',
+  },
+  413: {
+    name: 'Payload Too Large',
+    message: 'TODO',
+  },
+  414: {
+    name: 'URI Too Long',
+    message: 'TODO',
+  },
+  415: {
+    name: 'Unsupportedd Media Type',
+    message: 'TODO',
+  },
+  416: {
+    name: 'Range Not Satisfiable',
+    message: 'TODO',
+  },
+  417: {
+    name: 'Expectation Failed',
+    message: 'TODO',
+  },
+  418: {
+    name: 'Im a Teapot',
+    message: 'TODO',
+  },
+  421: {
+    name: 'Misdirected Request',
+    message: 'TODO',
+  },
+  422: {
+    name: 'Unprocessable Entity',
+    message: 'TODO',
+  },
+  423: {
+    name: 'Locked',
+    message: 'TODO',
+  },
+  424: {
+    name: 'Failed Dependency',
+    message: 'TODO',
+  },
+  425: {
+    name: 'Too Early',
+    message: 'TODO',
+  },
+  426: {
+    name: 'Upgrade Required',
+    message: 'TODO',
+  },
+  428: {
+    name: 'Precondition Required',
+    message: 'TODO',
+  },
+  429: {
+    name: 'Too Many Requests',
+    message: 'TODO',
+  },
+  431: {
+    name: 'Request Header Fields Too Large',
+    message: 'TODO',
+  },
+  451: {
+    name: 'Unavailable For Legal Reasons',
+    message: 'TODO',
+  },
+  500: {
+    name: 'Internal Server Error',
+    message: 'TODO',
+  },
+  501: {
+    name: 'Not Implemented',
+    message: 'TODO',
+  },
+  502: {
+    name: 'Bad Gateway',
+    message: 'TODO',
+  },
+  503: {
+    name: 'Server Unavailable',
+    message: 'TODO',
+  },
+  504: {
+    name: 'Gateway Timeout',
+    message: 'TODO',
+  },
+  505: {
+    name: 'HTTP Version Not Supported',
+    message: 'TODO',
+  },
+  506: {
+    name: 'Variant Also Negotiates',
+    message: 'TODO',
+  },
+  507: {
+    name: 'Insufficient Storage',
+    message: 'TODO',
+  },
+  508: {
+    name: 'Loop Detected',
+    message: 'TODO',
+  },
+  510: {
+    name: 'Not Extended',
+    message: 'TODO',
+  },
+  511: {
+    name: 'Network Authentication Required',
+    message: 'TODO',
+  },
+} as const;
+export type HTTPStatus = typeof HTTP_STATUS[keyof typeof HTTP_STATUS];

@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import Error from '$components/error';
 import Metadata from '$components/metadata';
-import { ON, StatusCode } from '$constants/index';
+import { ON, HTTPStatusCode } from '$constants/index';
 import { BaseError, getHTTPError, NetworkError, OASError } from '$errors/index';
 import useTheme from '$hooks/theme';
 import Layout, { Props as LayoutProps } from '$layouts/index';
@@ -59,7 +59,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
 
       if (!response.ok) {
         // The authorization cookie is not valid.
-        const error = getHTTPError(response.status as StatusCode);
+        const error = getHTTPError(response.status as HTTPStatusCode);
         setError(error);
         setIsPending(false);
         return;
