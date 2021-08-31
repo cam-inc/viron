@@ -277,7 +277,20 @@ const Header: React.FC<Props> = ({
         </div>
       </Popover>
       {/* Page Popover */}
-      <Popover {...pagePopover.bind}>TODO</Popover>
+      <Popover {...pagePopover.bind}>
+        <div className="flex flex-col gap-1 text-on-surface">
+          {page.group && (
+            <div className="text-xxs text-on-surface-low">{page.group}</div>
+          )}
+          <div className="text-xxs">{page.id}</div>
+          <div className="text-base text-on-surface-high font-bold">
+            {page.title}
+          </div>
+          {page.description && (
+            <CommonMark on={ON.SURFACE} data={page.description} />
+          )}
+        </div>
+      </Popover>
       {/* Contents Popover */}
       <Popover {...contentsPopover.bind}>
         {page.contents.map(function (content) {
@@ -287,7 +300,7 @@ const Header: React.FC<Props> = ({
                 on={ON.SURFACE}
                 size={BUTTON_SIZE.SM}
                 variant={BUTTON_VARIANT.TEXT}
-                label={content.title}
+                label={content.title || content.id}
                 data={content}
                 onClick={handleContentClick}
               />
