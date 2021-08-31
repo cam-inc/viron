@@ -283,7 +283,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
 
   return (
     <>
-      <Metadata title="TODO | Viron" />
+      <Metadata />
       <Layout
         renderAppBar={renderAppBar}
         renderNavigation={renderNavigation}

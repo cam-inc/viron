@@ -2,7 +2,6 @@ import { BiCaretDownSquare } from '@react-icons/all-files/bi/BiCaretDownSquare';
 import { BiCaretRightSquare } from '@react-icons/all-files/bi/BiCaretRightSquare';
 import React, { useCallback } from 'react';
 import Button from '$components/button';
-import Operation from '$components/operation';
 import { ON } from '$constants/index';
 import { ClassName, Endpoint } from '$types/index';
 import { Document, Info } from '$types/oas';
@@ -96,14 +95,9 @@ const Head: React.FC<Props> = ({
           />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-xxs">{content.type}</div>
-          <div className="text-xxs">{content.operationId}</div>
-          <div>{content.title}</div>
-          <Operation
-            on={ON.SURFACE}
-            document={document}
-            operation={base.request.operation}
-          />
+          <div className="text-on-surface-high">
+            {content.title || content.id}
+          </div>
         </div>
         {!!siblings.length && (
           <div className="flex-none ml-2">

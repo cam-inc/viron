@@ -170,7 +170,7 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
 
   return (
     <>
-      <Metadata title="OAuth | Viron" />
+      <Metadata title="OAuth" />
       <Layout
         renderAppBar={renderAppBar}
         renderNavigation={renderNavigation}

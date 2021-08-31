@@ -103,7 +103,7 @@ const HomePage: React.FC<Props> = () => {
 
   return (
     <>
-      <Metadata title="Home" />
+      <Metadata title="Dashboard" />
       <Layout
         renderAppBar={renderAppBar}
         renderNavigation={renderNavigation}
