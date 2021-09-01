@@ -14,7 +14,7 @@ import Modal, { useModal } from '$components/modal';
 import Paper from '$components/paper';
 import Popover, { usePopover } from '$components/popover';
 import Spinner from '$components/spinner';
-import { ON, STATUS_CODE } from '$constants/index';
+import { ON, HTTP_STATUS_CODE } from '$constants/index';
 import { BaseError, HTTPUnexpectedError, NetworkError } from '$errors/index';
 import { screenState } from '$store/atoms/app';
 import { listState } from '$store/atoms/endpoint';
@@ -223,8 +223,8 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove, className = '' }) => {
           return;
         }
         if (
-          response.status === STATUS_CODE.UNAUTHORIZED ||
-          response.status === STATUS_CODE.FORBIDDEN
+          response.status === HTTP_STATUS_CODE.UNAUTHORIZED ||
+          response.status === HTTP_STATUS_CODE.FORBIDDEN
         ) {
           setIsSigninRequired(true);
           setIsPending(false);

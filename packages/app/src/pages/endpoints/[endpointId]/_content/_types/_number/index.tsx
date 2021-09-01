@@ -8,7 +8,6 @@ import { UseBaseReturn } from '../../_hooks/useBase';
 type Props = {
   document: Document;
   content: Info['x-pages'][number]['contents'][number];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   base: UseBaseReturn;
 };
 const _ContentNumber: React.FC<Props> = ({ base }) => {
@@ -17,6 +16,12 @@ const _ContentNumber: React.FC<Props> = ({ base }) => {
     return <Error on={ON.SURFACE} error={result.value} />;
   }
 
-  return <div>{result.value.toLocaleString()}</div>;
+  return (
+    <div className="flex justify-end">
+      <div className="text-2xl font-bold text-on-surface">
+        {result.value.toLocaleString()}
+      </div>
+    </div>
+  );
 };
 export default _ContentNumber;

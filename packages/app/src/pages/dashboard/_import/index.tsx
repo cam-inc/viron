@@ -7,7 +7,7 @@ import Button, {
 } from '$components/button';
 import Error from '$components/error';
 import Modal, { useModal } from '$components/modal';
-import { ON, STATUS_CODE } from '$constants/index';
+import { ON, HTTP_STATUS_CODE } from '$constants/index';
 import {
   BaseError,
   FileReaderError,
@@ -38,149 +38,154 @@ const Import: React.FC<Props> = ({ className = '' }) => {
     inputElmRef.current?.click();
   }, []);
 
-  const handleInputChange = useCallback(function (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) {
-    const inputElement = e.currentTarget;
-    if (!inputElement.files || !inputElement.files.length) {
-      return;
-    }
-    const file = inputElement.files[0];
-    const reader = new FileReader();
-    reader.readAsText(file);
-    reader.onload = function () {
-      if (typeof reader.result !== 'string') {
-        setError(new FileReaderError('Invalid file type.'));
+  const handleInputChange = useCallback(
+    function (e: React.ChangeEvent<HTMLInputElement>) {
+      const inputElement = e.currentTarget;
+      if (!inputElement.files || !inputElement.files.length) {
         return;
       }
-      let endpointList: EndpointForDistribution[] = [];
-      try {
-        endpointList = JSON.parse(reader.result);
-      } catch {
-        setError(new FileReaderError('Invalid file data.'));
-        return;
-      }
-      // TODO: 良い感じにsrc/pages/dashboard/_add/index.tsxと処理を統一したい。
-      Promise.all(
-        endpointList.map<Promise<void>>(function (endpoint) {
-          const f = async function () {
-            // Check whether the endpoint exists or not.
-            const [response, responseError] = await promiseErrorHandler(
-              fetch(endpoint.url, {
-                mode: 'cors',
-              })
-            );
-            if (responseError) {
-              // 稀なケース。エクスポート後にエンドポイントurlを変更した際などに。
-              setError(new NetworkError(responseError.message));
-              return;
-            }
-            if (response.ok) {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const document: Record<string, any> = await response.json();
-              const { isValid } = lint(document);
-              if (!isValid) {
-                setError(
-                  new OASError('The OAS Document is not of version we support.')
-                );
-                return;
-              }
-              setEndpointList(function (currVal) {
-                // ID duplication check.
-                let { id } = endpoint;
-                if (
-                  !!currVal.find(function (endpoint) {
-                    return endpoint.id === id;
-                  })
-                ) {
-                  id = `${id}-${Math.random()}`;
-                }
-                const _endpoint: Endpoint = {
-                  ...endpoint,
-                  id,
-                  isPrivate: false,
-                  authConfigs: null,
-                  document: resolve(document),
-                };
-                return [...currVal, _endpoint];
-              });
-              return;
-            }
-            if (!response.ok && response.status === STATUS_CODE.UNAUTHORIZED) {
-              const authconfigsPath = response.headers.get(
-                'x-viron-authtypes-path'
+      const file = inputElement.files[0];
+      const reader = new FileReader();
+      reader.readAsText(file);
+      reader.onload = function () {
+        if (typeof reader.result !== 'string') {
+          setError(new FileReaderError('Invalid file type.'));
+          return;
+        }
+        let endpointList: EndpointForDistribution[] = [];
+        try {
+          endpointList = JSON.parse(reader.result);
+        } catch {
+          setError(new FileReaderError('Invalid file data.'));
+          return;
+        }
+        // TODO: 良い感じにsrc/pages/dashboard/_add/index.tsxと処理を統一したい。
+        Promise.all(
+          endpointList.map<Promise<void>>(function (endpoint) {
+            const f = async function () {
+              // Check whether the endpoint exists or not.
+              const [response, responseError] = await promiseErrorHandler(
+                fetch(endpoint.url, {
+                  mode: 'cors',
+                })
               );
-              // TODO: 値のundefinedチェックに加えて、値の妥当性もチェックすること。
-              if (!authconfigsPath) {
-                setError(
-                  new BaseError(
-                    'The x-viron-authtypes-path response header is missing.'
-                  )
-                );
+              if (responseError) {
+                // 稀なケース。エクスポート後にエンドポイントurlを変更した際などに。
+                setError(new NetworkError(responseError.message));
                 return;
               }
-              const [authconfigsResponse, authconfigsResponseError] =
-                await promiseErrorHandler(
-                  fetch(`${new URL(endpoint.url).origin}${authconfigsPath}`, {
-                    mode: 'cors',
-                  })
-                );
-              if (!!authconfigsResponseError) {
-                // Network error.
-                setError(
-                  new BaseError(
-                    `Couldn't establish a connection to ${
-                      new URL(endpoint.url).origin
-                    }${authconfigsPath}.`
-                  )
-                );
-                return;
-              }
-              const authConfigs: AuthConfigsResponse =
-                await authconfigsResponse.json();
-              // TODO: authConfigs値の妥当性をチェックする。
-              setEndpointList(function (currVal) {
-                // ID duplication check.
-                let { id } = endpoint;
-                if (
-                  !!currVal.find(function (endpoint) {
-                    return endpoint.id === id;
-                  })
-                ) {
-                  id = `${id}-${Math.random()}`;
+              if (response.ok) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const document: Record<string, any> = await response.json();
+                const { isValid } = lint(document);
+                if (!isValid) {
+                  setError(
+                    new OASError(
+                      'The OAS Document is not of version we support.'
+                    )
+                  );
+                  return;
                 }
-                const _endpoint: Endpoint = {
-                  ...endpoint,
-                  id,
-                  isPrivate: true,
-                  authConfigs,
-                  document: null,
-                };
-                return [...currVal, _endpoint];
-              });
-              return;
-            }
+                setEndpointList(function (currVal) {
+                  // ID duplication check.
+                  let { id } = endpoint;
+                  if (
+                    !!currVal.find(function (endpoint) {
+                      return endpoint.id === id;
+                    })
+                  ) {
+                    id = `${id}-${Math.random()}`;
+                  }
+                  const _endpoint: Endpoint = {
+                    ...endpoint,
+                    id,
+                    isPrivate: false,
+                    authConfigs: null,
+                    document: resolve(document),
+                  };
+                  return [...currVal, _endpoint];
+                });
+                return;
+              }
+              if (
+                !response.ok &&
+                response.status === HTTP_STATUS_CODE.UNAUTHORIZED
+              ) {
+                const authconfigsPath = response.headers.get(
+                  'x-viron-authtypes-path'
+                );
+                // TODO: 値のundefinedチェックに加えて、値の妥当性もチェックすること。
+                if (!authconfigsPath) {
+                  setError(
+                    new BaseError(
+                      'The x-viron-authtypes-path response header is missing.'
+                    )
+                  );
+                  return;
+                }
+                const [authconfigsResponse, authconfigsResponseError] =
+                  await promiseErrorHandler(
+                    fetch(`${new URL(endpoint.url).origin}${authconfigsPath}`, {
+                      mode: 'cors',
+                    })
+                  );
+                if (!!authconfigsResponseError) {
+                  // Network error.
+                  setError(
+                    new BaseError(
+                      `Couldn't establish a connection to ${
+                        new URL(endpoint.url).origin
+                      }${authconfigsPath}.`
+                    )
+                  );
+                  return;
+                }
+                const authConfigs: AuthConfigsResponse =
+                  await authconfigsResponse.json();
+                // TODO: authConfigs値の妥当性をチェックする。
+                setEndpointList(function (currVal) {
+                  // ID duplication check.
+                  let { id } = endpoint;
+                  if (
+                    !!currVal.find(function (endpoint) {
+                      return endpoint.id === id;
+                    })
+                  ) {
+                    id = `${id}-${Math.random()}`;
+                  }
+                  const _endpoint: Endpoint = {
+                    ...endpoint,
+                    id,
+                    isPrivate: true,
+                    authConfigs,
+                    document: null,
+                  };
+                  return [...currVal, _endpoint];
+                });
+                return;
+              }
 
-            // Something went wrong.
-            // response.ok is false and response.status is other than 401.
-            setError(new HTTPUnexpectedError());
-          };
-          return f();
-        })
-      )
-        .catch(function (error: Error) {
-          setError(new BaseError(error.message));
-        })
-        .finally(function () {
-          inputElement.value = '';
-        });
-    };
-    reader.onerror = function () {
-      setError(new FileReaderError((reader.error as DOMException).message));
-      inputElement.value = '';
-    };
-  },
-  []);
+              // Something went wrong.
+              // response.ok is false and response.status is other than 401.
+              setError(new HTTPUnexpectedError());
+            };
+            return f();
+          })
+        )
+          .catch(function (error: Error) {
+            setError(new BaseError(error.message));
+          })
+          .finally(function () {
+            inputElement.value = '';
+          });
+      };
+      reader.onerror = function () {
+        setError(new FileReaderError((reader.error as DOMException).message));
+        inputElement.value = '';
+      };
+    },
+    [setEndpointList]
+  );
 
   useEffect(
     function () {

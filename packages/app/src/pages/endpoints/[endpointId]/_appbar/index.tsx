@@ -278,7 +278,7 @@ const Header: React.FC<Props> = ({
       </Popover>
       {/* Page Popover */}
       <Popover {...pagePopover.bind}>
-        <div className="flex flex-col gap-1 text-on-surface">
+        <div className="flex flex-col gap-1 text-on-surface whitespace-nowrap">
           {page.group && (
             <div className="text-xxs text-on-surface-low">{page.group}</div>
           )}

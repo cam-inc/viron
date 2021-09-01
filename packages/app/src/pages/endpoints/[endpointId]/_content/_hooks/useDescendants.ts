@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { useMemo } from 'react';
-import { StatusCode } from '$constants/index';
+import { HTTPStatusCode } from '$constants/index';
 import { BaseError, getHTTPError, NetworkError } from '$errors/index';
 import { Endpoint } from '$types/index';
 import {
@@ -154,7 +154,7 @@ const useDescendants = function (
             }
             if (!response.ok) {
               return {
-                error: getHTTPError(response.status as StatusCode),
+                error: getHTTPError(response.status as HTTPStatusCode),
               };
             }
             const data = await response.json();

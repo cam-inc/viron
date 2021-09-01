@@ -1,4 +1,8 @@
-import { StatusCode, STATUS_CODE } from '$constants/index';
+import {
+  HTTPStatusCode,
+  HTTP_STATUS,
+  HTTP_STATUS_CODE,
+} from '$constants/index';
 
 export class Success<T, E extends BaseError> {
   readonly value: T;
@@ -30,41 +34,28 @@ export class Failure<T, E extends BaseError> {
 
 export type Result<T, E extends BaseError> = Success<T, E> | Failure<T, E>;
 
-export const CODE = {
-  BASE: '#base',
-  NETWORK: '#network',
-  HTTP: '#http',
-  FILE_READER: '#fileReader',
-  OAS: '#oas',
-} as const;
-export type Code = typeof CODE[keyof typeof CODE];
-
-export const NAME = {
-  BASE: 'base',
-  NETWORK: 'network',
-  HTTP: 'http',
-  FILE_READER: 'fileReader',
-  OAS: 'oas',
-} as const;
-export type Name = typeof NAME[keyof typeof NAME];
-
 export class BaseError extends Error {
-  code: Code = CODE.BASE;
-  name: Name = NAME.BASE;
+  code = '#base';
+  name = 'Base Error';
+  message = 'An error has occured.';
 }
 
 export class NetworkError extends BaseError {
-  code: Code = CODE.NETWORK;
-  name: Name = NAME.NETWORK;
+  code = '#network';
+  name = 'Network Error';
+  message = "Couldn't establish a connection.";
 }
 
 export class HTTPError extends BaseError {
-  code: Code = CODE.HTTP;
-  name: Name = NAME.HTTP;
+  code = '#http';
+  name = 'HTTP Error';
+  message = 'A HTTP-related error has occured.';
 }
 
 export class HTTP400Error extends HTTPError {
-  message = 'TODO';
+  code = '#http-400';
+  name = HTTP_STATUS[HTTP_STATUS_CODE.BAD_REQUEST].name;
+  message = HTTP_STATUS[HTTP_STATUS_CODE.BAD_REQUEST].message;
 }
 
 export class HTTP401Error extends HTTPError {
@@ -80,22 +71,24 @@ export class HTTPUnexpectedError extends HTTPError {
 }
 
 export class FileReaderError extends BaseError {
-  code: Code = CODE.FILE_READER;
-  name: Name = NAME.FILE_READER;
+  code = '#fileReader';
+  name = 'File Reader Error';
+  message = "Counln't read a file properly.";
 }
 
 export class OASError extends BaseError {
-  code: Code = CODE.OAS;
-  name: Name = NAME.OAS;
+  code = '#oas';
+  name = 'OAS Error';
+  message = 'Incorrect OAS document.';
 }
 
-export const getHTTPError = function (statusCode: StatusCode): BaseError {
+export const getHTTPError = function (statusCode: HTTPStatusCode): BaseError {
   switch (statusCode) {
-    case STATUS_CODE.BAD_REQUEST:
+    case HTTP_STATUS_CODE.BAD_REQUEST:
       return new HTTP400Error();
-    case STATUS_CODE.UNAUTHORIZED:
+    case HTTP_STATUS_CODE.UNAUTHORIZED:
       return new HTTP401Error();
-    case STATUS_CODE.FORBIDDEN:
+    case HTTP_STATUS_CODE.FORBIDDEN:
       return new HTTP403Error();
     default:
       return new HTTPError();

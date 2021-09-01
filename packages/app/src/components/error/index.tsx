@@ -1,3 +1,4 @@
+import { BiError } from '@react-icons/all-files/bi/BiError';
 import classnames from 'classnames';
 import React, { useEffect } from 'react';
 import { On, ON } from '$constants/index';
@@ -35,30 +36,47 @@ const Error: React.FC<Props> = ({ on, error }) => {
         'text-on-complementary': on === ON.COMPLEMENTARY,
       })}
     >
-      <div>
-        Error[{error.code}]: {error.name}
-      </div>
-      {error.message && <div className="text-xxs">{error.message}</div>}
-      {error instanceof NetworkError && (
-        <div>
-          <div>TODO: NetworkError</div>
-        </div>
-      )}
-      {error instanceof HTTP401Error && (
-        <div>
-          <div>TODO: 認証が必要よ。</div>
-          <div>
-            <Link on={on} to="/dashboard">
-              home
-            </Link>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <div className="flex-none">
+            <BiError className="text-2xl" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-base font-bold">{error.name}</div>
+            <div
+              className={classnames('text-xxs', {
+                'text-on-background-low': on === ON.BACKGROUND,
+                'text-on-surface-low': on === ON.SURFACE,
+                'text-on-primary-low': on === ON.PRIMARY,
+                'text-on-complementary-low': on === ON.COMPLEMENTARY,
+              })}
+            >
+              [{error.code}]
+            </div>
           </div>
         </div>
-      )}
-      {error instanceof HTTP403Error && (
-        <div>
-          <div>TODO: コンテンツへのアクセス権がないよ。</div>
-        </div>
-      )}
+        <div className="text-xs">{error.message}</div>
+        {error instanceof NetworkError && (
+          <div>
+            <div>TODO: NetworkError</div>
+          </div>
+        )}
+        {error instanceof HTTP401Error && (
+          <div>
+            <div>TODO: 認証が必要よ。</div>
+            <div>
+              <Link on={on} to="/dashboard">
+                home
+              </Link>
+            </div>
+          </div>
+        )}
+        {error instanceof HTTP403Error && (
+          <div>
+            <div>TODO: コンテンツへのアクセス権がないよ。</div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

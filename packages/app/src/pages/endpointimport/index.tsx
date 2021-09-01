@@ -5,7 +5,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import Error from '$components/error';
 import Metadata from '$components/metadata';
-import { ON, StatusCode } from '$constants/index';
+import { ON, HTTPStatusCode } from '$constants/index';
 import { BaseError, getHTTPError, NetworkError, OASError } from '$errors/index';
 import useTheme from '$hooks/theme';
 import Layout, { Props as LayoutProps } from '$layouts/index';
@@ -132,7 +132,7 @@ const EndpointImportPagge: React.FC<Props> = ({ location }) => {
           return;
         }
         if (!response.ok) {
-          const error = getHTTPError(response.status as StatusCode);
+          const error = getHTTPError(response.status as HTTPStatusCode);
           setError(error);
           setIsPending(false);
           return;

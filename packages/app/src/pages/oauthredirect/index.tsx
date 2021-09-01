@@ -7,7 +7,7 @@ import { useRecoilState } from 'recoil';
 import Error from '$components/error';
 import Metadata from '$components/metadata';
 import Request from '$components/request';
-import { ON, StatusCode } from '$constants/index';
+import { ON, HTTPStatusCode } from '$constants/index';
 import { BaseError, getHTTPError, NetworkError } from '$errors/index';
 import useTheme from '$hooks/theme';
 import Layout, { Props as LayoutProps } from '$layouts/index';
@@ -115,7 +115,7 @@ const OAuthRedirectPage: React.FC<Props> = ({ location }) => {
       return;
     }
     if (!response.ok) {
-      setError(getHTTPError(response.status as StatusCode));
+      setError(getHTTPError(response.status as HTTPStatusCode));
       return;
     }
     navigate(`/endpoints/${endpoint.id}`);

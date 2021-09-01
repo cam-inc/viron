@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { useMemo } from 'react';
-import { StatusCode } from '$constants/index';
+import { HTTPStatusCode } from '$constants/index';
 import { BaseError, getHTTPError, NetworkError } from '$errors/index';
 import { Endpoint } from '$types/index';
 import {
@@ -142,7 +142,7 @@ const useSiblings = function (
               return { error: new NetworkError() };
             }
             if (!response.ok) {
-              return { error: getHTTPError(response.status as StatusCode) };
+              return { error: getHTTPError(response.status as HTTPStatusCode) };
             }
             const data = await response.json();
             return {

@@ -4,17 +4,19 @@ import { AiFillGoogleCircle } from '@react-icons/all-files/ai/AiFillGoogleCircle
 import { AiOutlineLogin } from '@react-icons/all-files/ai/AiOutlineLogin';
 import { navigate } from 'gatsby';
 import _ from 'lodash';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import Button from '$components/button';
 import Error from '$components/error';
 import Drawer, { useDrawer } from '$components/drawer';
+import Modal, { useModal } from '$components/modal';
 import Request, { Props as RequestProps } from '$components/request';
 import {
   ENVIRONMENTAL_VARIABLE,
   OAUTH_REDIRECT_URI,
   ON,
+  HTTPStatusCode,
 } from '$constants/index';
-import { BaseError } from '$errors/index';
+import { BaseError, getHTTPError, NetworkError } from '$errors/index';
 import { remove, KEY, set } from '$storage/index';
 import { AuthConfig, Endpoint } from '$types/index';
 import {
@@ -256,6 +258,10 @@ const Email: React.FC<{
     document = resolve(document);
   }
 
+  // Request and Response error handling.
+  const [error, setError] = useState<BaseError | null>(null);
+  const errorModal = useModal();
+
   const request = useMemo<RequestType | null>(
     function () {
       if (!document) {
@@ -299,16 +305,18 @@ const Email: React.FC<{
         fetch(requestInfo, requestInit)
       );
       if (!!responseError) {
-        // TODO
+        setError(new NetworkError(responseError.message));
+        errorModal.open();
         return;
       }
       if (!response.ok) {
-        // TODO
+        setError(getHTTPError(response.status as HTTPStatusCode));
+        errorModal.open();
         return;
       }
       navigate(`/endpoints/${endpoint.id}`);
     },
-    [endpoint, document, request]
+    [endpoint, document, request, errorModal]
   );
 
   const defaultValues = useMemo<RequestValue>(
@@ -346,15 +354,20 @@ const Email: React.FC<{
   }
 
   return (
-    <Request
-      on={ON.SURFACE}
-      endpoint={endpoint}
-      document={document}
-      defaultValues={defaultValues}
-      request={request}
-      onSubmit={handleSubmit}
-      className="h-full"
-      renderHead={renderHead}
-    />
+    <>
+      <Request
+        on={ON.SURFACE}
+        endpoint={endpoint}
+        document={document}
+        defaultValues={defaultValues}
+        request={request}
+        onSubmit={handleSubmit}
+        className="h-full"
+        renderHead={renderHead}
+      />
+      <Modal {...errorModal.bind}>
+        {error && <Error on={ON.SURFACE} error={error} />}
+      </Modal>
+    </>
   );
 };

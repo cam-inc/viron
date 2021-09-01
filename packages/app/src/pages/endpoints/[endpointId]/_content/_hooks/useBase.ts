@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { StatusCode } from '$constants/index';
+import { HTTPStatusCode } from '$constants/index';
 import { BaseError, getHTTPError, NetworkError } from '$errors/index';
 import { Endpoint } from '$types/index';
 import {
@@ -108,7 +108,7 @@ const useBase = function (
         }
         if (!response.ok) {
           // The authorization cookie is not valid or any other reasons.
-          setError(getHTTPError(response.status as StatusCode));
+          setError(getHTTPError(response.status as HTTPStatusCode));
           setData(null);
           setIsPending(false);
           return;
