@@ -7,12 +7,15 @@ info:
     - id: article
       group: 管理画面/入稿
       title: 記事
-      description: 記事情報を閲覧/管理します
+      description: |
+        # 記事情報の管理
+        記事データの **入稿・更新・削除** を行います。
       contents:
-        - operationId: listArticles
-          resourceId: article
+        - title: 記事
           type: table
+          operationId: listArticles
           pagination: true
+          resourceId: article
 
 tags:
   - name: article

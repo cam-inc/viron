@@ -24,6 +24,7 @@ import {
   OAS_X_THEME,
   OAS_X_THUMBNAIL,
   Theme,
+  XPageContentType,
 } from '../constants';
 import { getDebug } from '../logging';
 import { oasValidationFailure } from '../errors';
@@ -78,17 +79,16 @@ export interface OasXPageContentAction {
 export type OasXPageContentActions = OasXPageContentAction[];
 
 export interface OasXPageContent {
+  title: string;
+  type: XPageContentType;
   operationId: string;
-  resourceId: string;
-  type: string;
   defaultParametersValue?: OasCustomParameters;
   defaultRequestBodyValues?: OasCustomRequestBody;
   pagination?: boolean;
-  query?: string[];
-  tableLabels?: string[];
-  sort?: string[];
   autoRefreshSec?: number;
   actions?: OasXPageContentActions;
+  // only used by backend
+  resourceId: string;
 }
 
 export type OasXPageContents = OasXPageContent[];

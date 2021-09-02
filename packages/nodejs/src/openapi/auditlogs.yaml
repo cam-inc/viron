@@ -7,21 +7,15 @@ info:
     - id: vironAuditLog
       group: 管理画面/管理
       title: Viron 監査ログ
-      description: このVironサーバの監査ログを閲覧できます
+      description: |
+        # 監査ログの閲覧
+        Vironサーバの監査ログを閲覧します。
       contents:
-        - operationId: listVironAuditlogs
-          resourceId: vironAuditLog
+        - title: 監査ログ 
           type: table
-          query:
-            - userId
-            - requestUri
-          sort:
-            - requestMethod
-            - requestUri
-            - sourceIp
-            - userId
-            - statusCode
-            - createdAt
+          operationId: listVironAuditlogs
+          pagination: true
+          resourceId: vironAuditLog
 
 tags:
   - name: vironAuditLog

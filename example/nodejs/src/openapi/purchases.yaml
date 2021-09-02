@@ -7,12 +7,15 @@ info:
     - id: purchase
       group: 管理画面/ユーザー
       title: 購買情報
-      description: 購買情報を閲覧/管理します
+      description: |
+        # 購買情報の管理
+        購買情報データの **作成・更新・削除** を行います。
       contents:
-        - operationId: listPurchases
-          resourceId: purchase
+        - title: 購買情報
           type: table
+          operationId: listPurchases
           pagination: true
+          resourceId: purchase
 
 tags:
   - name: purchase

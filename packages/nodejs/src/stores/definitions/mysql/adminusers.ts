@@ -42,11 +42,11 @@ const schemaDefinition: ModelAttributes<AdminUserModel, AdminUser> = {
     allowNull: true,
   },
   googleOAuth2ExpiryDate: {
-    type: DataTypes.INTEGER.UNSIGNED,
+    type: DataTypes.BIGINT,
     allowNull: true,
   },
   googleOAuth2IdToken: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(2048),
     allowNull: true,
   },
   googleOAuth2RefreshToken: {

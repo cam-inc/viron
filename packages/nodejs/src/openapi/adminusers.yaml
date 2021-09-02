@@ -8,14 +8,14 @@ info:
     - id: vironAdminUsers
       group: 管理画面/管理
       title: Viron 管理ユーザー
-      description: 管理ユーザー一覧を閲覧できます
+      description: |
+        # 管理ユーザーの管理
+        Vironを利用している管理ユーザーの **作成・更新・削除** を行います。
       contents:
-        - operationId: listVironAdminUsers
-          resourceId: vironAdminUser
+        - title: 管理ユーザー
           type: table
-          query:
-            - id
-            - roleId
+          operationId: listVironAdminUsers
+          resourceId: vironAdminUser
 
 tags:
   - name: vironAdminUsers

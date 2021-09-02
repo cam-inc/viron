@@ -8,11 +8,15 @@ info:
     - id: vironAdminAccount
       group: 管理画面/管理
       title: Viron アカウント設定
-      description: アカウント設定を閲覧できます
+      description: |
+        # アカウントの管理
+        ログインユーザーのアカウント情報を閲覧できます。
+        また、パスワード認証を利用している場合はパスワードの変更ができます。
       contents:
-        - operationId: listVironAdminAccounts
-          resourceId: vironAdminAccount
+        - title: アカウント設定 
           type: table
+          operationId: listVironAdminAccounts
+          resourceId: vironAdminAccount
 
 tags:
   - name: vironAdminAccounts
