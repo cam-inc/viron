@@ -7,11 +7,14 @@ info:
     - id: vironAdminRoles
       group: 管理画面/管理
       title: Viron 管理ロール
-      description: 管理ロール一覧を閲覧できます
+      description: |
+        # 管理ロール一覧の管理
+        管理ロールデータの **作成・更新・削除** を行います。
       contents:
-        - operationId: listVironAdminRoles
-          resourceId: vironAdminRole
+        - title: 管理ロール 
+          operationId: listVironAdminRoles
           type: table
+          resourceId: vironAdminRole
 
 tags:
   - name: vironAdminRoles

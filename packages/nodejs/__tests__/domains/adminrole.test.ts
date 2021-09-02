@@ -25,6 +25,7 @@ import {
   API_METHOD,
   OAS_X_PAGES,
   PERMISSION,
+  X_PAGE_CONTENT_TYPE,
 } from '../../src/constants';
 import { roleIdAlreadyExists } from '../../src/errors';
 
@@ -47,9 +48,10 @@ describe('domains/adminrole', () => {
             description: 'ブログ',
             contents: [
               {
+                title: 'ブログ',
                 operationId: 'getBlog',
                 resourceId: 'blog',
-                type: 'table',
+                type: X_PAGE_CONTENT_TYPE.TABLE,
               },
             ],
           },
@@ -60,9 +62,10 @@ describe('domains/adminrole', () => {
             description: 'ニュース',
             contents: [
               {
+                title: 'ニュース',
                 operationId: 'getNews',
                 resourceId: 'news',
-                type: 'table',
+                type: X_PAGE_CONTENT_TYPE.TABLE,
               },
             ],
           },
@@ -285,9 +288,10 @@ describe('domains/adminrole', () => {
             description: 'ブログ',
             contents: [
               {
+                title: 'ブログ',
                 operationId: 'listBlog',
                 resourceId: 'blog',
-                type: 'table',
+                type: X_PAGE_CONTENT_TYPE.TABLE,
               },
             ],
           },

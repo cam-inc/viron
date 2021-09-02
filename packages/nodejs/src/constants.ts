@@ -156,6 +156,14 @@ export const THEME = {
 } as const;
 export type Theme = typeof THEME[keyof typeof THEME];
 
+export const X_PAGE_CONTENT_TYPE = {
+  NUMBER: 'number',
+  TABLE: 'table',
+  CUSTOM: 'custom',
+} as const;
+export type XPageContentType =
+  typeof X_PAGE_CONTENT_TYPE[keyof typeof X_PAGE_CONTENT_TYPE];
+
 export const TABLE_SORT_DELIMITER = ':';
 
 export const ADMIN_USER_ID_ME = 'me';

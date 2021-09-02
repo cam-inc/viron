@@ -2,7 +2,11 @@ import assert from 'assert';
 import path from 'path';
 import sinon from 'sinon';
 import copy from 'fast-copy';
-import { API_METHOD, PERMISSION } from '../../src/constants';
+import {
+  API_METHOD,
+  PERMISSION,
+  X_PAGE_CONTENT_TYPE,
+} from '../../src/constants';
 import {
   clearCache,
   get,
@@ -61,9 +65,10 @@ describe('domains/oas', () => {
         description: 'user list for test.',
         contents: [
           {
+            title: 'ユーザー',
             resourceId: 'user',
             operationId: 'listUsers',
-            type: 'table',
+            type: X_PAGE_CONTENT_TYPE.TABLE,
           },
         ],
       };
@@ -74,9 +79,10 @@ describe('domains/oas', () => {
         description: 'blog list for test.',
         contents: [
           {
+            title: 'ブログ',
             resourceId: 'blog',
             operationId: 'listBlogs',
-            type: 'table',
+            type: X_PAGE_CONTENT_TYPE.TABLE,
           },
         ],
       };
@@ -194,6 +200,7 @@ describe('domains/oas', () => {
             description: 'ブログ',
             contents: [
               {
+                title: 'ブログ',
                 operationId: 'listBlog',
                 resourceId: 'blog',
                 type: 'table',
@@ -207,6 +214,7 @@ describe('domains/oas', () => {
             description: 'ユーザーブログ',
             contents: [
               {
+                title: 'ユーザーブログ',
                 operationId: 'listUserBlog',
                 resourceId: 'userblog',
                 type: 'table',
