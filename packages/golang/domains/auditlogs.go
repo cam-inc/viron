@@ -11,7 +11,7 @@ import (
 
 type (
 	AuditLog struct {
-		ID            uint    `json:"id"`
+		ID            string  `json:"id"`
 		RequestMethod *string `json:"requestMethod"`
 		RequestUri    *string `json:"requestUri"`
 		SourceIp      *string `json:"sourceIp"`
@@ -34,7 +34,7 @@ func auditLogToEntity(audit *AuditLog) *repositories.AuditLog {
 		RequestMethod: audit.RequestMethod,
 		RequestUri:    audit.RequestUri,
 		SourceIp:      audit.SourceIp,
-		UserId:        audit.UserId,
+		UserID:        audit.UserId,
 		RequestBody:   audit.RequestBody,
 		StatusCode:    audit.StatusCode,
 	}
@@ -46,7 +46,7 @@ func entityToAuditlog(entity *repositories.AuditLog) *AuditLog {
 		RequestMethod: entity.RequestMethod,
 		RequestUri:    entity.RequestUri,
 		SourceIp:      entity.SourceIp,
-		UserId:        entity.UserId,
+		UserId:        entity.UserID,
 		RequestBody:   entity.RequestBody,
 		StatusCode:    entity.StatusCode,
 		CreatedAt:     entity.CreatedAtInt,
@@ -58,9 +58,11 @@ func ListAuditLog(ctx context.Context, audit *AuditLog, page, size int, sort []s
 	repo := container.GetAuditLogRepository()
 	results, err := repo.Find(ctx, &repositories.AuditLogOptions{
 		AuditLog: auditLogToEntity(audit),
-		Size:     size,
-		Page:     page,
-		Sort:     sort,
+		Paginate: &repositories.Paginate{
+			Size: size,
+			Page: page,
+			Sort: sort,
+		},
 	})
 
 	res := &AuditLogsWithPager{

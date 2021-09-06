@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"time"
 
+	"go.mongodb.org/mongo-driver/mongo/options"
+
 	"github.com/cam-inc/viron/packages/golang/errors"
 
 	"github.com/cam-inc/viron/packages/golang/logging"
@@ -20,6 +22,7 @@ import (
 
 	sqladapter "github.com/Blank-Xu/sql-adapter"
 	"github.com/casbin/casbin/v2"
+	mongodbadapter "github.com/casbin/mongodb-adapter/v3"
 )
 
 type (
@@ -69,9 +72,12 @@ var (
 		constant.API_METHOD_PUT:    []string{constant.PERMISSION_WRITE},
 		constant.API_METHOD_DELETE: []string{constant.PERMISSION_WRITE},
 	}
+
+	log logging.Logger
 )
 
 func new(params ...interface{}) error {
+	log = logging.GetDefaultLogger()
 	if casbinInstance != nil {
 		return nil
 	}
@@ -101,6 +107,19 @@ func NewMySQL(conn *sql.DB) error {
 
 	//casbinInstance = enforcer
 	//return nil
+	return new(m, a)
+}
+
+func NewMongo(opt *options.ClientOptions, dbName string, collectionName string) error {
+	a, err := mongodbadapter.NewAdapterWithCollectionName(opt, dbName, collectionName)
+	if err != nil {
+		return err
+	}
+	m, err := model.NewModelFromString(modelText)
+	if err != nil {
+		return err
+	}
+
 	return new(m, a)
 }
 
@@ -174,7 +193,7 @@ func method2Permissions(method string) []string {
 func listRoles(userID string) []string {
 	roles, err := casbinInstance.GetRolesForUser(userID)
 	if err != nil {
-		fmt.Printf("listRoles -> %+v\n", err)
+		log.Errorf("listRoles -> %+v\n", err)
 		return []string{}
 	}
 	return roles
@@ -193,7 +212,7 @@ func listUsers(roleID string) []string {
 func AddRoleForUser(userID, roleID string) bool {
 	ok, err := casbinInstance.AddRoleForUser(userID, roleID)
 	if err != nil {
-		fmt.Printf("DEBUG AddRoleForUser %+v\n", err)
+		log.Errorf("DEBUG AddRoleForUser %+v\n", err)
 	}
 	return ok && err == nil
 }
@@ -214,12 +233,12 @@ func RevokeRoleForUser(userID, roleID string) bool {
 	if roleID == "" {
 		ok, err = casbinInstance.DeleteUser(userID)
 		if err != nil {
-			fmt.Printf("DEBUG RevokeRoleForUser(%s) %+v\n", userID, err)
+			log.Errorf("DEBUG RevokeRoleForUser(%s) %+v\n", userID, err)
 		}
 	} else {
 		ok, err = casbinInstance.DeleteRoleForUser(userID, roleID)
 		if err != nil {
-			fmt.Printf("DEBUG RevokeRoleForUser(%s,%s) %+v\n", userID, roleID, err)
+			log.Errorf("DEBUG RevokeRoleForUser(%s,%s) %+v\n", userID, roleID, err)
 		}
 	}
 	return ok && err == nil
@@ -265,7 +284,7 @@ func removeRole(roleID string) (bool, error) {
 
 // hasPermissionByResourceID idがリソースを操作する権限を持っているかチェック
 func hasPermissionByResourceID(id, resourceID string, permissions []string) bool {
-	log := logging.GetDefaultLogger()
+
 	log.Debug("hasPermissionByResourceID called")
 	for _, permission := range permissions {
 		if ok, err := casbinInstance.Enforce(id, resourceID, permission); err != nil {
@@ -307,8 +326,6 @@ func ListResourcesByOas(apiDef *openapi3.T) []string {
 
 // ListByOas 管理ロール一覧
 func ListByOas(apiDef *openapi3.T) *AdminRolesWithPager {
-
-	log := logging.GetDefaultLogger()
 
 	policies := listPolicies("")
 	log.Debugf("policies=%+v", policies)
@@ -365,7 +382,7 @@ func CreateViewerRole(apiDef *openapi3.T) error {
 	resourceIDs := ListResourcesByOas(apiDef)
 	if len(policies) == len(resourceIDs) {
 		// 更新するものがない
-		logging.GetDefaultLogger().Debug("len(policies) == len(resourceIDs)")
+		log.Debug("len(policies) == len(resourceIDs)")
 		return nil
 	}
 

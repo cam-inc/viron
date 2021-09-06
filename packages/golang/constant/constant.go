@@ -3,6 +3,8 @@ package constant
 import "net/http"
 
 const (
+	ENV_STORE_MODE = "mode"
+
 	CTX_KEY_API_DEFINITION     = "apiDefinition"
 	CTX_KEY_JWT_EXPIRATION_SEC = "jwtExpirationSec"
 	CTX_KEY_ADMINUSER          = "adminUser"
@@ -109,4 +111,6 @@ var (
 		API_METHOD_PUT,
 		API_METHOD_DELETE,
 	}
+
+	VIRON_MONGO_COLLECTION_MAP = map[string][]string{}
 )

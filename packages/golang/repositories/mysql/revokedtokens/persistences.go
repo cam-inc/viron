@@ -3,9 +3,8 @@ package revokedtokens
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
-
-	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
 	"github.com/volatiletech/sqlboiler/v4/boil"
 
@@ -17,21 +16,13 @@ import (
 type revokedTokensPersistence struct {
 	conn *sql.DB
 }
-type RevokedTokenConditions struct {
-	Token string
-}
-
-func (r *RevokedTokenConditions) ConvertConditionMongoDB() []interface{} {
-	panic("no implements")
-}
-func (r *RevokedTokenConditions) ConvertConditionMySQL() []qm.QueryMod {
-	return []qm.QueryMod{qm.Where("token = ?", r.Token)}
-}
 
 func (r *revokedTokensPersistence) FindOne(ctx context.Context, token string) (repositories.Entity, error) {
 
-	cond := &RevokedTokenConditions{
-		Token: token,
+	cond := &repositories.RevokedTokenOptions{
+		RevokedToken: &repositories.RevokedToken{
+			Token: token,
+		},
 	}
 
 	results, err := r.Find(ctx, cond)
@@ -49,6 +40,7 @@ func (r *revokedTokensPersistence) FindOne(ctx context.Context, token string) (r
 func (r *revokedTokensPersistence) Find(ctx context.Context, conditions repositories.Conditions) (repositories.EntitySlice, error) {
 
 	mods := conditions.ConvertConditionMySQL()
+	mods = append(mods, conditions.ConvertPager().PaginateMySQL()...)
 	list := repositories.EntitySlice{}
 	results, err := models.Revokedtokens(mods...).All(ctx, r.conn)
 	if err != nil {
@@ -57,7 +49,7 @@ func (r *revokedTokensPersistence) Find(ctx context.Context, conditions reposito
 
 	for _, r := range results {
 		revokedtoken := &repositories.RevokedToken{
-			ID:        r.ID,
+			ID:        fmt.Sprintf("%d", r.ID),
 			Token:     r.Token,
 			RevokedAt: r.RevokedAt,
 			CreatedAt: r.CreatedAt,
@@ -89,7 +81,7 @@ func (r *revokedTokensPersistence) CreateOne(ctx context.Context, entity reposit
 	if err := model.Insert(ctx, r.conn, boil.Infer()); err != nil {
 		return nil, err
 	}
-	revokedToken.ID = model.ID
+	revokedToken.ID = fmt.Sprintf("%d", model.ID)
 	return revokedToken, nil
 }
 

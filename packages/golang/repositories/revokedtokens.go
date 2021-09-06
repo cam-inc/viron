@@ -4,22 +4,43 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/volatiletech/sqlboiler/queries/qm"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
+	"go.mongodb.org/mongo-driver/bson"
+
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 type (
 	RevokedToken struct {
-		ID        uint
-		Token     string
-		RevokedAt time.Time
-		CreatedAt time.Time
-		UpdatedAt time.Time
+		ID           string             `bson:"-"`
+		OID          primitive.ObjectID `bson:"_id"`
+		Token        string             `bson:"token"`
+		RevokedAt    time.Time          `bson:"-"`
+		RevokedAtInt int64              `bson:"revokedAt"`
+		CreatedAt    time.Time          `bson:"-"`
+		CreatedAtInt int64              `bson:"createdAt"`
+		UpdatedAt    time.Time          `bson:"-"`
+		UpdatedAtInt int64              `bson:"updatedAt"`
 	}
 
 	RevokedTokenOptions struct {
 		*RevokedToken
+		*Paginate
 	}
 )
+
+var _ Conditions = &RevokedTokenOptions{}
+
+func (op *RevokedTokenOptions) ConvertConditionMongoDB() *MongoConditions {
+	conditions := &MongoConditions{}
+	m := bson.M{}
+	if op.Token != "" {
+		m["token"] = op.Token
+	}
+	conditions.Filter = m
+	return conditions
+}
 
 func (revoked *RevokedToken) Bind(b interface{}) error {
 	d, ok := b.(*RevokedToken)
@@ -31,6 +52,9 @@ func (revoked *RevokedToken) Bind(b interface{}) error {
 }
 
 func (op *RevokedTokenOptions) ConvertConditionMySQL() []qm.QueryMod {
-	q := []qm.QueryMod{}
-	return q
+	conditions := []qm.QueryMod{}
+	if op.Token != "" {
+		conditions = append(conditions, qm.Where("token = ?", op.Token))
+	}
+	return conditions
 }

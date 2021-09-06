@@ -568,7 +568,7 @@ func testAuditlogsSelect(t *testing.T) {
 }
 
 var (
-	auditlogDBTypes = map[string]string{`ID`: `int`, `RequestMethod`: `varchar`, `RequestUri`: `varchar`, `SourceIp`: `varchar`, `UserId`: `varchar`, `RequestBody`: `text`, `StatusCode`: `int`, `CreatedAt`: `datetime`, `UpdatedAt`: `datetime`}
+	auditlogDBTypes = map[string]string{`ID`: `int`, `RequestMethod`: `varchar`, `RequestUri`: `varchar`, `SourceIp`: `varchar`, `UserID`: `varchar`, `RequestBody`: `text`, `StatusCode`: `int`, `CreatedAt`: `datetime`, `UpdatedAt`: `datetime`}
 	_               = bytes.MinRead
 )
 

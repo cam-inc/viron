@@ -16,6 +16,7 @@ import (
 func SigninEmail(ctx context.Context, email string, password string) (string, *errors.VironError) {
 	user := domains.FindByEmail(ctx, email)
 	if user == nil {
+		fmt.Println("user is nil")
 		payload := &domains.AdminUser{
 			Email:    email,
 			Password: &password,
@@ -31,10 +32,9 @@ func SigninEmail(ctx context.Context, email string, password string) (string, *e
 	if user.AuthType != constant.AUTH_TYPE_EMAIL {
 		return "", errors.SigninFailed
 	}
-
 	if !helpers.VerifyPassword(password, *user.Password, *user.Salt) {
 		return "", errors.SigninFailed
 	}
 
-	return Sign(fmt.Sprintf("%d", user.ID)), nil
+	return Sign(user.ID), nil
 }

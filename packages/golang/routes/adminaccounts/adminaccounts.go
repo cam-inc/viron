@@ -1,7 +1,6 @@
 package adminaccounts
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/cam-inc/viron/packages/golang/logging"
@@ -53,7 +52,7 @@ func (a *adminaccountsImpl) UpdateVironAdminAccount(w http.ResponseWriter, r *ht
 		return
 	}
 
-	if string(id) != fmt.Sprintf("%d", user.ID) {
+	if string(id) != user.ID {
 		helpers.SendError(w, http.StatusForbidden, errors.Forbidden)
 		return
 	}

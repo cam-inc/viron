@@ -3,6 +3,7 @@ package auditlogs
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -26,6 +27,7 @@ func (a *auditLogsPersistence) FindOne(ctx context.Context, id string) (reposito
 
 func (a *auditLogsPersistence) Find(ctx context.Context, conditions repositories.Conditions) (repositories.EntitySlice, error) {
 	mods := conditions.ConvertConditionMySQL()
+	mods = append(mods, conditions.ConvertPager().PaginateMySQL()...)
 
 	list := repositories.EntitySlice{}
 
@@ -36,11 +38,11 @@ func (a *auditLogsPersistence) Find(ctx context.Context, conditions repositories
 
 	for _, r := range result {
 		auditlog := &repositories.AuditLog{
-			ID:            r.ID,
+			ID:            fmt.Sprintf("%d", r.ID),
 			RequestMethod: r.RequestMethod.Ptr(),
 			RequestUri:    r.RequestUri.Ptr(),
 			SourceIp:      r.SourceIp.Ptr(),
-			UserId:        r.UserId.Ptr(),
+			UserID:        r.UserId.Ptr(),
 			RequestBody:   r.RequestBody.Ptr(),
 			StatusCode:    r.StatusCode.Ptr(),
 			CreatedAt:     r.CreatedAt,
@@ -77,7 +79,7 @@ func (a *auditLogsPersistence) CreateOne(ctx context.Context, entity repositorie
 		RequestMethod: null.StringFromPtr(audit.RequestMethod),
 		RequestUri:    null.StringFromPtr(audit.RequestUri),
 		SourceIp:      null.StringFromPtr(audit.SourceIp),
-		UserId:        null.StringFromPtr(audit.UserId),
+		UserId:        null.StringFromPtr(audit.UserID),
 		RequestBody:   null.StringFromPtr(audit.RequestBody),
 		StatusCode:    null.UintFromPtr(audit.StatusCode),
 		CreatedAt:     time.Now(),
@@ -87,7 +89,7 @@ func (a *auditLogsPersistence) CreateOne(ctx context.Context, entity repositorie
 	if err := model.Insert(ctx, a.conn, boil.Infer()); err != nil {
 		return nil, err
 	}
-	audit.ID = model.ID
+	audit.ID = fmt.Sprintf("%d", model.ID)
 	return audit, nil
 }
 

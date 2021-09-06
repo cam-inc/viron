@@ -162,7 +162,6 @@ func AuthenticationFunc(ctx context.Context, input *openapi3filter.Authenticatio
 		fmt.Println(constant.CTX_KEY_AUTH, "nil")
 		return errors.UnAuthorized
 	}
-	fmt.Println("AuthenticationFunc")
 	return nil
 }
 
@@ -220,7 +219,6 @@ func JWTSecurityHandlerFunc(cfg *config.Auth) func(http.HandlerFunc) http.Handle
 				http.Error(w, errors.UnAuthorized.Error(), errors.UnAuthorized.StatusCode())
 				return
 			}
-			fmt.Printf("DEBUG2 uri=%s\n", r.RequestURI)
 			claim, err := auth.Verify(token)
 			if err != nil {
 				fmt.Println(err)

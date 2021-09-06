@@ -3,10 +3,9 @@ package adminusers
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"strconv"
 	"time"
-
-	"github.com/cam-inc/viron/packages/golang/repositories/mysql"
 
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
@@ -23,67 +22,24 @@ type adminUsersPersistence struct {
 	conn *sql.DB
 }
 
-// TODO: repositoriesパッケージに移動する
-type AdminUserConditions struct {
-	ID        uint
-	Email     string
-	Size      int
-	Page      int
-	Sort      []string
-	LikeEmail string
-	IDs       []uint
-	Emails    []string
-}
-
-func (c *AdminUserConditions) ConvertConditionMongoDB() []interface{} {
-	panic("no implements")
-}
-func (c *AdminUserConditions) ConvertConditionMySQL() []qm.QueryMod {
-
-	conditions := []qm.QueryMod{}
-	if c.ID != 0 {
-		conditions = append(conditions, qm.Where("id = ?", c.ID))
-	}
-	if c.Email != "" {
-		conditions = append(conditions, qm.Where("email = ?", c.Email))
-	}
-	if c.LikeEmail != "" {
-		conditions = append(conditions, qm.Where("email like ?", c.LikeEmail))
-	}
-	if len(c.IDs) != 0 {
-		ids := []interface{}{}
-		for i := range c.IDs {
-			ids = append(ids, i)
-		}
-		conditions = append(conditions, qm.WhereIn("id in ?", ids...))
-	}
-	if len(c.Emails) != 0 {
-		emails := []interface{}{}
-		for e := range c.Emails {
-			emails = append(emails, e)
-		}
-		conditions = append(conditions, qm.WhereIn("email in ?", emails...))
-	}
-
-	if len(c.Sort) > 0 {
-		conditions = append(conditions, mysql.GetOrderBy(c.Sort))
-	}
-
-	pager := mysql.GetPager(c.Size, c.Page)
-
-	conditions = append(conditions, qm.Limit(pager.Limit))
-	conditions = append(conditions, qm.Offset(pager.Offset))
-
-	return conditions
-}
-
 func (a *adminUsersPersistence) FindOne(ctx context.Context, id string) (repositories.Entity, error) {
-	return &repositories.AdminUser{}, nil
+	conditions := &repositories.AdminUserConditions{
+		ID: id,
+	}
+	slice, err := a.Find(ctx, conditions)
+	if err != nil {
+		return nil, err
+	}
+	if len(slice) == 0 {
+		return nil, nil
+	}
+	return slice[0], nil
 }
 
 func (a *adminUsersPersistence) Find(ctx context.Context, conditions repositories.Conditions) (repositories.EntitySlice, error) {
 
 	mods := conditions.ConvertConditionMySQL()
+	mods = append(mods, conditions.ConvertPager().PaginateMySQL()...)
 
 	list := repositories.EntitySlice{}
 
@@ -93,8 +49,9 @@ func (a *adminUsersPersistence) Find(ctx context.Context, conditions repositorie
 	}
 
 	for _, r := range result {
+		id := fmt.Sprintf("%d", r.ID)
 		adminuser := &repositories.AdminUser{
-			ID:                       r.ID,
+			ID:                       id,
 			Email:                    r.Email,
 			AuthType:                 r.AuthType,
 			Password:                 r.Password.Ptr(),
@@ -147,7 +104,7 @@ func (a *adminUsersPersistence) CreateOne(ctx context.Context, entity repositori
 	if err := model.Insert(ctx, a.conn, boil.Infer()); err != nil {
 		return nil, err
 	}
-	adminuser.ID = model.ID
+	adminuser.ID = fmt.Sprintf("%d", model.ID)
 	return adminuser, nil
 }
 
