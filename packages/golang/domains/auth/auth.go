@@ -18,7 +18,7 @@ func createFirstAdminUser(ctx context.Context, payload *domains.AdminUser, authT
 		return nil, err
 	}
 
-	if ret := domains.AddRoleForUser(fmt.Sprintf("%d", user.ID), constant.ADMIN_ROLE_SUPER); !ret {
+	if ret := domains.AddRoleForUser(user.ID, constant.ADMIN_ROLE_SUPER); !ret {
 		return nil, fmt.Errorf("AddRoleForUser return %v", ret)
 	}
 

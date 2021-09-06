@@ -5,17 +5,37 @@ import (
 	"os"
 	"strconv"
 
+	"go.mongodb.org/mongo-driver/mongo/options"
+
 	"github.com/cam-inc/viron/example/golang/pkg/constant"
 	pkgConstant "github.com/cam-inc/viron/packages/golang/constant"
 	"github.com/go-sql-driver/mysql"
 )
 
 type (
+	Mode   string
 	Config struct {
+		StoreMode  Mode
 		StoreMySQL *MySQL
+		StoreMongo *Mongo
 		Cors       *Cors
 		Auth       *Auth
 		Oas        *Oas
+	}
+
+	Store struct {
+		Mode string
+		*MySQL
+		*Mongo
+		options.ClientOptions
+	}
+
+	Mongo struct {
+		URI                  string
+		User                 string
+		Password             string
+		VironDB              string
+		CasbinCollectionName string
 	}
 
 	MySQL struct {
@@ -81,6 +101,11 @@ type (
 	}
 )
 
+const (
+	StoreModeMongo Mode = "mongo"
+	StoreModeMySQL Mode = "mysql"
+)
+
 func (m *MySQL) ToDriverConfig() *mysql.Config {
 	return &mysql.Config{
 		Addr:                 fmt.Sprintf("%s:%d", m.Host, m.Port),
@@ -97,6 +122,10 @@ func (m *MySQL) ToDriverConfig() *mysql.Config {
 func New() *Config {
 
 	mysqlPort, _ := strconv.Atoi(os.Getenv(constant.MYSQL_PORT))
+	mode := StoreModeMongo
+	if os.Getenv(pkgConstant.ENV_STORE_MODE) == string(StoreModeMySQL) {
+		mode = StoreModeMySQL
+	}
 	// TODO: yaml -> statik で環境別設定
 	return &Config{
 		Auth: &Auth{
@@ -109,6 +138,7 @@ func New() *Config {
 		Cors: &Cors{
 			AllowOrigins: []string{"https://localhost:8000"},
 		},
+		StoreMode: mode,
 		StoreMySQL: &MySQL{
 			Dialect:              "mysql",
 			Host:                 os.Getenv(constant.MYSQL_HOST),
@@ -119,6 +149,13 @@ func New() *Config {
 			DBName:               os.Getenv(constant.MYSQL_DATABASE),
 			AllowNativePasswords: true,
 			ParseTime:            true,
+		},
+		StoreMongo: &Mongo{
+			URI:                  "mongodb://mongo:27017",
+			User:                 "root",
+			Password:             "password",
+			VironDB:              "viron_example",
+			CasbinCollectionName: "casbin_rule_go",
 		},
 		Oas: &Oas{
 			InfoExtensions: map[string]interface{}{

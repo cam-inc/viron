@@ -13,6 +13,7 @@ require (
 	github.com/imdario/mergo v0.3.12
 	github.com/spf13/cobra v1.2.1
 	github.com/volatiletech/sqlboiler/v4 v4.6.0
+	go.mongodb.org/mongo-driver v1.7.1
 	go.uber.org/automaxprocs v1.4.0
 )
 

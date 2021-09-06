@@ -3,7 +3,6 @@ package adminusers
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/cam-inc/viron/packages/golang/logging"
 
@@ -32,8 +31,7 @@ func (a *adminuser) ListVironAdminUsers(w http.ResponseWriter, r *http.Request, 
 		conditions.Page = int(*params.Page)
 	}
 	if params.Id != nil {
-		paramID, _ := strconv.Atoi(string(*params.Id))
-		conditions.ID = uint(paramID)
+		conditions.ID = string(*params.Id)
 	}
 	if params.Email != nil {
 		conditions.Email = string(*params.Email)
@@ -120,18 +118,20 @@ func PagerToVironAdminUserListWithPager(currentPage, maxPage int, users []*domai
 		List: VironAdminUserList{},
 	}
 
-	for i, adminUser := range users {
+	for _, adminUser := range users {
 		vironPager.List = append(vironPager.List, VironAdminUser{
-			AuthType: adminUser.AuthType,
-			Email:    openapi_types.Email(adminUser.Email),
-			Id:       fmt.Sprintf("%d", adminUser.ID),
-			RoleIds:  &adminUser.RoleIDs,
+			AuthType:  adminUser.AuthType,
+			Email:     openapi_types.Email(adminUser.Email),
+			Id:        adminUser.ID,
+			RoleIds:   &adminUser.RoleIDs,
+			CreatedAt: &adminUser.CreatedAtInt,
+			UpdatedAt: &adminUser.UpdateAtInt,
 		})
 
-		createdAtInt64 := adminUser.CreatedAt.Unix()
-		updatedAtInt64 := adminUser.UpdateAt.Unix()
-		vironPager.List[i].CreatedAt = &createdAtInt64
-		vironPager.List[i].UpdatedAt = &updatedAtInt64
+		//createdAtInt64 := adminUser.CreatedAt.Unix()
+		//updatedAtInt64 := adminUser.UpdateAt.Unix()
+		//vironPager.List[i].CreatedAt = &createdAtInt64
+		//vironPager.List[i].UpdatedAt = &updatedAtInt64
 	}
 
 	return vironPager

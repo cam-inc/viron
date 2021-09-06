@@ -19,13 +19,13 @@ func InitMySQL(conn *sql.DB, dbName string, filePath string) error {
 		return err
 	}
 
-	// DB migrate status is dirty
+	// vironDB migrate status is dirty
 	if v, dirty, err := m.Version(); err != migrate.ErrNilVersion && dirty {
 		if err := m.Force(int(v)); err != nil {
 			return err
 		}
 	} else if err != migrate.ErrNilVersion {
-		// DB migrated
+		// vironDB migrated
 		return nil
 	}
 	return m.Up()

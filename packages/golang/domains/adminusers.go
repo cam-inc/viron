@@ -4,14 +4,11 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/cam-inc/viron/packages/golang/logging"
 
 	"github.com/cam-inc/viron/packages/golang/errors"
-
-	"github.com/cam-inc/viron/packages/golang/repositories/mysql/adminusers"
 
 	"github.com/cam-inc/viron/packages/golang/repositories/container"
 
@@ -23,8 +20,7 @@ import (
 
 type (
 	AdminUser struct {
-		ID                       uint      `json:"-"`
-		UID                      string    `json:"id"`
+		ID                       string    `json:"id"`
 		Email                    string    `json:"email"`
 		AuthType                 string    `json:"authType"`
 		Password                 *string   `json:"password,omitempty"`
@@ -47,7 +43,7 @@ type (
 	}
 
 	AdminUserConditions struct {
-		ID       uint
+		ID       string
 		Email    string
 		AuthType string
 		RoleID   string
@@ -84,13 +80,16 @@ func CreateAdminUser(ctx context.Context, payload *AdminUser, authType string) (
 	if err != nil {
 		return nil, errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("adminUser createOne %+v", err))
 	}
+
 	entity.Bind(adminUser)
 
 	payload.ID = adminUser.ID
+	payload.Salt = adminUser.Salt
+	payload.Password = adminUser.Password
 
 	// Role update
 	if len(payload.RoleIDs) > 0 {
-		updateRolesForUser(fmt.Sprintf("%d", payload.ID), payload.RoleIDs)
+		updateRolesForUser(payload.ID, payload.RoleIDs)
 	}
 
 	return payload, nil
@@ -102,11 +101,10 @@ func CountAdminUser(ctx context.Context) int {
 	return repo.Count(ctx, nil)
 }
 
-func findOne(ctx context.Context, conditions *adminusers.AdminUserConditions) *AdminUser {
+func findOne(ctx context.Context, conditions *repositories.AdminUserConditions) *AdminUser {
 	repo := container.GetAdminUserRepository()
 	result, err := repo.Find(ctx, conditions)
 	if err != nil || len(result) == 0 {
-		fmt.Println(err)
 		return nil
 	}
 
@@ -114,7 +112,7 @@ func findOne(ctx context.Context, conditions *adminusers.AdminUserConditions) *A
 
 	result[0].Bind(user)
 
-	user.RoleIDs = listRoles(fmt.Sprintf("%d", user.ID))
+	user.RoleIDs = listRoles(user.ID)
 
 	auser := &AdminUser{
 		ID:                       user.ID,
@@ -137,8 +135,12 @@ func findOne(ctx context.Context, conditions *adminusers.AdminUserConditions) *A
 // FindByEmail emailで1件取得
 func FindByEmail(ctx context.Context, email string) *AdminUser {
 
-	conditions := &adminusers.AdminUserConditions{
+	conditions := &repositories.AdminUserConditions{
 		Email: email,
+		Paginate: &repositories.Paginate{
+			Size: 1,
+			Page: 1,
+		},
 	}
 
 	return findOne(ctx, conditions)
@@ -147,13 +149,12 @@ func FindByEmail(ctx context.Context, email string) *AdminUser {
 // FindByID IDで1件取得
 func FindByID(ctx context.Context, userID string) *AdminUser {
 
-	userIDInt, err := strconv.Atoi(userID)
-	if err != nil {
-		return nil
-	}
-
-	conditions := &adminusers.AdminUserConditions{
-		ID: uint(userIDInt),
+	conditions := &repositories.AdminUserConditions{
+		ID: userID,
+		Paginate: &repositories.Paginate{
+			Size: 1,
+			Page: 1,
+		},
 	}
 
 	return findOne(ctx, conditions)
@@ -164,13 +165,15 @@ func ListAdminUser(ctx context.Context, opts *AdminUserConditions) (*AdminUsersW
 
 	repo := container.GetAdminUserRepository()
 
-	conditions := &adminusers.AdminUserConditions{}
+	conditions := &repositories.AdminUserConditions{}
 	if opts != nil {
 		conditions.ID = opts.ID
 		conditions.Email = opts.Email
-		conditions.Sort = opts.Sort
-		conditions.Page = opts.Page
-		conditions.Size = opts.Size
+		conditions.Paginate = &repositories.Paginate{
+			Sort: opts.Sort,
+			Page: opts.Page,
+			Size: opts.Size,
+		}
 	}
 	if conditions.Page <= 0 {
 		conditions.Page = constant.DEFAULT_PAGER_PAGE
@@ -192,19 +195,29 @@ func ListAdminUser(ctx context.Context, opts *AdminUserConditions) (*AdminUsersW
 		entity := &repositories.AdminUser{}
 		result.Bind(entity)
 		entity.RoleIDs = listRoles(fmt.Sprintf("%d", entity.ID))
-		withPager.List = append(withPager.List, &AdminUser{
+		adminuser := &AdminUser{
 			ID:           entity.ID,
-			UID:          fmt.Sprintf("%d", entity.ID),
 			Email:        entity.Email,
 			Password:     entity.Password,
 			Salt:         entity.Salt,
 			AuthType:     entity.AuthType,
 			RoleIDs:      entity.RoleIDs,
 			CreatedAt:    entity.CreatedAt,
-			CreatedAtInt: entity.CreatedAt.Unix(),
+			CreatedAtInt: entity.CreatedAtInt,
 			UpdateAt:     entity.UpdatedAt,
-			UpdateAtInt:  entity.UpdatedAt.Unix(),
-		})
+			UpdateAtInt:  entity.UpdatedAtInt,
+		}
+
+		adminuser.RoleIDs = listRoles(adminuser.ID)
+
+		if adminuser.CreatedAtInt == 0 {
+			adminuser.CreatedAtInt = adminuser.CreatedAt.Unix()
+		}
+
+		if adminuser.UpdateAtInt == 0 {
+			adminuser.UpdateAtInt = adminuser.UpdateAt.Unix()
+		}
+		withPager.List = append(withPager.List, adminuser)
 	}
 	count := CountAdminUser(ctx)
 	pager := Pagging(count, conditions.Size, conditions.Page)

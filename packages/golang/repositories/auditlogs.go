@@ -4,30 +4,34 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cam-inc/viron/packages/golang/repositories/mysql"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+
+	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"go.mongodb.org/mongo-driver/bson"
 
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 type (
 	AuditLog struct {
-		ID            uint      `json:"id"`
-		RequestMethod *string   `json:"requestMethod"`
-		RequestUri    *string   `json:"requestUri"`
-		SourceIp      *string   `json:"sourceIp"`
-		UserId        *string   `json:"userId"`
-		RequestBody   *string   `json:"requestBody"`
-		StatusCode    *uint     `json:"statusCode"`
-		CreatedAt     time.Time `json:"-"`
-		CreatedAtInt  int64     `json:"createdAt"`
-		UpdatedAt     time.Time `json:"-"`
-		UpdatedAtInt  int64     `json:"updatedAt"`
+		ID            string             `json:"id" bson:"-"`
+		OID           primitive.ObjectID `json:"-" bson:"_id"`
+		RequestMethod *string            `json:"requestMethod" bson:"requestMethod"`
+		RequestUri    *string            `json:"requestUri" bson:"requestUri"`
+		SourceIp      *string            `json:"sourceIp" bson:"sourceIp"`
+		UserID        *string            `json:"userId" bson:"userId"`
+		RequestBody   *string            `json:"requestBody" bson:"requestBody"`
+		StatusCode    *uint              `json:"statusCode" bson:"statusCode"`
+		CreatedAt     time.Time          `json:"-" json:"-"`
+		CreatedAtInt  int64              `json:"createdAt" bson:"createdAt"`
+		UpdatedAt     time.Time          `json:"-" bson:"-"`
+		UpdatedAtInt  int64              `json:"updatedAt" bson:"updatedAt"`
 	}
 	AuditLogOptions struct {
 		*AuditLog
-		Size int
-		Page int
-		Sort []string
+		*options.FindOptions
+		*Paginate
 	}
 )
 
@@ -40,13 +44,57 @@ func (audit *AuditLog) Bind(b interface{}) error {
 	return nil
 }
 
-func (op *AuditLogOptions) ConvertConditionMongoDB() []interface{} {
-	panic("implement me")
+func (op *AuditLogOptions) ConvertConditionMongoDB() *MongoConditions {
+	conditions := &MongoConditions{}
+
+	m := bson.M{}
+
+	if op.ID != "" {
+		m["_id"], _ = primitive.ObjectIDFromHex(op.ID)
+	}
+
+	if op.RequestMethod != nil {
+		m["requestMethod"] = op.RequestMethod
+	}
+
+	if op.RequestUri != nil {
+		m["requestUri"] = op.RequestUri
+	}
+
+	if op.SourceIp != nil {
+		m["sourceIp"] = op.SourceIp
+	}
+
+	if op.UserID != nil {
+		m["userId"] = op.UserID
+	}
+
+	if op.RequestBody != nil {
+		m["requestBody"] = op.RequestBody
+	}
+
+	if op.StatusCode != nil {
+		m["statusCode"] = op.StatusCode
+	}
+
+	conditions.Filter = m
+
+	if op.FindOptions == nil {
+		op.FindOptions = options.Find()
+	}
+
+	pager := op.ConvertPager()
+	paginator := pager.PaginateMongo()
+	op.FindOptions = options.MergeFindOptions(op.FindOptions, paginator)
+
+	conditions.FindOptions = op.FindOptions
+
+	return conditions
 }
 
 func (op *AuditLogOptions) ConvertConditionMySQL() []qm.QueryMod {
 	conditions := []qm.QueryMod{}
-	if op.ID != 0 {
+	if op.ID != "" {
 		conditions = append(conditions, qm.Where("id = ?", op.ID))
 	}
 
@@ -62,8 +110,8 @@ func (op *AuditLogOptions) ConvertConditionMySQL() []qm.QueryMod {
 		conditions = append(conditions, qm.Where("sourceIp = ?", *op.SourceIp))
 	}
 
-	if op.UserId != nil {
-		conditions = append(conditions, qm.Where("userId = ?", *op.UserId))
+	if op.UserID != nil {
+		conditions = append(conditions, qm.Where("userId = ?", *op.UserID))
 	}
 
 	if op.RequestBody != nil {
@@ -74,23 +122,16 @@ func (op *AuditLogOptions) ConvertConditionMySQL() []qm.QueryMod {
 		conditions = append(conditions, qm.Where("statusCode = ?", *op.StatusCode))
 	}
 
-	if len(op.Sort) > 0 {
-		conditions = append(conditions, mysql.GetOrderBy(op.Sort))
-	}
-
-	pager := mysql.GetPager(op.Size, op.Page)
-
-	conditions = append(conditions, qm.Limit(pager.Limit))
-	conditions = append(conditions, qm.Offset(pager.Offset))
-
 	return conditions
 }
 
 func NewAuditLogOptions(audit *AuditLog, size, page int, sort []string) Conditions {
 	return &AuditLogOptions{
 		AuditLog: audit,
-		Size:     size,
-		Page:     page,
-		Sort:     sort,
+		Paginate: &Paginate{
+			Size: size,
+			Page: page,
+			Sort: sort,
+		},
 	}
 }

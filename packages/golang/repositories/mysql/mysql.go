@@ -1,38 +1,33 @@
 package mysql
 
 import (
+	"fmt"
 	"strings"
 
-	"github.com/cam-inc/viron/packages/golang/constant"
+	"github.com/cam-inc/viron/packages/golang/repositories"
+
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
-
-type (
-	Pager struct {
-		Limit  int
-		Offset int
-	}
-)
-
-func GetPager(size int, page int) *Pager {
-
-	if size == 0 {
-		size = constant.DEFAULT_PAGER_SIZE
-	}
-	if page == 0 {
-		page = constant.DEFAULT_PAGER_PAGE
-	}
-
-	return &Pager{
-		Limit:  size,
-		Offset: (page - 1) * size,
-	}
-}
 
 func GetOrderBy(sort []string) qm.QueryMod {
 	if len(sort) > 0 {
 		orderBy := strings.Join(sort, ",")
 		return qm.OrderBy(orderBy)
+	}
+	return nil
+}
+
+func GenOrderBy(sort []repositories.Sort) qm.QueryMod {
+	if len(sort) > 0 {
+		var clause string
+		for i, s := range sort {
+			if i == 0 {
+				clause = s.SQL()
+			} else {
+				clause = fmt.Sprintf("%s, %s", clause, s.SQL())
+			}
+		}
+		return qm.OrderBy(clause)
 	}
 	return nil
 }

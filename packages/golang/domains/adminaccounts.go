@@ -15,7 +15,7 @@ import (
 
 type (
 	AdminAccount struct {
-		ID       uint     `json:"ID"`
+		ID       string   `json:"id"`
 		Email    string   `json:"email"`
 		AuthType string   `json:"type"`
 		Password *string  `json:"password"`

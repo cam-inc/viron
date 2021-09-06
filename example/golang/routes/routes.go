@@ -3,6 +3,8 @@ package routes
 import (
 	"net/http"
 
+	"github.com/cam-inc/viron/example/golang/pkg/migrate"
+
 	"github.com/getkin/kin-openapi/openapi3filter"
 
 	"github.com/cam-inc/viron/example/golang/pkg/constant"
@@ -13,7 +15,6 @@ import (
 	"github.com/cam-inc/viron/packages/golang/helpers"
 
 	"github.com/cam-inc/viron/example/golang/pkg/domains"
-	"github.com/cam-inc/viron/example/golang/pkg/migrate"
 	"github.com/cam-inc/viron/example/golang/routes/root"
 
 	"github.com/cam-inc/viron/example/golang/routes/components"
@@ -42,17 +43,30 @@ func New() http.Handler {
 	log := logging.GetLogger(constant.LOG_NAME, logging.DebugLevel)
 
 	cfg := config.New()
-	mysqlConfig := cfg.StoreMySQL
-	store.SetupMySQL(mysqlConfig)
-	if err := domains.SetUpMySQL(store.GetMySQLConnection()); err != nil {
-		panic(err)
+
+	if cfg.StoreMode == config.StoreModeMySQL {
+		mysqlConfig := cfg.StoreMySQL
+		store.SetupMySQL(mysqlConfig)
+		if err := domains.SetUpMySQL(store.GetMySQLConnection()); err != nil {
+			panic(err)
+		}
+		if err := packageDomains.NewMySQL(store.GetMySQLConnection()); err != nil {
+			panic(err)
+		}
+		if err := migrate.InitMySQL(store.GetMySQLConnection(), cfg.StoreMySQL.DBName, "file:///viron/example/golang/pkg/migrate/sql"); err != nil {
+			panic(err)
+		}
+	} else {
+		store.SetupMongo(cfg.StoreMongo)
+		conn := store.GetMongoCollection()
+		if err := domains.SetUpMongo(conn.Client, cfg.StoreMongo.VironDB); err != nil {
+			panic(err)
+		}
+		if err := packageDomains.NewMongo(conn.Options, cfg.StoreMongo.VironDB, cfg.StoreMongo.CasbinCollectionName); err != nil {
+			panic(err)
+		}
 	}
-	if err := migrate.InitMySQL(store.GetMySQLConnection(), cfg.StoreMySQL.DBName, "file:///viron/example/golang/pkg/migrate/sql"); err != nil {
-		panic(err)
-	}
-	if err := packageDomains.NewMySQL(store.GetMySQLConnection()); err != nil {
-		panic(err)
-	}
+
 	definition := &openapi3.T{
 		ExtensionProps: openapi3.ExtensionProps{
 			Extensions: map[string]interface{}{},
