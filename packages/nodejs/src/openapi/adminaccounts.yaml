@@ -13,7 +13,7 @@ info:
         ログインユーザーのアカウント情報を閲覧できます。
         また、パスワード認証を利用している場合はパスワードの変更ができます。
       contents:
-        - title: アカウント設定 
+        - title: アカウント設定
           type: table
           operationId: listVironAdminAccounts
           resourceId: vironAdminAccount

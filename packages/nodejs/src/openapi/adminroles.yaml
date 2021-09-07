@@ -11,7 +11,7 @@ info:
         # 管理ロール一覧の管理
         管理ロールデータの **作成・更新・削除** を行います。
       contents:
-        - title: 管理ロール 
+        - title: 管理ロール
           operationId: listVironAdminRoles
           type: table
           resourceId: vironAdminRole
