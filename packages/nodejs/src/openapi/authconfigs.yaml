@@ -55,7 +55,7 @@ components:
             - oauth
             - signout
           example: oauth
-        operationId: 
+        operationId:
           description: クライアントがリクエストするAPIのOperationID
           type: string
           example: signinEmail

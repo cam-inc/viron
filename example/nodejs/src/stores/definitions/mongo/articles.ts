@@ -51,9 +51,11 @@ const schemaDefinition: SchemaDefinition = {
   },
   createdAt: {
     type: Schema.Types.Number,
+    get: (createdAt: number) => new Date(createdAt * 1000),
   },
   updatedAt: {
     type: Schema.Types.Number,
+    get: (updatedAt: number) => new Date(updatedAt * 1000),
   },
 };
 
@@ -68,8 +70,8 @@ export const schema = new Schema<ArticleDocument>(schemaDefinition, {
   collection: name,
   strict: true,
   timestamps: { currentTime: (): number => Math.floor(Date.now() / 1000) },
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true },
+  toJSON: { virtuals: true, getters: true },
+  toObject: { virtuals: true, getters: true },
   id: true,
   versionKey: false,
 });

@@ -11,7 +11,7 @@ info:
         # 監査ログの閲覧
         Vironサーバの監査ログを閲覧します。
       contents:
-        - title: 監査ログ 
+        - title: 監査ログ
           type: table
           operationId: listVironAuditlogs
           pagination: true
@@ -123,6 +123,4 @@ components:
           description: ステータスコード
           type: integer
         createdAt:
-          description: 日時
-          type: string
-          format: date-time
+          $ref: './components.yaml#/components/schemas/VironCreatedAt'

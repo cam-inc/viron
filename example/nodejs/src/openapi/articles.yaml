@@ -144,13 +144,9 @@ components:
         body:
           $ref: '#/components/schemas/ArticleBody'
         createdAt:
-          description: 作成日時
-          type: string
-          format: date-time
+          $ref: './components.yaml#/components/schemas/CreatedAt'
         updatedAt:
-          description: 更新日時
-          type: string
-          format: date-time
+          $ref: './components.yaml#/components/schemas/UpdatedAt'
       required:
         - id
         - title

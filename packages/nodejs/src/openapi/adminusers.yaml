@@ -136,13 +136,9 @@ components:
           items:
             type: string
         createdAt:
-          description: 作成日時
-          type: integer
-          format: int64
+          $ref: './components.yaml#/components/schemas/VironCreatedAt'
         updatedAt:
-          description: 更新日時
-          type: integer
-          format: int64
+          $ref: './components.yaml#/components/schemas/VironUpdatedAt'
       required:
         - id
         - email

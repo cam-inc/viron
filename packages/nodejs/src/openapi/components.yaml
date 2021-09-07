@@ -16,6 +16,16 @@ components:
         - maxPage
         - currentPage
 
+    VironCreatedAt:
+      description: 作成日時
+      type: string
+      format: date-time
+
+    VironUpdatedAt:
+      description: 更新日時
+      type: string
+      format: date-time
+
   parameters:
     VironIdPathParam:
       name: id
