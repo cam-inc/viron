@@ -21,7 +21,7 @@ const schemaDefinition: ModelAttributes<ArticleModel, Article> = {
     allowNull: false,
   },
   body: {
-    type: DataTypes.ARRAY(DataTypes.JSON),
+    type: DataTypes.JSON,
     allowNull: false,
   },
   createdAt: {
