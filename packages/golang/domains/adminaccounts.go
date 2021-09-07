@@ -65,7 +65,7 @@ func UpdateAccountByID(ctx context.Context, userID string, payload *AdminAccount
 	}
 	repo := container.GetAdminUserRepository()
 
-	adminUser := &repositories.AdminUser{
+	adminUser := &repositories.AdminUserEntity{
 		ID:       user.ID,
 		AuthType: user.AuthType,
 		Email:    user.Email,

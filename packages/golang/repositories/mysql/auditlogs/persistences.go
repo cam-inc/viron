@@ -37,7 +37,7 @@ func (a *auditLogsPersistence) Find(ctx context.Context, conditions repositories
 	}
 
 	for _, r := range result {
-		auditlog := &repositories.AuditLog{
+		auditlog := &repositories.AuditLogEntity{
 			ID:            fmt.Sprintf("%d", r.ID),
 			RequestMethod: r.RequestMethod.Ptr(),
 			RequestUri:    r.RequestUri.Ptr(),
@@ -71,7 +71,7 @@ func (a *auditLogsPersistence) Count(ctx context.Context, conditions repositorie
 
 func (a *auditLogsPersistence) CreateOne(ctx context.Context, entity repositories.Entity) (repositories.Entity, error) {
 
-	audit := &repositories.AuditLog{}
+	audit := &repositories.AuditLogEntity{}
 	if err := entity.Bind(audit); err != nil {
 		return nil, err
 	}

@@ -12,7 +12,7 @@ import (
 )
 
 type (
-	RevokedToken struct {
+	RevokedTokenEntity struct {
 		ID           string             `bson:"-"`
 		OID          primitive.ObjectID `bson:"_id"`
 		Token        string             `bson:"token"`
@@ -24,15 +24,15 @@ type (
 		UpdatedAtInt int64              `bson:"updatedAt"`
 	}
 
-	RevokedTokenOptions struct {
-		*RevokedToken
+	RevokedTokenConditions struct {
+		*RevokedTokenEntity
 		*Paginate
 	}
 )
 
-var _ Conditions = &RevokedTokenOptions{}
+var _ Conditions = &RevokedTokenConditions{}
 
-func (op *RevokedTokenOptions) ConvertConditionMongoDB() *MongoConditions {
+func (op *RevokedTokenConditions) ConvertConditionMongoDB() *MongoConditions {
 	conditions := &MongoConditions{}
 	m := bson.M{}
 	if op.Token != "" {
@@ -42,8 +42,8 @@ func (op *RevokedTokenOptions) ConvertConditionMongoDB() *MongoConditions {
 	return conditions
 }
 
-func (revoked *RevokedToken) Bind(b interface{}) error {
-	d, ok := b.(*RevokedToken)
+func (revoked *RevokedTokenEntity) Bind(b interface{}) error {
+	d, ok := b.(*RevokedTokenEntity)
 	if !ok {
 		return fmt.Errorf("revoked bind failed")
 	}
@@ -51,7 +51,7 @@ func (revoked *RevokedToken) Bind(b interface{}) error {
 	return nil
 }
 
-func (op *RevokedTokenOptions) ConvertConditionMySQL() []qm.QueryMod {
+func (op *RevokedTokenConditions) ConvertConditionMySQL() []qm.QueryMod {
 	conditions := []qm.QueryMod{}
 	if op.Token != "" {
 		conditions = append(conditions, qm.Where("token = ?", op.Token))

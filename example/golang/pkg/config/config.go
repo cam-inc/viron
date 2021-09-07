@@ -52,9 +52,6 @@ type (
 	}
 
 	Cors struct {
-		/*
-			allowOrigins: ['https://localhost:8000'],
-		*/
 		AllowOrigins []string `yaml:"allowOrigins"`
 	}
 	JWT struct {
@@ -71,33 +68,10 @@ type (
 	Auth struct {
 		JWT          *JWT
 		GoogleOAuth2 *GoogleOAuth2
-		/**
-		  jwt: {
-		     secret: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-		     provider: 'viron-example-nodejs',
-		     expirationSec: 24 * 60 * 60,
-		   },
-		   googleOAuth2: {
-		     clientId: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? '',
-
-		     clientSecret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET ?? '',
-		     additionalScopes: [],
-		     userHostedDomains: ['cam-inc.co.jp', 'cyberagent.co.jp'],
-		   },
-		*/
-
 	}
 
 	Oas struct {
 		InfoExtensions map[string]interface{} `json:"infoExtensions"`
-		/*
-			infoExtentions: {
-			        [OAS_X_THEME]: THEME.STANDARD,
-			        [OAS_X_THUMBNAIL]: 'https://example.com/logo.png',
-			        [OAS_X_TAGS]: ['example', 'nodejs'],
-			      },
-		*/
-
 	}
 )
 
@@ -151,11 +125,11 @@ func New() *Config {
 			ParseTime:            true,
 		},
 		StoreMongo: &Mongo{
-			URI:                  "mongodb://mongo:27017",
-			User:                 "root",
-			Password:             "password",
-			VironDB:              "viron_example",
-			CasbinCollectionName: "casbin_rule_go",
+			URI:                  os.Getenv(constant.MONGO_URI),
+			User:                 os.Getenv(constant.MONGO_USER),
+			Password:             os.Getenv(constant.MONGO_PASSWORD),
+			VironDB:              os.Getenv(constant.MONGO_DATABASE),
+			CasbinCollectionName: os.Getenv(constant.MONGO_CASBIN_COL_NAME),
 		},
 		Oas: &Oas{
 			InfoExtensions: map[string]interface{}{

@@ -56,7 +56,7 @@ type (
 // CreateAdminUser adminUser insert
 func CreateAdminUser(ctx context.Context, payload *AdminUser, authType string) (*AdminUser, *errors.VironError) {
 
-	adminUser := &repositories.AdminUser{}
+	adminUser := &repositories.AdminUserEntity{}
 
 	if authType == constant.AUTH_TYPE_EMAIL {
 		adminUser.AuthType = authType
@@ -108,7 +108,7 @@ func findOne(ctx context.Context, conditions *repositories.AdminUserConditions) 
 		return nil
 	}
 
-	user := &repositories.AdminUser{}
+	user := &repositories.AdminUserEntity{}
 
 	result[0].Bind(user)
 
@@ -192,7 +192,7 @@ func ListAdminUser(ctx context.Context, opts *AdminUserConditions) (*AdminUsersW
 	}
 
 	for _, result := range results {
-		entity := &repositories.AdminUser{}
+		entity := &repositories.AdminUserEntity{}
 		result.Bind(entity)
 		entity.RoleIDs = listRoles(fmt.Sprintf("%d", entity.ID))
 		adminuser := &AdminUser{
@@ -240,7 +240,7 @@ func UpdateAdminUserByID(ctx context.Context, id string, payload *AdminUser) *er
 				return errors.Initialize(http.StatusInternalServerError, "password gen failed.")
 			}
 
-			entity := &repositories.AdminUser{
+			entity := &repositories.AdminUserEntity{
 				ID:       user.ID,
 				Email:    user.Email,
 				AuthType: user.AuthType,

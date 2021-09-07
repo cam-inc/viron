@@ -22,8 +22,8 @@ const (
 )
 
 func (r *revokedTokensPersistence) FindOne(ctx context.Context, token string) (repositories.Entity, error) {
-	cond := &repositories.RevokedTokenOptions{
-		RevokedToken: &repositories.RevokedToken{
+	cond := &repositories.RevokedTokenConditions{
+		RevokedTokenEntity: &repositories.RevokedTokenEntity{
 			Token: token,
 		},
 	}
@@ -47,7 +47,7 @@ func (r *revokedTokensPersistence) Find(ctx context.Context, conditions reposito
 	}
 	var results repositories.EntitySlice
 	for cur.Next(ctx) {
-		revokedToken := &repositories.RevokedToken{}
+		revokedToken := &repositories.RevokedTokenEntity{}
 		if err := cur.Decode(revokedToken); err != nil {
 			return nil, err
 		}
@@ -66,7 +66,7 @@ func (r *revokedTokensPersistence) Count(ctx context.Context, conditions reposit
 }
 
 func (r *revokedTokensPersistence) CreateOne(ctx context.Context, entity repositories.Entity) (repositories.Entity, error) {
-	revokedToken := &repositories.RevokedToken{}
+	revokedToken := &repositories.RevokedTokenEntity{}
 	if err := entity.Bind(revokedToken); err != nil {
 		return nil, err
 	}
@@ -81,7 +81,7 @@ func (r *revokedTokensPersistence) CreateOne(ctx context.Context, entity reposit
 		return nil, err
 	}
 
-	result := &repositories.RevokedToken{}
+	result := &repositories.RevokedTokenEntity{}
 
 	if err := r.client.Collection(collectionName).FindOne(ctx, bson.D{{"_id", response.InsertedID}}).Decode(result); err != nil {
 		return nil, err

@@ -50,7 +50,7 @@ func (a *adminUsersPersistence) Find(ctx context.Context, conditions repositorie
 
 	for _, r := range result {
 		id := fmt.Sprintf("%d", r.ID)
-		adminuser := &repositories.AdminUser{
+		adminuser := &repositories.AdminUserEntity{
 			ID:                       id,
 			Email:                    r.Email,
 			AuthType:                 r.AuthType,
@@ -84,7 +84,7 @@ func (a *adminUsersPersistence) Count(ctx context.Context, conditions repositori
 }
 
 func (a *adminUsersPersistence) CreateOne(ctx context.Context, entity repositories.Entity) (repositories.Entity, error) {
-	adminuser := &repositories.AdminUser{}
+	adminuser := &repositories.AdminUserEntity{}
 	if err := entity.Bind(adminuser); err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (a *adminUsersPersistence) CreateOne(ctx context.Context, entity repositori
 }
 
 func (a *adminUsersPersistence) UpdateByID(ctx context.Context, id string, entity repositories.Entity) error {
-	up := &repositories.AdminUser{}
+	up := &repositories.AdminUserEntity{}
 	if err := entity.Bind(up); err != nil {
 		return err
 	}

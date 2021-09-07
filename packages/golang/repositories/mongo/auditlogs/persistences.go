@@ -34,7 +34,7 @@ func (a *auditLogsPersistence) Find(ctx context.Context, conditions repositories
 	}
 	var results repositories.EntitySlice
 	for cur.Next(ctx) {
-		auditLog := &repositories.AuditLog{}
+		auditLog := &repositories.AuditLogEntity{}
 		if err := cur.Decode(auditLog); err != nil {
 			return nil, err
 		}
@@ -64,7 +64,7 @@ func (a *auditLogsPersistence) Count(ctx context.Context, conditions repositorie
 
 func (a *auditLogsPersistence) CreateOne(ctx context.Context, entity repositories.Entity) (repositories.Entity, error) {
 
-	audit := &repositories.AuditLog{}
+	audit := &repositories.AuditLogEntity{}
 	if err := entity.Bind(audit); err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (a *auditLogsPersistence) CreateOne(ctx context.Context, entity repositorie
 		return nil, err
 	}
 
-	result := &repositories.AuditLog{}
+	result := &repositories.AuditLogEntity{}
 	if err := a.client.Collection(collectionName).FindOne(ctx, bson.D{{"_id", response.InsertedID}}).Decode(result); err != nil {
 		return nil, err
 	}
