@@ -14,23 +14,7 @@ import (
 )
 
 type (
-
-	/*
-		export interface AdminUser {
-		  id: string;
-		  email: string;
-		  authType: AuthType;
-		  password: string | null;
-		  salt: string | null;
-		  googleOAuth2AccessToken: string | null;
-		  googleOAuth2ExpiryDate: number | null;
-		  googleOAuth2IdToken: string | null;
-		  googleOAuth2RefreshToken: string | null;
-		  googleOAuth2TokenType: string | null;
-		  createdAt: Date;
-		  updatedAt: Date;
-	*/
-	AdminUser struct {
+	AdminUserEntity struct {
 		ID                       string             `bson:"-"`
 		OID                      primitive.ObjectID `bson:"_id"`
 		Email                    string             `bson:"email"`
@@ -50,7 +34,7 @@ type (
 		RoleIDs []string `bson:"-"`
 	}
 
-	AdminUsers []*AdminUser
+	AdminUsers []*AdminUserEntity
 
 	AdminUserConditions struct {
 		ID    string
@@ -66,16 +50,8 @@ type (
 
 var _ Conditions = &AdminUserConditions{}
 
-func (admins AdminUsers) ToEntitySlice() EntitySlice {
-	entities := EntitySlice{}
-	for _, admin := range admins {
-		entities = append(entities, admin)
-	}
-	return entities
-}
-
-func (admin *AdminUser) Bind(b interface{}) error {
-	d, ok := b.(*AdminUser)
+func (admin *AdminUserEntity) Bind(b interface{}) error {
+	d, ok := b.(*AdminUserEntity)
 	if !ok {
 		return fmt.Errorf("adminuser bind failed")
 	}
@@ -83,7 +59,7 @@ func (admin *AdminUser) Bind(b interface{}) error {
 	return nil
 }
 
-func (admin *AdminUser) ToBSONSet() bson.D {
+func (admin *AdminUserEntity) ToBSONSet() bson.D {
 	set := bson.D{}
 
 	if admin.Password != nil {

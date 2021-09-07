@@ -19,8 +19,8 @@ type revokedTokensPersistence struct {
 
 func (r *revokedTokensPersistence) FindOne(ctx context.Context, token string) (repositories.Entity, error) {
 
-	cond := &repositories.RevokedTokenOptions{
-		RevokedToken: &repositories.RevokedToken{
+	cond := &repositories.RevokedTokenConditions{
+		RevokedTokenEntity: &repositories.RevokedTokenEntity{
 			Token: token,
 		},
 	}
@@ -48,7 +48,7 @@ func (r *revokedTokensPersistence) Find(ctx context.Context, conditions reposito
 	}
 
 	for _, r := range results {
-		revokedtoken := &repositories.RevokedToken{
+		revokedtoken := &repositories.RevokedTokenEntity{
 			ID:        fmt.Sprintf("%d", r.ID),
 			Token:     r.Token,
 			RevokedAt: r.RevokedAt,
@@ -67,7 +67,7 @@ func (r *revokedTokensPersistence) Count(ctx context.Context, conditions reposit
 }
 
 func (r *revokedTokensPersistence) CreateOne(ctx context.Context, entity repositories.Entity) (repositories.Entity, error) {
-	revokedToken := &repositories.RevokedToken{}
+	revokedToken := &repositories.RevokedTokenEntity{}
 	if err := entity.Bind(revokedToken); err != nil {
 		return nil, err
 	}

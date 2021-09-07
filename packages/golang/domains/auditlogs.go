@@ -28,8 +28,8 @@ type (
 	}
 )
 
-func auditLogToEntity(audit *AuditLog) *repositories.AuditLog {
-	return &repositories.AuditLog{
+func auditLogToEntity(audit *AuditLog) *repositories.AuditLogEntity {
+	return &repositories.AuditLogEntity{
 		ID:            audit.ID,
 		RequestMethod: audit.RequestMethod,
 		RequestUri:    audit.RequestUri,
@@ -40,7 +40,7 @@ func auditLogToEntity(audit *AuditLog) *repositories.AuditLog {
 	}
 }
 
-func entityToAuditlog(entity *repositories.AuditLog) *AuditLog {
+func entityToAuditlog(entity *repositories.AuditLogEntity) *AuditLog {
 	return &AuditLog{
 		ID:            entity.ID,
 		RequestMethod: entity.RequestMethod,
@@ -56,8 +56,8 @@ func entityToAuditlog(entity *repositories.AuditLog) *AuditLog {
 
 func ListAuditLog(ctx context.Context, audit *AuditLog, page, size int, sort []string) *AuditLogsWithPager {
 	repo := container.GetAuditLogRepository()
-	results, err := repo.Find(ctx, &repositories.AuditLogOptions{
-		AuditLog: auditLogToEntity(audit),
+	results, err := repo.Find(ctx, &repositories.AuditLogConditions{
+		AuditLogEntity: auditLogToEntity(audit),
 		Paginate: &repositories.Paginate{
 			Size: size,
 			Page: page,
@@ -74,7 +74,7 @@ func ListAuditLog(ctx context.Context, audit *AuditLog, page, size int, sort []s
 	}
 
 	for _, result := range results {
-		a := &repositories.AuditLog{}
+		a := &repositories.AuditLogEntity{}
 		if err := result.Bind(a); err != nil {
 			continue
 		}

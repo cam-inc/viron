@@ -15,7 +15,7 @@ func SignOut(ctx context.Context, token string) bool {
 	}
 
 	repo := container.GetRevokedTokensRepository()
-	revokedToken := &repositories.RevokedToken{
+	revokedToken := &repositories.RevokedTokenEntity{
 		Token:     token,
 		RevokedAt: time.Now(),
 	}
@@ -37,7 +37,7 @@ func IsSignedOut(ctx context.Context, token string) bool {
 	if err != nil {
 		return false
 	}
-	revoked := &repositories.RevokedToken{}
+	revoked := &repositories.RevokedTokenEntity{}
 	if err := entity.Bind(revoked); err != nil {
 		return false
 	}

@@ -43,7 +43,7 @@ func (a *adminUsersPersistence) Find(ctx context.Context, conditions repositorie
 	}
 	var results repositories.EntitySlice
 	for cur.Next(ctx) {
-		adminUser := &repositories.AdminUser{}
+		adminUser := &repositories.AdminUserEntity{}
 		if err := cur.Decode(adminUser); err != nil {
 			return nil, err
 		}
@@ -73,7 +73,7 @@ func (a *adminUsersPersistence) Count(ctx context.Context, conditions repositori
 
 func (a *adminUsersPersistence) CreateOne(ctx context.Context, entity repositories.Entity) (repositories.Entity, error) {
 
-	adminuser := &repositories.AdminUser{}
+	adminuser := &repositories.AdminUserEntity{}
 	if err := entity.Bind(adminuser); err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (a *adminUsersPersistence) CreateOne(ctx context.Context, entity repositori
 		return nil, err
 	}
 
-	result := &repositories.AdminUser{}
+	result := &repositories.AdminUserEntity{}
 
 	fmt.Printf("InsertedID %+v\n", response.InsertedID)
 	if err := a.client.Collection(collectionName).FindOne(ctx, bson.D{{"_id", response.InsertedID}}).Decode(result); err != nil {
@@ -100,7 +100,7 @@ func (a *adminUsersPersistence) CreateOne(ctx context.Context, entity repositori
 }
 
 func (a *adminUsersPersistence) UpdateByID(ctx context.Context, id string, entity repositories.Entity) error {
-	adminUser := &repositories.AdminUser{}
+	adminUser := &repositories.AdminUserEntity{}
 	if err := entity.Bind(adminUser); err != nil {
 		return err
 	}

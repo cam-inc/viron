@@ -14,7 +14,7 @@ import (
 )
 
 type (
-	AuditLog struct {
+	AuditLogEntity struct {
 		ID            string             `json:"id" bson:"-"`
 		OID           primitive.ObjectID `json:"-" bson:"_id"`
 		RequestMethod *string            `json:"requestMethod" bson:"requestMethod"`
@@ -23,20 +23,20 @@ type (
 		UserID        *string            `json:"userId" bson:"userId"`
 		RequestBody   *string            `json:"requestBody" bson:"requestBody"`
 		StatusCode    *uint              `json:"statusCode" bson:"statusCode"`
-		CreatedAt     time.Time          `json:"-" json:"-"`
+		CreatedAt     time.Time          `json:"-" bson:"-"`
 		CreatedAtInt  int64              `json:"createdAt" bson:"createdAt"`
 		UpdatedAt     time.Time          `json:"-" bson:"-"`
 		UpdatedAtInt  int64              `json:"updatedAt" bson:"updatedAt"`
 	}
-	AuditLogOptions struct {
-		*AuditLog
+	AuditLogConditions struct {
+		*AuditLogEntity
 		*options.FindOptions
 		*Paginate
 	}
 )
 
-func (audit *AuditLog) Bind(b interface{}) error {
-	d, ok := b.(*AuditLog)
+func (audit *AuditLogEntity) Bind(b interface{}) error {
+	d, ok := b.(*AuditLogEntity)
 	if !ok {
 		return fmt.Errorf("audit bind failed")
 	}
@@ -44,7 +44,7 @@ func (audit *AuditLog) Bind(b interface{}) error {
 	return nil
 }
 
-func (op *AuditLogOptions) ConvertConditionMongoDB() *MongoConditions {
+func (op *AuditLogConditions) ConvertConditionMongoDB() *MongoConditions {
 	conditions := &MongoConditions{}
 
 	m := bson.M{}
@@ -92,7 +92,7 @@ func (op *AuditLogOptions) ConvertConditionMongoDB() *MongoConditions {
 	return conditions
 }
 
-func (op *AuditLogOptions) ConvertConditionMySQL() []qm.QueryMod {
+func (op *AuditLogConditions) ConvertConditionMySQL() []qm.QueryMod {
 	conditions := []qm.QueryMod{}
 	if op.ID != "" {
 		conditions = append(conditions, qm.Where("id = ?", op.ID))
@@ -125,9 +125,9 @@ func (op *AuditLogOptions) ConvertConditionMySQL() []qm.QueryMod {
 	return conditions
 }
 
-func NewAuditLogOptions(audit *AuditLog, size, page int, sort []string) Conditions {
-	return &AuditLogOptions{
-		AuditLog: audit,
+func NewAuditLogConditions(audit *AuditLogEntity, size, page int, sort []string) Conditions {
+	return &AuditLogConditions{
+		AuditLogEntity: audit,
 		Paginate: &Paginate{
 			Size: size,
 			Page: page,
