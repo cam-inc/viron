@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/cam-inc/viron/packages/golang/helpers"
 
@@ -15,8 +14,9 @@ import (
 // SigninEmail Emailアドレスでサインイン
 func SigninEmail(ctx context.Context, email string, password string) (string, *errors.VironError) {
 	user := domains.FindByEmail(ctx, email)
+	log.Debugf("user(%s)", email)
 	if user == nil {
-		fmt.Println("user is nil")
+		log.Debugf("user(%s) is nil", email)
 		payload := &domains.AdminUser{
 			Email:    email,
 			Password: &password,

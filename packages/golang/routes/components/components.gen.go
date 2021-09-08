@@ -11,15 +11,22 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/getkin/kin-openapi/openapi3"
 )
+
+// 作成日時
+type VironCreatedAt time.Time
 
 // VironPager defines model for VironPager.
 type VironPager struct {
 	CurrentPage int `json:"currentPage"`
 	MaxPage     int `json:"maxPage"`
 }
+
+// 更新日時
+type VironUpdatedAt time.Time
 
 // VironEmailQueryParam defines model for VironEmailQueryParam.
 type VironEmailQueryParam string
@@ -45,13 +52,14 @@ type VironSortQueryParam []string
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/4xTTW8TQQz9KyuLA4jRksJtL3Dh0FugEhcEkrPrTYzmqx5v1bTsf0eeoDSp0iaXldbP",
-	"fu/ZYz9Cn0JOkaIW6B4ho2AgJal/P1hS/BqQ/beJZLs00OIcoYNbC4GDiIGgA7I0cFD6DQW0LN1mA4oK",
-	"xzXMs9vxXQ9L1M0xV0bdPFHxAA6EbicWGqBTmegi3vMmK/NZpiWuSexzTDhQ6YWzcjJmw5s4hRVJk8bG",
-	"c1FwJ0UzrumULEelNckz3Rt+eFXX8DOChR8uE/yePF0yNql5l4zuJom+6j6JNiVTzyP3aMGDXug++zQQ",
-	"dCP6Qi/0lkSPjLBS+L+6qiRW8rt9/7l7i6X/a+Lv3oB7btdB4Hi9q7zaoyiCWwOLbr0FxiSh9raTe7qJ",
-	"+lJVVFImUaaK9ZMIRTX01NgdBLx/CZwPV/7nPtMdkf7ae02rP9QrzFbHcUyVkrXa/nJnHj94XjUH1+3g",
-	"jqTsnmHRLtorM5QyRcwMHXxqF+1HcPUUC3Rx8n7+FwAA///LAn8ZHgQAAA==",
+	"H4sIAAAAAAAC/5RUO28TQRD+K9aIAsRyONBdAwhRpDNE0CCQ1ndz9qDbR2bnojjBDRUlFQhBS09By79B",
+	"9zvQrJEfwY6d5qSbb/Z7zD4uoQouBo9eEpSXEC1bh4Kc/14RB//MWWqfd8izkYJaJw8lnGoJDHjrEEpA",
+	"bQMDqZqis9ols6hAEiY/gfncLPiO65GV6SZXtDJdUVENBhhPO2KsoRTu8CDe/SYz816mkZ0g62eTsMZU",
+	"MUWhoMyKD3znxsiD0AxaSgJmq2i0E9wmS15wgnxF94QurtVVfI9goovDBF+EFg8ZG+e+Q0Z3EliudR9Y",
+	"BiliRQ1VVotrWfA8tqFGKBvbJtyRLbBsGCFB9+/oiiDrkrfF3UflbZuq9yp+5xaYq3YNOPLHi5VHS9Qy",
+	"25mCSWatFprALmdbyK3uxFNGK1g/kf8T/vn9vf/4qf/yo//6AUymsAIl1FbwnpDDbW5W25+TcIjIQpgF",
+	"q44ZvSi6bS8NOHu+C5yv36PXy06zQfpmaSiM32ElS0MvY70rZf/tV//5541SqhnyTcg+SfKAH5+pzv2W",
+	"xoO1d8jAGXJaCA2LYXGkjkJEbyNBCQ+LYfEATH40EpS+a9v53wAAAP//VGXS08gEAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

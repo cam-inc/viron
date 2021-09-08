@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   version: 0.0.1
-  title: '@viron/example-golang components'
+  title: '@viron/example-nodejs components'
 
 components:
   parameters:
@@ -57,6 +57,16 @@ components:
       required:
         - maxPage
         - currentPage
+
+    CreatedAt:
+      description: 作成日時
+      type: string
+      format: date-time
+
+    UpdatedAt:
+      description: 更新日時
+      type: string
+      format: date-time
 
   securitySchemes:
     jwt:

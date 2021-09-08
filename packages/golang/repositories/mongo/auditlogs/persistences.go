@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/cam-inc/viron/packages/golang/helpers"
+
 	"go.mongodb.org/mongo-driver/bson"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -39,6 +41,8 @@ func (a *auditLogsPersistence) Find(ctx context.Context, conditions repositories
 			return nil, err
 		}
 		auditLog.ID = auditLog.OID.Hex()
+		auditLog.CreatedAt = helpers.UnixToTime(auditLog.CreatedAtInt)
+		auditLog.UpdatedAt = helpers.UnixToTime(auditLog.UpdatedAtInt)
 		results = append(results, auditLog)
 	}
 
@@ -72,8 +76,8 @@ func (a *auditLogsPersistence) CreateOne(ctx context.Context, entity repositorie
 	audit.OID = primitive.NewObjectID()
 
 	now := time.Now().Unix()
-	audit.CreatedAtInt = now
-	audit.UpdatedAtInt = now
+	audit.CreatedAtInt = int(now)
+	audit.UpdatedAtInt = int(now)
 	response, err := a.client.Collection(collectionName).InsertOne(ctx, audit)
 	if err != nil {
 		return nil, err

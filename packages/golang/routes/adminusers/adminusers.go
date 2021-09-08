@@ -119,19 +119,16 @@ func PagerToVironAdminUserListWithPager(currentPage, maxPage int, users []*domai
 	}
 
 	for _, adminUser := range users {
+		createdAt := externalRef0.VironCreatedAt(adminUser.CreatedAt)
+		updatedAt := externalRef0.VironUpdatedAt(adminUser.UpdatedAt)
 		vironPager.List = append(vironPager.List, VironAdminUser{
 			AuthType:  adminUser.AuthType,
 			Email:     openapi_types.Email(adminUser.Email),
 			Id:        adminUser.ID,
 			RoleIds:   &adminUser.RoleIDs,
-			CreatedAt: &adminUser.CreatedAtInt,
-			UpdatedAt: &adminUser.UpdateAtInt,
+			CreatedAt: &createdAt,
+			UpdatedAt: &updatedAt,
 		})
-
-		//createdAtInt64 := adminUser.CreatedAt.Unix()
-		//updatedAtInt64 := adminUser.UpdateAt.Unix()
-		//vironPager.List[i].CreatedAt = &createdAtInt64
-		//vironPager.List[i].UpdatedAt = &updatedAtInt64
 	}
 
 	return vironPager

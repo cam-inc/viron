@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cam-inc/viron/packages/golang/helpers"
+
 	"go.mongodb.org/mongo-driver/bson"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -48,6 +50,8 @@ func (a *adminUsersPersistence) Find(ctx context.Context, conditions repositorie
 			return nil, err
 		}
 		adminUser.ID = adminUser.OID.Hex()
+		adminUser.CreatedAt = helpers.UnixToTime(adminUser.CreatedAtInt)
+		adminUser.UpdatedAt = helpers.UnixToTime(adminUser.UpdatedAtInt)
 		results = append(results, adminUser)
 	}
 
@@ -78,9 +82,9 @@ func (a *adminUsersPersistence) CreateOne(ctx context.Context, entity repositori
 		return nil, err
 	}
 	adminuser.OID = primitive.NewObjectID()
-	now := time.Now().Unix()
-	adminuser.CreatedAtInt = now
-	adminuser.UpdatedAtInt = now
+	now := time.Now()
+	adminuser.CreatedAtInt = int(now.Unix())
+	adminuser.UpdatedAtInt = int(now.Unix())
 	response, err := a.client.Collection(collectionName).InsertOne(ctx, adminuser)
 	if err != nil {
 		return nil, err
@@ -104,7 +108,7 @@ func (a *adminUsersPersistence) UpdateByID(ctx context.Context, id string, entit
 	if err := entity.Bind(adminUser); err != nil {
 		return err
 	}
-	adminUser.UpdatedAtInt = time.Now().Unix()
+	adminUser.UpdatedAtInt = int(time.Now().Unix())
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err
