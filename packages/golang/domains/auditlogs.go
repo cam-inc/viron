@@ -2,6 +2,7 @@ package domains
 
 import (
 	"context"
+	"time"
 
 	"github.com/getkin/kin-openapi/openapi3"
 
@@ -11,15 +12,15 @@ import (
 
 type (
 	AuditLog struct {
-		ID            string  `json:"id"`
-		RequestMethod *string `json:"requestMethod"`
-		RequestUri    *string `json:"requestUri"`
-		SourceIp      *string `json:"sourceIp"`
-		UserId        *string `json:"userId"`
-		RequestBody   *string `json:"requestBody"`
-		StatusCode    *uint   `json:"statusCode"`
-		CreatedAt     int64   `json:"createdAt"`
-		UpdatedAt     int64   `json:"updatedAt"`
+		ID            string    `json:"id"`
+		RequestMethod *string   `json:"requestMethod,omitempty"`
+		RequestUri    *string   `json:"requestUri,omitempty"`
+		SourceIp      *string   `json:"sourceIp,omitempty"`
+		UserId        *string   `json:"userId,omitempty"`
+		RequestBody   *string   `json:"requestBody,omitempty"`
+		StatusCode    *uint     `json:"statusCode,omitempty"`
+		CreatedAt     time.Time `json:"createdAt"`
+		UpdatedAt     time.Time `json:"updatedAt"`
 	}
 
 	AuditLogsWithPager struct {
@@ -49,8 +50,8 @@ func entityToAuditlog(entity *repositories.AuditLogEntity) *AuditLog {
 		UserId:        entity.UserID,
 		RequestBody:   entity.RequestBody,
 		StatusCode:    entity.StatusCode,
-		CreatedAt:     entity.CreatedAtInt,
-		UpdatedAt:     entity.UpdatedAtInt,
+		CreatedAt:     entity.CreatedAt,
+		UpdatedAt:     entity.UpdatedAt,
 	}
 }
 

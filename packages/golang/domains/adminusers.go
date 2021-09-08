@@ -31,10 +31,8 @@ type (
 		GoogleOAuth2RefreshToken *string   `json:"googleOAuth2RefreshToken,omitempty"`
 		GoogleOAuth2TokenType    *string   `json:"googleOAuth2TokenType,omitempty"`
 		RoleIDs                  []string  `json:"roleIds"`
-		CreatedAt                time.Time `json:"-"`
-		UpdateAt                 time.Time `json:"-"`
-		CreatedAtInt             int64     `json:"createdAt"`
-		UpdateAtInt              int64     `json:"updatedAt"`
+		CreatedAt                time.Time `json:"createdAt"`
+		UpdatedAt                time.Time `json:"updatedAt"`
 	}
 
 	AdminUsersWithPager struct {
@@ -105,6 +103,7 @@ func findOne(ctx context.Context, conditions *repositories.AdminUserConditions) 
 	repo := container.GetAdminUserRepository()
 	result, err := repo.Find(ctx, conditions)
 	if err != nil || len(result) == 0 {
+		log.Errorf("err %+v result %+v", err, result)
 		return nil
 	}
 
@@ -126,7 +125,7 @@ func findOne(ctx context.Context, conditions *repositories.AdminUserConditions) 
 		GoogleOAuth2RefreshToken: user.GoogleOAuth2RefreshToken,
 		GoogleOAuth2TokenType:    user.GoogleOAuth2TokenType,
 		CreatedAt:                user.CreatedAt,
-		UpdateAt:                 user.UpdatedAt,
+		UpdatedAt:                user.UpdatedAt,
 		RoleIDs:                  user.RoleIDs,
 	}
 	return auser
@@ -196,27 +195,18 @@ func ListAdminUser(ctx context.Context, opts *AdminUserConditions) (*AdminUsersW
 		result.Bind(entity)
 		entity.RoleIDs = listRoles(fmt.Sprintf("%d", entity.ID))
 		adminuser := &AdminUser{
-			ID:           entity.ID,
-			Email:        entity.Email,
-			Password:     entity.Password,
-			Salt:         entity.Salt,
-			AuthType:     entity.AuthType,
-			RoleIDs:      entity.RoleIDs,
-			CreatedAt:    entity.CreatedAt,
-			CreatedAtInt: entity.CreatedAtInt,
-			UpdateAt:     entity.UpdatedAt,
-			UpdateAtInt:  entity.UpdatedAtInt,
+			ID:        entity.ID,
+			Email:     entity.Email,
+			Password:  entity.Password,
+			Salt:      entity.Salt,
+			AuthType:  entity.AuthType,
+			RoleIDs:   entity.RoleIDs,
+			CreatedAt: entity.CreatedAt,
+			UpdatedAt: entity.UpdatedAt,
 		}
 
 		adminuser.RoleIDs = listRoles(adminuser.ID)
 
-		if adminuser.CreatedAtInt == 0 {
-			adminuser.CreatedAtInt = adminuser.CreatedAt.Unix()
-		}
-
-		if adminuser.UpdateAtInt == 0 {
-			adminuser.UpdateAtInt = adminuser.UpdateAt.Unix()
-		}
 		withPager.List = append(withPager.List, adminuser)
 	}
 	count := CountAdminUser(ctx)

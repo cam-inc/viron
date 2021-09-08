@@ -17,16 +17,16 @@ type (
 	AuditLogEntity struct {
 		ID            string             `json:"id" bson:"-"`
 		OID           primitive.ObjectID `json:"-" bson:"_id"`
-		RequestMethod *string            `json:"requestMethod" bson:"requestMethod"`
-		RequestUri    *string            `json:"requestUri" bson:"requestUri"`
-		SourceIp      *string            `json:"sourceIp" bson:"sourceIp"`
-		UserID        *string            `json:"userId" bson:"userId"`
-		RequestBody   *string            `json:"requestBody" bson:"requestBody"`
-		StatusCode    *uint              `json:"statusCode" bson:"statusCode"`
+		RequestMethod *string            `json:"requestMethod" bson:"requestMethod,omitempty"`
+		RequestUri    *string            `json:"requestUri" bson:"requestUri,omitempty"`
+		SourceIp      *string            `json:"sourceIp" bson:"sourceIp,omitempty"`
+		UserID        *string            `json:"userId" bson:"userId,omitempty"`
+		RequestBody   *string            `json:"requestBody" bson:"requestBody,omitempty"`
+		StatusCode    *uint              `json:"statusCode" bson:"statusCode,omitempty"`
 		CreatedAt     time.Time          `json:"-" bson:"-"`
-		CreatedAtInt  int64              `json:"createdAt" bson:"createdAt"`
+		CreatedAtInt  int                `json:"createdAt" bson:"createdAt"`
 		UpdatedAt     time.Time          `json:"-" bson:"-"`
-		UpdatedAtInt  int64              `json:"updatedAt" bson:"updatedAt"`
+		UpdatedAtInt  int                `json:"updatedAt" bson:"updatedAt"`
 	}
 	AuditLogConditions struct {
 		*AuditLogEntity

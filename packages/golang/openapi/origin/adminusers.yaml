@@ -8,14 +8,14 @@ info:
     - id: vironAdminUsers
       group: 管理画面/管理
       title: Viron 管理ユーザー
-      description: 管理ユーザー一覧を閲覧できます
+      description: |
+        # 管理ユーザーの管理
+        Vironを利用している管理ユーザーの **作成・更新・削除** を行います。
       contents:
-        - operationId: listVironAdminUsers
-          resourceId: vironAdminUser
+        - title: 管理ユーザー
           type: table
-          query:
-            - id
-            - roleId
+          operationId: listVironAdminUsers
+          resourceId: vironAdminUser
 
 tags:
   - name: vironAdminUsers
@@ -136,13 +136,9 @@ components:
           items:
             type: string
         createdAt:
-          description: 作成日時
-          type: integer
-          format: int64
+          $ref: './components.yaml#/components/schemas/VironCreatedAt'
         updatedAt:
-          description: 更新日時
-          type: integer
-          format: int64
+          $ref: './components.yaml#/components/schemas/VironUpdatedAt'
       required:
         - id
         - email

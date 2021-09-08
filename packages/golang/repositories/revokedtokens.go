@@ -17,11 +17,11 @@ type (
 		OID          primitive.ObjectID `bson:"_id"`
 		Token        string             `bson:"token"`
 		RevokedAt    time.Time          `bson:"-"`
-		RevokedAtInt int64              `bson:"revokedAt"`
+		RevokedAtInt int                `bson:"revokedAt"`
 		CreatedAt    time.Time          `bson:"-"`
-		CreatedAtInt int64              `bson:"createdAt"`
+		CreatedAtInt int                `bson:"createdAt"`
 		UpdatedAt    time.Time          `bson:"-"`
-		UpdatedAtInt int64              `bson:"updatedAt"`
+		UpdatedAtInt int                `bson:"updatedAt"`
 	}
 
 	RevokedTokenConditions struct {

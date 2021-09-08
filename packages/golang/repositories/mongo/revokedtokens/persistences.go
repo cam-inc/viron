@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/cam-inc/viron/packages/golang/helpers"
+
 	"go.mongodb.org/mongo-driver/bson"
 	mongoDriver "go.mongodb.org/mongo-driver/mongo"
 
@@ -52,6 +54,9 @@ func (r *revokedTokensPersistence) Find(ctx context.Context, conditions reposito
 			return nil, err
 		}
 		revokedToken.ID = revokedToken.OID.Hex()
+		revokedToken.CreatedAt = helpers.UnixToTime(revokedToken.CreatedAtInt)
+		revokedToken.UpdatedAt = helpers.UnixToTime(revokedToken.UpdatedAtInt)
+		revokedToken.RevokedAt = helpers.UnixToTime(revokedToken.RevokedAtInt)
 		results = append(results, revokedToken)
 	}
 
@@ -71,11 +76,11 @@ func (r *revokedTokensPersistence) CreateOne(ctx context.Context, entity reposit
 		return nil, err
 	}
 
-	revokedToken.RevokedAtInt = revokedToken.RevokedAt.Unix()
+	revokedToken.RevokedAtInt = int(revokedToken.RevokedAt.Unix())
 
 	now := time.Now().Unix()
-	revokedToken.CreatedAtInt = now
-	revokedToken.UpdatedAtInt = now
+	revokedToken.CreatedAtInt = int(now)
+	revokedToken.UpdatedAtInt = int(now)
 	response, err := r.client.Collection(collectionName).InsertOne(ctx, revokedToken)
 	if err != nil {
 		return nil, err

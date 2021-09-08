@@ -17,19 +17,19 @@ type (
 	AdminUserEntity struct {
 		ID                       string             `bson:"-"`
 		OID                      primitive.ObjectID `bson:"_id"`
-		Email                    string             `bson:"email"`
+		Email                    string             `bson:"email,omitempty"`
 		AuthType                 string             `bson:"authType"`
-		Password                 *string            `bson:"password"`
-		Salt                     *string            `bson:"salt"`
-		GoogleOAuth2AccessToken  *string            `bson:"googleOAuth2AccessToken""`
-		GoogleOAuth2ExpiryDate   *int               `bson:"googleOAuth2ExpiryDate"`
-		GoogleOAuth2IdToken      *string            `bson:"googleOAuth2IdToken"`
-		GoogleOAuth2RefreshToken *string            `bson:"googleOAuth2RefreshToken"`
-		GoogleOAuth2TokenType    *string            `bson:"googleOAuth2TokenType"`
+		Password                 *string            `bson:"password,omitempty"`
+		Salt                     *string            `bson:"salt,omitempty"`
+		GoogleOAuth2AccessToken  *string            `bson:"googleOAuth2AccessToken,omitempty"`
+		GoogleOAuth2ExpiryDate   *int               `bson:"googleOAuth2ExpiryDate,omitempty"`
+		GoogleOAuth2IdToken      *string            `bson:"googleOAuth2IdToken,omitempty"`
+		GoogleOAuth2RefreshToken *string            `bson:"googleOAuth2RefreshToken,omitempty"`
+		GoogleOAuth2TokenType    *string            `bson:"googleOAuth2TokenType,omitempty"`
 		CreatedAt                time.Time          `bson:"-"`
 		UpdatedAt                time.Time          `bson:"-"`
-		CreatedAtInt             int64              `bson:"createdAt"`
-		UpdatedAtInt             int64              `bson:"updatedAt"`
+		CreatedAtInt             int                `bson:"createdAt,omitempty"`
+		UpdatedAtInt             int                `bson:"updatedAt,omitempty"`
 
 		RoleIDs []string `bson:"-"`
 	}
@@ -86,7 +86,7 @@ func (admin *AdminUserEntity) ToBSONSet() bson.D {
 		set = append(set, bson.E{"googleOAuth2TokenType", *admin.GoogleOAuth2TokenType})
 	}
 	if admin.UpdatedAtInt == 0 {
-		admin.UpdatedAtInt = time.Now().Unix()
+		admin.UpdatedAtInt = int(time.Now().Unix())
 	}
 	set = append(set, bson.E{"updatedAt", admin.UpdatedAtInt})
 

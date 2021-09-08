@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cam-inc/viron/packages/golang/logging"
+
 	"github.com/cam-inc/viron/packages/golang/errors"
 
 	"github.com/cam-inc/viron/packages/golang/constant"
@@ -38,6 +40,7 @@ type (
 
 var (
 	jwt *JWT
+	log logging.Logger
 )
 
 func SetUp(secret string, provider string, expiration int) error {
@@ -47,6 +50,7 @@ func SetUp(secret string, provider string, expiration int) error {
 		ExpirationSec: expiration,
 		jwtAuth:       jwtauth.New(string(jwa.HS512), []byte(secret), nil),
 	}
+	log = logging.GetDefaultLogger()
 	return nil
 }
 

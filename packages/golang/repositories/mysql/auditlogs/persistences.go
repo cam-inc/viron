@@ -46,9 +46,7 @@ func (a *auditLogsPersistence) Find(ctx context.Context, conditions repositories
 			RequestBody:   r.RequestBody.Ptr(),
 			StatusCode:    r.StatusCode.Ptr(),
 			CreatedAt:     r.CreatedAt,
-			CreatedAtInt:  r.CreatedAt.Unix(),
 			UpdatedAt:     r.UpdatedAt,
-			UpdatedAtInt:  r.UpdatedAt.Unix(),
 		}
 		list = append(list, auditlog)
 	}

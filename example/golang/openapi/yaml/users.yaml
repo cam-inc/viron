@@ -7,11 +7,13 @@ info:
     - id: user
       group: 管理画面/ユーザー
       title: ユーザー情報
-      description: ユーザー情報を閲覧/管理します
+      description: |
+        # ユーザー情報の管理
+        ユーザーデータの **作成・更新・削除** を行います。
       contents:
-        - operationId: listUsers
-          resourceId: user
+        - title: ユーザー情報 
           type: table
+          operationId: listUsers
           pagination: true
           actions:
             # CSVダウンロード
@@ -19,6 +21,7 @@ info:
               defaultParametersValue: 
                 resourceName: users
                 format: csv
+          resourceId: user
 
 tags:
   - name: user
@@ -148,13 +151,9 @@ components:
           description: ニックネーム
           type: string
         createdAt:
-          description: 作成日時
-          type: string
-          format: date-time
+          $ref: './components.yaml#/components/schemas/CreatedAt'
         updatedAt:
-          description: 更新日時
-          type: string
-          format: date-time
+          $ref: './components.yaml#/components/schemas/UpdatedAt'
       required:
         - id
         - name
