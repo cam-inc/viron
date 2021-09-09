@@ -42,6 +42,7 @@ func New() http.Handler {
 	log := logging.GetLogger(constant.LOG_NAME, logging.DebugLevel)
 
 	cfg := config.New()
+	domainAuth.NewGoogleOAuth2(cfg.Auth.GoogleOAuth2)
 	mysqlConfig := cfg.StoreMySQL
 	store.SetupMySQL(mysqlConfig)
 	if err := domains.SetUpMySQL(store.GetMySQLConnection()); err != nil {

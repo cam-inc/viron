@@ -3,11 +3,12 @@ package constant
 import "net/http"
 
 const (
-	CTX_KEY_API_DEFINITION     = "apiDefinition"
-	CTX_KEY_JWT_EXPIRATION_SEC = "jwtExpirationSec"
-	CTX_KEY_ADMINUSER          = "adminUser"
-	CTX_KEY_ADMINUSER_ID       = "userId"
-	CTX_KEY_AUTH               = "auth"
+	CTX_KEY_API_DEFINITION       = "apiDefinition"
+	CTX_KEY_JWT_EXPIRATION_SEC   = "jwtExpirationSec"
+	CTX_KEY_STATE_EXPIRATION_SEC = "stateExpirationSec"
+	CTX_KEY_ADMINUSER            = "adminUser"
+	CTX_KEY_ADMINUSER_ID         = "userId"
+	CTX_KEY_AUTH                 = "auth"
 
 	/*
 		export const DEFAULT_PAGER_SIZE = 10;
@@ -176,6 +177,8 @@ const (
 
 	DEFAULT_JWT_EXPIRATION_SEC = 24 * 60 * 60
 
+	OAUTH2_STATE_EXPIRATION_SEC = 10 * 60
+
 	CASBIN_SYNC_INTERVAL_MSEC = 1 * 60 * 1000
 
 	/*
@@ -251,5 +254,9 @@ var (
 		API_METHOD_POST,
 		API_METHOD_PUT,
 		API_METHOD_DELETE,
+	}
+
+	GOOGLE_OAUTH2_DEFAULT_SCOPES = []string{
+		"https://www.googleapis.com/auth/userinfo.email",
 	}
 )

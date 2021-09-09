@@ -139,7 +139,7 @@ func (a *adminUsersPersistence) CreateOne(ctx context.Context, entity repositori
 		GoogleOAuth2AccessToken:  null.StringFromPtr(adminuser.GoogleOAuth2AccessToken),
 		GoogleOAuth2IdToken:      null.StringFromPtr(adminuser.GoogleOAuth2IdToken),
 		GoogleOAuth2RefreshToken: null.StringFromPtr(adminuser.GoogleOAuth2RefreshToken),
-		GoogleOAuth2ExpiryDate:   null.IntFromPtr(adminuser.GoogleOAuth2ExpiryDate),
+		GoogleOAuth2ExpiryDate:   null.Uint64FromPtr(adminuser.GoogleOAuth2ExpiryDate),
 		GoogleOAuth2TokenType:    null.StringFromPtr(adminuser.GoogleOAuth2TokenType),
 		CreatedAt:                time.Now(),
 		UpdatedAt:                time.Now(),
@@ -184,7 +184,7 @@ func (a *adminUsersPersistence) UpdateByID(ctx context.Context, id string, entit
 		columns = append(columns, models.AdminuserColumns.GoogleOAuth2AccessToken)
 	}
 	if up.GoogleOAuth2ExpiryDate != nil {
-		adminUser.GoogleOAuth2ExpiryDate = null.NewInt(*up.GoogleOAuth2ExpiryDate, true)
+		adminUser.GoogleOAuth2ExpiryDate = null.NewUint64(*up.GoogleOAuth2ExpiryDate, true)
 		columns = append(columns, models.AdminuserColumns.GoogleOAuth2ExpiryDate)
 	}
 	if up.GoogleOAuth2RefreshToken != nil {

@@ -13,6 +13,7 @@ require (
 	github.com/go-chi/jwtauth v1.2.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/imdario/mergo v0.3.12
 	github.com/kat-co/vala v0.0.0-20170210184112-42e1d8b61f12
 	github.com/lestrrat-go/jwx v1.1.0
@@ -26,4 +27,6 @@ require (
 	github.com/volatiletech/sqlboiler/v4 v4.6.0
 	github.com/volatiletech/strmangle v0.0.1
 	golang.org/x/crypto v0.0.0-20210506145944-38f3c27a63bf
+	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f // indirect
+	google.golang.org/api v0.56.0 // indirect
 )

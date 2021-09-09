@@ -15,7 +15,7 @@ type (
 		Password                 *string
 		Salt                     *string
 		GoogleOAuth2AccessToken  *string
-		GoogleOAuth2ExpiryDate   *int
+		GoogleOAuth2ExpiryDate   *uint64
 		GoogleOAuth2IdToken      *string
 		GoogleOAuth2RefreshToken *string
 		GoogleOAuth2TokenType    *string
