@@ -21,6 +21,7 @@ type (
 		ResourceID  string   `json:"resourceId"`
 		Query       []string `json:"query,omitempty"`
 		ContentType string   `json:"type"`
+		Pagination  bool     `json:"pagination"`
 		Sort        []string `json:"sort,omitempty"`
 	}
 	XPage struct {

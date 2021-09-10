@@ -12,6 +12,7 @@ info:
         - operationId: listVironAdminRoles
           resourceId: vironAdminRole
           type: table
+          pagination: true
 
 tags:
   - name: vironAdminRoles

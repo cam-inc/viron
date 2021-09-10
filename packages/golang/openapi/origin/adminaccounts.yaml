@@ -13,6 +13,7 @@ info:
         - operationId: listVironAdminAccounts
           resourceId: vironAdminAccount
           type: table
+          pagination: true
 
 tags:
   - name: vironAdminAccounts

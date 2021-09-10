@@ -12,6 +12,7 @@ info:
         - operationId: listVironAuditlogs
           resourceId: vironAuditLog
           type: table
+          pagination: true
           query:
             - userId
             - requestUri
