@@ -42,11 +42,11 @@ func (ip *VironSourceIpQueryParam) stringPtr() *string {
 	s := string(*ip)
 	return &s
 }
-func (status *VironStatusCodeQueryParam) intPtr() *uint {
+func (status *VironStatusCodeQueryParam) intPtr() *int {
 	if status == nil {
 		return nil
 	}
-	i := uint(*status)
+	i := int(*status)
 	return &i
 }
 func (params ListVironAuditlogsParams) convertToDomainsAuditLog() *domains.AuditLog {

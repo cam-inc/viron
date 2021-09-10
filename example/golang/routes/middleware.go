@@ -289,7 +289,7 @@ func InjectAuditLog(next http.Handler) http.Handler {
 				}
 			}
 			sourceIP := r.Header.Get("x-forwarded-for")
-			status := uint(ww.Status())
+			status := int(ww.Status())
 			audit := &domains.AuditLog{
 				UserId:        &userID,
 				RequestMethod: &r.Method,

@@ -44,9 +44,12 @@ func (a *auditLogsPersistence) Find(ctx context.Context, conditions repositories
 			SourceIp:      r.SourceIp.Ptr(),
 			UserID:        r.UserId.Ptr(),
 			RequestBody:   r.RequestBody.Ptr(),
-			StatusCode:    r.StatusCode.Ptr(),
 			CreatedAt:     r.CreatedAt,
 			UpdatedAt:     r.UpdatedAt,
+		}
+		if r.StatusCode.Valid {
+			status := int(r.StatusCode.Uint)
+			auditlog.StatusCode = &status
 		}
 		list = append(list, auditlog)
 	}
@@ -79,9 +82,11 @@ func (a *auditLogsPersistence) CreateOne(ctx context.Context, entity repositorie
 		SourceIp:      null.StringFromPtr(audit.SourceIp),
 		UserId:        null.StringFromPtr(audit.UserID),
 		RequestBody:   null.StringFromPtr(audit.RequestBody),
-		StatusCode:    null.UintFromPtr(audit.StatusCode),
 		CreatedAt:     time.Now(),
 		UpdatedAt:     time.Now(),
+	}
+	if audit.StatusCode != nil {
+		model.StatusCode = null.UintFrom(uint(*audit.StatusCode))
 	}
 
 	if err := model.Insert(ctx, a.conn, boil.Infer()); err != nil {

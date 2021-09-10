@@ -18,7 +18,7 @@ type (
 		SourceIp      *string   `json:"sourceIp,omitempty"`
 		UserId        *string   `json:"userId,omitempty"`
 		RequestBody   *string   `json:"requestBody,omitempty"`
-		StatusCode    *uint     `json:"statusCode,omitempty"`
+		StatusCode    *int      `json:"statusCode,omitempty"`
 		CreatedAt     time.Time `json:"createdAt"`
 		UpdatedAt     time.Time `json:"updatedAt"`
 	}

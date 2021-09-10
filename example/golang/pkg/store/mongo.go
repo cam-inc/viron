@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -25,6 +26,9 @@ func SetupMongo(config *config.Mongo) {
 		Username: config.User,
 		Password: config.Password,
 	})
+
+	fmt.Printf("mongo client options %+v\n", opt)
+
 	client, err := mongo.NewClient(opt)
 	if err != nil {
 		panic(err)
