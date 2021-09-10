@@ -133,7 +133,7 @@ func New() *Config {
 		},
 		Oas: &Oas{
 			InfoExtensions: map[string]interface{}{
-				pkgConstant.OAS_X_THEME:     pkgConstant.THEME_STANDARD,
+				pkgConstant.OAS_X_THEME:     pkgConstant.MAGENDA,
 				pkgConstant.OAS_X_THUMBNAIL: "https://example.com/logo.png",
 				pkgConstant.OAS_X_TAGS:      []string{"example", "golang"},
 			},
