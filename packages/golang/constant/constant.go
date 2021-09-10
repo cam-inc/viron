@@ -5,11 +5,12 @@ import "net/http"
 const (
 	ENV_STORE_MODE = "mode"
 
-	CTX_KEY_API_DEFINITION     = "apiDefinition"
-	CTX_KEY_JWT_EXPIRATION_SEC = "jwtExpirationSec"
-	CTX_KEY_ADMINUSER          = "adminUser"
-	CTX_KEY_ADMINUSER_ID       = "userId"
-	CTX_KEY_AUTH               = "auth"
+	CTX_KEY_API_DEFINITION       = "apiDefinition"
+	CTX_KEY_JWT_EXPIRATION_SEC   = "jwtExpirationSec"
+	CTX_KEY_STATE_EXPIRATION_SEC = "stateExpirationSec"
+	CTX_KEY_ADMINUSER            = "adminUser"
+	CTX_KEY_ADMINUSER_ID         = "userId"
+	CTX_KEY_AUTH                 = "auth"
 
 	DEFAULT_PAGER_SIZE = 10
 	DEFAULT_PAGER_PAGE = 1
@@ -72,6 +73,8 @@ const (
 	ADMIN_ROLE_VIEWER = "viewer"
 
 	DEFAULT_JWT_EXPIRATION_SEC = 24 * 60 * 60
+
+	OAUTH2_STATE_EXPIRATION_SEC = 10 * 60
 
 	CASBIN_SYNC_INTERVAL_MSEC = 1 * 60 * 1000
 
@@ -138,4 +141,8 @@ var (
 	}
 
 	VIRON_MONGO_COLLECTION_MAP = map[string][]string{}
+
+	GOOGLE_OAUTH2_DEFAULT_SCOPES = []string{
+		"https://www.googleapis.com/auth/userinfo.email",
+	}
 )

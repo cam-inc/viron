@@ -44,6 +44,8 @@ func New() http.Handler {
 
 	cfg := config.New()
 
+	domainAuth.NewGoogleOAuth2(cfg.Auth.GoogleOAuth2)
+
 	if cfg.StoreMode == config.StoreModeMySQL {
 		mysqlConfig := cfg.StoreMySQL
 		store.SetupMySQL(mysqlConfig)

@@ -9,6 +9,7 @@ import (
 
 	"github.com/cam-inc/viron/example/golang/pkg/constant"
 	pkgConstant "github.com/cam-inc/viron/packages/golang/constant"
+	pkgConfig "github.com/cam-inc/viron/packages/golang/config"
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -59,15 +60,9 @@ type (
 		Provider      string `yaml:"provider"`
 		ExpirationSec int    `yaml:"expirationSec"`
 	}
-	GoogleOAuth2 struct {
-		ClientID          string
-		ClientSecret      string
-		AdditionalScope   []string `yaml:"additionalScopes"`
-		UserHostedDomains []string `yaml:"userHostedDomains"`
-	}
 	Auth struct {
 		JWT          *JWT
-		GoogleOAuth2 *GoogleOAuth2
+		GoogleOAuth2 *pkgConfig.GoogleOAuth2
 	}
 
 	Oas struct {
@@ -94,7 +89,6 @@ func (m *MySQL) ToDriverConfig() *mysql.Config {
 }
 
 func New() *Config {
-
 	mysqlPort, _ := strconv.Atoi(os.Getenv(constant.MYSQL_PORT))
 	mode := StoreModeMongo
 	if os.Getenv(pkgConstant.ENV_STORE_MODE) == string(StoreModeMySQL) {
@@ -107,6 +101,12 @@ func New() *Config {
 				Secret:        "xxxxxxxxxxxxxxxxxxxx",
 				Provider:      "viron_example",
 				ExpirationSec: 24 * 60 * 60,
+			},
+			GoogleOAuth2: &pkgConfig.GoogleOAuth2{
+				ClientID:          os.Getenv(constant.GOOGLE_OAUTH2_CLIENT_ID),
+				ClientSecret:      os.Getenv(constant.GOOGLE_OAUTH2_CLIENT_SECRET),
+				AdditionalScope:   []string{},
+				UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
 			},
 		},
 		Cors: &Cors{

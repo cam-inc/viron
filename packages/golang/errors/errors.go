@@ -49,6 +49,7 @@ var (
 	OasUndefined            = Initialize(404, "OAS is undefined")
 	AdminUserNotfound       = Initialize(404, "Admin User not found.")
 	Forbidden               = Initialize(403, "Forbidden")
+	MismatchState           = Initialize(400, "State is mismatch.")
 )
 
 /**
