@@ -30,18 +30,6 @@ type (
 	}
 )
 
-var _ Conditions = &RevokedTokenConditions{}
-
-func (op *RevokedTokenConditions) ConvertConditionMongoDB() *MongoConditions {
-	conditions := &MongoConditions{}
-	m := bson.M{}
-	if op.Token != "" {
-		m["token"] = op.Token
-	}
-	conditions.Filter = m
-	return conditions
-}
-
 func (revoked *RevokedTokenEntity) Bind(b interface{}) error {
 	d, ok := b.(*RevokedTokenEntity)
 	if !ok {
@@ -51,10 +39,22 @@ func (revoked *RevokedTokenEntity) Bind(b interface{}) error {
 	return nil
 }
 
-func (op *RevokedTokenConditions) ConvertConditionMySQL() []qm.QueryMod {
+var _ Conditions = &RevokedTokenConditions{}
+
+func (c *RevokedTokenConditions) ConvertConditionMongoDB() *MongoConditions {
+	conditions := &MongoConditions{}
+	m := bson.M{}
+	if c.Token != "" {
+		m["token"] = c.Token
+	}
+	conditions.Filter = m
+	return conditions
+}
+
+func (c *RevokedTokenConditions) ConvertConditionMySQL() []qm.QueryMod {
 	conditions := []qm.QueryMod{}
-	if op.Token != "" {
-		conditions = append(conditions, qm.Where("token = ?", op.Token))
+	if c.Token != "" {
+		conditions = append(conditions, qm.Where("token = ?", c.Token))
 	}
 	return conditions
 }

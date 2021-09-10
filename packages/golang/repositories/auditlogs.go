@@ -15,18 +15,18 @@ import (
 
 type (
 	AuditLogEntity struct {
-		ID            string             `json:"id" bson:"-"`
-		OID           primitive.ObjectID `json:"-" bson:"_id"`
-		RequestMethod *string            `json:"requestMethod" bson:"requestMethod,omitempty"`
-		RequestUri    *string            `json:"requestUri" bson:"requestUri,omitempty"`
-		SourceIp      *string            `json:"sourceIp" bson:"sourceIp,omitempty"`
-		UserID        *string            `json:"userId" bson:"userId,omitempty"`
-		RequestBody   *string            `json:"requestBody" bson:"requestBody,omitempty"`
-		StatusCode    *uint              `json:"statusCode" bson:"statusCode,omitempty"`
-		CreatedAt     time.Time          `json:"-" bson:"-"`
-		CreatedAtInt  int                `json:"createdAt" bson:"createdAt"`
-		UpdatedAt     time.Time          `json:"-" bson:"-"`
-		UpdatedAtInt  int                `json:"updatedAt" bson:"updatedAt"`
+		ID            string             `bson:"-"`
+		OID           primitive.ObjectID `bson:"_id"`
+		RequestMethod *string            `bson:"requestMethod,omitempty"`
+		RequestUri    *string            `bson:"requestUri,omitempty"`
+		SourceIp      *string            `bson:"sourceIp,omitempty"`
+		UserID        *string            `bson:"userId,omitempty"`
+		RequestBody   *string            `bson:"requestBody,omitempty"`
+		StatusCode    *int               `bson:"statusCode,omitempty"`
+		CreatedAt     time.Time          `bson:"-"`
+		CreatedAtInt  int                `bson:"createdAt"`
+		UpdatedAt     time.Time          `bson:"-"`
+		UpdatedAtInt  int                `bson:"updatedAt"`
 	}
 	AuditLogConditions struct {
 		*AuditLogEntity
@@ -44,82 +44,82 @@ func (audit *AuditLogEntity) Bind(b interface{}) error {
 	return nil
 }
 
-func (op *AuditLogConditions) ConvertConditionMongoDB() *MongoConditions {
+func (c *AuditLogConditions) ConvertConditionMongoDB() *MongoConditions {
 	conditions := &MongoConditions{}
 
 	m := bson.M{}
 
-	if op.ID != "" {
-		m["_id"], _ = primitive.ObjectIDFromHex(op.ID)
+	if c.ID != "" {
+		m["_id"], _ = primitive.ObjectIDFromHex(c.ID)
 	}
 
-	if op.RequestMethod != nil {
-		m["requestMethod"] = op.RequestMethod
+	if c.RequestMethod != nil {
+		m["requestMethod"] = c.RequestMethod
 	}
 
-	if op.RequestUri != nil {
-		m["requestUri"] = op.RequestUri
+	if c.RequestUri != nil {
+		m["requestUri"] = c.RequestUri
 	}
 
-	if op.SourceIp != nil {
-		m["sourceIp"] = op.SourceIp
+	if c.SourceIp != nil {
+		m["sourceIp"] = c.SourceIp
 	}
 
-	if op.UserID != nil {
-		m["userId"] = op.UserID
+	if c.UserID != nil {
+		m["userId"] = c.UserID
 	}
 
-	if op.RequestBody != nil {
-		m["requestBody"] = op.RequestBody
+	if c.RequestBody != nil {
+		m["requestBody"] = c.RequestBody
 	}
 
-	if op.StatusCode != nil {
-		m["statusCode"] = op.StatusCode
+	if c.StatusCode != nil {
+		m["statusCode"] = c.StatusCode
 	}
 
 	conditions.Filter = m
 
-	if op.FindOptions == nil {
-		op.FindOptions = options.Find()
+	if c.FindOptions == nil {
+		c.FindOptions = options.Find()
 	}
 
-	pager := op.ConvertPager()
+	pager := c.ConvertPager()
 	paginator := pager.PaginateMongo()
-	op.FindOptions = options.MergeFindOptions(op.FindOptions, paginator)
+	c.FindOptions = options.MergeFindOptions(c.FindOptions, paginator)
 
-	conditions.FindOptions = op.FindOptions
+	conditions.FindOptions = c.FindOptions
 
 	return conditions
 }
 
-func (op *AuditLogConditions) ConvertConditionMySQL() []qm.QueryMod {
+func (c *AuditLogConditions) ConvertConditionMySQL() []qm.QueryMod {
 	conditions := []qm.QueryMod{}
-	if op.ID != "" {
-		conditions = append(conditions, qm.Where("id = ?", op.ID))
+	if c.ID != "" {
+		conditions = append(conditions, qm.Where("id = ?", c.ID))
 	}
 
-	if op.RequestMethod != nil {
-		conditions = append(conditions, qm.Where("requestMethod = ?", *op.RequestMethod))
+	if c.RequestMethod != nil {
+		conditions = append(conditions, qm.Where("requestMethod = ?", *c.RequestMethod))
 	}
 
-	if op.RequestUri != nil {
-		conditions = append(conditions, qm.Where("requestUri = ?", *op.RequestUri))
+	if c.RequestUri != nil {
+		conditions = append(conditions, qm.Where("requestUri = ?", *c.RequestUri))
 	}
 
-	if op.SourceIp != nil {
-		conditions = append(conditions, qm.Where("sourceIp = ?", *op.SourceIp))
+	if c.SourceIp != nil {
+		conditions = append(conditions, qm.Where("sourceIp = ?", *c.SourceIp))
 	}
 
-	if op.UserID != nil {
-		conditions = append(conditions, qm.Where("userId = ?", *op.UserID))
+	if c.UserID != nil {
+		conditions = append(conditions, qm.Where("userId = ?", *c.UserID))
 	}
 
-	if op.RequestBody != nil {
-		conditions = append(conditions, qm.Where("requestBody = ?", *op.RequestBody))
+	if c.RequestBody != nil {
+		conditions = append(conditions, qm.Where("requestBody = ?", *c.RequestBody))
 	}
 
-	if op.StatusCode != nil {
-		conditions = append(conditions, qm.Where("statusCode = ?", *op.StatusCode))
+	if c.StatusCode != nil {
+		conditions = append(conditions, qm.Where("statusCode = ?", *c.StatusCode))
 	}
 
 	return conditions

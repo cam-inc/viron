@@ -81,6 +81,31 @@ const (
 	THEME_STANDARD = "standard"
 	THEME_MIDNIGHT = "midnight"
 	THEME_TERMINAL = "terminal"
+
+	RED                  = THEME("red")
+	ULTIMATE_ORANGE      = THEME("ultimate orange")
+	ORANGE_JUICE         = THEME("orange juice")
+	AMBER                = THEME("amber")
+	YELLOW               = THEME("yellow")
+	LIMONCELLO           = THEME("limoncello")
+	RADIUM               = THEME("radium")
+	HARLEQUIN            = THEME("harlequin")
+	GREEN                = THEME("green")
+	LUCENT_LIME          = THEME("lucent lime")
+	GUPPIE_GREEN         = THEME("guppie green")
+	MINTY_PARADISE       = THEME("minty paradise")
+	AQUA                 = THEME("aqua")
+	CAPRI                = THEME("capri")
+	BRESCIAN_BLUE        = THEME("brescian blue")
+	RARE_BLUE            = THEME("rare blue")
+	BLUE                 = THEME("blue")
+	ELECTRIC_ULTRAMARINE = THEME("electric ultramarine")
+	VIOLENT_VIOLET
+	ELECTRIC_CRIMSON = THEME("electric crimson")
+)
+
+type (
+	THEME string
 )
 
 var (
