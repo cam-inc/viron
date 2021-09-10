@@ -78,34 +78,34 @@ const (
 	COOKIE_KEY_VIRON_AUTHORIZATION = "viron_authorization"
 	COOKIE_KEY_OAUTH2_STATE        = "oauth2_state"
 
-	THEME_STANDARD = "standard"
-	THEME_MIDNIGHT = "midnight"
-	THEME_TERMINAL = "terminal"
-
-	RED                  = THEME("red")
-	ULTIMATE_ORANGE      = THEME("ultimate orange")
-	ORANGE_JUICE         = THEME("orange juice")
-	AMBER                = THEME("amber")
-	YELLOW               = THEME("yellow")
-	LIMONCELLO           = THEME("limoncello")
-	RADIUM               = THEME("radium")
-	HARLEQUIN            = THEME("harlequin")
-	GREEN                = THEME("green")
-	LUCENT_LIME          = THEME("lucent lime")
-	GUPPIE_GREEN         = THEME("guppie green")
-	MINTY_PARADISE       = THEME("minty paradise")
-	AQUA                 = THEME("aqua")
-	CAPRI                = THEME("capri")
-	BRESCIAN_BLUE        = THEME("brescian blue")
-	RARE_BLUE            = THEME("rare blue")
-	BLUE                 = THEME("blue")
-	ELECTRIC_ULTRAMARINE = THEME("electric ultramarine")
-	VIOLENT_VIOLET
-	ELECTRIC_CRIMSON = THEME("electric crimson")
+	RED                  = Theme("red")
+	ULTIMATE_ORANGE      = Theme("ultimate orange")
+	ORANGE_JUICE         = Theme("orange juice")
+	AMBER                = Theme("amber")
+	YELLOW               = Theme("yellow")
+	LIMONCELLO           = Theme("limoncello")
+	RADIUM               = Theme("radium")
+	HARLEQUIN            = Theme("harlequin")
+	GREEN                = Theme("green")
+	LUCENT_LIME          = Theme("lucent lime")
+	GUPPIE_GREEN         = Theme("guppie green")
+	MINTY_PARADISE       = Theme("minty paradise")
+	AQUA                 = Theme("aqua")
+	CAPRI                = Theme("capri")
+	BRESCIAN_BLUE        = Theme("brescian blue")
+	RARE_BLUE            = Theme("rare blue")
+	BLUE                 = Theme("blue")
+	ELECTRIC_ULTRAMARINE = Theme("electric ultramarine")
+	VIOLENT_VIOLET       = Theme("violent violet")
+	ELECTRIC_PURPLE      = Theme("electric purple")
+	MAGENDA              = Theme("magenta")
+	BRUTAL_PINK          = Theme("brutal pink")
+	NEON_ROSE            = Theme("neon rose")
+	ELECTRIC_CRIMSON     = Theme("electric crimson")
 )
 
 type (
-	THEME string
+	Theme string
 )
 
 var (
