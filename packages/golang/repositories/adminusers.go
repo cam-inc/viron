@@ -22,7 +22,7 @@ type (
 		Password                 *string            `bson:"password,omitempty"`
 		Salt                     *string            `bson:"salt,omitempty"`
 		GoogleOAuth2AccessToken  *string            `bson:"googleOAuth2AccessToken,omitempty"`
-		GoogleOAuth2ExpiryDate   *int               `bson:"googleOAuth2ExpiryDate,omitempty"`
+		GoogleOAuth2ExpiryDate   *uint64            `bson:"googleOAuth2ExpiryDate,omitempty"`
 		GoogleOAuth2IdToken      *string            `bson:"googleOAuth2IdToken,omitempty"`
 		GoogleOAuth2RefreshToken *string            `bson:"googleOAuth2RefreshToken,omitempty"`
 		GoogleOAuth2TokenType    *string            `bson:"googleOAuth2TokenType,omitempty"`

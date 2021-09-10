@@ -12,6 +12,7 @@ import (
 	"github.com/cam-inc/viron/packages/golang/helpers"
 
 	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/google/uuid"
 )
 
 type authObj struct {
@@ -112,11 +113,73 @@ func (a *authObj) SigninEmail(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *authObj) Oauth2GoogleAuthorization(w http.ResponseWriter, r *http.Request, params Oauth2GoogleAuthorizationParams) {
-	panic("implement me")
+	state, err := uuid.NewUUID()
+	if err != nil {
+		helpers.SendError(w, http.StatusBadRequest, errors.SigninFailed)
+		return
+	}
+	url, err := auth.GetGoogleOAuth2AuthorizationUrl(string(params.RedirectUri), state.String())
+
+	ctx := r.Context()
+	v := ctx.Value(constant.CTX_KEY_STATE_EXPIRATION_SEC)
+	var age int
+	if v != nil {
+		age, _ = v.(int)
+	}
+	opts := &http.Cookie{
+		MaxAge:   age,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+		Domain:   r.URL.Hostname(),
+	}
+	cookie := helpers.GenOAuthStateCookie(state.String(), opts)
+	http.SetCookie(w, cookie)
+	w.Header().Add("location", url)
+	helpers.Send(w, http.StatusFound, nil)
 }
 
 func (a *authObj) Oauth2GoogleCallback(w http.ResponseWriter, r *http.Request) {
-	panic("implement me")
+	state, err := r.Cookie(constant.COOKIE_KEY_OAUTH2_STATE)
+
+	if err != nil {
+		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
+		return
+	}
+	oauth2GoogleCollback := &OAuth2GoogleCallbackPayload{}
+	if err := helpers.BodyDecode(r, oauth2GoogleCollback); err != nil {
+		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
+		return
+	}
+
+	if oauth2GoogleCollback == nil || state == nil || oauth2GoogleCollback.State != state.Value {
+		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
+		return
+	}
+
+	ctx := r.Context()
+	token, tokenErr := auth.SigninGoogleOAuth2(oauth2GoogleCollback.Code, oauth2GoogleCollback.RedirectUri, ctx)
+	if tokenErr != nil {
+		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
+		return
+	}
+
+	v := ctx.Value(constant.CTX_KEY_JWT_EXPIRATION_SEC)
+	var age int
+	if v != nil {
+		age, _ = v.(int)
+	}
+	opts := &http.Cookie{
+		MaxAge:   age,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+		Domain:   r.URL.Hostname(),
+	}
+
+	cookie := helpers.GenAuthorizationCookie(token, opts)
+	http.SetCookie(w, cookie)
+	helpers.Send(w, http.StatusNoContent, nil)
 }
 
 func (a *authObj) Signout(w http.ResponseWriter, r *http.Request) {
