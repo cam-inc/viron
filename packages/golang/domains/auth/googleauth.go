@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -23,7 +22,7 @@ func NewGoogleOAuth2(googleOAuth2 *config.GoogleOAuth2) {
 	googleOAuth2Config = googleOAuth2
 }
 
-func GetGoogleOAuth2Config(redirectUrl string, googleOAuth2 *config.GoogleOAuth2) *oauth2.Config {
+func getGoogleOAuth2Config(redirectUrl string, googleOAuth2 *config.GoogleOAuth2) *oauth2.Config {
 	scope := constant.GOOGLE_OAUTH2_DEFAULT_SCOPES
 	if len(googleOAuth2.AdditionalScope) > 0 {
 		scope = append(constant.GOOGLE_OAUTH2_DEFAULT_SCOPES, googleOAuth2.AdditionalScope...)
@@ -39,13 +38,13 @@ func GetGoogleOAuth2Config(redirectUrl string, googleOAuth2 *config.GoogleOAuth2
 }
 
 func GetGoogleOAuth2AuthorizationUrl(redirectUrl string, state string) (string, *errors.VironError) {
-	cfn := GetGoogleOAuth2Config(redirectUrl, googleOAuth2Config)
+	cfn := getGoogleOAuth2Config(redirectUrl, googleOAuth2Config)
 	url := cfn.AuthCodeURL(state)
 	return url, nil
 }
 
 func SigninGoogleOAuth2(code string, redirectUrl string, ctx context.Context) (string, *errors.VironError) {
-	cfn := GetGoogleOAuth2Config(redirectUrl, googleOAuth2Config)
+	cfn := getGoogleOAuth2Config(redirectUrl, googleOAuth2Config)
 
 	oauth2Token, err := cfn.Exchange(oauth2.NoContext, code)
 	if err != nil {
@@ -98,5 +97,5 @@ func SigninGoogleOAuth2(code string, redirectUrl string, ctx context.Context) (s
 		return "", errors.SigninFailed
 	}
 
-	return Sign(fmt.Sprintf("%d", user.ID)), nil
+	return Sign(user.ID), nil
 }
