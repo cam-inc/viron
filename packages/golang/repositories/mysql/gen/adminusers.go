@@ -30,7 +30,7 @@ type Adminuser struct {
 	Password                 null.String `boil:"password" json:"password,omitempty" toml:"password" yaml:"password,omitempty"`
 	Salt                     null.String `boil:"salt" json:"salt,omitempty" toml:"salt" yaml:"salt,omitempty"`
 	GoogleOAuth2AccessToken  null.String `boil:"googleOAuth2AccessToken" json:"googleOAuth2AccessToken,omitempty" toml:"googleOAuth2AccessToken" yaml:"googleOAuth2AccessToken,omitempty"`
-	GoogleOAuth2ExpiryDate   null.Int    `boil:"googleOAuth2ExpiryDate" json:"googleOAuth2ExpiryDate,omitempty" toml:"googleOAuth2ExpiryDate" yaml:"googleOAuth2ExpiryDate,omitempty"`
+	GoogleOAuth2ExpiryDate   null.Uint64 `boil:"googleOAuth2ExpiryDate" json:"googleOAuth2ExpiryDate,omitempty" toml:"googleOAuth2ExpiryDate" yaml:"googleOAuth2ExpiryDate,omitempty"`
 	GoogleOAuth2IdToken      null.String `boil:"googleOAuth2IdToken" json:"googleOAuth2IdToken,omitempty" toml:"googleOAuth2IdToken" yaml:"googleOAuth2IdToken,omitempty"`
 	GoogleOAuth2RefreshToken null.String `boil:"googleOAuth2RefreshToken" json:"googleOAuth2RefreshToken,omitempty" toml:"googleOAuth2RefreshToken" yaml:"googleOAuth2RefreshToken,omitempty"`
 	GoogleOAuth2TokenType    null.String `boil:"googleOAuth2TokenType" json:"googleOAuth2TokenType,omitempty" toml:"googleOAuth2TokenType" yaml:"googleOAuth2TokenType,omitempty"`
@@ -168,26 +168,26 @@ func (w whereHelpernull_String) GTE(x null.String) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
-type whereHelpernull_Int struct{ field string }
+type whereHelpernull_Uint64 struct{ field string }
 
-func (w whereHelpernull_Int) EQ(x null.Int) qm.QueryMod {
+func (w whereHelpernull_Uint64) EQ(x null.Uint64) qm.QueryMod {
 	return qmhelper.WhereNullEQ(w.field, false, x)
 }
-func (w whereHelpernull_Int) NEQ(x null.Int) qm.QueryMod {
+func (w whereHelpernull_Uint64) NEQ(x null.Uint64) qm.QueryMod {
 	return qmhelper.WhereNullEQ(w.field, true, x)
 }
-func (w whereHelpernull_Int) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_Int) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-func (w whereHelpernull_Int) LT(x null.Int) qm.QueryMod {
+func (w whereHelpernull_Uint64) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_Uint64) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+func (w whereHelpernull_Uint64) LT(x null.Uint64) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.LT, x)
 }
-func (w whereHelpernull_Int) LTE(x null.Int) qm.QueryMod {
+func (w whereHelpernull_Uint64) LTE(x null.Uint64) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.LTE, x)
 }
-func (w whereHelpernull_Int) GT(x null.Int) qm.QueryMod {
+func (w whereHelpernull_Uint64) GT(x null.Uint64) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GT, x)
 }
-func (w whereHelpernull_Int) GTE(x null.Int) qm.QueryMod {
+func (w whereHelpernull_Uint64) GTE(x null.Uint64) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
@@ -219,7 +219,7 @@ var AdminuserWhere = struct {
 	Password                 whereHelpernull_String
 	Salt                     whereHelpernull_String
 	GoogleOAuth2AccessToken  whereHelpernull_String
-	GoogleOAuth2ExpiryDate   whereHelpernull_Int
+	GoogleOAuth2ExpiryDate   whereHelpernull_Uint64
 	GoogleOAuth2IdToken      whereHelpernull_String
 	GoogleOAuth2RefreshToken whereHelpernull_String
 	GoogleOAuth2TokenType    whereHelpernull_String
@@ -232,7 +232,7 @@ var AdminuserWhere = struct {
 	Password:                 whereHelpernull_String{field: "`adminusers`.`password`"},
 	Salt:                     whereHelpernull_String{field: "`adminusers`.`salt`"},
 	GoogleOAuth2AccessToken:  whereHelpernull_String{field: "`adminusers`.`googleOAuth2AccessToken`"},
-	GoogleOAuth2ExpiryDate:   whereHelpernull_Int{field: "`adminusers`.`googleOAuth2ExpiryDate`"},
+	GoogleOAuth2ExpiryDate:   whereHelpernull_Uint64{field: "`adminusers`.`googleOAuth2ExpiryDate`"},
 	GoogleOAuth2IdToken:      whereHelpernull_String{field: "`adminusers`.`googleOAuth2IdToken`"},
 	GoogleOAuth2RefreshToken: whereHelpernull_String{field: "`adminusers`.`googleOAuth2RefreshToken`"},
 	GoogleOAuth2TokenType:    whereHelpernull_String{field: "`adminusers`.`googleOAuth2TokenType`"},

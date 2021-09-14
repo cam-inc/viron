@@ -26,7 +26,7 @@ type (
 		Password                 *string   `json:"password,omitempty"`
 		Salt                     *string   `json:"salt,omitempty"`
 		GoogleOAuth2AccessToken  *string   `json:"googleOAuth2AccessToken,omitempty"`
-		GoogleOAuth2ExpiryDate   *int      `json:"googleOAuth2ExpiryDate,omitempty"`
+		GoogleOAuth2ExpiryDate   *uint64   `json:"googleOAuth2ExpiryDate,omitempty"`
 		GoogleOAuth2IdToken      *string   `json:"googleOAuth2IdToken,omitempty"`
 		GoogleOAuth2RefreshToken *string   `json:"googleOAuth2RefreshToken,omitempty"`
 		GoogleOAuth2TokenType    *string   `json:"googleOAuth2TokenType,omitempty"`
@@ -66,6 +66,7 @@ func CreateAdminUser(ctx context.Context, payload *AdminUser, authType string) (
 		adminUser.Password = &password.Password
 		adminUser.Salt = &password.Salt
 	} else if authType == constant.AUTH_TYPE_GOOGLE {
+		adminUser.Email = string(payload.Email)
 		adminUser.AuthType = authType
 		adminUser.GoogleOAuth2TokenType = payload.GoogleOAuth2TokenType
 		adminUser.GoogleOAuth2IdToken = payload.GoogleOAuth2IdToken

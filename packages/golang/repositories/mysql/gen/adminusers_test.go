@@ -568,7 +568,7 @@ func testAdminusersSelect(t *testing.T) {
 }
 
 var (
-	adminuserDBTypes = map[string]string{`ID`: `int`, `Email`: `varchar`, `AuthType`: `varchar`, `Password`: `varchar`, `Salt`: `varchar`, `GoogleOAuth2AccessToken`: `varchar`, `GoogleOAuth2ExpiryDate`: `int`, `GoogleOAuth2IdToken`: `varchar`, `GoogleOAuth2RefreshToken`: `varchar`, `GoogleOAuth2TokenType`: `varchar`, `CreatedAt`: `datetime`, `UpdatedAt`: `datetime`}
+	adminuserDBTypes = map[string]string{`ID`: `int`, `Email`: `varchar`, `AuthType`: `varchar`, `Password`: `varchar`, `Salt`: `varchar`, `GoogleOAuth2AccessToken`: `varchar`, `GoogleOAuth2ExpiryDate`: `bigint`, `GoogleOAuth2IdToken`: `varchar`, `GoogleOAuth2RefreshToken`: `varchar`, `GoogleOAuth2TokenType`: `varchar`, `CreatedAt`: `datetime`, `UpdatedAt`: `datetime`}
 	_                = bytes.MinRead
 )
 
