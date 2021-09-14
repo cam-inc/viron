@@ -1,8 +1,10 @@
 import { list as userList } from './users';
 import { list as purchaseList } from './purchases';
 import { list as articleList } from './articles';
+import { list as mediaList } from './medias';
 import {
   getArticleRepository,
+  getMediaRepository,
   getPurchaseRepository,
   getUserRepository,
 } from '../repositories';
@@ -11,6 +13,7 @@ const genAmount = (): number => Math.floor(Math.random() * (10 + 1 - 1)) + 1;
 
 export const load = async (): Promise<void> => {
   const articleRepository = getArticleRepository();
+  const mediaRepository = getMediaRepository();
   const purchaseRepository = getPurchaseRepository();
   const userRepository = getUserRepository();
   await Promise.all(
@@ -35,6 +38,13 @@ export const load = async (): Promise<void> => {
           return;
         }
         return await articleRepository.createOne(obj);
+      }) as Promise<unknown>[],
+      mediaList.map(async (obj) => {
+        const doc = await mediaRepository.findOne({ name: obj.name });
+        if (doc) {
+          return;
+        }
+        return await mediaRepository.createOne(obj);
       }) as Promise<unknown>[],
     ].flat()
   );
