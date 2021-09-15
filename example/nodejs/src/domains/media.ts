@@ -4,8 +4,8 @@ import { FindConditions, getMediaRepository } from '../repositories';
 export interface Media {
   id: string;
   name: string;
-  filePath: string;
-  contentType: string;
+  url: string;
+  mimeType: string;
   createdAt: number;
   updatedAt: number;
 }
@@ -16,14 +16,14 @@ export interface MediaView extends Media {
 
 export interface MediaCreateAttributes {
   name: string;
-  filePath: string;
-  contentType: string;
+  url: string;
+  mimeType: string;
 }
 
 export interface MediaUpdateAttributes {
   name: string;
-  filePath: string;
-  contentType: string;
+  url: string;
+  mimeType: string;
 }
 
 const format = (media: Media): MediaView => {

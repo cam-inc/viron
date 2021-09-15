@@ -7,11 +7,7 @@ import {
   normalizeMysqlFilterQuery,
 } from '@viron/lib';
 import { ctx } from '../../context';
-import {
-  Media,
-  MediaCreateAttributes,
-  MediaUpdateAttributes,
-} from '../../domains/media';
+import { Media, MediaCreateAttributes } from '../../domains/media';
 import { MediaModelCtor } from '../../stores/definitions/mysql/medias';
 
 const getModel = (): MediaModelCtor =>
@@ -73,14 +69,6 @@ export const createOne = async (obj: MediaCreateAttributes): Promise<Media> => {
   const model = getModel();
   const doc = await model.create(obj);
   return doc.toJSON() as Media;
-};
-
-export const updateOneById = async (
-  id: string,
-  obj: MediaUpdateAttributes
-): Promise<void> => {
-  const model = getModel();
-  await model.update(obj, { where: { id } });
 };
 
 export const removeOneById = async (id: string): Promise<void> => {

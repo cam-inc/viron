@@ -5,11 +5,11 @@ info:
   description: medias api specifications
   x-pages:
     - id: media
-      group: 管理画面/添付
+      group: 管理画面/アップロード
       title: メディア
       description: |
         # メディア情報の管理
-        メディアデータの **入稿・更新・削除** を行います。
+        メディアデータの **入稿・削除** を行います。
       contents:
         - title: メディア
           type: table
@@ -60,8 +60,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                example: {}
+                $ref: '#/components/schemas/Media'
       security:
         - jwt: []
 
@@ -121,12 +120,11 @@ components:
         name:
           description: メディア名
           type: string
-        filePath:
-          description: メディアファイルパス
+        url:
+          description: メディアURL
           type: string
-          format: binary
-        contentType:
-          description: メディアファイルタイプ
+        mimeType:
+          description: メディアタイプ
           type: string
         createdAt:
           $ref: './components.yaml#/components/schemas/CreatedAt'
@@ -135,8 +133,8 @@ components:
       required:
         - id
         - name
-        - filePath
-        - contentType
+        - url
+        - mimeType
 
     MediaPostPayload:
       type: object
@@ -144,16 +142,16 @@ components:
         name:
           description: メディア名
           type: string
-        filePath:
-          description: メディアファイルパス
+        url:
+          description: メディアURL
           type: string
-          format: binary
-        contentType:
-          description: メディアファイルタイプ
+        mimeType:
+          description: メディアタイプ
           type: string
       required:
         - name
-        - filePath
-        - contentType
+        - url
+        - mimeType
+
 
 

@@ -1,10 +1,5 @@
 import { RouteContext } from '../application';
-import {
-  list,
-  createOne,
-  updateOneById,
-  removeOneById,
-} from '../domains/media';
+import { list, createOne, removeOneById } from '../domains/media';
 
 // メディア一覧
 export const listMedias = async (context: RouteContext): Promise<void> => {
@@ -16,15 +11,8 @@ export const listMedias = async (context: RouteContext): Promise<void> => {
 
 // メディア作成
 export const createMedia = async (context: RouteContext): Promise<void> => {
-  console.log('pass here');
   const media = await createOne(context.requestBody);
   context.res.status(201).json(media);
-};
-
-// メディア更新
-export const updateArticle = async (context: RouteContext): Promise<void> => {
-  await updateOneById(context.params.path.articleId, context.requestBody);
-  context.res.status(204).end();
 };
 
 // メディア削除

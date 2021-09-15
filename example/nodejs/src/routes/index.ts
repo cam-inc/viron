@@ -1,5 +1,5 @@
 import path from 'path';
-import { Express, NextFunction } from 'express';
+import { Express } from 'express';
 
 import { middleware as genExegesisMiddlewares } from 'exegesis-express';
 
@@ -129,12 +129,7 @@ export async function register(app: Express): Promise<void> {
           jwt,
         },
         mimeTypeParsers: {
-          'multipart/form-data': {
-            parseReq(req, res, next) {
-              const expressNext = next as NextFunction;
-              multiPart(req, res, expressNext);
-            },
-          },
+          'multipart/form-data': multiPart,
         },
         defaultMaxBodySize: 1024 * 1024,
         allErrors: true,

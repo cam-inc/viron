@@ -6,11 +6,7 @@ import {
   getMongoSortOptions,
   normalizeMongoFilterQuery,
 } from '@viron/lib';
-import {
-  Media,
-  MediaCreateAttributes,
-  MediaUpdateAttributes,
-} from '../../domains/media';
+import { Media, MediaCreateAttributes } from '../../domains/media';
 import { MediaModel } from '../../stores/definitions/mongo/medias';
 import { ctx } from '../../context';
 
@@ -88,14 +84,6 @@ export const createOne = async (obj: MediaCreateAttributes): Promise<Media> => {
   const model = getModel();
   const doc = await model.create(obj);
   return doc.toJSON();
-};
-
-export const updateOneById = async (
-  id: string,
-  obj: MediaUpdateAttributes
-): Promise<void> => {
-  const model = getModel();
-  await model.updateOne({ _id: id }, obj);
 };
 
 export const removeOneById = async (id: string): Promise<void> => {

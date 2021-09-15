@@ -1,12 +1,12 @@
 export const list = [
   {
     name: 'image1',
-    filePath: 's3//image1.png',
-    contentType: 'image/png',
+    url: 'https://example.com/image1.png',
+    mimeType: 'image/png',
   },
   {
     name: 'video1',
-    filePath: 's3//video1.mpg',
-    contentType: 'video/mpeg',
+    url: 'https://example.com/video1.mpg',
+    mimeType: 'video/mpeg',
   },
 ];

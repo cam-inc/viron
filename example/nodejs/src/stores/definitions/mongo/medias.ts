@@ -8,11 +8,11 @@ const schemaDefinition: SchemaDefinition = {
     type: Schema.Types.String,
     required: true,
   },
-  filePath: {
+  url: {
     type: Schema.Types.String,
     required: true,
   },
-  contentType: {
+  mimeType: {
     type: Schema.Types.String,
     required: true,
   },

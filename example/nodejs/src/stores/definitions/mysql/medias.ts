@@ -20,11 +20,11 @@ const schemaDefinition: ModelAttributes<MediaModel, Media> = {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  filePath: {
+  url: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  contentType: {
+  mimeType: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -41,8 +41,8 @@ const schemaDefinition: ModelAttributes<MediaModel, Media> = {
 export class MediaModel extends Model<Media, MediaCreateAttributes> {
   id!: number;
   name!: string;
-  filePath!: string;
-  contentType!: string;
+  url!: string;
+  mimeType!: string;
   // timestamps!
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
