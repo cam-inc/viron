@@ -1,9 +1,12 @@
 import path from 'path';
 import { Express } from 'express';
+
 import { middleware as genExegesisMiddlewares } from 'exegesis-express';
+
 import merge from 'deepmerge';
 import { domainsOas } from '@viron/lib';
 
+import { multiPart } from '../parser/multipart';
 import { RouteContext } from '../application';
 import { logger } from '../context';
 import { jwt } from '../security_handlers/jwt';
@@ -15,6 +18,7 @@ import * as routesArticles from './articles';
 import * as routesAuditLogs from './auditlogs';
 import * as routesAuth from './auth';
 import * as routesAuthconfigs from './authconfigs';
+import * as routeMedias from './medias';
 import * as routesOas from './oas';
 import * as routesPing from './ping';
 import * as routesPurchases from './purchases';
@@ -39,6 +43,7 @@ export const oasPath = (name: string): string =>
   path.resolve(__dirname, '..', 'openapi', `${name}.yaml`);
 
 const routes: Route[] = [
+  { name: 'media', oasPath: oasPath('medias'), handlers: routeMedias },
   { name: 'ping', oasPath: oasPath('ping'), handlers: routesPing },
   {
     name: 'purchases',
@@ -122,6 +127,9 @@ export async function register(app: Express): Promise<void> {
         },
         authenticators: {
           jwt,
+        },
+        mimeTypeParsers: {
+          'multipart/form-data': multiPart,
         },
         defaultMaxBodySize: 1024 * 1024,
         allErrors: true,
