@@ -47,14 +47,14 @@ export const get = (): Config => {
         additionalScopes: [],
         userHostedDomains: ['gmail.com', 'cam-inc.co.jp', 'cyberagent.co.jp'],
       },
-      awsConfig: {
-        s3: {
-          accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID ?? '',
-          secretAccessKey: process.env.AWS_S3_SECRET_KEY ?? '',
-          region: '',
-          bucketName: '',
-          mediaDomain: '',
-        },
+    },
+    aws: {
+      s3: {
+        accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID ?? '',
+        secretAccessKey: process.env.AWS_S3_SECRET_KEY ?? '',
+        region: '',
+        bucketName: '',
+        mediaDomain: '',
       },
     },
     oas: {

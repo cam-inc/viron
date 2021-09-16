@@ -36,6 +36,7 @@ declare global {
 
 interface ExegesisIncomingMessage extends HttpIncomingMessage {
   path: string;
+  file: Express.MulterS3.File;
   cookies: Record<string, string | null | undefined>;
   _context: RequestContext;
 }

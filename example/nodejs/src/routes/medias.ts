@@ -11,7 +11,12 @@ export const listMedias = async (context: RouteContext): Promise<void> => {
 
 // メディア作成
 export const createMedia = async (context: RouteContext): Promise<void> => {
-  const media = await createOne(context.requestBody);
+  const requestBody = {
+    name: context.requestBody.name,
+    url: context.requestBody.uploadData,
+    mimeType: context.req.file.mimetype,
+  };
+  const media = await createOne(requestBody);
   context.res.status(201).json(media);
 };
 

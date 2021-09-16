@@ -142,16 +142,12 @@ components:
         name:
           description: メディア名
           type: string
-        url:
-          description: メディアURL
+        uploadData:
+          description: メディアのバイナリデータ
           type: string
-        mimeType:
-          description: メディアタイプ
-          type: string
+          format: binary
       required:
         - name
-        - url
-        - mimeType
-
+        - uploadData
 
 
