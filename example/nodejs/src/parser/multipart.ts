@@ -34,24 +34,24 @@ export const multiPart: BodyParser = {
       if (error instanceof multer.MulterError) {
         //File Upload Multer Error
         next(uploadMulterError(error));
+        return;
       } else if (error) {
         next(error);
+        return;
       }
 
       // If File not found
       if (expressRequest.file === undefined) {
         logger.info(`No file selected!`);
         next();
+        return;
       }
 
       // File Upload Success
-      logger.info(`file uploaded! ${expressRequest.file}`);
+      logger.info(`file uploaded! ${JSON.stringify(expressRequest.file)}`);
 
       const file = expressRequest.file as Express.MulterS3.File;
-      const fileName = file.location.replace(
-        `https://s3.${AWSS3Config.region}.amazonaws.com/${AWSS3Config.bucketName}/`,
-        ''
-      );
+      const fileName = file.location.split(AWSS3Config.bucketName).pop();
       req.body.uploadData = `https://${AWSS3Config.mediaDomain}/${fileName}`;
       next();
     });
