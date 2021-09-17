@@ -1,8 +1,9 @@
 import classNames from 'classnames';
 import React, { useMemo } from 'react';
+import { ON, On } from '$constants/index';
 import { ClassName } from '$types/index';
 import { CommonMark } from '$types/oas';
-import { ON, On } from '$constants/index';
+import markdownit from 'markdown-it';
 
 type Props = {
   on: On;
@@ -13,7 +14,7 @@ type Props = {
 const Description: React.FC<Props> = ({ on, value, className = '' }) => {
   const parsedDescription = useMemo(
     function () {
-      const md = require('markdown-it')('commonmark');
+      const md = markdownit('commonmark');
       return { __html: md.render(value) };
     },
     [value]
