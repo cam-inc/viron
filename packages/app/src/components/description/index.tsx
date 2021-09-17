@@ -1,22 +1,22 @@
 import classNames from 'classnames';
 import React, { useMemo } from 'react';
 import { ClassName } from '$types/index';
-import { CommonMark as CommonMarkType } from '$types/oas';
+import { CommonMark } from '$types/oas';
 import { ON, On } from '$constants/index';
 
 type Props = {
   on: On;
-  data: string | CommonMarkType;
+  value: string | CommonMark;
   className?: ClassName;
 };
 
-const Description: React.FC<Props> = ({ on, data, className = '' }) => {
+const Description: React.FC<Props> = ({ on, value, className = '' }) => {
   const parsedDescription = useMemo(
     function () {
       const md = require('markdown-it')('commonmark');
-      return { __html: md.render(data) };
+      return { __html: md.render(value) };
     },
-    [data]
+    [value]
   );
   return (
     <div
