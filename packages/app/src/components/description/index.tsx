@@ -1,20 +1,23 @@
-import React from 'react';
+import classNames from 'classnames';
+import React, { useMemo } from 'react';
+import { ClassName } from '$types/index';
 import { CommonMark as CommonMarkType } from '$types/oas';
 import { ON, On } from '$constants/index';
-import { ClassName } from '$types/index';
-import classNames from 'classnames';
 
 type Props = {
   on: On;
-  value: CommonMarkType;
+  data: string | CommonMarkType;
   className?: ClassName;
 };
 
-const md = require('markdown-it')('commonmark');
-const getParsedResult = (commonMarkText: CommonMarkType) => {
-  return { __html: md.render(commonMarkText) };
-};
-const Description: React.FC<Props> = ({ value, on, className = '' }) => {
+const Description: React.FC<Props> = ({ on, data, className = '' }) => {
+  const parsedDescription = useMemo(
+    function () {
+      const md = require('markdown-it')('commonmark');
+      return { __html: md.render(data) };
+    },
+    [data]
+  );
   return (
     <div
       className={classNames(className, {
@@ -23,7 +26,7 @@ const Description: React.FC<Props> = ({ value, on, className = '' }) => {
         'text-on-primary': on === ON.PRIMARY,
         'text-on-complementary': on === ON.COMPLEMENTARY,
       })}
-      dangerouslySetInnerHTML={getParsedResult(value)}
+      dangerouslySetInnerHTML={parsedDescription}
     />
   );
 };
