@@ -1,9 +1,9 @@
 import classNames from 'classnames';
+import markdownit from 'markdown-it';
 import React, { useMemo } from 'react';
 import { ON, On } from '$constants/index';
 import { ClassName } from '$types/index';
 import { CommonMark } from '$types/oas';
-import markdownit from 'markdown-it';
 
 type Props = {
   on: On;
