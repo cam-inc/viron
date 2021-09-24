@@ -16,6 +16,7 @@ import (
 )
 
 type authObj struct {
+	log logging.Logger
 }
 
 /*
@@ -80,6 +81,7 @@ func (a *authObj) SigninEmail(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	signinEmail := &SigninEmailPayload{}
 	if err := helpers.BodyDecode(r, signinEmail); err != nil {
+		a.log.Errorf("%v", err)
 		helpers.SendError(w, http.StatusBadRequest, err)
 		return
 	}
@@ -91,6 +93,7 @@ func (a *authObj) SigninEmail(w http.ResponseWriter, r *http.Request) {
 
 	token, err := auth.SigninEmail(ctx, string(signinEmail.Email), signinEmail.Password)
 	if err != nil {
+		a.log.Errorf("%v", err)
 		helpers.SendError(w, err.StatusCode(), err)
 		return
 	}
@@ -115,11 +118,14 @@ func (a *authObj) SigninEmail(w http.ResponseWriter, r *http.Request) {
 func (a *authObj) Oauth2GoogleAuthorization(w http.ResponseWriter, r *http.Request, params Oauth2GoogleAuthorizationParams) {
 	state, err := uuid.NewUUID()
 	if err != nil {
+		a.log.Errorf("%v", err)
 		helpers.SendError(w, http.StatusBadRequest, errors.SigninFailed)
 		return
 	}
 	url, err := auth.GetGoogleOAuth2AuthorizationUrl(string(params.RedirectUri), state.String())
-
+	if err != nil {
+		a.log.Errorf("%v", err)
+	}
 	ctx := r.Context()
 	v := ctx.Value(constant.CTX_KEY_STATE_EXPIRATION_SEC)
 	var age int
@@ -143,16 +149,19 @@ func (a *authObj) Oauth2GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	state, err := r.Cookie(constant.COOKIE_KEY_OAUTH2_STATE)
 
 	if err != nil {
+		a.log.Errorf("%v", err)
 		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
 		return
 	}
 	oauth2GoogleCollback := &OAuth2GoogleCallbackPayload{}
 	if err := helpers.BodyDecode(r, oauth2GoogleCollback); err != nil {
+		a.log.Errorf("body decode failed -> %v", err)
 		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
 		return
 	}
 
 	if oauth2GoogleCollback == nil || state == nil || oauth2GoogleCollback.State != state.Value {
+		a.log.Error(errors.MismatchState)
 		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
 		return
 	}
@@ -160,6 +169,7 @@ func (a *authObj) Oauth2GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	token, tokenErr := auth.SigninGoogleOAuth2(oauth2GoogleCollback.Code, oauth2GoogleCollback.RedirectUri, ctx)
 	if tokenErr != nil {
+		a.log.Errorf("tokenErr %v", tokenErr)
 		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
 		return
 	}
@@ -209,5 +219,7 @@ func (a *authObj) LoadOas() *openapi3.T {
 }
 
 func New() ServerInterface {
-	return &authObj{}
+	return &authObj{
+		log: logging.GetDefaultLogger(),
+	}
 }

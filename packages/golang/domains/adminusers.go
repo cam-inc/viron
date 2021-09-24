@@ -104,7 +104,7 @@ func findOne(ctx context.Context, conditions *repositories.AdminUserConditions) 
 	repo := container.GetAdminUserRepository()
 	result, err := repo.Find(ctx, conditions)
 	if err != nil || len(result) == 0 {
-		log.Errorf("err %+v result %+v", err, result)
+		log.Errorf("adminusers.go findOne conditions:%+v err %+v result %+v", conditions, err, result)
 		return nil
 	}
 

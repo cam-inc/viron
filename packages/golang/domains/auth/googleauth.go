@@ -5,10 +5,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cam-inc/viron/packages/golang/errors"
+	"github.com/cam-inc/viron/packages/golang/config"
 	"github.com/cam-inc/viron/packages/golang/constant"
 	"github.com/cam-inc/viron/packages/golang/domains"
-	"github.com/cam-inc/viron/packages/golang/config"
+	"github.com/cam-inc/viron/packages/golang/errors"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	oauthv2 "google.golang.org/api/oauth2/v2"
@@ -45,19 +45,21 @@ func GetGoogleOAuth2AuthorizationUrl(redirectUrl string, state string) (string, 
 
 func SigninGoogleOAuth2(code string, redirectUrl string, ctx context.Context) (string, *errors.VironError) {
 	cfn := getGoogleOAuth2Config(redirectUrl, googleOAuth2Config)
-
 	oauth2Token, err := cfn.Exchange(oauth2.NoContext, code)
 	if err != nil {
+		log.Errorf("Exchange failed -> %v", err)
 		return "", errors.SigninFailed
 	}
 
 	oauth2Service, err := oauthv2.New(cfn.Client(ctx, oauth2Token))
 	if err != nil {
+		log.Errorf("oauthv2.New failed -> %v", err)
 		return "", errors.SigninFailed
 	}
 
 	tokenInfo, err := oauth2Service.Tokeninfo().AccessToken(oauth2Token.AccessToken).Context(ctx).Do()
 	if err != nil || tokenInfo == nil || tokenInfo.Email == "" {
+		log.Errorf("oauth2Service failed err:%v, tokenInfo:%v ", err, tokenInfo)
 		return "", errors.SigninFailed
 	}
 
@@ -71,6 +73,7 @@ func SigninGoogleOAuth2(code string, redirectUrl string, ctx context.Context) (s
 		}
 	}
 	if !domainCheck {
+		log.Error("domainCheck is false.")
 		return "", errors.SigninFailed
 	}
 
@@ -88,12 +91,20 @@ func SigninGoogleOAuth2(code string, redirectUrl string, ctx context.Context) (s
 		}
 		var err error
 		user, err = createFirstAdminUser(ctx, payload, payload.AuthType)
-		if err != nil || user == nil {
+		if err != nil {
+			log.Errorf("create first admin user failed err:%v, user:%v", err, user)
 			return "", errors.SigninFailed
+		}
+
+		if user == nil {
+			if user, err = createViewer(ctx, payload, payload.AuthType); err != nil {
+				log.Errorf("create admin user(viewer) failed err:%v, user:%v", err, user)
+			}
 		}
 	}
 
 	if user.AuthType != constant.AUTH_TYPE_GOOGLE {
+		log.Error("user authType is not google.")
 		return "", errors.SigninFailed
 	}
 

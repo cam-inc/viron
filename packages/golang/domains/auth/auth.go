@@ -21,7 +21,18 @@ func createFirstAdminUser(ctx context.Context, payload *domains.AdminUser, authT
 	if ret := domains.AddRoleForUser(user.ID, constant.ADMIN_ROLE_SUPER); !ret {
 		return nil, fmt.Errorf("AddRoleForUser return %v", ret)
 	}
-
 	return user, nil
+}
 
+func createViewer(ctx context.Context, payload *domains.AdminUser, authType string) (*domains.AdminUser, error) {
+
+	user, err := domains.CreateAdminUser(ctx, payload, authType)
+	if err != nil {
+		return nil, err
+	}
+
+	if ret := domains.AddRoleForUser(user.ID, constant.ADMIN_ROLE_VIEWER); !ret {
+		return nil, fmt.Errorf("AddRoleForUser return %v", ret)
+	}
+	return user, nil
 }
