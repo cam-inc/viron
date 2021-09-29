@@ -4,6 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/cam-inc/viron/packages/golang/errors"
+
+	"github.com/cam-inc/viron/packages/golang/linter"
+	"github.com/cam-inc/viron/packages/golang/logging"
+
 	"github.com/cam-inc/viron/packages/golang/helpers"
 
 	"github.com/cam-inc/viron/packages/golang/domains"
@@ -30,6 +35,14 @@ func (o *oas) GetOas(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	clone := domains.GetOas(apiDef, user.RoleIDs)
+	result, err := linter.Lint(clone)
+	if err != nil || result.Valid() {
+		logging.GetDefaultLogger().Errorf("linter : %+v, err: %+v", result, err)
+		e := errors.OasValidationFailure
+		helpers.SendError(w, e.StatusCode(), e)
+		return
+	}
+
 	helpers.Send(w, http.StatusOK, clone)
 }
 
