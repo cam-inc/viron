@@ -47,6 +47,7 @@ var (
 	AdminRoleExists         = Initialize(400, "The role-id is already exists.")
 	UnAuthorized            = Initialize(401, "Unauthorized")
 	OasUndefined            = Initialize(404, "OAS is undefined")
+	OasValidationFailure    = Initialize(500, "OAS validation failure.")
 	AdminUserNotfound       = Initialize(404, "Admin User not found.")
 	Forbidden               = Initialize(403, "Forbidden")
 	MismatchState           = Initialize(400, "State is mismatch.")
