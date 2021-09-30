@@ -14,11 +14,7 @@ export const get = (): Config => {
       autoIndex: true,
       user: process.env.MONGODB_USER_NAME,
       pass: process.env.MONGODB_USER_PASSWORD,
-      useNewUrlParser: true,
-      useCreateIndex: true,
       authSource: 'admin',
-      useFindAndModify: false,
-      useUnifiedTopology: true,
       ssl: true,
       sslValidate: false,
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment

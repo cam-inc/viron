@@ -7,14 +7,17 @@ import {
   normalizeMongoFilterQuery,
 } from '@viron/lib';
 import { Media, MediaCreateAttributes } from '../../domains/media';
-import { MediaModel } from '../../stores/definitions/mongo/medias';
+import {
+  MediaModel,
+  MediaDocument,
+} from '../../stores/definitions/mongo/medias';
 import { ctx } from '../../context';
 
 const getModel = (): MediaModel => ctx.stores.main.models.medias as MediaModel;
 
 const convertConditions = (
-  conditions: FilterQuery<Media>
-): FilterQuery<Media> => {
+  conditions: FilterQuery<MediaDocument>
+): FilterQuery<MediaDocument> => {
   if (conditions.id) {
     conditions._id = conditions.id;
     delete conditions.id;
@@ -29,7 +32,7 @@ export const findOneById = async (id: string): Promise<Media | null> => {
 };
 
 export const find = async (
-  conditions: FilterQuery<Media> = {},
+  conditions: FilterQuery<MediaDocument> = {},
   sort: string[] | null = null,
   options?: QueryOptions
 ): Promise<Media[]> => {
@@ -45,7 +48,7 @@ export const find = async (
 };
 
 export const findWithPager = async (
-  conditions: FilterQuery<Media> = {},
+  conditions: FilterQuery<MediaDocument> = {},
   size?: number,
   page?: number,
   sort: string[] | null = null
@@ -62,7 +65,7 @@ export const findWithPager = async (
 };
 
 export const findOne = async (
-  conditions: FilterQuery<Media> = {}
+  conditions: FilterQuery<MediaDocument> = {}
 ): Promise<Media | null> => {
   const model = getModel();
   const doc = await model.findOne(
@@ -72,7 +75,7 @@ export const findOne = async (
 };
 
 export const count = async (
-  conditions: FilterQuery<Media> = {}
+  conditions: FilterQuery<MediaDocument> = {}
 ): Promise<number> => {
   const model = getModel();
   return await model.countDocuments(

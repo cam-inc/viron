@@ -17,10 +17,6 @@ export async function setupMongo(): Promise<Connection> {
   await conn.openUri(openUri, {
     dbName: 'viron_test',
     autoIndex: true,
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true,
   });
   conn.model(adminUsers.name, adminUsers.schema);
   conn.model(auditLogs.name, auditLogs.schema);

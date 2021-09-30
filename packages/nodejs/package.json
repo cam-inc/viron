@@ -33,7 +33,7 @@
     "json-schema-ref-parser": "^9.0.7",
     "json-schema-traverse": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "5.12.6",
+    "mongoose": "6.0.8",
     "path-to-regexp": "^6.2.0",
     "uuid": "^8.3.2"
   },

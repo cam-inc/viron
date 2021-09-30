@@ -17,8 +17,8 @@ const getModel = (): storeDefinitions.mongo.auditLogs.AuditLogModel => {
 };
 
 const convertConditions = (
-  conditions: FilterQuery<domainsAuditLog.AuditLog>
-): FilterQuery<domainsAuditLog.AuditLog> => {
+  conditions: FilterQuery<storeDefinitions.mongo.auditLogs.AuditLogDocument>
+): FilterQuery<storeDefinitions.mongo.auditLogs.AuditLogDocument> => {
   if (conditions.id) {
     conditions._id = conditions.id;
     delete conditions.id;
@@ -35,7 +35,7 @@ export const findOneById = async (
 };
 
 export const find = async (
-  conditions: FilterQuery<domainsAuditLog.AuditLog> = {},
+  conditions: FilterQuery<storeDefinitions.mongo.auditLogs.AuditLogDocument> = {},
   sort: string[] | null = null,
   options?: QueryOptions
 ): Promise<domainsAuditLog.AuditLog[]> => {
@@ -51,7 +51,7 @@ export const find = async (
 };
 
 export const findWithPager = async (
-  conditions: FilterQuery<domainsAuditLog.AuditLog> = {},
+  conditions: FilterQuery<storeDefinitions.mongo.auditLogs.AuditLogDocument> = {},
   size?: number,
   page?: number,
   sort: string[] | null = null
@@ -68,7 +68,7 @@ export const findWithPager = async (
 };
 
 export const count = async (
-  conditions: FilterQuery<domainsAuditLog.AuditLog> = {}
+  conditions: FilterQuery<storeDefinitions.mongo.auditLogs.AuditLogDocument> = {}
 ): Promise<number> => {
   const model = getModel();
   return await model.countDocuments(

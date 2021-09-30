@@ -10,9 +10,10 @@ import {
 } from '../../helpers';
 import { repositoryContainer } from '..';
 
-type FilterQueryWithUserIds = FilterQuery<domainsAdminUser.AdminUser> & {
-  userIds?: string[];
-};
+type FilterQueryWithUserIds =
+  FilterQuery<storeDefinitions.mongo.adminUsers.AdminUserDocument> & {
+    userIds?: string[];
+  };
 
 const getModel = (): storeDefinitions.mongo.adminUsers.AdminUserModel => {
   const conn = repositoryContainer.conn as Connection;
@@ -22,7 +23,7 @@ const getModel = (): storeDefinitions.mongo.adminUsers.AdminUserModel => {
 
 const convertConditions = (
   conditions: FilterQueryWithUserIds
-): FilterQuery<domainsAdminUser.AdminUser> => {
+): FilterQuery<storeDefinitions.mongo.adminUsers.AdminUserDocument> => {
   if (conditions.id) {
     conditions._id = conditions.id;
     delete conditions.id;
@@ -77,7 +78,7 @@ export const findWithPager = async (
 };
 
 export const findOne = async (
-  conditions: FilterQuery<domainsAdminUser.AdminUser> = {}
+  conditions: FilterQuery<storeDefinitions.mongo.adminUsers.AdminUserDocument> = {}
 ): Promise<domainsAdminUser.AdminUser | null> => {
   const model = getModel();
   const doc = await model.findOne(

@@ -11,15 +11,18 @@ import {
   ArticleCreateAttributes,
   ArticleUpdateAttributes,
 } from '../../domains/article';
-import { ArticleModel } from '../../stores/definitions/mongo/articles';
+import {
+  ArticleModel,
+  ArticleDocument,
+} from '../../stores/definitions/mongo/articles';
 import { ctx } from '../../context';
 
 const getModel = (): ArticleModel =>
   ctx.stores.main.models.articles as ArticleModel;
 
 const convertConditions = (
-  conditions: FilterQuery<Article>
-): FilterQuery<Article> => {
+  conditions: FilterQuery<ArticleDocument>
+): FilterQuery<ArticleDocument> => {
   if (conditions.id) {
     conditions._id = conditions.id;
     delete conditions.id;
@@ -34,7 +37,7 @@ export const findOneById = async (id: string): Promise<Article | null> => {
 };
 
 export const find = async (
-  conditions: FilterQuery<Article> = {},
+  conditions: FilterQuery<ArticleDocument> = {},
   sort: string[] | null = null,
   options?: QueryOptions
 ): Promise<Article[]> => {
@@ -50,7 +53,7 @@ export const find = async (
 };
 
 export const findWithPager = async (
-  conditions: FilterQuery<Article> = {},
+  conditions: FilterQuery<ArticleDocument> = {},
   size?: number,
   page?: number,
   sort: string[] | null = null
@@ -67,7 +70,7 @@ export const findWithPager = async (
 };
 
 export const findOne = async (
-  conditions: FilterQuery<Article> = {}
+  conditions: FilterQuery<ArticleDocument> = {}
 ): Promise<Article | null> => {
   const model = getModel();
   const doc = await model.findOne(
@@ -77,7 +80,7 @@ export const findOne = async (
 };
 
 export const count = async (
-  conditions: FilterQuery<Article> = {}
+  conditions: FilterQuery<ArticleDocument> = {}
 ): Promise<number> => {
   const model = getModel();
   return await model.countDocuments(

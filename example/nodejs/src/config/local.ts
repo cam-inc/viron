@@ -15,11 +15,7 @@ export const get = (mode: Mode): Config => {
       autoIndex: true,
       user: 'root',
       pass: 'password',
-      useNewUrlParser: true,
-      useCreateIndex: true,
       authSource: 'admin',
-      useFindAndModify: false,
-      useUnifiedTopology: true,
     },
   };
 
