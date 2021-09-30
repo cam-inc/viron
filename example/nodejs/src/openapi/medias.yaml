@@ -1,0 +1,153 @@
+openapi: 3.0.2
+info:
+  version: 0.0.1
+  title: '@viron/example-nodejs medias'
+  description: medias api specifications
+  x-pages:
+    - id: media
+      group: 管理画面/アップロード
+      title: メディア
+      description: |
+        # メディア情報の管理
+        メディアデータの **入稿・削除** を行います。
+      contents:
+        - title: メディア
+          type: table
+          operationId: listMedias
+          pagination: true
+          resourceId: media
+
+tags:
+  - name: media
+
+paths:
+  /medias:
+    get:
+      operationId: listMedias
+      tags:
+        - media
+      summary: list medias
+      description: メディア一覧
+      parameters:
+        - $ref: './components.yaml#/components/parameters/PagerSizeQueryParam'
+        - $ref: './components.yaml#/components/parameters/PagerPageQueryParam'
+        - $ref: './components.yaml#/components/parameters/SortQueryParam'
+        - $ref: '#/components/parameters/MediaIdQueryParam'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaListWithPager'
+      security:
+        - jwt: []
+
+    post:
+      operationId: createMedia
+      tags:
+        - media
+      summary: post media 
+      description: メディアアップロード
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MediaPostPayload'
+      responses:
+        201:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Media'
+      security:
+        - jwt: []
+
+  /medias/{mediaId}:
+    delete:
+      operationId: removeMedia
+      tags:
+        - media
+      summary: remove media
+      description: メディア削除
+      parameters:
+        - $ref: '#/components/parameters/MediaIdPathParam'
+      responses:
+        204:
+          description: OK
+      security:
+        - jwt: []
+
+components:
+  parameters:
+    MediaIdPathParam:
+      name: mediaId
+      in: path
+      schema:
+        type: string
+      required: true
+
+    MediaIdQueryParam:
+      name: mediaId
+      in: query
+      schema:
+        type: string
+      required: false
+
+  schemas:
+    MediaListWithPager:
+      allOf:
+        - $ref: './components.yaml#/components/schemas/Pager'
+        - type: object
+          properties:
+            list:
+              $ref: '#/components/schemas/MediaList'
+          required:
+            - list
+
+    MediaList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Media'
+    
+    Media:
+      type: object
+      properties:
+        id:
+          description: ID
+          type: string
+        name:
+          description: メディア名
+          type: string
+        url:
+          description: メディアURL
+          type: string
+        mimeType:
+          description: メディアタイプ
+          type: string
+        createdAt:
+          $ref: './components.yaml#/components/schemas/CreatedAt'
+        updatedAt:
+          $ref: './components.yaml#/components/schemas/UpdatedAt'
+      required:
+        - id
+        - name
+        - url
+        - mimeType
+
+    MediaPostPayload:
+      type: object
+      properties:
+        name:
+          description: メディア名
+          type: string
+        uploadData:
+          description: メディアのバイナリデータ
+          type: string
+          format: binary
+      required:
+        - name
+        - uploadData
+
+

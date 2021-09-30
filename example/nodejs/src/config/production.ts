@@ -48,6 +48,15 @@ export const get = (): Config => {
         userHostedDomains: ['gmail.com', 'cam-inc.co.jp', 'cyberagent.co.jp'],
       },
     },
+    aws: {
+      s3: {
+        accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID ?? '',
+        secretAccessKey: process.env.AWS_S3_SECRET_KEY ?? '',
+        region: '',
+        bucketName: '',
+        mediaDomain: '',
+      },
+    },
     oas: {
       infoExtentions: {
         [OAS_X_THEME]: THEME.BRUTAL_PINK,

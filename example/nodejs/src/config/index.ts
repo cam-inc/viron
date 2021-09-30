@@ -28,6 +28,16 @@ export interface OasConfig {
   infoExtentions: domainsOas.VironInfoObjectExtentions;
 }
 
+export interface AWSConfig {
+  s3: {
+    accessKeyId: string;
+    secretAccessKey: string;
+    region: string;
+    bucketName: string;
+    mediaDomain: string;
+  };
+}
+
 export interface Config {
   store: {
     main: MongoConfig | MysqlConfig;
@@ -37,6 +47,7 @@ export interface Config {
     jwt: domainsAuth.JwtConfig;
     googleOAuth2: domainsAuth.GoogleOAuthConfig;
   };
+  aws: AWSConfig;
   oas: OasConfig;
 }
 
