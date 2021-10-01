@@ -132,7 +132,7 @@ export const getTableColumns = function (
   const fields = getContentBaseOperationResponseKeys(document, content);
   fields.forEach(function (field) {
     columns.push({
-      type: field.type,
+      schema: { type: field.type },
       name: field.name,
       key: field.name,
       isSortable,
