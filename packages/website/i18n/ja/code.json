@@ -162,5 +162,12 @@
   "theme.docs.sidebar.navAriaLabel": {
     "message": "Sidebar navigation",
     "description": "The ARIA label for documentation menu"
+  },
+  "TAGLINE": {
+    "message": "タグライン",
+    "description": "tagline"
+  },
+  "Get Started": {
+    "message": "Get Started"
   }
 }
