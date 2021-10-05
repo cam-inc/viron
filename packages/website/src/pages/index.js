@@ -7,58 +7,6 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import styles from './styles.module.css';
 
-const features = [
-  {
-    title: 'フロントレス',
-    description: (
-      <>
-        HTML、CSS、JavaScript等のフロント用ソースコードを記述する必要はありません。APIサーバのみを用意して下さい。
-      </>
-    ),
-  },
-  {
-    title: 'OAS駆動',
-    description: (
-      <>
-        OpenAPI Specification 3.0に準拠。
-      </>
-    ),
-  },
-  {
-    title: '無料/オープンソース',
-    description: (
-      <>
-        GitHub上でオープンソースとして公開されています。誰でも無料で使用できます。
-      </>
-    ),
-  },
-  {
-    title: 'デスクトップアプリ提供',
-    description: (
-      <>
-        Chrome アプリを提供
-      </>
-    ),
-  },
-  {
-    title: 'レスポンシブデザイン',
-    description: (
-      <>
-        デスクトップ端末とモバイル端末上で画面サイズに応じたレイアウトが設定されます。
-      </>
-    ),
-  },
-];
-
-function Feature({ title, description}) {
-  return (
-    <div className={clsx('col col--4', styles.feature)}>
-      <h3>{title}</h3>
-      <p>{description}</p>
-    </div>
-  );
-}
-
 function Home() {
   const context = useDocusaurusContext();
   const {siteConfig = {}} = context;
@@ -72,9 +20,8 @@ function Home() {
         <div className="container">
           <h1 className="hero__title">{siteConfig.title}</h1>
       <p className="hero__subtitle">{translate({
-        //message: siteConfig.tagline,
-        message: 'TAGLINE',
-        description: 'tagline'
+        id: 'cmn.tagline',
+        message: 'Magic to turn OAS into GUI.'
       })}</p>
           <div className={styles.buttons}>
           <Link
@@ -94,9 +41,46 @@ function Home() {
         <section className={styles.features}>
           <div className="container">
             <div className="row">
-              {features.map((props, idx) => (
-                <Feature key={idx} {...props} />
-             ))}
+              <div className={clsx('col col--4', styles.feature)}>
+                <h3>{translate({
+                  id: 'cmn.features.01.title',
+                  message: 'Frontend-NoCode'
+                })}</h3>
+                <p>{translate({
+                 id: 'cmn.features.01.body',
+                 message: 'No need to write any frontend-matter codes.'
+                })}</p>
+              </div>
+              <div className={clsx('col col--4', styles.feature)}>
+                <h3>{translate({
+                  id: 'cmn.features.02.title',
+                  message: 'Open-Source Software'
+                })}</h3>
+                <p>{translate({
+                 id: 'cmn.features.02.body',
+                 message: 'Viron is an open-source software, which grants anyone to edit, study, distribute and contribute to it for free.'
+                })}</p>
+              </div>
+              <div className={clsx('col col--4', styles.feature)}>
+                <h3>{translate({
+                  id: 'cmn.features.03.title',
+                  message: 'Fine-Tuned User Interface'
+                })}</h3>
+                <p>{translate({
+                 id: 'cmn.features.03.body',
+                 message: 'Viron works on all modern browsers and offers responsive UI. It also supports light and dark modes with 24+ color themes.'
+                })}</p>
+              </div>
+              <div className={clsx('col col--4', styles.feature)}>
+                <h3>{translate({
+                  id: 'cmn.features.04.title',
+                  message: 'OpenAPI Specification-driven'
+                })}</h3>
+                <p>{translate({
+                 id: 'cmn.features.04.body',
+                 message: 'What a OAS can describe is what Viron can display on a screen. Viron grows as OAS does.'
+                })}</p>
+              </div>
             </div>
           </div>
         </section>
