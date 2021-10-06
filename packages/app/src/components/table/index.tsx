@@ -267,17 +267,15 @@ const Td: React.FC<{ on: On; isSticky?: boolean }> = ({
     style.background = `linear-gradient(to right, rgba(0,0,0,0) 0, var(--color-${on}) 8px, var(--color-${on}) 100%)`;
   }
   return (
-    <>
-      <td
-        className={classnames('p-2', {
-          'p-2': !isSticky,
-          'pr-2 py-2 pl-4 sticky right-0': isSticky,
-        })}
-        style={style}
-      >
-        {children}
-      </td>
-    </>
+    <td
+      className={classnames('p-2', {
+        'p-2': !isSticky,
+        'pr-2 py-2 pl-4 sticky right-0': isSticky,
+      })}
+      style={style}
+    >
+      {children}
+    </td>
   );
 };
 
@@ -306,28 +304,26 @@ const Cell: React.FC<{ on: On; column: Column; value: Value }> = ({
   };
   return (
     <>
+      <div
+        className={classnames('text-xxs whitespace-nowrap', {
+          'text-on-background-slight': on === ON.BACKGROUND,
+          'text-on-surface-slight': on === ON.SURFACE,
+          'text-on-primary-slight': on === ON.PRIMARY,
+          'text-on-complementary-slight': on === ON.COMPLEMENTARY,
+        })}
+      >
+        [{column.schema.type}]
+      </div>
       <div className="whitespace-nowrap">
         <div
-          className={classnames('text-xxs', {
-            'text-on-background-slight': on === ON.BACKGROUND,
-            'text-on-surface-slight': on === ON.SURFACE,
-            'text-on-primary-slight': on === ON.PRIMARY,
-            'text-on-complementary-slight': on === ON.COMPLEMENTARY,
+          className={classnames('text-sm', {
+            'text-on-background': on === ON.BACKGROUND,
+            'text-on-surface': on === ON.SURFACE,
+            'text-on-primary': on === ON.PRIMARY,
+            'text-on-complementary': on === ON.COMPLEMENTARY,
           })}
         >
-          [{column.schema.type}]
-        </div>
-        <div className="whitespace-nowrap">
-          <div
-            className={classnames('text-sm', {
-              'text-on-background': on === ON.BACKGROUND,
-              'text-on-surface': on === ON.SURFACE,
-              'text-on-primary': on === ON.PRIMARY,
-              'text-on-complementary': on === ON.COMPLEMENTARY,
-            })}
-          >
-            {formattedValue(column, value)}
-          </div>
+          {formattedValue(column, value)}
         </div>
       </div>
     </>
