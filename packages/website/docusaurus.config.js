@@ -11,7 +11,6 @@ module.exports = {
   onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
   onDuplicateRoutes: 'warn',
-  tagline: 'Provide OAS document, Get GUI.',
   organizationName: 'CAM, Inc.',
   projectName: 'viron',
   themeConfig: {

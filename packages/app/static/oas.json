@@ -114,6 +114,17 @@
         ]
       },
       {
+        "id": "fileUploads",
+        "title": "File Uploads全般",
+        "contents": [
+          {
+            "title": "Type of Number",
+            "type": "number",
+            "operationId": "get:/fileUploads/number"
+          }
+        ]
+      },
+      {
         "id": "request",
         "title": "request",
         "contents": [
@@ -431,6 +442,31 @@
         }
       }
     },
+    "/fileUploads/number": {
+      "get": {
+        "operationId": "get:/fileUploads/number",
+        "responses": {
+          "200": {
+            "description": "description",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "post:fileUploads",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Empty"
+          }
+        }
+      }
+    },
     "/actions/csv": {
       "get": {
         "operationId": "get:/actions/csv",
@@ -575,6 +611,18 @@
                       "type": "string"
                     },
                     "uniqueItems": true
+                  },
+                  "ANY_OF": {
+                    "type": "array",
+                    "anyOf": [
+
+                    ]
+                  },
+                  "ONE_OF": {
+                    "type": "array",
+                    "oneOf": [
+
+                    ]
                   },
                   "MAX_PROPERTIES": {
                     "type": "object",
