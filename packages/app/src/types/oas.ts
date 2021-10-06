@@ -115,7 +115,7 @@ export const TABLE_SORT = {
 } as const;
 export type TableSort = typeof TABLE_SORT[keyof typeof TABLE_SORT];
 export type TableColumn = {
-  type: Schema['type'];
+  schema: Schema;
   name: string;
   key: string;
   isSortable: boolean;
