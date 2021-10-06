@@ -132,7 +132,7 @@ export const getTableColumns = function (
   const fields = getContentBaseOperationResponseKeys(document, content);
   fields.forEach(function (field) {
     columns.push({
-      schema: { type: field.type },
+      schema: field.schema,
       name: field.name,
       key: field.name,
       isSortable,
@@ -408,8 +408,8 @@ export const getRequestParameterKeys = function (
 export const getContentBaseOperationResponseKeys = function (
   document: Document,
   content: Info['x-pages'][number]['contents'][number]
-): { type: Schema['type']; name: string }[] {
-  const ret: { type: Schema['type']; name: string }[] = [];
+): { schema: Schema; name: string }[] {
+  const ret: { schema: Schema; name: string }[] = [];
   const getRequestResult = getRequest(document, {
     operationId: content.operationId,
   });
@@ -448,7 +448,7 @@ export const getContentBaseOperationResponseKeys = function (
       }
       _.keys(properties).forEach(function (key) {
         ret.push({
-          type: properties[key].type,
+          schema: properties[key],
           name: key,
         });
       });
