@@ -12,7 +12,6 @@ type Value = any;
 export type Data = Record<Key, Value>;
 type Column = TableColumn & {
   sort: TableSort;
-  // isActions?: boolean;
 };
 
 export type Props = {
@@ -33,7 +32,9 @@ const Table: React.FC<Props> = ({
   onRowClick,
   onRequestSortChange,
 }) => {
-  const handleColumnHeadClick = useCallback<NonNullable<ThProps['onClick']>>(
+  const handleColumnHeadClick = useCallback<
+    NonNullable<ThTitleProp['onClick']>
+  >(
     function (column) {
       if (!column.isSortable) {
         return;
@@ -75,8 +76,12 @@ const Table: React.FC<Props> = ({
               {columns.map(function (column) {
                 return (
                   <React.Fragment key={column.key}>
-                    <Th on={on} column={column} onClick={handleColumnHeadClick}>
-                      <ThTitle on={on} column={column} />
+                    <Th on={on}>
+                      <ThTitle
+                        on={on}
+                        column={column}
+                        onClick={handleColumnHeadClick}
+                      />
                     </Th>
                   </React.Fragment>
                 );
@@ -97,13 +102,11 @@ const Table: React.FC<Props> = ({
                       return (
                         <React.Fragment key={column.key}>
                           <Td on={on}>
-                            <CellValueType on={on} column={column}>
-                              <CellValue
-                                on={on}
-                                column={column}
-                                value={data[column.key]}
-                              />
-                            </CellValueType>
+                            <Cell
+                              on={on}
+                              column={column}
+                              value={data[column.key]}
+                            />
                           </Td>
                         </React.Fragment>
                       );
@@ -165,23 +168,9 @@ const Tr: React.FC<TrProps> = ({
 
 type ThProps = {
   on: On;
-  column?: Column;
-  onClick?: (column: Column) => void;
   isSticky?: boolean;
 };
-const Th: React.FC<ThProps> = ({
-  on,
-  column,
-  onClick,
-  isSticky = false,
-  children,
-}) => {
-  const handleClick = useCallback(
-    function () {
-      if (column) onClick?.(column);
-    },
-    [column, onClick]
-  );
+const Th: React.FC<ThProps> = ({ on, isSticky = false, children }) => {
   const style: React.CSSProperties = {};
   if (isSticky) {
     style.background = `linear-gradient(to right, rgba(0,0,0,0) 0, var(--color-${on}) 8px, var(--color-${on}) 100%)`;
@@ -197,16 +186,26 @@ const Th: React.FC<ThProps> = ({
         'text-on-complementary-high': on === ON.COMPLEMENTARY,
       })}
       style={style}
-      onClick={handleClick}
     >
       {children}
     </th>
   );
 };
 
-const ThTitle: React.FC<{ on: On; column: Column }> = ({ on, column }) => {
+type ThTitleProp = {
+  on: On;
+  column: Column;
+  onClick?: (column: Column) => void;
+};
+const ThTitle: React.FC<ThTitleProp> = ({ on, column, onClick }) => {
+  const handleClick = useCallback(
+    function () {
+      onClick?.(column);
+    },
+    [column, onClick]
+  );
   return (
-    <div className="flex items-center">
+    <div className="flex items-center" onClick={handleClick}>
       <div className="flex-none mr-1">
         <div
           className={classnames({
@@ -268,23 +267,43 @@ const Td: React.FC<{ on: On; isSticky?: boolean }> = ({
     style.background = `linear-gradient(to right, rgba(0,0,0,0) 0, var(--color-${on}) 8px, var(--color-${on}) 100%)`;
   }
   return (
-    <td
-      className={classnames('p-2', {
-        'p-2': !isSticky,
-        'pr-2 py-2 pl-4 sticky right-0': isSticky,
-      })}
-      style={style}
-    >
-      {children}
-    </td>
+    <>
+      <td
+        className={classnames('p-2', {
+          'p-2': !isSticky,
+          'pr-2 py-2 pl-4 sticky right-0': isSticky,
+        })}
+        style={style}
+      >
+        {children}
+      </td>
+    </>
   );
 };
 
-const CellValueType: React.FC<{ on: On; column: Column }> = ({
+const Cell: React.FC<{ on: On; column: Column; value: Value }> = ({
   on,
   column,
-  children,
+  value,
 }) => {
+  const formattedValue = function (column: Column, value: Value) {
+    switch (column.schema.type) {
+      case 'string':
+        if (column.schema.format === ('date' || 'date-time')) {
+          const date = new Date(value);
+          const intlDate = new Intl.DateTimeFormat([], {
+            dateStyle: 'medium',
+            timeStyle: 'medium',
+          }).format(date);
+          return intlDate;
+        }
+        return JSON.stringify(value);
+      case 'number' || 'integer':
+        return value.toLocaleString();
+      default:
+        return JSON.stringify(value);
+    }
+  };
   return (
     <>
       <div className="whitespace-nowrap">
@@ -298,51 +317,17 @@ const CellValueType: React.FC<{ on: On; column: Column }> = ({
         >
           [{column.schema.type}]
         </div>
-        {children}
-      </div>
-    </>
-  );
-};
-
-const CellValue: React.FC<{ on: On; column: Column; value: Value }> = ({
-  on,
-  value,
-  column,
-}) => {
-  const formattedValue = function (value: Value, column: Column) {
-    switch (column.schema.type) {
-      case 'string':
-        if (
-          typeof value === 'string' &&
-          column.schema.format === ('date' || 'date-time')
-        ) {
-          const date = new Date(value);
-          const intlDate = new Intl.DateTimeFormat([], {
-            dateStyle: 'medium',
-            timeStyle: 'medium',
-          }).format(date);
-          return intlDate;
-        }
-        return JSON.stringify(value);
-      case 'number' || 'integer':
-        if (typeof value === 'number') return value.toLocaleString();
-        break;
-      default:
-        return JSON.stringify(value);
-    }
-  };
-  return (
-    <>
-      <div className="whitespace-nowrap">
-        <div
-          className={classnames('text-sm', {
-            'text-on-background': on === ON.BACKGROUND,
-            'text-on-surface': on === ON.SURFACE,
-            'text-on-primary': on === ON.PRIMARY,
-            'text-on-complementary': on === ON.COMPLEMENTARY,
-          })}
-        >
-          {formattedValue(value, column)}
+        <div className="whitespace-nowrap">
+          <div
+            className={classnames('text-sm', {
+              'text-on-background': on === ON.BACKGROUND,
+              'text-on-surface': on === ON.SURFACE,
+              'text-on-primary': on === ON.PRIMARY,
+              'text-on-complementary': on === ON.COMPLEMENTARY,
+            })}
+          >
+            {formattedValue(column, value)}
+          </div>
         </div>
       </div>
     </>
