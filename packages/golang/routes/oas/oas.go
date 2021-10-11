@@ -36,7 +36,7 @@ func (o *oas) GetOas(w http.ResponseWriter, r *http.Request) {
 	}
 	clone := domains.GetOas(apiDef, user.RoleIDs)
 	result, err := linter.Lint(clone)
-	if err != nil || result.Valid() {
+	if err != nil || !result.Valid() {
 		logging.GetDefaultLogger().Errorf("linter : %+v, err: %+v", result, err)
 		e := errors.OasValidationFailure
 		helpers.SendError(w, e.StatusCode(), e)
