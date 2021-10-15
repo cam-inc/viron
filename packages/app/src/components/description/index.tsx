@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import markdownit from 'markdown-it';
 import React, { useMemo } from 'react';
-import { ON, On } from '$constants/index';
+import { On } from '$constants/index';
 import { ClassName } from '$types/index';
 import { CommonMark } from '$types/oas';
 
@@ -21,12 +21,7 @@ const Description: React.FC<Props> = ({ on, value, className = '' }) => {
   );
   return (
     <div
-      className={classNames(className, {
-        'text-on-background': on === ON.BACKGROUND,
-        'text-on-surface': on === ON.SURFACE,
-        'text-on-primary': on === ON.PRIMARY,
-        'text-on-complementary': on === ON.COMPLEMENTARY,
-      })}
+      className={classNames(`text-on-${on}`, className)}
       dangerouslySetInnerHTML={parsedDescription}
     />
   );

@@ -1,8 +1,8 @@
 import { BiError } from '@react-icons/all-files/bi/BiError';
 import classnames from 'classnames';
 import React, { useEffect } from 'react';
-import { On, ON } from '$constants/index';
 import Link from '$components/link';
+import { On } from '$constants/index';
 import {
   BaseError,
   HTTP401Error,
@@ -28,14 +28,7 @@ const Error: React.FC<Props> = ({ on, error }) => {
   );
 
   return (
-    <div
-      className={classnames('text-xs', {
-        'text-on-background': on === ON.BACKGROUND,
-        'text-on-surface': on === ON.SURFACE,
-        'text-on-primary': on === ON.PRIMARY,
-        'text-on-complementary': on === ON.COMPLEMENTARY,
-      })}
-    >
+    <div className={classnames('text-xs', `text-on-${on}`)}>
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
           <div className="flex-none">
@@ -43,14 +36,7 @@ const Error: React.FC<Props> = ({ on, error }) => {
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-base font-bold">{error.name}</div>
-            <div
-              className={classnames('text-xxs', {
-                'text-on-background-low': on === ON.BACKGROUND,
-                'text-on-surface-low': on === ON.SURFACE,
-                'text-on-primary-low': on === ON.PRIMARY,
-                'text-on-complementary-low': on === ON.COMPLEMENTARY,
-              })}
-            >
+            <div className={classnames('text-xxs', `text-on-${on}-low`)}>
               [{error.code}]
             </div>
           </div>

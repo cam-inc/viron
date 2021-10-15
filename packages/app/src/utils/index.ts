@@ -29,6 +29,7 @@ export const promiseErrorHandler = async function <T, E = Error>(
   try {
     res = await promise.then((res) => res);
   } catch (_err) {
+    // @ts-ignore
     err = _err;
   }
   return [res as T, err as E];

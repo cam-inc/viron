@@ -3,7 +3,7 @@ import classnames from 'classnames';
 import React, { useCallback } from 'react';
 import CommonMark from '$components/commonMark';
 import Popover, { usePopover } from '$components/popover';
-import { On, ON } from '$constants/index';
+import { On } from '$constants/index';
 import { ClassName } from '$types/index';
 import { Server } from '$types/oas';
 
@@ -30,14 +30,11 @@ const _Server: React.FC<Props> = ({ on, server, className = '' }) => {
   return (
     <>
       <div
-        className={classnames('p-1 text-xs rounded border', className, {
-          'text-on-background-low border-on-background-low':
-            on === ON.BACKGROUND,
-          'text-on-surface-low border-on-surface-low': on === ON.SURFACE,
-          'text-on-primary-low border-on-primary-low': on === ON.PRIMARY,
-          'text-on-complementary-low border-on-complementary-low':
-            on === ON.COMPLEMENTARY,
-        })}
+        className={classnames(
+          'p-1 text-xs rounded border',
+          `text-on-${on}-low border-on-${on}-low`,
+          className
+        )}
         ref={popover.targetRef}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}

@@ -4,7 +4,7 @@ import React, { useCallback } from 'react';
 import CommonMark from '$components/commonMark';
 import Link from '$components/link';
 import Popover, { usePopover } from '$components/popover';
-import { ON, On } from '$constants/index';
+import { On } from '$constants/index';
 import { ClassName } from '$types/index';
 import { ExternalDocumentation } from '$types/oas';
 
@@ -31,12 +31,7 @@ const ExternalDocs: React.FC<Props> = ({ on, data, className = '' }) => {
   return (
     <>
       <div
-        className={classnames('text-xxs', className, {
-          'text-on-background': on === ON.BACKGROUND,
-          'text-on-surface': on === ON.SURFACE,
-          'text-on-primary': on === ON.PRIMARY,
-          'text-on-complementary': on === ON.COMPLEMENTARY,
-        })}
+        className={classnames('text-xxs', `text-on-${on}`, className)}
         ref={popover.targetRef}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}

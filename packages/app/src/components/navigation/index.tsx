@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import React from 'react';
-import { On, ON } from '$constants/index';
+import { On } from '$constants/index';
 import { ClassName } from '$types/index';
 
 export type Props = {
@@ -26,12 +26,9 @@ const Navigation: React.FC<Props> = ({
         <div
           className={classnames(
             'flex-1 min-h-0 overflow-y-scroll overscroll-y-contain',
+            `border-on-${on}-faint`,
             {
               'border-t-2 border-b-2': renderBody,
-              'border-on-background-faint': on === ON.BACKGROUND,
-              'border-on-surface-faint': on === ON.SURFACE,
-              'border-on-primary-faint': on === ON.PRIMARY,
-              'border-on-complementary-faint': on === ON.COMPLEMENTARY,
             }
           )}
         >

@@ -2,7 +2,7 @@ import { BiCaretDown } from '@react-icons/all-files/bi/BiCaretDown';
 import { BiCaretUp } from '@react-icons/all-files/bi/BiCaretUp';
 import classnames from 'classnames';
 import React, { useCallback } from 'react';
-import { ON, On } from '$constants/index';
+import { On } from '$constants/index';
 import { ClassName } from '$types/index';
 import { TableColumn, TableSort, TABLE_SORT } from '$types/oas';
 
@@ -67,11 +67,7 @@ const Table: React.FC<Props> = ({
     <div className={className}>
       <div className="overflow-x-auto overscroll-x-contain">
         <table className="min-w-full border-collapse">
-          <thead
-            className={classnames('border-b-2', {
-              'border-on-surface-faint': on === ON.SURFACE,
-            })}
-          >
+          <thead className={classnames('border-b-2', `border-on-${on}-faint`)}>
             <Tr on={on} isHead>
               {columns.map(function (column) {
                 return (
@@ -148,21 +144,23 @@ const Tr: React.FC<TrProps> = ({
     [data, onClick]
   );
   return (
-    <tr
-      className={classnames('border-b', {
-        'border-on-background-faint': on === ON.BACKGROUND,
-        'hover:bg-on-background-faint': on === ON.BACKGROUND && !isHead,
-        'border-on-surface-faint': on === ON.SURFACE,
-        'hover:bg-on-surface-faint': on === ON.SURFACE && !isHead,
-        'border-on-primary-faint': on === ON.PRIMARY,
-        'hover:bg-on-primary-faint': on === ON.PRIMARY && !isHead,
-        'border-on-complementary-faint': on === ON.COMPLEMENTARY,
-        'hover:bg-on-complementary-faint': on === ON.COMPLEMENTARY && !isHead,
-      })}
-      onClick={handleClick}
-    >
-      {children}
-    </tr>
+    <>
+      {!isHead ? (
+        <tr
+          className={classnames(
+            'border-b',
+            `border-on-${on}-faint hover:bg-on-${on}-faint`
+          )}
+          onClick={handleClick}
+        >
+          {children}
+        </tr>
+      ) : (
+        <tr className="border-b" onClick={handleClick}>
+          {children}
+        </tr>
+      )}
+    </>
   );
 };
 
@@ -177,13 +175,9 @@ const Th: React.FC<ThProps> = ({ on, isSticky = false, children }) => {
   }
   return (
     <th
-      className={classnames('text-xs text-left', {
+      className={classnames('text-xs text-left', `text-on-${on}-high`, {
         'p-2': !isSticky,
         'pr-2 py-2 pl-4 sticky right-0': isSticky,
-        'text-on-background-high': on === ON.BACKGROUND,
-        'text-on-surface-high': on === ON.SURFACE,
-        'text-on-primary-high': on === ON.PRIMARY,
-        'text-on-complementary-high': on === ON.COMPLEMENTARY,
       })}
       style={style}
     >
@@ -207,50 +201,26 @@ const ThTitle: React.FC<ThTitleProp> = ({ on, column, onClick }) => {
   return (
     <div className="flex items-center" onClick={handleClick}>
       <div className="flex-none mr-1">
-        <div
-          className={classnames({
-            'text-on-background-slight':
-              on === ON.BACKGROUND && column.sort !== TABLE_SORT.ASC,
-            'text-on-background':
-              on === ON.BACKGROUND && column.sort === TABLE_SORT.ASC,
-            'text-on-surface-slight':
-              on === ON.SURFACE && column.sort !== TABLE_SORT.ASC,
-            'text-on-surface':
-              on === ON.SURFACE && column.sort === TABLE_SORT.ASC,
-            'text-on-primary-slight':
-              on === ON.PRIMARY && column.sort !== TABLE_SORT.ASC,
-            'text-on-primary':
-              on === ON.PRIMARY && column.sort === TABLE_SORT.ASC,
-            'text-on-complementary-slight':
-              on === ON.COMPLEMENTARY && column.sort !== TABLE_SORT.ASC,
-            'text-on-complementary':
-              on === ON.COMPLEMENTARY && column.sort === TABLE_SORT.ASC,
-          })}
-        >
-          <BiCaretUp />
-        </div>
-        <div
-          className={classnames({
-            'text-on-background-slight':
-              on === ON.BACKGROUND && column.sort !== TABLE_SORT.DESC,
-            'text-on-background':
-              on === ON.BACKGROUND && column.sort === TABLE_SORT.DESC,
-            'text-on-surface-slight':
-              on === ON.SURFACE && column.sort !== TABLE_SORT.DESC,
-            'text-on-surface':
-              on === ON.SURFACE && column.sort === TABLE_SORT.DESC,
-            'text-on-primary-slight':
-              on === ON.PRIMARY && column.sort !== TABLE_SORT.DESC,
-            'text-on-primary':
-              on === ON.PRIMARY && column.sort === TABLE_SORT.DESC,
-            'text-on-complementary-slight':
-              on === ON.COMPLEMENTARY && column.sort !== TABLE_SORT.DESC,
-            'text-on-complementary':
-              on === ON.COMPLEMENTARY && column.sort === TABLE_SORT.DESC,
-          })}
-        >
-          <BiCaretDown />
-        </div>
+        {column.sort === TABLE_SORT.ASC && (
+          <div className={classnames(`text-on-${on}`)}>
+            <BiCaretUp />
+          </div>
+        )}
+        {column.sort !== TABLE_SORT.ASC && (
+          <div className={classnames(`text-on-${on}-slight`)}>
+            <BiCaretUp />
+          </div>
+        )}
+        {column.sort === TABLE_SORT.DESC && (
+          <div className={classnames(`text-on-${on}`)}>
+            <BiCaretDown />
+          </div>
+        )}
+        {column.sort !== TABLE_SORT.DESC && (
+          <div className={classnames(`text-on-${on}-slight`)}>
+            <BiCaretDown />
+          </div>
+        )}
       </div>
       <div className="flex-1 min-w-0 font-bold">{column.name}</div>
     </div>
@@ -305,24 +275,15 @@ const Cell: React.FC<{ on: On; column: Column; value: Value }> = ({
   return (
     <>
       <div
-        className={classnames('text-xxs whitespace-nowrap', {
-          'text-on-background-slight': on === ON.BACKGROUND,
-          'text-on-surface-slight': on === ON.SURFACE,
-          'text-on-primary-slight': on === ON.PRIMARY,
-          'text-on-complementary-slight': on === ON.COMPLEMENTARY,
-        })}
+        className={classnames(
+          'text-xxs whitespace-nowrap',
+          `text-on-${on}-slight`
+        )}
       >
         [{column.schema.type}]
       </div>
       <div className="whitespace-nowrap">
-        <div
-          className={classnames('text-sm', {
-            'text-on-background': on === ON.BACKGROUND,
-            'text-on-surface': on === ON.SURFACE,
-            'text-on-primary': on === ON.PRIMARY,
-            'text-on-complementary': on === ON.COMPLEMENTARY,
-          })}
-        >
+        <div className={classnames('text-sm', `text-on-${on}`)}>
           {formattedValue(column, value)}
         </div>
       </div>

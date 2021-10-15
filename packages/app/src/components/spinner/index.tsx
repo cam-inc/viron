@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import React from 'react';
-import { ON, On } from '$constants/index';
+import { On } from '$constants/index';
 import { ClassName } from '$types/index';
 
 export type Props = {
@@ -25,12 +25,7 @@ const Spinner: React.FC<Props> = ({ on, className = '' }) => {
             )}
           >
             <div
-              className={classnames(ballInnerClassNames, {
-                'bg-on-background-high': on === ON.BACKGROUND,
-                'bg-on-surface-high': on === ON.SURFACE,
-                'bg-on-primary-high': on === ON.PRIMARY,
-                'bg-on-complementary-high': on === ON.COMPLEMENTARY,
-              })}
+              className={classnames(ballInnerClassNames, `bg-on-${on}-high`)}
             />
           </div>
           <div
@@ -40,12 +35,7 @@ const Spinner: React.FC<Props> = ({ on, className = '' }) => {
             )}
           >
             <div
-              className={classnames(ballInnerClassNames, {
-                'bg-on-background-medium': on === ON.BACKGROUND,
-                'bg-on-surface-medium': on === ON.SURFACE,
-                'bg-on-primary-medium': on === ON.PRIMARY,
-                'bg-on-complementary-medium': on === ON.COMPLEMENTARY,
-              })}
+              className={classnames(ballInnerClassNames, `bg-on-${on}-medium`)}
             />
           </div>
           <div
@@ -55,12 +45,7 @@ const Spinner: React.FC<Props> = ({ on, className = '' }) => {
             )}
           >
             <div
-              className={classnames(ballInnerClassNames, {
-                'bg-on-background-low': on === ON.BACKGROUND,
-                'bg-on-surface-low': on === ON.SURFACE,
-                'bg-on-primary-low': on === ON.PRIMARY,
-                'bg-on-complementary-low': on === ON.COMPLEMENTARY,
-              })}
+              className={classnames(ballInnerClassNames, `bg-on-${on}-low`)}
             />
           </div>
           <div
@@ -70,12 +55,7 @@ const Spinner: React.FC<Props> = ({ on, className = '' }) => {
             )}
           >
             <div
-              className={classnames(ballInnerClassNames, {
-                'bg-on-background-faint': on === ON.BACKGROUND,
-                'bg-on-surface-faint': on === ON.SURFACE,
-                'bg-on-primary-faint': on === ON.PRIMARY,
-                'bg-on-complementary-faint': on === ON.COMPLEMENTARY,
-              })}
+              className={classnames(ballInnerClassNames, `bg-on-${on}-faint`)}
             />
           </div>
         </div>
