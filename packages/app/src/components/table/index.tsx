@@ -10,8 +10,7 @@ type Key = string;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Value = any;
 export type Data = Record<Key, Value>;
-type Column = Omit<TableColumn, 'type'> & {
-  type: TableColumn['type'] | 'actions';
+type Column = TableColumn & {
   sort: TableSort;
 };
 
@@ -33,7 +32,9 @@ const Table: React.FC<Props> = ({
   onRowClick,
   onRequestSortChange,
 }) => {
-  const handleColumnHeadClick = useCallback<NonNullable<ThProps['onClick']>>(
+  const handleColumnHeadClick = useCallback<
+    NonNullable<ThTitleProp['onClick']>
+  >(
     function (column) {
       if (!column.isSortable) {
         return;
@@ -75,27 +76,20 @@ const Table: React.FC<Props> = ({
               {columns.map(function (column) {
                 return (
                   <React.Fragment key={column.key}>
-                    <Th
-                      on={on}
-                      column={column}
-                      onClick={handleColumnHeadClick}
-                    />
+                    <Th on={on}>
+                      <ThTitle
+                        on={on}
+                        column={column}
+                        onClick={handleColumnHeadClick}
+                      />
+                    </Th>
                   </React.Fragment>
                 );
               })}
               {renderActions && (
-                <Th
-                  on={on}
-                  column={{
-                    type: 'actions',
-                    name: 'actions',
-                    // TODO: 重複しないように。
-                    key: 'actions',
-                    isSortable: false,
-                    sort: TABLE_SORT.NONE,
-                  }}
-                  isSticky
-                />
+                <Th on={on} isSticky>
+                  <div>actions</div>
+                </Th>
               )}
             </Tr>
           </thead>
@@ -174,17 +168,9 @@ const Tr: React.FC<TrProps> = ({
 
 type ThProps = {
   on: On;
-  column: Column;
-  onClick?: (column: Column) => void;
   isSticky?: boolean;
 };
-const Th: React.FC<ThProps> = ({ on, column, onClick, isSticky = false }) => {
-  const handleClick = useCallback(
-    function () {
-      onClick?.(column);
-    },
-    [column, onClick]
-  );
+const Th: React.FC<ThProps> = ({ on, isSticky = false, children }) => {
   const style: React.CSSProperties = {};
   if (isSticky) {
     style.background = `linear-gradient(to right, rgba(0,0,0,0) 0, var(--color-${on}) 8px, var(--color-${on}) 100%)`;
@@ -200,60 +186,74 @@ const Th: React.FC<ThProps> = ({ on, column, onClick, isSticky = false }) => {
         'text-on-complementary-high': on === ON.COMPLEMENTARY,
       })}
       style={style}
-      onClick={handleClick}
     >
-      <div className="flex items-center">
-        {column.isSortable && (
-          <div className="flex-none mr-1">
-            <div
-              className={classnames({
-                'text-on-background-slight':
-                  on === ON.BACKGROUND && column.sort !== TABLE_SORT.ASC,
-                'text-on-background':
-                  on === ON.BACKGROUND && column.sort === TABLE_SORT.ASC,
-                'text-on-surface-slight':
-                  on === ON.SURFACE && column.sort !== TABLE_SORT.ASC,
-                'text-on-surface':
-                  on === ON.SURFACE && column.sort === TABLE_SORT.ASC,
-                'text-on-primary-slight':
-                  on === ON.PRIMARY && column.sort !== TABLE_SORT.ASC,
-                'text-on-primary':
-                  on === ON.PRIMARY && column.sort === TABLE_SORT.ASC,
-                'text-on-complementary-slight':
-                  on === ON.COMPLEMENTARY && column.sort !== TABLE_SORT.ASC,
-                'text-on-complementary':
-                  on === ON.COMPLEMENTARY && column.sort === TABLE_SORT.ASC,
-              })}
-            >
-              <BiCaretUp />
-            </div>
-            <div
-              className={classnames({
-                'text-on-background-slight':
-                  on === ON.BACKGROUND && column.sort !== TABLE_SORT.DESC,
-                'text-on-background':
-                  on === ON.BACKGROUND && column.sort === TABLE_SORT.DESC,
-                'text-on-surface-slight':
-                  on === ON.SURFACE && column.sort !== TABLE_SORT.DESC,
-                'text-on-surface':
-                  on === ON.SURFACE && column.sort === TABLE_SORT.DESC,
-                'text-on-primary-slight':
-                  on === ON.PRIMARY && column.sort !== TABLE_SORT.DESC,
-                'text-on-primary':
-                  on === ON.PRIMARY && column.sort === TABLE_SORT.DESC,
-                'text-on-complementary-slight':
-                  on === ON.COMPLEMENTARY && column.sort !== TABLE_SORT.DESC,
-                'text-on-complementary':
-                  on === ON.COMPLEMENTARY && column.sort === TABLE_SORT.DESC,
-              })}
-            >
-              <BiCaretDown />
-            </div>
-          </div>
-        )}
-        <div className="flex-1 min-w-0 font-bold">{column.name}</div>
-      </div>
+      {children}
     </th>
+  );
+};
+
+type ThTitleProp = {
+  on: On;
+  column: Column;
+  onClick?: (column: Column) => void;
+};
+const ThTitle: React.FC<ThTitleProp> = ({ on, column, onClick }) => {
+  const handleClick = useCallback(
+    function () {
+      onClick?.(column);
+    },
+    [column, onClick]
+  );
+  return (
+    <div className="flex items-center" onClick={handleClick}>
+      <div className="flex-none mr-1">
+        <div
+          className={classnames({
+            'text-on-background-slight':
+              on === ON.BACKGROUND && column.sort !== TABLE_SORT.ASC,
+            'text-on-background':
+              on === ON.BACKGROUND && column.sort === TABLE_SORT.ASC,
+            'text-on-surface-slight':
+              on === ON.SURFACE && column.sort !== TABLE_SORT.ASC,
+            'text-on-surface':
+              on === ON.SURFACE && column.sort === TABLE_SORT.ASC,
+            'text-on-primary-slight':
+              on === ON.PRIMARY && column.sort !== TABLE_SORT.ASC,
+            'text-on-primary':
+              on === ON.PRIMARY && column.sort === TABLE_SORT.ASC,
+            'text-on-complementary-slight':
+              on === ON.COMPLEMENTARY && column.sort !== TABLE_SORT.ASC,
+            'text-on-complementary':
+              on === ON.COMPLEMENTARY && column.sort === TABLE_SORT.ASC,
+          })}
+        >
+          <BiCaretUp />
+        </div>
+        <div
+          className={classnames({
+            'text-on-background-slight':
+              on === ON.BACKGROUND && column.sort !== TABLE_SORT.DESC,
+            'text-on-background':
+              on === ON.BACKGROUND && column.sort === TABLE_SORT.DESC,
+            'text-on-surface-slight':
+              on === ON.SURFACE && column.sort !== TABLE_SORT.DESC,
+            'text-on-surface':
+              on === ON.SURFACE && column.sort === TABLE_SORT.DESC,
+            'text-on-primary-slight':
+              on === ON.PRIMARY && column.sort !== TABLE_SORT.DESC,
+            'text-on-primary':
+              on === ON.PRIMARY && column.sort === TABLE_SORT.DESC,
+            'text-on-complementary-slight':
+              on === ON.COMPLEMENTARY && column.sort !== TABLE_SORT.DESC,
+            'text-on-complementary':
+              on === ON.COMPLEMENTARY && column.sort === TABLE_SORT.DESC,
+          })}
+        >
+          <BiCaretDown />
+        </div>
+      </div>
+      <div className="flex-1 min-w-0 font-bold">{column.name}</div>
+    </div>
   );
 };
 
@@ -284,20 +284,37 @@ const Cell: React.FC<{ on: On; column: Column; value: Value }> = ({
   column,
   value,
 }) => {
-  // TODO: typeofして最適な見せ方に。
+  const formattedValue = function (column: Column, value: Value) {
+    switch (column.schema.type) {
+      case 'string':
+        if (column.schema.format === ('date' || 'date-time')) {
+          const date = new Date(value);
+          const intlDate = new Intl.DateTimeFormat([], {
+            dateStyle: 'medium',
+            timeStyle: 'medium',
+          }).format(date);
+          return intlDate;
+        }
+        return JSON.stringify(value);
+      case 'number' || 'integer':
+        return value.toLocaleString();
+      default:
+        return JSON.stringify(value);
+    }
+  };
   return (
     <>
+      <div
+        className={classnames('text-xxs whitespace-nowrap', {
+          'text-on-background-slight': on === ON.BACKGROUND,
+          'text-on-surface-slight': on === ON.SURFACE,
+          'text-on-primary-slight': on === ON.PRIMARY,
+          'text-on-complementary-slight': on === ON.COMPLEMENTARY,
+        })}
+      >
+        [{column.schema.type}]
+      </div>
       <div className="whitespace-nowrap">
-        <div
-          className={classnames('text-xxs', {
-            'text-on-background-slight': on === ON.BACKGROUND,
-            'text-on-surface-slight': on === ON.SURFACE,
-            'text-on-primary-slight': on === ON.PRIMARY,
-            'text-on-complementary-slight': on === ON.COMPLEMENTARY,
-          })}
-        >
-          [{column.type}]
-        </div>
         <div
           className={classnames('text-sm', {
             'text-on-background': on === ON.BACKGROUND,
@@ -306,7 +323,7 @@ const Cell: React.FC<{ on: On; column: Column; value: Value }> = ({
             'text-on-complementary': on === ON.COMPLEMENTARY,
           })}
         >
-          {JSON.stringify(value)}
+          {formattedValue(column, value)}
         </div>
       </div>
     </>
