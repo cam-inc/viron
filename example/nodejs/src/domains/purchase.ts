@@ -1,4 +1,8 @@
-import { ListWithPager } from '@viron/lib';
+import {
+  ListWithPager,
+  TABLE_SORT_DELIMITER,
+  TABLE_SORT_ORDER,
+} from '@viron/lib';
 import { FindConditions, getPurchaseRepository } from '../repositories';
 
 export interface Purchase {
@@ -36,7 +40,7 @@ export const list = async (
   conditions?: FindConditions<Purchase>,
   size?: number,
   page?: number,
-  sort?: string[]
+  sort = [`createdAt${TABLE_SORT_DELIMITER}${TABLE_SORT_ORDER.DESC}`]
 ): Promise<ListWithPager<PurchaseView>> => {
   const repository = getPurchaseRepository();
   const result = await repository.findWithPager(conditions, size, page, sort);

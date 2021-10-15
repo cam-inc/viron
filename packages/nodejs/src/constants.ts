@@ -165,6 +165,12 @@ export type XPageContentType =
   typeof X_PAGE_CONTENT_TYPE[keyof typeof X_PAGE_CONTENT_TYPE];
 
 export const TABLE_SORT_DELIMITER = ':';
+export const TABLE_SORT_ORDER = {
+  ASC: 'asc',
+  DESC: 'desc',
+} as const;
+export type TableSortOrder =
+  typeof TABLE_SORT_ORDER[keyof typeof TABLE_SORT_ORDER];
 
 export const ADMIN_USER_ID_ME = 'me';
 

@@ -43,8 +43,8 @@ export const oasPath = (name: string): string =>
   path.resolve(__dirname, '..', 'openapi', `${name}.yaml`);
 
 const routes: Route[] = [
-  { name: 'media', oasPath: oasPath('medias'), handlers: routeMedias },
   { name: 'ping', oasPath: oasPath('ping'), handlers: routesPing },
+  { name: 'users', oasPath: oasPath('users'), handlers: routesUsers },
   {
     name: 'purchases',
     oasPath: oasPath('purchases'),
@@ -55,8 +55,8 @@ const routes: Route[] = [
     oasPath: oasPath('resources'),
     handlers: routesResources,
   },
-  { name: 'users', oasPath: oasPath('users'), handlers: routesUsers },
   { name: 'articles', oasPath: oasPath('articles'), handlers: routesArticles },
+  { name: 'media', oasPath: oasPath('medias'), handlers: routeMedias },
   {
     name: 'adminaccounts',
     oasPath: domainsOas.getPath('adminaccounts'),

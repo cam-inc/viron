@@ -1,4 +1,9 @@
-import { AUTH_TYPE, AuthType } from '../constants';
+import {
+  AUTH_TYPE,
+  AuthType,
+  TABLE_SORT_DELIMITER,
+  TABLE_SORT_ORDER,
+} from '../constants';
 import { ListWithPager, genPasswordHash } from '../helpers';
 import { FindConditions, repositoryContainer } from '../repositories';
 import { adminUserNotFound } from '../errors';
@@ -132,7 +137,7 @@ export const list = async (
   conditions: FindConditions<AdminUser> & { roleId?: string } = {},
   size?: number,
   page?: number,
-  sort?: string[]
+  sort = [`createdAt${TABLE_SORT_DELIMITER}${TABLE_SORT_ORDER.DESC}`]
 ): Promise<ListWithPager<AdminUserView>> => {
   const repository = repositoryContainer.getAdminUserRepository();
   if (conditions.roleId) {
