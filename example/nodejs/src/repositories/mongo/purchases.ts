@@ -14,7 +14,7 @@ import {
 import {
   PurchaseModel,
   PurchaseDocument,
-} from '../../stores/definitions/mongo/purchases';
+} from '../../infrastructures/mongo/models/purchases';
 import { ctx } from '../../context';
 
 const getModel = (): PurchaseModel =>

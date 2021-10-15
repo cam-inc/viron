@@ -3,9 +3,10 @@ import { ConnectOptions as MongoConnectOptions } from 'mongoose';
 import { Options as MysqlConnectOptions } from 'sequelize';
 import { domainsAuth, domainsOas } from '@viron/lib';
 import { Mode, ServiceEnv, SERVICE_ENV, StoreType } from '../constants';
-import { openUri } from '../stores/connection/mongo';
+import { openUri } from '../infrastructures/mongo/connection';
 import { get as getDevelopment } from './development';
 import { get as getLocal } from './local';
+import { get as getProduction } from './production';
 
 export interface MongoConfig extends StoreConfig {
   openUri: openUri;
@@ -61,9 +62,9 @@ export const get = (mode: Mode, serviceEnv: ServiceEnv): Config => {
     case SERVICE_ENV.DEVELOPMENT:
       ret = getDevelopment();
       break;
-    //case SERVICE_ENV.PRODUCTION:
-    //  ret = getProduction(mode);
-    //  break;
+    case SERVICE_ENV.PRODUCTION:
+      ret = getProduction();
+      break;
     default:
       ret = getLocal(mode);
       break;

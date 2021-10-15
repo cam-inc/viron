@@ -1,5 +1,5 @@
 import { Connection, FilterQuery, QueryOptions } from 'mongoose';
-import { storeDefinitions } from '../../stores';
+import { mongo } from '../../infrastructures';
 import { domainsAuth } from '../../domains';
 import { repositoryContainer } from '..';
 import {
@@ -10,15 +10,15 @@ import {
   normalizeMongoFilterQuery,
 } from '../../helpers';
 
-const getModel = (): storeDefinitions.mongo.revokedTokens.RevokedTokenModel => {
+const getModel = (): mongo.models.revokedTokens.RevokedTokenModel => {
   const conn = repositoryContainer.conn as Connection;
   return conn.models
-    .revokedtokens as storeDefinitions.mongo.revokedTokens.RevokedTokenModel;
+    .revokedtokens as mongo.models.revokedTokens.RevokedTokenModel;
 };
 
 const convertConditions = (
-  conditions: FilterQuery<storeDefinitions.mongo.revokedTokens.RevokedTokenDocument>
-): FilterQuery<storeDefinitions.mongo.revokedTokens.RevokedTokenDocument> => {
+  conditions: FilterQuery<mongo.models.revokedTokens.RevokedTokenDocument>
+): FilterQuery<mongo.models.revokedTokens.RevokedTokenDocument> => {
   if (conditions.id) {
     conditions._id = conditions.id;
     delete conditions.id;
@@ -35,7 +35,7 @@ export const findOneById = async (
 };
 
 export const find = async (
-  conditions: FilterQuery<storeDefinitions.mongo.revokedTokens.RevokedTokenDocument> = {},
+  conditions: FilterQuery<mongo.models.revokedTokens.RevokedTokenDocument> = {},
   sort: string[] | null = null,
   options?: QueryOptions
 ): Promise<domainsAuth.RevokedToken[]> => {
@@ -51,7 +51,7 @@ export const find = async (
 };
 
 export const findWithPager = async (
-  conditions: FilterQuery<storeDefinitions.mongo.revokedTokens.RevokedTokenDocument> = {},
+  conditions: FilterQuery<mongo.models.revokedTokens.RevokedTokenDocument> = {},
   size?: number,
   page?: number,
   sort: string[] | null = null
@@ -68,7 +68,7 @@ export const findWithPager = async (
 };
 
 export const findOne = async (
-  conditions: FilterQuery<storeDefinitions.mongo.revokedTokens.RevokedTokenDocument> = {}
+  conditions: FilterQuery<mongo.models.revokedTokens.RevokedTokenDocument> = {}
 ): Promise<domainsAuth.RevokedToken | null> => {
   const model = getModel();
   const doc = await model.findOne(
@@ -78,7 +78,7 @@ export const findOne = async (
 };
 
 export const count = async (
-  conditions: FilterQuery<storeDefinitions.mongo.revokedTokens.RevokedTokenDocument> = {}
+  conditions: FilterQuery<mongo.models.revokedTokens.RevokedTokenDocument> = {}
 ): Promise<number> => {
   const model = getModel();
   return await model.countDocuments(

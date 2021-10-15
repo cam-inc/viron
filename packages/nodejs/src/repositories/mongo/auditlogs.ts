@@ -1,5 +1,5 @@
 import { Connection, FilterQuery, QueryOptions } from 'mongoose';
-import { storeDefinitions } from '../../stores';
+import { mongo } from '../../infrastructures';
 import { domainsAuditLog } from '../../domains';
 import { repositoryContainer } from '..';
 import {
@@ -10,15 +10,14 @@ import {
   normalizeMongoFilterQuery,
 } from '../../helpers';
 
-const getModel = (): storeDefinitions.mongo.auditLogs.AuditLogModel => {
+const getModel = (): mongo.models.auditLogs.AuditLogModel => {
   const conn = repositoryContainer.conn as Connection;
-  return conn.models
-    .auditlogs as storeDefinitions.mongo.auditLogs.AuditLogModel;
+  return conn.models.auditlogs as mongo.models.auditLogs.AuditLogModel;
 };
 
 const convertConditions = (
-  conditions: FilterQuery<storeDefinitions.mongo.auditLogs.AuditLogDocument>
-): FilterQuery<storeDefinitions.mongo.auditLogs.AuditLogDocument> => {
+  conditions: FilterQuery<mongo.models.auditLogs.AuditLogDocument>
+): FilterQuery<mongo.models.auditLogs.AuditLogDocument> => {
   if (conditions.id) {
     conditions._id = conditions.id;
     delete conditions.id;
@@ -35,7 +34,7 @@ export const findOneById = async (
 };
 
 export const find = async (
-  conditions: FilterQuery<storeDefinitions.mongo.auditLogs.AuditLogDocument> = {},
+  conditions: FilterQuery<mongo.models.auditLogs.AuditLogDocument> = {},
   sort: string[] | null = null,
   options?: QueryOptions
 ): Promise<domainsAuditLog.AuditLog[]> => {
@@ -51,7 +50,7 @@ export const find = async (
 };
 
 export const findWithPager = async (
-  conditions: FilterQuery<storeDefinitions.mongo.auditLogs.AuditLogDocument> = {},
+  conditions: FilterQuery<mongo.models.auditLogs.AuditLogDocument> = {},
   size?: number,
   page?: number,
   sort: string[] | null = null
@@ -68,7 +67,7 @@ export const findWithPager = async (
 };
 
 export const count = async (
-  conditions: FilterQuery<storeDefinitions.mongo.auditLogs.AuditLogDocument> = {}
+  conditions: FilterQuery<mongo.models.auditLogs.AuditLogDocument> = {}
 ): Promise<number> => {
   const model = getModel();
   return await model.countDocuments(

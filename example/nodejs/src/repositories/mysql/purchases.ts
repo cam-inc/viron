@@ -12,7 +12,7 @@ import {
   PurchaseCreateAttributes,
   PurchaseUpdateAttributes,
 } from '../../domains/purchase';
-import { PurchaseModelCtor } from '../../stores/definitions/mysql/purchases';
+import { PurchaseModelCtor } from '../../infrastructures/mysql/models/purchases';
 
 const getModel = (): PurchaseModelCtor =>
   ctx.stores.main.models.purchases as PurchaseModelCtor;

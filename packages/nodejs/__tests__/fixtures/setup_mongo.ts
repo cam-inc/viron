@@ -3,7 +3,7 @@ import {
   adminUsers,
   auditLogs,
   revokedTokens,
-} from '../../src/stores/definitions/mongo';
+} from '../../src/infrastructures/mongo/models';
 
 export async function setupMongo(): Promise<Connection> {
   //mongoose.set('debug', true);

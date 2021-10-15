@@ -10,7 +10,7 @@ import { Media, MediaCreateAttributes } from '../../domains/media';
 import {
   MediaModel,
   MediaDocument,
-} from '../../stores/definitions/mongo/medias';
+} from '../../infrastructures/mongo/models/medias';
 import { ctx } from '../../context';
 
 const getModel = (): MediaModel => ctx.stores.main.models.medias as MediaModel;

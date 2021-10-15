@@ -1,20 +1,20 @@
 import { Connection, Model } from 'mongoose';
-import { storeDefinitions } from '@viron/lib';
+import { mongo } from '@viron/lib';
 import * as users from './users';
 import * as purchases from './purchases';
 import * as articles from './articles';
 import * as medias from './medias';
 
-const { adminUsers, auditLogs, revokedTokens } = storeDefinitions.mongo;
+const { adminUsers, auditLogs, revokedTokens } = mongo.models;
 
 export interface MongoModels {
   [users.name]: Model<users.UserDocument>;
   [purchases.name]: Model<purchases.PurchaseDocument>;
   [articles.name]: Model<articles.ArticleDocument>;
   [medias.name]: Model<medias.MediaDocument>;
-  [adminUsers.name]: Model<storeDefinitions.mongo.adminUsers.AdminUserDocument>;
-  [auditLogs.name]: Model<storeDefinitions.mongo.auditLogs.AuditLogDocument>;
-  [revokedTokens.name]: Model<storeDefinitions.mongo.revokedTokens.RevokedTokenDocument>;
+  [adminUsers.name]: Model<mongo.models.adminUsers.AdminUserDocument>;
+  [auditLogs.name]: Model<mongo.models.auditLogs.AuditLogDocument>;
+  [revokedTokens.name]: Model<mongo.models.revokedTokens.RevokedTokenDocument>;
 }
 
 // Get models

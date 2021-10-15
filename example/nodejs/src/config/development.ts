@@ -53,8 +53,8 @@ export const get = (): Config => {
         accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID ?? '',
         secretAccessKey: process.env.AWS_S3_SECRET_KEY ?? '',
         region: 'ap-northeast-1',
-        bucketName: 'local-media.viron.work',
-        mediaDomain: 'local-media.viron.work',
+        bucketName: 'media.viron.work',
+        mediaDomain: 'media.viron.work',
       },
     },
     oas: {

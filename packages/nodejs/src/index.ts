@@ -1,4 +1,4 @@
-export * from './stores';
+export * from './infrastructures';
 export * from './domains';
 export * from './constants';
 export * from './repositories';

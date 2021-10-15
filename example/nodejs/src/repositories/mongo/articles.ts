@@ -14,7 +14,7 @@ import {
 import {
   ArticleModel,
   ArticleDocument,
-} from '../../stores/definitions/mongo/articles';
+} from '../../infrastructures/mongo/models/articles';
 import { ctx } from '../../context';
 
 const getModel = (): ArticleModel =>

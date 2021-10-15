@@ -1,34 +1,34 @@
-import * as mongoose from 'mongoose';
+import { Document, Model, Schema, SchemaDefinition } from 'mongoose';
 import { User } from '../../../domains/user';
 
 export const name = 'users';
 
-const schemaDefinition: mongoose.SchemaDefinition = {
+const schemaDefinition: SchemaDefinition = {
   name: {
-    type: mongoose.Schema.Types.String,
+    type: Schema.Types.String,
     required: true,
   },
   nickName: {
-    type: mongoose.Schema.Types.String,
+    type: Schema.Types.String,
     required: true,
   },
   createdAt: {
-    type: mongoose.Schema.Types.Number,
+    type: Schema.Types.Number,
     get: (createdAt: number) => new Date(createdAt * 1000),
   },
   updatedAt: {
-    type: mongoose.Schema.Types.Number,
+    type: Schema.Types.Number,
     get: (updatedAt: number) => new Date(updatedAt * 1000),
   },
 };
 
-export interface UserDocument extends User, mongoose.Document {
-  id: string; // mongoose.Docmentのidがanyなので上書き
+export interface UserDocument extends User, Document {
+  id: string; // Docmentのidがanyなので上書き
 }
 
-export type UserModel = mongoose.Model<UserDocument>;
+export type UserModel = Model<UserDocument>;
 
-export const schema = new mongoose.Schema<UserDocument>(schemaDefinition, {
+export const schema = new Schema<UserDocument>(schemaDefinition, {
   autoIndex: true,
   collection: name,
   strict: true,

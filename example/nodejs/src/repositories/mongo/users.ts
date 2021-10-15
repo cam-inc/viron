@@ -11,7 +11,10 @@ import {
   UserCreateAttributes,
   UserUpdateAttributes,
 } from '../../domains/user';
-import { UserModel, UserDocument } from '../../stores/definitions/mongo/users';
+import {
+  UserModel,
+  UserDocument,
+} from '../../infrastructures/mongo/models/users';
 import { ctx } from '../../context';
 
 const getModel = (): UserModel => ctx.stores.main.models.users as UserModel;

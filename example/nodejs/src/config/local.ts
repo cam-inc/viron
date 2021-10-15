@@ -53,7 +53,6 @@ export const get = (mode: Mode): Config => {
       },
       googleOAuth2: {
         clientId: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? '',
-
         clientSecret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET ?? '',
         additionalScopes: [],
         userHostedDomains: ['cam-inc.co.jp', 'cyberagent.co.jp'],

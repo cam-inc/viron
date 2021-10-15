@@ -1,20 +1,20 @@
 import { Sequelize } from 'sequelize';
-import { storeDefinitions } from '@viron/lib';
+import { mysql } from '@viron/lib';
 import * as users from './users';
 import * as purchases from './purchases';
 import * as articles from './articles';
 import * as medias from './medias';
 
-const { adminUsers, auditLogs, revokedTokens } = storeDefinitions.mysql;
+const { adminUsers, auditLogs, revokedTokens } = mysql.models;
 
 export interface MysqlModels {
   [users.name]: users.UserModelCtor;
   [purchases.name]: purchases.PurchaseModelCtor;
   [articles.name]: articles.ArticleModelCtor;
   [medias.name]: medias.MediaModelCtor;
-  [adminUsers.name]: storeDefinitions.mysql.adminUsers.AdminUserModelCtor;
-  [auditLogs.name]: storeDefinitions.mysql.auditLogs.AuditLogModelCtor;
-  [revokedTokens.name]: storeDefinitions.mysql.revokedTokens.RevokedTokenModelCtor;
+  [adminUsers.name]: mysql.models.adminUsers.AdminUserModelCtor;
+  [auditLogs.name]: mysql.models.auditLogs.AuditLogModelCtor;
+  [revokedTokens.name]: mysql.models.revokedTokens.RevokedTokenModelCtor;
 }
 
 // Get models
