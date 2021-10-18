@@ -5,7 +5,7 @@ import React from 'react';
 import CommonMark from '$components/commonMark';
 import ExternalDocs from '$components/externalDocs';
 import Server from '$components/server';
-import { On, ON } from '$constants/index';
+import { On } from '$constants/index';
 import { ClassName } from '$types/index';
 import { Document, Operation } from '$types/oas';
 
@@ -17,14 +17,7 @@ type Props = {
 };
 const _Operation: React.FC<Props> = ({ on, operation, className = '' }) => {
   return (
-    <div
-      className={classnames('', className, {
-        'text-on-background': on === ON.BACKGROUND,
-        'text-on-surface': on === ON.SURFACE,
-        'text-on-primary': on === ON.PRIMARY,
-        'text-on-complementary': on === ON.COMPLEMENTARY,
-      })}
-    >
+    <div className={classnames('', `text-on-${on}`, className)}>
       <div className="flex flex-col gap-1">
         {operation.deprecated && (
           <div className="flex">
@@ -53,16 +46,7 @@ const _Operation: React.FC<Props> = ({ on, operation, className = '' }) => {
                   <div
                     className={classnames(
                       'flex items-center gap-1 px-1 border rounded',
-                      {
-                        'text-on-background-low border-on-background-low':
-                          on === ON.BACKGROUND,
-                        'text-on-surface-low border-on-surface-low':
-                          on === ON.SURFACE,
-                        'text-on-primary-low border-on-primary-low':
-                          on === ON.PRIMARY,
-                        'text-on-complementary-low border-on-complementary-low':
-                          on === ON.COMPLEMENTARY,
-                      }
+                      `text-on-${on}-low border-on-${on}-low`
                     )}
                   >
                     <BiPurchaseTagAlt />

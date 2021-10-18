@@ -3,7 +3,6 @@ import { BiCaretRightSquare } from '@react-icons/all-files/bi/BiCaretRightSquare
 import classnames from 'classnames';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { On, ON } from '$constants/index';
 import Button, {
   SIZE as BUTTON_SIZE,
   VARIANT as BUTTON_VARIANT,
@@ -11,6 +10,7 @@ import Button, {
 import Operation from '$components/operation';
 import Schema from '$components/schema';
 import { useEliminate } from '$components/schema/hooks/index';
+import { On, ON } from '$constants/index';
 import { ClassName, Endpoint } from '$types/index';
 import {
   Document,
@@ -81,32 +81,22 @@ const _Request: React.FC<Props> = ({
         {/* Custom Head */}
         {renderHead && (
           <div
-            className={classnames('flex-none p-2 border-b-2', {
-              'border-on-background-faint': on === ON.BACKGROUND,
-              'border-on-surface-faint': on === ON.SURFACE,
-              'border-on-primary-faint': on === ON.PRIMARY,
-              'border-on-complementary-faint': on === ON.COMPLEMENTARY,
-            })}
+            className={classnames(
+              'flex-none p-2 border-b-2',
+              `border-on-${on}-faint`
+            )}
           >
             {renderHead()}
           </div>
         )}
         {/* Common Head */}
         <div
-          className={classnames('flex-none flex gap-2 border-b-2', {
-            'text-on-background border-on-background-faint':
-              on === ON.BACKGROUND,
-            'text-on-surface border-on-surface-faint': on === ON.SURFACE,
-            'text-on-primary border-on-primary-faint': on === ON.PRIMARY,
-            'text-on-complementary border-on-complementary-faint':
-              on === ON.COMPLEMENTARY,
-          })}
+          className={classnames(
+            'flex-none flex gap-2 border-b-2',
+            `text-on-${on} border-on-${on}-faint`
+          )}
         >
-          <div
-            className={classnames('flex-none p-2', {
-              'bg-on-surface-faint': on === ON.SURFACE,
-            })}
-          >
+          <div className={classnames('flex-none p-2', `bg-on-${on}-faint`)}>
             <div className="flex items-center h-[22px]">
               <button
                 type="button"
@@ -128,12 +118,10 @@ const _Request: React.FC<Props> = ({
             </div>
             {isCommonHeadOpened && (
               <div
-                className={classnames('pt-2 mt-2 border-t', {
-                  'border-on-background-faint': on === ON.BACKGROUND,
-                  'border-on-surface-faint': on === ON.SURFACE,
-                  'border-on-primary-faint': on === ON.PRIMARY,
-                  'border-on-complementary-faint': on === ON.COMPLEMENTARY,
-                })}
+                className={classnames(
+                  'pt-2 mt-2 border-t',
+                  `border-on-${on}-faint`
+                )}
               >
                 <Operation
                   on={on}
@@ -218,12 +206,10 @@ const _Request: React.FC<Props> = ({
         </div>
         {/* Tail */}
         <div
-          className={classnames('flex-none p-2 border-t-2', {
-            'border-on-background-faint': on === ON.BACKGROUND,
-            'border-on-surface-faint': on === ON.SURFACE,
-            'border-on-primary-faint': on === ON.PRIMARY,
-            'border-on-complementary-faint': on === ON.COMPLEMENTARY,
-          })}
+          className={classnames(
+            'flex-none p-2 border-t-2',
+            `border-on-${on}-faint`
+          )}
         >
           <Button
             className="w-full"

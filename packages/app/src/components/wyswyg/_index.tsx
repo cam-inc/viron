@@ -1,7 +1,7 @@
 import EditorJS, { EditorConfig, OutputData } from '@editorjs/editorjs';
 import classnames from 'classnames';
 import React, { useEffect, useMemo, useState } from 'react';
-import { On, ON } from '$constants/index';
+import { On } from '$constants/index';
 import { ClassName } from '$types/index';
 
 export type Props = {
@@ -60,16 +60,7 @@ const Wyswyg: React.FC<Props> = ({
   return (
     <div
       id={holder}
-      className={classnames(
-        'border-2',
-        {
-          'border-on-background': on === ON.BACKGROUND,
-          'border-on-surface': on === ON.SURFACE,
-          'border-on-primary': on === ON.PRIMARY,
-          'border-on-complementary': on === ON.COMPLEMENTARY,
-        },
-        className
-      )}
+      className={classnames('border-2', `border-on-${on}`, className)}
     />
   );
 };
