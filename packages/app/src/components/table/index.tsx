@@ -192,26 +192,22 @@ const ThTitle: React.FC<ThTitleProp> = ({ on, column, onClick }) => {
   return (
     <div className="flex items-center" onClick={handleClick}>
       <div className="flex-none mr-1">
-        {column.sort === TABLE_SORT.ASC && (
-          <div className={classnames(`text-on-${on}`)}>
-            <BiCaretUp />
-          </div>
-        )}
-        {column.sort !== TABLE_SORT.ASC && (
-          <div className={classnames(`text-on-${on}-slight`)}>
-            <BiCaretUp />
-          </div>
-        )}
-        {column.sort === TABLE_SORT.DESC && (
-          <div className={classnames(`text-on-${on}`)}>
-            <BiCaretDown />
-          </div>
-        )}
-        {column.sort !== TABLE_SORT.DESC && (
-          <div className={classnames(`text-on-${on}-slight`)}>
-            <BiCaretDown />
-          </div>
-        )}
+        <div
+          className={classnames({
+            [`text-on-${on}`]: column.sort === TABLE_SORT.ASC,
+            [`text-on-${on}-slight`]: column.sort !== TABLE_SORT.ASC,
+          })}
+        >
+          <BiCaretUp />
+        </div>
+        <div
+          className={classnames({
+            [`text-on-${on}`]: column.sort === TABLE_SORT.DESC,
+            [`text-on-${on}-slight`]: column.sort !== TABLE_SORT.DESC,
+          })}
+        >
+          <BiCaretDown />
+        </div>
       </div>
       <div className="flex-1 min-w-0 font-bold">{column.name}</div>
     </div>
