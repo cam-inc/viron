@@ -51,25 +51,12 @@ const Button = function <T = null>({
     },
     [data, onClick]
   );
-  function styles(on: On, variant: Variant) {
-    switch (variant) {
-      case 'paper':
-        return `bg-on-${on}-faint text-on-${on} hover:bg-on-${on}-slight hover:text-on-${on}-high focus:ring-on-${on}-high focus:bg-on-${on}-slight focus:text-on-${on}-high active:bg-on-${on}-slight active:text-on-${on}-high`;
-      case 'text':
-        return `text-on-${on} hover:text-on-${on}-high hover:bg-on-${on}-faint focus:ring-on-${on} focus:text-on-${on}-high focus:bg-on-${on}-faint active:text-on-${on}-high active:bg-on-${on}-faint`;
-      case 'ghost':
-        return `border border-on-${on}-slight text-on-${on} hover:border-on-${on} hover:text-on-${on}-high focus:ring-on-${on} focus:border-on-${on} focus:text-on-${on}-high active:border-on-${on} active:text-on-${on}-high`;
-      default:
-        return '';
-    }
-  }
   return (
     <button
       type={type}
       disabled={disabled}
       className={classnames(
         'p-2 flex gap-1 items-center rounded focus:outline-none focus:ring-2',
-        styles(on, variant),
         className,
         {
           // Common
@@ -80,6 +67,12 @@ const Button = function <T = null>({
           'text-lg': size === SIZE.LG,
           'text-xl': size === SIZE.XL,
           'text-2xl': size === SIZE['2XL'],
+          [`bg-on-${on}-faint text-on-${on} hover:bg-on-${on}-slight hover:text-on-${on}-high focus:ring-on-${on}-high focus:bg-on-${on}-slight focus:text-on-${on}-high active:bg-on-${on}-slight active:text-on-${on}-high`]:
+            variant === 'paper',
+          [`text-on-${on} hover:text-on-${on}-high hover:bg-on-${on}-faint focus:ring-on-${on} focus:text-on-${on}-high focus:bg-on-${on}-faint active:text-on-${on}-high active:bg-on-${on}-faint`]:
+            variant === 'text',
+          [`border border-on-${on}-slight text-on-${on} hover:border-on-${on} hover:text-on-${on}-high focus:ring-on-${on} focus:border-on-${on} focus:text-on-${on}-high active:border-on-${on} active:text-on-${on}-high`]:
+            variant === 'ghost',
         }
       )}
       onClick={handleClick}

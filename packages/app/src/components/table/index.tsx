@@ -144,23 +144,14 @@ const Tr: React.FC<TrProps> = ({
     [data, onClick]
   );
   return (
-    <>
-      {!isHead ? (
-        <tr
-          className={classnames(
-            'border-b',
-            `border-on-${on}-faint hover:bg-on-${on}-faint`
-          )}
-          onClick={handleClick}
-        >
-          {children}
-        </tr>
-      ) : (
-        <tr className="border-b" onClick={handleClick}>
-          {children}
-        </tr>
-      )}
-    </>
+    <tr
+      className={classnames('border-b', `border-on-${on}-faint`, {
+        [`hover:bg-on-${on}-faint`]: !isHead,
+      })}
+      onClick={handleClick}
+    >
+      {children}
+    </tr>
   );
 };
 
