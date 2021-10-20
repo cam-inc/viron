@@ -196,7 +196,7 @@ const PopoverLg: React.FC<Props> = ({
     function () {
       const space = 8;
       const commonClassName =
-        'p-2 rounded bg-surface-05dp shadow-05dp overflow-scroll overscroll-contain';
+        'p-2 rounded bg-surface-05dp shadow-05dp overflow-auto overscroll-contain';
       switch (placement) {
         case PLACEMENT.TOP_LEFT: {
           return (
