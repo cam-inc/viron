@@ -75,6 +75,23 @@ const PopoverLg: React.FC<Props> = ({
     },
     [targetRef, onRequestClose]
   );
+
+  useEffect(
+    function () {
+      const cleanup = function () {
+        window.removeEventListener('keydown', handler);
+      };
+      const handler = function (e: KeyboardEvent) {
+        if (e.key === 'Escape') {
+          onRequestClose();
+        }
+      };
+      window.addEventListener('keydown', handler);
+      return cleanup;
+    },
+    [onRequestClose]
+  );
+
   useEffect(
     function () {
       onRequestClose();
@@ -341,6 +358,22 @@ const PopoverNotLg: React.FC<Props> = ({
       setIsVisible(isOpened);
     },
     [isOpened]
+  );
+
+  useEffect(
+    function () {
+      const cleanup = function () {
+        window.removeEventListener('keydown', handler);
+      };
+      const handler = function (e: KeyboardEvent) {
+        if (e.key === 'Escape') {
+          onRequestClose();
+        }
+      };
+      window.addEventListener('keydown', handler);
+      return cleanup;
+    },
+    [onRequestClose]
   );
 
   const handleBGClick = useCallback(
