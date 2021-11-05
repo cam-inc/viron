@@ -133,6 +133,9 @@ func Ref(docRoot *openapi3.T, org string, rep string) error {
 			for _, any := range schema.Value.AnyOf {
 				any.Ref = ref(any.Ref, org, rep)
 			}
+			for _, property := range schema.Value.Properties {
+				property.Ref = ref(property.Ref, org, rep)
+			}
 		}
 	}
 	for _, response := range docRoot.Components.Responses {
