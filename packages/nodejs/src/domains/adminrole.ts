@@ -194,7 +194,16 @@ export const hasPermissionByResourceId = async (
   const casbin = repositoryContainer.getCasbin();
   await sync();
   const tasks = permissions.map((permission) =>
-    casbin.enforce(id, resourceId, permission)
+    casbin.enforce(id, resourceId, permission).catch((e) => {
+      debug(
+        'Casbin Enforce failure. id: %s, resourceId: %s, permission: %s, error: %o',
+        id,
+        resourceId,
+        permission,
+        e
+      );
+      return false;
+    })
   );
   for await (const allowed of tasks) {
     if (allowed) {
@@ -210,9 +219,9 @@ export const hasPermissionByResourceId = async (
   return false;
 };
 
-// ユーザーがリソースを操作する権限を持っているかチェック
+// idがAPIをコールする権限を持っているかチェック
 export const hasPermission = async (
-  userId: string,
+  id: string,
   requestUri: string,
   requestMethod: ApiMethod,
   oas: VironOpenAPIObject
@@ -223,7 +232,7 @@ export const hasPermission = async (
     return true;
   }
   return await hasPermissionByResourceId(
-    userId,
+    id,
     resourceId,
     method2Permissions(requestMethod)
   );

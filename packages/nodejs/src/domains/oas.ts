@@ -30,6 +30,7 @@ import { getDebug } from '../logging';
 import { oasValidationFailure } from '../errors';
 import {
   createViewer,
+  hasPermission,
   hasPermissionByResourceId,
   method2Permissions,
 } from './adminrole';
@@ -180,17 +181,64 @@ export const get = async (
     return page.contents.length ? page : null;
   };
 
+  // 権限のないOperationをフィルタする
+  const filterOperation = async (
+    path: string,
+    method: ApiMethod
+  ): Promise<OperationObject | null> => {
+    const pathItem: PathItemObject = clonedApiDefinition.paths[path];
+    const operation = pathItem[method];
+    if (!operation?.operationId) {
+      return operation ?? null;
+    }
+    const tasks = roleIds.map((roleId) =>
+      hasPermission(roleId, path, method, oas)
+    );
+    for await (const hasPermission of tasks) {
+      if (hasPermission) {
+        return operation;
+      }
+    }
+    return null;
+  };
+
+  // pathItemを書き換える
+  const rewritePathItem = async (path: string): Promise<PathsObject | null> => {
+    const pathItem = clonedApiDefinition.paths[path];
+    const newPathItems = await Promise.all(
+      Object.keys(pathItem).map(async (method: string) => {
+        const operation = await filterOperation(path, method as ApiMethod);
+        if (operation) {
+          return { [method]: operation };
+        }
+        return null;
+      })
+    );
+    const newPathItem = Object.assign({}, ...newPathItems);
+    if (Object.keys(newPathItem).length <= 0) {
+      return null;
+    }
+    return { [path]: newPathItem };
+  };
+
   // x-pagesを書き換える
   const pages = await Promise.all(
     (clonedApiDefinition.info[OAS_X_PAGES] ?? []).map(rewritePage)
   );
   clonedApiDefinition.info[OAS_X_PAGES] = pages.filter(Boolean) as OasXPages;
 
+  // pathsを書き換える
+  const paths = await Promise.all(
+    Object.keys(clonedApiDefinition.paths).map(rewritePathItem)
+  );
+  clonedApiDefinition.paths = Object.assign({}, ...paths);
+
   // validation
   const { isValid, errors } = lint(clonedApiDefinition);
   if (!isValid) {
     debug('OAS validation failure. errors:');
     (errors ?? []).forEach((error, i) => debug('%s: %o', i, error));
+    debug('oas: %o', clonedApiDefinition);
     throw oasValidationFailure();
   }
   return clonedApiDefinition;
