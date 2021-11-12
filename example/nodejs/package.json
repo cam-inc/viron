@@ -79,7 +79,7 @@
     "clear": "rm -rf dist",
     "build": "npm run clear && tsc --project tsconfig.production.json && cp -fr src/openapi dist/",
     "start": "node dist/server.js",
-    "test": "jest",
+    "test": "jest -c ./jest.config.ts",
     "test:watch": "jest --watch",
     "coverage": "jest --coverage"
   },
