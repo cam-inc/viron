@@ -97,36 +97,6 @@ func (p *Pager) PaginateMySQL() []qm.QueryMod {
 	return conditions
 }
 
-func PaginateMongo(sort []string, size int, page int) *options.FindOptions {
-	findOptions := options.Find()
-	if len(sort) > 0 {
-		if orderBy := parseSorts(sort).MongoDB(); orderBy != nil {
-			findOptions.SetSort(orderBy)
-		}
-	}
-
-	pager := getPager(size, page)
-	findOptions.SetLimit(int64(pager.Limit))
-	findOptions.SetSkip(int64(pager.Offset))
-
-	return findOptions
-}
-
-func PaginateMySQL(sort []string, size int, page int) []qm.QueryMod {
-	conditions := []qm.QueryMod{}
-	if len(sort) > 0 {
-		if orderBy := parseSorts(sort).SQL(); orderBy != nil {
-			conditions = append(conditions, orderBy)
-		}
-	}
-
-	pager := getPager(size, page)
-
-	conditions = append(conditions, qm.Limit(pager.Limit))
-	conditions = append(conditions, qm.Offset(pager.Offset))
-	return conditions
-}
-
 func getPager(size int, page int) *Pager {
 	if size == 0 {
 		size = constant.DEFAULT_PAGER_SIZE

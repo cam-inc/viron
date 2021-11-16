@@ -80,7 +80,9 @@ func CreateAdminUser(ctx context.Context, payload *AdminUser, authType string) (
 		return nil, errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("adminUser createOne %+v", err))
 	}
 
-	entity.Bind(adminUser)
+	if err := entity.Bind(adminUser); err != nil {
+		return nil, errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("%v", err))
+	}
 
 	payload.ID = adminUser.ID
 	payload.Salt = adminUser.Salt
@@ -194,7 +196,7 @@ func ListAdminUser(ctx context.Context, opts *AdminUserConditions) (*AdminUsersW
 	for _, result := range results {
 		entity := &repositories.AdminUserEntity{}
 		result.Bind(entity)
-		entity.RoleIDs = listRoles(fmt.Sprintf("%d", entity.ID))
+		entity.RoleIDs = listRoles(fmt.Sprintf("%s", entity.ID))
 		adminuser := &AdminUser{
 			ID:        entity.ID,
 			Email:     entity.Email,
