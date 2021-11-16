@@ -1671,27 +1671,3 @@ func Lint(dist interface{}) (*gojsonschema.Result, error) {
 	return sc.Validate(gojsonschema.NewGoLoader(dist))
 
 }
-
-/*
-export type LintReturn = {
-  isValid: boolean;
-  errors: ValidateFunction['errors'];
-};
-export const lint = function(document: object): LintReturn {
-  const ajv = new Ajv({
-    schemaId: 'auto',
-    format: 'full',
-    coerceTypes: true,
-    unknownFormats: 'ignore',
-    //useDefaults: true,
-    nullable: true,
-  });
-  ajv.addMetaSchema(jsonSchemaDraft04);
-  const validate = ajv.compile(schema);
-  const isValid = validate(document);
-  return {
-    isValid: isValid as boolean,
-    errors: validate.errors || []
-  };
-};
-*/

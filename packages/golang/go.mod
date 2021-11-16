@@ -12,6 +12,7 @@ require (
 	github.com/getkin/kin-openapi v0.66.0
 	github.com/go-chi/chi/v5 v5.0.3
 	github.com/go-chi/jwtauth v1.2.0
+	github.com/go-courier/husky v1.7.2 // indirect
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/google/uuid v1.3.0
@@ -20,6 +21,7 @@ require (
 	github.com/lestrrat-go/jwx v1.1.0
 	github.com/soongo/path-to-regexp v1.6.3
 	github.com/spf13/viper v1.8.1
+	github.com/stretchr/testify v1.7.0
 	github.com/volatiletech/null/v8 v8.1.2
 	github.com/volatiletech/randomize v0.0.1
 	//github.com/volatiletech/sqlboiler v3.7.1+incompatible

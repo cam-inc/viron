@@ -3,6 +3,8 @@ package container
 import (
 	"database/sql"
 
+	"github.com/cam-inc/viron/packages/golang/repositories/mock"
+
 	"github.com/cam-inc/viron/packages/golang/repositories/mongo"
 
 	"github.com/cam-inc/viron/packages/golang/repositories"
@@ -33,6 +35,19 @@ func SetUpMySQL(conn *sql.DB) error {
 	repositoriesContainer["revokedtokens"] = revokedtokens.New(conn)
 	// casbin
 
+	return nil
+}
+
+func SetUpMock(m map[string]mock.MockFunc) error {
+	if _, exists := m["adminusers"]; exists {
+		repositoriesContainer["adminusers"] = mock.New(m["adminusers"])
+	}
+	if _, exists := m["auditlogs"]; exists {
+		repositoriesContainer["auditlogs"] = mock.New(m["auditlogs"])
+	}
+	if _, exists := m["revokedtokens"]; exists {
+		repositoriesContainer["revokedtokens"] = mock.New(m["revokedtokens"])
+	}
 	return nil
 }
 
