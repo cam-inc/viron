@@ -5,7 +5,7 @@ import _isNumber from 'mout/lang/isNumber';
 import isString from 'mout/lang/isString';
 import isUndefined from 'mout/lang/isUndefined';
 
-export default function() {
+export default function () {
   const store = this.riotx.get();
 
   // クリップボードコピーをサポートしているか否か。
@@ -44,7 +44,7 @@ export default function() {
     // 文字列を受け取った場合は形式によって返却値が変わる。
     if (isString(value)) {
       // 数字と`-`と`.`のみも文字列に変換する。
-      value = value.replace(/[^-^0-9]/g, '');
+      value = value.replace(/[^-.^0-9]/g, '');
       // 空文字列の場合はnullとして扱う。
       if (!value.length) {
         return null;
