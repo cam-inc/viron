@@ -13,7 +13,7 @@ import {
 } from '../constants';
 import { ListWithPager, paging } from '../helpers';
 import { repositoryContainer } from '../repositories';
-import { getResourceId, VironOpenAPIObject } from './oas';
+import { findOperation, getResourceId, VironOpenAPIObject } from './oas';
 import { getDebug } from '../logging';
 
 const debug = getDebug('domains:adminrole');
@@ -228,8 +228,9 @@ export const hasPermission = async (
 ): Promise<boolean> => {
   const resourceId = getResourceId(requestUri, requestMethod, oas);
   if (!resourceId) {
-    // TODO: セキュリティ的にあまりよくないのであとでなんとかする
-    return true;
+    // リソースに紐づかないAPIはオペレーションがあれば通す
+    const operation = await findOperation(requestUri, requestMethod, oas);
+    return !!operation;
   }
   return await hasPermissionByResourceId(
     id,
@@ -343,3 +344,6 @@ export const createViewer = async (
   await updatePermissionsForRole(ADMIN_ROLE.VIEWER, permissions);
   return true;
 };
+
+export const isApiMethod = (method: string): method is ApiMethod =>
+  Object.values<string>(API_METHOD).includes(method);

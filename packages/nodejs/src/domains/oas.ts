@@ -32,6 +32,7 @@ import {
   createViewer,
   hasPermission,
   hasPermissionByResourceId,
+  isApiMethod,
   method2Permissions,
 } from './adminrole';
 
@@ -204,10 +205,13 @@ export const get = async (
 
   // pathItemを書き換える
   const rewritePathItem = async (path: string): Promise<PathsObject | null> => {
-    const pathItem = clonedApiDefinition.paths[path];
+    const pathItem: PathItemObject = clonedApiDefinition.paths[path];
     const newPathItems = await Promise.all(
       Object.keys(pathItem).map(async (method: string) => {
-        const operation = await filterOperation(path, method as ApiMethod);
+        if (!isApiMethod(method)) {
+          return null;
+        }
+        const operation = await filterOperation(path, method);
         if (operation) {
           return { [method]: operation };
         }
@@ -343,21 +347,24 @@ type OperationIdPathMethodMap = Record<string, PathMethod>;
 let operationIdPathMethodMap: OperationIdPathMethodMap | null;
 const genOperationIdPathMethodMap = (
   oas: VironOpenAPIObject
-): OperationIdPathMethodMap => {
+): OperationIdPathMethodMap | null => {
   const { paths } = oas;
   Object.keys(paths).forEach((path) => {
-    Object.keys(paths[path]).forEach((method) => {
+    Object.keys(paths[path]).forEach((method: string) => {
+      if (!isApiMethod(method)) {
+        return;
+      }
       const operationObject = paths[path][method];
       if (operationObject.operationId) {
         operationIdPathMethodMap = operationIdPathMethodMap ?? {};
         operationIdPathMethodMap[operationObject.operationId] = {
-          path: path,
-          method: method as ApiMethod,
+          path,
+          method,
         };
       }
     });
   });
-  return operationIdPathMethodMap as OperationIdPathMethodMap;
+  return operationIdPathMethodMap;
 };
 
 // operationIdからpathとmethodを逆引き
@@ -366,21 +373,17 @@ const findPathMethodByOperationId = (
   oas: VironOpenAPIObject
 ): PathMethod | null => {
   const map = operationIdPathMethodMap ?? genOperationIdPathMethodMap(oas);
-  return map[operationId] ?? null;
+  return map?.[operationId] ?? null;
 };
 
-// uri,methodをactionsに持つcontentのresourceIdを取得
+// operationIdをactionsに持つcontentのresourceIdを取得
 const findResourceIdByActions = (
-  uri: string,
-  method: ApiMethod,
+  operationId: string,
   oas: VironOpenAPIObject
 ): string | null => {
   const contents = listContentsByOas(oas);
   const content = contents.find((content) =>
-    (content.actions ?? []).find((action) => {
-      const pm = findPathMethodByOperationId(action.operationId, oas);
-      return pm?.method === method && !!match(uri, pm.path);
-    })
+    (content.actions ?? []).find((action) => action.operationId === operationId)
   );
   return content?.resourceId ?? null;
 };
@@ -397,7 +400,11 @@ export const getResourceId = (
 ): string | null => {
   // operationIdからresourceIdを取得できれば終了
   const operationId = findOperationId(uri, method, oas);
-  const resourceId = operationId ? findResourceId(operationId, oas) : null;
+  if (!operationId) {
+    return null;
+  }
+
+  const resourceId = findResourceId(operationId, oas);
   if (resourceId) {
     debug(
       'Hit the passed uri and method. %s:%s, ResourceId: %s',
@@ -436,7 +443,7 @@ export const getResourceId = (
   }
 
   // uriとmethodがどこかのactionsに定義されているかもしれないので探す
-  const actionResourceId = findResourceIdByActions(uri, method, oas);
+  const actionResourceId = findResourceIdByActions(operationId, oas);
   if (actionResourceId) {
     debug(
       'Hit actions uri. %s:%s, ResourceId: %s',

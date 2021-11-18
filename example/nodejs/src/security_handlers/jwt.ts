@@ -11,7 +11,6 @@ import {
   unauthorized,
   HTTP_HEADER,
   VIRON_AUTHCONFIGS_PATH,
-  ApiMethod,
   COOKIE_KEY,
   forbidden,
   AUTH_TYPE,
@@ -47,6 +46,13 @@ export const jwt = async (
   context: ExegesisPluginContext
 ): Promise<AuthenticationResult> => {
   const pContext = context as PluginContext;
+  if (
+    !pContext.req.method ||
+    !domainsAdminRole.isApiMethod(pContext.req.method)
+  ) {
+    return authFailure(unauthorized());
+  }
+
   const token = pContext.req.cookies[COOKIE_KEY.VIRON_AUTHORIZATION];
   const claims = await domainsAuth.verifyJwt(token);
   // exegesisのContext外でも使えるように
@@ -59,7 +65,7 @@ export const jwt = async (
       !(await domainsAdminRole.hasPermission(
         userId,
         pContext.req.path,
-        (pContext.req.method as string).toLowerCase() as ApiMethod,
+        pContext.req.method,
         pContext.req._context.apiDefinition
       ))
     ) {
