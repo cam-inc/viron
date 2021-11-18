@@ -46,10 +46,11 @@ export const jwt = async (
   context: ExegesisPluginContext
 ): Promise<AuthenticationResult> => {
   const pContext = context as PluginContext;
-  if (
-    !pContext.req.method ||
-    !domainsAdminRole.isApiMethod(pContext.req.method)
-  ) {
+  if (!pContext.req.method) {
+    return authFailure(unauthorized());
+  }
+  const method = pContext.req.method.toLowerCase();
+  if (!domainsAdminRole.isApiMethod(method)) {
     return authFailure(unauthorized());
   }
 
@@ -65,7 +66,7 @@ export const jwt = async (
       !(await domainsAdminRole.hasPermission(
         userId,
         pContext.req.path,
-        pContext.req.method,
+        method,
         pContext.req._context.apiDefinition
       ))
     ) {

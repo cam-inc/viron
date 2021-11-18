@@ -242,7 +242,7 @@ export const get = async (
   if (!isValid) {
     debug('OAS validation failure. errors:');
     (errors ?? []).forEach((error, i) => debug('%s: %o', i, error));
-    debug('oas: %o', clonedApiDefinition);
+    debug('oas: %s', JSON.stringify(clonedApiDefinition));
     throw oasValidationFailure();
   }
   return clonedApiDefinition;

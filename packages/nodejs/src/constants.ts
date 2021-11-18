@@ -2,6 +2,7 @@ export const API_METHOD = {
   GET: 'get',
   POST: 'post',
   PUT: 'put',
+  PATCH: 'patch',
   DELETE: 'delete',
 } as const;
 export type ApiMethod = typeof API_METHOD[keyof typeof API_METHOD];
@@ -65,6 +66,7 @@ export const ACCESS_CONTROL_ALLOW_METHODS = [
   'GET',
   'PUT',
   'POST',
+  'PATCH',
   'DELETE',
   'HEAD',
   'OPTIONS',
@@ -87,6 +89,8 @@ export const SIGNOUT_PATH = '/signout';
 export const PERMISSION = {
   READ: 'read',
   WRITE: 'write',
+  ALL: 'all',
+  DELETE: 'delete',
   DENY: 'deny',
 } as const;
 export type Permission = typeof PERMISSION[keyof typeof PERMISSION];
