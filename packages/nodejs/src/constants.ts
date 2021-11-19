@@ -90,7 +90,6 @@ export const PERMISSION = {
   READ: 'read',
   WRITE: 'write',
   ALL: 'all',
-  DELETE: 'delete',
   DENY: 'deny',
 } as const;
 export type Permission = typeof PERMISSION[keyof typeof PERMISSION];
