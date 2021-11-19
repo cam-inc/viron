@@ -126,13 +126,23 @@ describe('domains/oas', () => {
         .withArgs(
           'editor',
           'user',
-          sinon.match([PERMISSION.READ, PERMISSION.WRITE])
+          sinon.match([
+            PERMISSION.READ,
+            PERMISSION.WRITE,
+            PERMISSION.DELETE,
+            PERMISSION.ALL,
+          ])
         )
         .resolves(false)
         .withArgs(
           'editor',
           'blog',
-          sinon.match([PERMISSION.READ, PERMISSION.WRITE])
+          sinon.match([
+            PERMISSION.READ,
+            PERMISSION.WRITE,
+            PERMISSION.DELETE,
+            PERMISSION.ALL,
+          ])
         )
         .resolves(true);
       sandbox
