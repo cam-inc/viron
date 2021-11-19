@@ -33,11 +33,13 @@ const (
 	API_METHOD_GET    = "get"
 	API_METHOD_POST   = "post"
 	API_METHOD_PUT    = "put"
+	API_METHOD_PATCH  = "patch"
 	API_METHOD_DELETE = "delete"
 
 	PERMISSION_READ  = "read"
 	PERMISSION_WRITE = "write"
 	PERMISSION_DENY  = "deny"
+	PERMISSION_ALL   = "all"
 
 	AUTH_CONFIG_PROVIDER_VIRON      = "viron"
 	AUTH_CONFIG_PROVIDER_GOOGLE     = "google"
