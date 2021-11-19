@@ -155,6 +155,8 @@ func MethodNameLower(method string) string {
 		return constant.API_METHOD_POST
 	case constant.API_METHOD_PUT:
 		return constant.API_METHOD_PUT
+	case constant.API_METHOD_PATCH:
+		return constant.API_METHOD_PATCH
 	case constant.API_METHOD_DELETE:
 		return constant.API_METHOD_DELETE
 	}

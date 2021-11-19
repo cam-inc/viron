@@ -67,10 +67,11 @@ var (
 	syncedTime int64
 
 	permissionMap = map[string][]string{
-		constant.API_METHOD_GET:    []string{constant.PERMISSION_READ, constant.PERMISSION_WRITE},
-		constant.API_METHOD_POST:   []string{constant.PERMISSION_WRITE},
-		constant.API_METHOD_PUT:    []string{constant.PERMISSION_WRITE},
-		constant.API_METHOD_DELETE: []string{constant.PERMISSION_WRITE},
+		constant.API_METHOD_GET:    []string{constant.PERMISSION_READ, constant.PERMISSION_WRITE, constant.PERMISSION_ALL},
+		constant.API_METHOD_POST:   []string{constant.PERMISSION_WRITE, constant.PERMISSION_ALL},
+		constant.API_METHOD_PUT:    []string{constant.PERMISSION_WRITE, constant.PERMISSION_ALL},
+		constant.API_METHOD_PATCH:  []string{constant.PERMISSION_WRITE, constant.PERMISSION_ALL},
+		constant.API_METHOD_DELETE: []string{constant.PERMISSION_ALL},
 	}
 
 	log logging.Logger
