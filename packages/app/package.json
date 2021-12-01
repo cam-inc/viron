@@ -5,6 +5,7 @@
     "node": ">=15.13.0",
     "npm": ">=7.9.0"
   },
+  "browserlist": [">5%", "last 2 versions", "not dead"],
   "scripts": {
     "pre-commit": "run-s lint:staged test:static",
     "pre-push": "npm run test:unit",
