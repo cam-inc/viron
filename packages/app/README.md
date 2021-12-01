@@ -54,6 +54,15 @@ As we use Gatsby of version 2, we need to do some tricks to architect a UI tree.
 - ModalWrapper: A parent component of every modal component.
 - Splash: This is a component that is similar to native app's splash UI.
 
+### Environment Variables
+
+We conform with the [Gatsby's direction](https://www.gatsbyjs.com/docs/how-to/local-development/environment-variables/).
+
+### TypeScript
+
+Gatsby supports TypeScript out of the box but does NOT run type checking during build; refer to the [plugin's explanation](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-plugin-typescript) for detail. We adopt the hybrid approach described [here](https://www.typescriptlang.org/docs/handbook/babel-with-typescript.html#babel-for-transpiling-tsc-for-types) to manually execute type checking.
+
+
 ### State Management
 
 We use the [Recoil](https://recoiljs.org/) as a state management library. Belows are some of reasons we chose the Recoil.
