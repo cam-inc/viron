@@ -1,3 +1,7 @@
+require('dotenv').config({
+  path: `.env.${process.env.NODE_ENV}`,
+});
+
 const package = require('./package.json');
 
 // @see: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/

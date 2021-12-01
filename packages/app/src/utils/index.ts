@@ -1,7 +1,6 @@
 import { URL } from '$types/index';
 
-// @ts-ignore
-const nodeEnv: string = __NODE_ENV__;
+const nodeEnv: string = process.env.GATSBY_MODE as string;
 
 export const isProduction: boolean = nodeEnv === 'production';
 

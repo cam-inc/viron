@@ -1,11 +1,5 @@
-exports.onCreateWebpackConfig = ({ actions, plugins }) => {
+exports.onCreateWebpackConfig = ({ actions }) => {
   actions.setWebpackConfig({
-    plugins: [
-      // Just use DefinePlugin. Using .env.* files is too much.
-      plugins.define({
-        __NODE_ENV__: JSON.stringify(process.env.NODE_ENV),
-      }),
-    ],
     resolve: {
       fallback: {
         // Necesary for using Tailwind JIT mode.

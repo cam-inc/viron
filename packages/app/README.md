@@ -4,8 +4,12 @@
 
 ## Development
 
-Run the example API server in the Quick Start section [here](../../example/nodejs/README.md).
-Then run `npm run develop --workspace=@viron/app` in order to access [https://localhost:8000/](https://localhost:8000/).
+1. Follow the section [here](../../README.md#setup) to setup.
+2. Build packages on list below by executing `npm run build --workspace=[package name]`.
+  - @viron/linter
+  - @viron/lib
+3. Run the sample API server in the Quick Start section [here](../../example/nodejs/README.md#quick-start).
+4. Run `npm run develop --workspace=@viron/app` in order to access [https://localhost:8000/](https://localhost:8000/).
 
 ### Basic Commands
 
