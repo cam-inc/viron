@@ -5,7 +5,7 @@ import { useRecoilState } from 'recoil';
 import ErrorBoundary from '$components/errorBoundary';
 import Drawer, { useDrawer } from '$components/drawer';
 import { ON } from '$constants/index';
-import { screenState } from '$store/atoms/app';
+import { useAppScreenGlobalStateValue } from '$store/index';
 
 export type Props = {
   renderAppBar?: (args: {
@@ -79,7 +79,7 @@ const Layout: React.FC<Props> = ({
   }, []);
 
   // Show navigation with drawer depending on screen size.
-  const [screen] = useRecoilState(screenState);
+  const screen = useAppScreenGlobalStateValue();
   const { lg } = screen;
   const drawer = useDrawer({ position: 'left' });
   const openNavigation = useCallback(

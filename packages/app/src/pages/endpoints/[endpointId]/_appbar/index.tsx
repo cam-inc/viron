@@ -5,7 +5,6 @@ import { BiPurchaseTagAlt } from '@react-icons/all-files/bi/BiPurchaseTagAlt';
 import { BiServer } from '@react-icons/all-files/bi/BiServer';
 import { BiSidebar } from '@react-icons/all-files/bi/BiSidebar';
 import React, { useCallback, useMemo } from 'react';
-import { useRecoilState } from 'recoil';
 import Breadcrumb, { Props as BreadcrumbProps } from '$components/breadcrumb';
 import Button, {
   SIZE as BUTTON_SIZE,
@@ -17,7 +16,7 @@ import Logo from '$components/logo';
 import Popover, { usePopover } from '$components/popover';
 import { ON } from '$constants/index';
 import { Props as LayoutProps } from '$layouts/index';
-import { screenState } from '$store/atoms/app';
+import { useAppScreenGlobalStateValue } from '$store/index';
 import { Endpoint } from '$types/index';
 import { Document, Info } from '$types/oas';
 
@@ -33,7 +32,7 @@ const Header: React.FC<Props> = ({
   document,
   page,
 }) => {
-  const [screen] = useRecoilState(screenState);
+  const screen = useAppScreenGlobalStateValue();
   const { lg } = screen;
 
   // Navigation Opener.

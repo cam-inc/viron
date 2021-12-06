@@ -1,31 +1,29 @@
 import { selectorFamily } from 'recoil';
-import { listState } from '$store/atoms/endpoint';
+import { list as endpointListAtom, NAME } from '$store/atoms/endpoint';
 import { Endpoint, EndpointID } from '$types/index';
 
-const name = 'endpointSelector';
+const KEY = {
+  ONE: 'one',
+} as const;
 
 export const oneState = selectorFamily<Endpoint | null, { id: EndpointID }>({
-  key: `${name}.list`,
-  get: function (params: { id: EndpointID }) {
-    return function ({ get }): Endpoint | null {
-      const endpointList = get(listState);
-      return (
-        endpointList.find(function (endpoint) {
-          return endpoint.id === params.id;
-        }) || null
-      );
-    };
-  },
-  set: function (params: { id: EndpointID }) {
-    return function ({ set }, newValue) {
-      return set(listState, function (currVal) {
-        return [...currVal].map(function (endpoint) {
-          if (endpoint.id !== params.id) {
+  key: `${NAME}.${KEY.ONE}`,
+  get:
+    ({ id }) =>
+    ({ get }) => {
+      const endpointList = get(endpointListAtom);
+      return endpointList.find((endpoint) => endpoint.id === id) || null;
+    },
+  set:
+    ({ id }) =>
+    ({ set }, newValue) => {
+      set(endpointListAtom, (currVal) => {
+        return currVal.map((endpoint) => {
+          if (endpoint.id !== id) {
             return endpoint;
           }
           return { ...endpoint, ...newValue };
         });
       });
-    };
-  },
+    },
 });

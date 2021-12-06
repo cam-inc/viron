@@ -1,19 +1,18 @@
 import { BiSidebar } from '@react-icons/all-files/bi/BiSidebar';
 import React, { useCallback } from 'react';
-import { useRecoilState } from 'recoil';
 import Button, {
   SIZE as BUTTON_SIZE,
   VARIANT as BUTTON_VARIANT,
 } from '$components/button';
 import { ON } from '$constants/index';
 import { Props as LayoutProps } from '$layouts/index';
-import { screenState } from '$store/atoms/app';
+import { useAppScreenGlobalStateValue } from '$store/index';
 import Export from '../_export';
 import Import from '../_import';
 
 type Props = Parameters<NonNullable<LayoutProps['renderAppBar']>>[0];
 const Appbar: React.FC<Props> = ({ className = '', openNavigation }) => {
-  const [screen] = useRecoilState(screenState);
+  const screen = useAppScreenGlobalStateValue();
   const { lg } = screen;
 
   const handleNavButtonClick = useCallback(

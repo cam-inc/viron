@@ -7,7 +7,6 @@ import classnames from 'classnames';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { useRecoilState } from 'recoil';
 import Button from '$components/button';
 import Error from '$components/error';
 import Modal, { useModal } from '$components/modal';
@@ -16,8 +15,10 @@ import Popover, { usePopover } from '$components/popover';
 import Spinner from '$components/spinner';
 import { ON, HTTP_STATUS_CODE } from '$constants/index';
 import { BaseError, HTTPUnexpectedError, NetworkError } from '$errors/index';
-import { screenState } from '$store/atoms/app';
-import { listState } from '$store/atoms/endpoint';
+import {
+  useAppScreenGlobalStateValue,
+  useEndpointListGlobalState,
+} from '$store/index';
 import { ClassName, Endpoint } from '$types/index';
 import { promiseErrorHandler } from '$utils/index';
 import Enter from './_enter';
@@ -34,7 +35,7 @@ export type Props = {
 };
 const _Endpoint: React.FC<Props> = ({ endpoint, onRemove, className = '' }) => {
   // Endpoints
-  const [endpoints, setEndpoints] = useRecoilState(listState);
+  const [endpoints, setEndpoints] = useEndpointListGlobalState();
 
   // Menu
   const menuPopover = usePopover<HTMLDivElement>();
@@ -46,7 +47,7 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove, className = '' }) => {
   );
 
   // Sort by Drag and Drop.
-  const [screen] = useRecoilState(screenState);
+  const screen = useAppScreenGlobalStateValue();
   const { lg } = screen;
   const DnDItemType = 'endpoint';
   type DnDItem = {

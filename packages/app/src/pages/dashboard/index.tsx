@@ -2,14 +2,13 @@ import { BiPlusCircle } from '@react-icons/all-files/bi/BiPlusCircle';
 import classnames from 'classnames';
 import { PageProps } from 'gatsby';
 import React, { useCallback } from 'react';
-import { useRecoilState } from 'recoil';
 import Metadata from '$components/metadata';
 import Modal, { useModal } from '$components/modal';
 import Notification, { useNotification } from '$components/notification';
 import useTheme from '$hooks/theme';
 import { useTranslation } from '$i18n/index';
 import Layout, { Props as LayoutProps } from '$layouts/index';
-import { listState as endpointListState } from '$store/atoms/endpoint';
+import { useEndpointListGlobalStateValue } from '$store/index';
 import Add, { Props as AddProps } from './_add/index';
 import Appbar from './_appbar';
 import Endpoint, { Props as EndpointProps } from './_endpoint';
@@ -19,7 +18,7 @@ type Props = PageProps;
 const HomePage: React.FC<Props> = () => {
   useTheme();
 
-  const [endpointList] = useRecoilState(endpointListState);
+  const endpointList = useEndpointListGlobalStateValue();
 
   const renderAppBar = useCallback<NonNullable<LayoutProps['renderAppBar']>>(
     function (args) {

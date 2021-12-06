@@ -2,14 +2,13 @@ import classnames from 'classnames';
 import { navigate, PageProps } from 'gatsby';
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useRecoilState } from 'recoil';
 import Error from '$components/error';
 import Metadata from '$components/metadata';
 import { ON, HTTPStatusCode } from '$constants/index';
 import { BaseError, getHTTPError, NetworkError, OASError } from '$errors/index';
 import useTheme from '$hooks/theme';
 import Layout, { Props as LayoutProps } from '$layouts/index';
-import { listState as endpointListState } from '$store/atoms/endpoint';
+import { useEndpointListGlobalStateSet } from '$store/index';
 import {
   AuthConfigsResponse,
   Endpoint,
@@ -23,7 +22,7 @@ import Navigation from './_parts/_navigation/index';
 type Props = PageProps;
 const EndpointImportPagge: React.FC<Props> = ({ location }) => {
   useTheme();
-  const [, setEndpointList] = useRecoilState(endpointListState);
+  const setEndpointList = useEndpointListGlobalStateSet();
 
   const [error, setError] = useState<BaseError | null>(null);
   const [isPending, setIsPending] = useState<boolean>(true);

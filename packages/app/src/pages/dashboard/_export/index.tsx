@@ -1,19 +1,18 @@
 import { BiShareAlt } from '@react-icons/all-files/bi/BiShareAlt';
 import React from 'react';
-import { useRecoilState } from 'recoil';
 import Button, {
   SIZE as BUTTON_SIZE,
   VARIANT as BUTTON_VARIANT,
 } from '$components/button';
 import { ON } from '$constants/index';
-import { listState as endpointListState } from '$store/atoms/endpoint';
+import { useEndpointListGlobalStateValue } from '$store/index';
 import { ClassName, EndpointForDistribution } from '$types/index';
 
 type Props = {
   className?: ClassName;
 };
 const Export: React.FC<Props> = ({ className = '' }) => {
-  const [endpointList] = useRecoilState(endpointListState);
+  const endpointList = useEndpointListGlobalStateValue();
 
   const handleClick = function () {
     // Omit some data to minimize the json file size.

@@ -2,13 +2,12 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import classnames from 'classnames';
 import React, { useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import { useRecoilState } from 'recoil';
 import * as yup from 'yup';
 import Button from '$components/button';
 import Textinput from '$components/textinput';
 import { ON, HTTP_STATUS_CODE } from '$constants/index';
 import { HTTPUnexpectedError } from '$errors/index';
-import { listState as endpointListState } from '$store/atoms/endpoint';
+import { useEndpointListGlobalState } from '$store/index';
 import {
   AuthConfigsResponse,
   ClassName,
@@ -39,7 +38,7 @@ const Add: React.FC<Props> = ({ onAdd, className = '' }) => {
     useForm<FormData>({
       resolver: yupResolver(schema),
     });
-  const [endpointList, setEndpointList] = useRecoilState(endpointListState);
+  const [endpointList, setEndpointList] = useEndpointListGlobalState();
 
   const addEndpoint = useCallback(
     async function (data: FormData): Promise<void> {

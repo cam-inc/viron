@@ -1,6 +1,5 @@
 import { BiListPlus } from '@react-icons/all-files/bi/BiListPlus';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useRecoilState } from 'recoil';
 import Button, {
   SIZE as BUTTON_SIZE,
   VARIANT as BUTTON_VARIANT,
@@ -15,7 +14,7 @@ import {
   NetworkError,
   OASError,
 } from '$errors/index';
-import { listState as endpointListState } from '$store/atoms/endpoint';
+import { useEndpointListGlobalStateSet } from '$store/index';
 import {
   AuthConfigsResponse,
   ClassName,
@@ -29,7 +28,7 @@ type Props = {
   className?: ClassName;
 };
 const Import: React.FC<Props> = ({ className = '' }) => {
-  const [, setEndpointList] = useRecoilState(endpointListState);
+  const setEndpointList = useEndpointListGlobalStateSet();
   const inputElmRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<BaseError | null>(null);
   const modal = useModal();

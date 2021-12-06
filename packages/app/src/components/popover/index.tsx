@@ -6,9 +6,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useRecoilState } from 'recoil';
 import Portal from '$components/portal';
-import { screenState } from '$store/atoms/app';
+import { useAppScreenGlobalStateValue } from '$store/index';
 import { ID } from '$wrappers/popover';
 
 // Which point of a target element a popover should be placed.
@@ -30,7 +29,7 @@ type Props = {
 };
 
 const Popover: React.FC<Props> = (props) => {
-  const [screen] = useRecoilState(screenState);
+  const screen = useAppScreenGlobalStateValue();
   const { lg } = screen;
   if (lg) {
     return <PopoverLg {...props} />;
@@ -46,7 +45,7 @@ const PopoverLg: React.FC<Props> = ({
   targetRef,
   children,
 }) => {
-  const [screen] = useRecoilState(screenState);
+  const screen = useAppScreenGlobalStateValue();
   const [isVisible, setIsVisible] = useState<boolean>(isOpened);
   useEffect(
     function () {
