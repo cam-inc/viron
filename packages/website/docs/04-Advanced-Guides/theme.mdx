@@ -1,0 +1,77 @@
+---
+title: Theme
+---
+
+# Theme
+
+This function allows you to switch UI color taste between 24 preset patterns. With this function, you will be confident about which one you are editing by separating documents by color depending on, for example, environmental values: local, development, production, etc.
+
+Switching between themes is as easy as writing just a single line of code in a document like shown in the code snippet below:
+
+
+```json {4}
+{
+  openapi: "3.0.2",
+  info: {
+    "x-theme": "red" // Specify a theme name here.
+  }
+}
+```
+
+## Light and Dark Modes
+
+Each theme contains two modes: **light** and **dark**. Viron automatically detects which mode to use by referring to the [prefers-color-scheme CSS media feature](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme) and adjusts colors on the screen to match it. For example, if you choose to use the theme of **red**, your screen will be light-reddish with light mode on and dark-reddish with dark mode on; thus, there are 48 patterns offered in total, 24 multiplied by 2.
+
+Check [this section](./theme#color-system) to see how all the colors in a theme are selected.
+
+## List of All the Themes
+
+Here is a list of all the 24 themes with their name and hue value.
+
+| | name | hue |
+|:-: | :-- | :-- |
+| <Colorchip hue="0" /> | red | 0 |
+| <Colorchip hue="15" /> | ultimate orange | 15 |
+| <Colorchip hue="30" /> | orange juice | 30 |
+| <Colorchip hue="45" /> | amber | 45 |
+| <Colorchip hue="60" /> | yellow | 60 |
+| <Colorchip hue="75" /> | limoncello | 75 |
+| <Colorchip hue="90" /> | radium | 90 |
+| <Colorchip hue="105" /> | harlequin | 105 |
+| <Colorchip hue="120" /> | green | 120 |
+| <Colorchip hue="135" /> | lucent lime | 135 |
+| <Colorchip hue="150" /> | guppie green | 150 |
+| <Colorchip hue="165" /> | minty paradise | 165 |
+| <Colorchip hue="180" /> | aqua | 180 |
+| <Colorchip hue="195" /> | capri | 195 |
+| <Colorchip hue="210" /> | brescian blue | 210 |
+| <Colorchip hue="225" /> | rare blue | 225 |
+| <Colorchip hue="240" /> | blue | 240 |
+| <Colorchip hue="255" /> | electric ultramarine | 255 |
+| <Colorchip hue="270" /> | violent violet | 270 |
+| <Colorchip hue="285" /> | electric purple | 285 |
+| <Colorchip hue="300" /> | magenta | 300 |
+| <Colorchip hue="315" /> | brutal pink | 315 |
+| <Colorchip hue="330" /> | neon rose | 330 |
+| <Colorchip hue="345" /> | electric crimson | 345 |
+
+:::note
+We thank [Color Namer](https://colornamer.robertcooper.me/) for providing us with cool names!
+:::
+
+## Color System
+
+Viron selects colors for each theme by partially following [Google Material Design 3 color system](https://m3.material.io/styles/color/overview), using the theme specified by a user as dynamic color.
+
+TODO: color systemのテーブル。
+
+export const Colorchip = ({ hue }) => {
+  return (
+    <div style={{
+      width: '16px',
+      height: '16px',
+      borderRadius: '4px',
+      backgroundColor: `hsl(${hue} 50% 50%)`
+    }} />
+  );
+};
