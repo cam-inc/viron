@@ -1,10 +1,17 @@
 import { isSSR } from '$utils/index';
 
 export const ON = {
+  PRIMARY: 'primary',
+  PRIMARY_CONTAINER: 'primaryContainer',
+  SECONDARY: 'secondary',
+  SECONDARY_CONTAINER: 'secondaryContainer',
+  TERTIARY: 'tertiary',
+  TERTIARY_CONTAINER: 'tertiaryContainer',
+  ERROR: 'error',
+  ERROR_CONTAINER: 'errorContainer',
   BACKGROUND: 'background',
   SURFACE: 'surface',
-  PRIMARY: 'primary',
-  COMPLEMENTARY: 'complementary',
+  SURFACE_VARIANT: 'surfaceVariant',
 } as const;
 export type On = typeof ON[keyof typeof ON];
 

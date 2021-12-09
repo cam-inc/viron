@@ -55,3 +55,26 @@ export type __AuthConfig = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   defaultRequestBodyValue: any;
 };
+
+// colors
+export type Red = number;
+export type Green = number;
+export type Blue = number;
+export type Alpha = number;
+export type RGB = {
+  r: Red;
+  g: Green;
+  b: Blue;
+};
+export type RGBA = RGB & {
+  a: Alpha;
+};
+export type Hue = number;
+export type Saturation = number;
+export type Lightness = number;
+export type HSL = {
+  h: Hue;
+  s: Saturation;
+  l: Lightness;
+};
+export type Hex = string;

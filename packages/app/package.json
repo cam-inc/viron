@@ -54,6 +54,7 @@
     "babel-jest": "^27.0.6",
     "babel-preset-gatsby": "^1.9.0",
     "classnames": "^2.2.6",
+    "color-blend": "^3.0.1",
     "gatsby": "^4.2.0",
     "gatsby-plugin-alias-imports": "^1.0.5",
     "gatsby-plugin-lodash": "^5.2.0",

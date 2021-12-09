@@ -21,12 +21,12 @@ import {
 } from '$store/index';
 import { ClassName, Endpoint } from '$types/index';
 import { promiseErrorHandler } from '$utils/index';
-import Enter from './_enter';
-import Info from './_info';
-import QRCode from './_qrcode/index';
-import Signin from './_signin';
-import Signout from './_signout';
-import Thumbnail from './_thumbnail';
+import Enter from './enter';
+import Info from './info';
+import QRCode from './qrcode/index';
+import Signin from './signin';
+import Signout from './signout';
+import Thumbnail from './thumbnail';
 
 export type Props = {
   endpoint: Endpoint;

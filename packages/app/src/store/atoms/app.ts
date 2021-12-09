@@ -27,6 +27,7 @@ export const screen = atom<Screen>({
 export const theme = atom<X_Theme>({
   key: `${NAME}.${KEY.THEME}`,
   default: X_THEME.RED,
+  // TODO: 消す
   effects_UNSTABLE: [
     // Keep the stored data and the body element's attribute in sync for css styles to be applied.
     ({ onSet }) => {
@@ -38,6 +39,7 @@ export const theme = atom<X_Theme>({
         if (!bodyElm) {
           return;
         }
+        // TODO: 消す
         bodyElm.dataset.theme = newValue;
       });
     },

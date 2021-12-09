@@ -1,7 +1,6 @@
 import classnames from 'classnames';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useRecoilState } from 'recoil';
 import ErrorBoundary from '$components/errorBoundary';
 import Drawer, { useDrawer } from '$components/drawer';
 import { ON } from '$constants/index';
@@ -99,10 +98,10 @@ const Layout: React.FC<Props> = ({
     <>
       <div
         id="layout-index"
-        className="relative flex flex-col min-h-screen bg-background"
+        className="relative flex flex-col min-h-screen bg-thm-background text-thm-on-background"
       >
         {/* System Bar */}
-        <div className="fixed z-layout-systembar top-0 right-0 left-0 h-[8px] bg-primary-variant shadow-01dp" />
+        <div className="fixed z-layout-systembar top-0 right-0 left-0 h-[8px] bg-thm-secondary text-thm-on-secondary shadow-01dp" />
         {/* region: App Bar */}
         {renderAppBar && (
           <div
@@ -116,7 +115,7 @@ const Layout: React.FC<Props> = ({
           >
             <div
               className={classnames(
-                'h-[64px] bg-primary shadow-01dp transform transition duration-300 ease-out',
+                'h-[64px] bg-thm-primary text-thm-on-primary shadow-01dp transform transition duration-300 ease-out',
                 {
                   'pointer-events-none': !isAppBarOpened,
                   'opacity-0': !isAppBarOpened,
@@ -136,7 +135,7 @@ const Layout: React.FC<Props> = ({
         )}
         {/* region: Navigation */}
         {renderNavigation && lg && (
-          <div className="fixed z-layout-navigation top-[8px] left-0 bottom-0 w-[160px] bg-surface shadow-01dp border-r border-on-surface-faint overflow-y-scroll overscroll-y-contain">
+          <div className="fixed z-layout-navigation top-[8px] left-0 bottom-0 w-[160px] bg-thm-surface text-thm-on-surface shadow-01dp border-r border-thm-on-surface-faint overflow-y-scroll overscroll-y-contain">
             <ErrorBoundary on={ON.SURFACE}>
               {renderNavigation({
                 className: '',
@@ -151,7 +150,7 @@ const Layout: React.FC<Props> = ({
         {renderSubBody && (
           <div
             className={classnames(
-              'fixed z-layout-subbody right-0 bottom-0 h-[50vh] bg-background shadow-01dp border-t-2 border-on-background-faint overflow-y-scroll overscroll-y-contain',
+              'fixed z-layout-subbody right-0 bottom-0 h-[50vh] bg-thm-background text-thm-on-background shadow-01dp border-t-2 border-thm-on-background overflow-y-scroll overscroll-y-contain',
               {
                 'left-[160px]': lg && renderNavigation,
                 'left-0': !(lg && renderNavigation),

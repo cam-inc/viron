@@ -12,6 +12,6 @@ export const list = atom<Endpoint[]>({
   key: `${NAME}.${KEY.LIST}`,
   default: [],
   effects_UNSTABLE: [
-    localStoragePersistence<Endpoint[]>(STORAGE_KEY.ENDPOINT_LIST),
+    localStoragePersistence<Endpoint[]>(STORAGE_KEY.ENDPOINT_LIST, []),
   ],
 });

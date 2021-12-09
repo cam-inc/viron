@@ -19,10 +19,10 @@ const _Navigation: React.FC<Props> = ({ className = '' }) => {
         <div className="flex flex-col gap-2 items-center py-8">
           <Logo
             className="h-12 drop-shadow-01dp"
-            left="text-primary"
-            right="text-primary-variant"
+            left="text-thm-primary"
+            right="text-thm-secondary"
           />
-          <div className="text-on-surface text-xs font-bold text-center">
+          <div className="text-thm-on-surface text-xs font-bold text-center">
             Give OAS, <br />
             Get GUI.
           </div>
@@ -36,13 +36,13 @@ const _Navigation: React.FC<Props> = ({ className = '' }) => {
     function () {
       return (
         <div className="p-2">
-          <div className="flex justify-center py-2 border-t border-dotted border-on-surface-low">
+          <div className="flex justify-center py-2 border-t border-dotted border-thm-on-surface-low">
             <NavigationLinks on={ON.SURFACE} />
           </div>
-          <div className="flex justify-center py-2 border-t border-dotted border-on-surface-low">
+          <div className="flex justify-center py-2 border-t border-dotted border-thm-on-surface-low">
             <NavigationServices on={ON.SURFACE} />
           </div>
-          <div className="flex justify-center py-2 border-t border-dotted border-on-surface-low">
+          <div className="flex justify-center py-2 border-t border-dotted border-thm-on-surface-low">
             <NavigationVersion on={ON.SURFACE} />
           </div>
         </div>

@@ -8,10 +8,7 @@ type Props = {
   on: On;
 };
 const Links: React.FC<Props> = ({ on }) => {
-  const _className = classnames(
-    'hover:underline focus:outline-none focus:ring-2',
-    `text-on-${on} focus:ring-on-${on} active:text-on-${on}-high`
-  );
+  const _className = `text-thm-on-${on} hover:underline focus:outline-none focus:ring-2 focus:ring-them-on-${on} focus:text-on-${on}-high active:text-thm-on-${on}-high`;
 
   return (
     <ul className="flex flex-col gap-2 items-center text-xs">

@@ -7,8 +7,8 @@ import Button, {
 import { ON } from '$constants/index';
 import { Props as LayoutProps } from '$layouts/index';
 import { useAppScreenGlobalStateValue } from '$store/index';
-import Export from '../_export';
-import Import from '../_import';
+import Export from './export/index';
+import Import from './import/index';
 
 type Props = Parameters<NonNullable<LayoutProps['renderAppBar']>>[0];
 const Appbar: React.FC<Props> = ({ className = '', openNavigation }) => {
@@ -39,11 +39,11 @@ const Appbar: React.FC<Props> = ({ className = '', openNavigation }) => {
         </div>
         <div className="flex-1 min-w-0" />
         <div className="flex-none">
-          <ul className="flex text-xs text-on-primary">
-            <li className="flex justify-center items-center mr-2 last:mr-0">
+          <ul className="flex gap-2 text-xs text-thm-on-primary">
+            <li className="flex justify-center items-center">
               <Export />
             </li>
-            <li className="flex justify-center items-center px-2 mr-2 last:mr-0">
+            <li className="flex justify-center items-center px-2">
               <Import />
             </li>
           </ul>

@@ -31,43 +31,28 @@ export const useGlobalStateSet = useSetRecoilState;
  * ```
  */
 // App
-export const useAppIsLaunchedGlobalState = function () {
-  return useGlobalState(appIsLaunchedAtom);
-};
-export const useAppIsLaunchedGlobalStateValue = function () {
-  return useGlobalStateValue(appIsLaunchedAtom);
-};
-export const useAppIsLaunchedGlobalStateSet = function () {
-  return useGlobalStateSet(appIsLaunchedAtom);
-};
+export const useAppIsLaunchedGlobalState = () =>
+  useGlobalState(appIsLaunchedAtom);
+export const useAppIsLaunchedGlobalStateValue = () =>
+  useGlobalStateValue(appIsLaunchedAtom);
+export const useAppIsLaunchedGlobalStateSet = () =>
+  useGlobalStateSet(appIsLaunchedAtom);
 
-export const useAppScreenGlobalState = function () {
-  return useGlobalState(appScreenAtom);
-};
-export const useAppScreenGlobalStateValue = function () {
-  return useGlobalStateValue(appScreenAtom);
-};
-export const useAppScreenGlobalStateSet = function () {
-  return useGlobalStateSet(appScreenAtom);
-};
+export const useAppScreenGlobalState = () => useGlobalState(appScreenAtom);
+export const useAppScreenGlobalStateValue = () =>
+  useGlobalStateValue(appScreenAtom);
+export const useAppScreenGlobalStateSet = () =>
+  useGlobalStateSet(appScreenAtom);
 
-export const useAppThemeGlobalState = function () {
-  return useGlobalState(appThemeAtom);
-};
-export const useAppThemeGlobalStateValue = function () {
-  return useGlobalStateValue(appThemeAtom);
-};
-export const useAppThemeGlobalStateSet = function () {
-  return useGlobalStateSet(appThemeAtom);
-};
+export const useAppThemeGlobalState = () => useGlobalState(appThemeAtom);
+export const useAppThemeGlobalStateValue = () =>
+  useGlobalStateValue(appThemeAtom);
+export const useAppThemeGlobalStateSet = () => useGlobalStateSet(appThemeAtom);
 
 // Endpoint
-export const useEndpointListGlobalState = function () {
-  return useGlobalState(endpointListAtom);
-};
-export const useEndpointListGlobalStateValue = function () {
-  return useGlobalStateValue(endpointListAtom);
-};
-export const useEndpointListGlobalStateSet = function () {
-  return useGlobalStateSet(endpointListAtom);
-};
+export const useEndpointListGlobalState = () =>
+  useGlobalState(endpointListAtom);
+export const useEndpointListGlobalStateValue = () =>
+  useGlobalStateValue(endpointListAtom);
+export const useEndpointListGlobalStateSet = () =>
+  useGlobalStateSet(endpointListAtom);

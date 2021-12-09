@@ -1,7 +1,7 @@
 import classnames from 'classnames';
 import { PluginOptions } from 'gatsby';
 import _ from 'lodash';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { HelmetProvider } from 'react-helmet-async';
@@ -17,9 +17,11 @@ import {
   GlobalStateProvider,
   useAppIsLaunchedGlobalState,
   useAppScreenGlobalStateSet,
+  useAppThemeGlobalStateValue,
 } from '$store/index';
 import '$styles/global.css';
 import { ClassName } from '$types/index';
+import { getCustomProperties } from '$utils/colorSystem';
 import DrawerWrapper from '$wrappers/drawer';
 import ModalWrapper from '$wrappers/modal';
 import NotificationWrapper from '$wrappers/notification';
@@ -54,31 +56,36 @@ export default RootWrapper;
 // the name doesn't matter. It's just a local component.
 const Root: React.FC<Props> = ({ children }) => {
   // Entry point.
-  const { launch, isLaunched } = useRoot();
+  const { launch, isLaunched, style } = useRoot();
   useEffect(() => {
     launch();
   }, []);
 
   return (
-    <div id="root" className="relative font-mono">
-      <div className="min-h-screen">{children}</div>
-      <DrawerWrapper className="fixed inset-0 z-wrapper-drawer" />
-      <ModalWrapper className="fixed inset-0 z-wrapper-modal" />
-      <PopoverWrapper className="fixed inset-0 z-wrapper-popover" />
-      <NotificationWrapper className="fixed left-0 right-0 bottom-0 pr-4 pb-4 z-wrapper-notification" />
-      <ProgressWrapper className="fixed inset-0 z-wrapper-progress" />
-      <Splash isActive={!isLaunched} className="fixed inset-0 z-splash" />
-    </div>
+    <>
+      {style}
+      <div id="root" className="relative font-mono">
+        <div className="min-h-screen">{children}</div>
+        <DrawerWrapper className="fixed inset-0 z-wrapper-drawer" />
+        <ModalWrapper className="fixed inset-0 z-wrapper-modal" />
+        <PopoverWrapper className="fixed inset-0 z-wrapper-popover" />
+        <NotificationWrapper className="fixed left-0 right-0 bottom-0 pr-4 pb-4 z-wrapper-notification" />
+        <ProgressWrapper className="fixed inset-0 z-wrapper-progress" />
+        <Splash isActive={!isLaunched} className="fixed inset-0 z-splash" />
+      </div>
+    </>
   );
 };
 
 type UseRootReturn = {
   launch: () => Promise<void>;
   isLaunched: boolean;
+  style: JSX.Element;
 };
 const useRoot = function (): UseRootReturn {
   const [isLaunched, setIsLaunched] = useAppIsLaunchedGlobalState();
   const setScreen = useAppScreenGlobalStateSet();
+  const theme = useAppThemeGlobalStateValue();
 
   const launch = useCallback(async () => {
     if (isLaunched) {
@@ -86,6 +93,17 @@ const useRoot = function (): UseRootReturn {
     }
     setIsLaunched(true);
   }, [isLaunched, setIsLaunched]);
+
+  // Watch theme.
+  const style = useMemo(() => {
+    const customProperties = getCustomProperties(theme);
+    let str = 'body{';
+    Object.entries(customProperties).forEach(([key, value]) => {
+      str = `${str}${key}:${value};`;
+    });
+    str = `${str}}`;
+    return <style>{str}</style>;
+  }, [theme]);
 
   // Watch screen size.
   useEffect(() => {
@@ -137,6 +155,7 @@ const useRoot = function (): UseRootReturn {
   return {
     launch,
     isLaunched,
+    style,
   };
 };
 
