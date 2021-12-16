@@ -54,27 +54,27 @@ func (c *AuditLogConditions) ConvertConditionMongoDB() *MongoConditions {
 	}
 
 	if c.RequestMethod != nil {
-		m["requestMethod"] = c.RequestMethod
+		m["requestMethod"] = *c.RequestMethod
 	}
 
 	if c.RequestUri != nil {
-		m["requestUri"] = c.RequestUri
+		m["requestUri"] = *c.RequestUri
 	}
 
 	if c.SourceIp != nil {
-		m["sourceIp"] = c.SourceIp
+		m["sourceIp"] = *c.SourceIp
 	}
 
 	if c.UserID != nil {
-		m["userId"] = c.UserID
+		m["userId"] = *c.UserID
 	}
 
 	if c.RequestBody != nil {
-		m["requestBody"] = c.RequestBody
+		m["requestBody"] = *c.RequestBody
 	}
 
 	if c.StatusCode != nil {
-		m["statusCode"] = c.StatusCode
+		m["statusCode"] = *c.StatusCode
 	}
 
 	conditions.Filter = m

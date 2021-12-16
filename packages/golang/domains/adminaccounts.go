@@ -23,12 +23,6 @@ type (
 		RoleIDs  []string `json:"roleIds"`
 	}
 
-	/*
-		AdminUsersWithPager struct {
-				Pager
-				List []*AdminUser `json:"list"`
-			}
-	*/
 	AdminAccountsWithPager struct {
 		Pager
 		List []*AdminAccount `json:"list"`
