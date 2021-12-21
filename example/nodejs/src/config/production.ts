@@ -26,6 +26,7 @@ export const get = (): Config => {
   const ret: Config = {
     store: {
       main: mongo,
+      vironLib: mongo,
     },
     cors: {
       allowOrigins: ['https://viron.plus', 'https://snapshot.viron.plus'],

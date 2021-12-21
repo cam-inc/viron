@@ -42,6 +42,7 @@ export interface AWSConfig {
 export interface Config {
   store: {
     main: MongoConfig | MysqlConfig;
+    vironLib: MongoConfig | MysqlConfig;
   };
   cors: CorsConfig;
   auth: {

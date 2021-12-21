@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize';
 import { FindOptions, WhereOptions } from 'sequelize/types';
-import { mysql } from '../../infrastructures';
+import { AuditLogModelCtor } from '../../infrastructures/mysql/models/auditlogs';
 import { domainsAuditLog } from '../../domains';
 import { repositoryContainer } from '..';
 import {
@@ -11,9 +11,9 @@ import {
   normalizeMysqlFilterQuery,
 } from '../../helpers';
 
-const getModel = (): mysql.models.auditLogs.AuditLogModelCtor => {
+const getModel = (): AuditLogModelCtor => {
   const conn = repositoryContainer.conn as Sequelize;
-  return conn.models.auditlogs as mysql.models.auditLogs.AuditLogModelCtor;
+  return conn.models.auditlogs as AuditLogModelCtor;
 };
 
 export const findOneById = async (

@@ -77,5 +77,3 @@ npm run docker-compose:up:mongo
 ```
 "example-nodejs:docker-compose:up:mongo": "docker-compose -f ./docker-compose.example-nodejs.mongo.yml up --build --force-recreate"
 ```
-
-TODO

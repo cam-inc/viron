@@ -3,7 +3,7 @@ import { AuditLog } from '../../../domains/auditlog';
 
 export const name = 'auditlogs';
 
-const schemaDefinition: SchemaDefinition = {
+export const schemaDefinition: SchemaDefinition = {
   requestMethod: {
     type: Schema.Types.String,
     required: false,

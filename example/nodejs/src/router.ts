@@ -79,6 +79,9 @@ export async function register(app: Express, routes: Route[]): Promise<void> {
     app.use(middleware);
     apiDefinition = merge(apiDefinition, apiDoc);
   });
+  apiDefinition = domainsOas.dereference(
+    apiDefinition as domainsOas.VironOpenAPIObject
+  );
 
   logger.info('register routes finish. apiDefinition: %o', apiDefinition);
 }

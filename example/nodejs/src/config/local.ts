@@ -37,6 +37,7 @@ export const get = (mode: Mode): Config => {
   const ret: Config = {
     store: {
       main: mode == MODE.MONGO ? mongo : mysql,
+      vironLib: mode == MODE.MONGO ? mongo : mysql,
     },
     cors: {
       allowOrigins: [

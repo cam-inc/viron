@@ -3,7 +3,7 @@ import { AdminUser } from '../../../domains/adminuser';
 
 export const name = 'adminusers';
 
-const schemaDefinition: SchemaDefinition = {
+export const schemaDefinition: SchemaDefinition = {
   email: {
     type: Schema.Types.String,
     required: true,

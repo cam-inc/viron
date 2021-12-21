@@ -1,9 +1,5 @@
 import mongoose, { Connection } from 'mongoose';
-import {
-  adminUsers,
-  auditLogs,
-  revokedTokens,
-} from '../../src/infrastructures/mongo/models';
+import { getModels } from '../../src/infrastructures/mongo/models';
 
 export async function setupMongo(): Promise<Connection> {
   //mongoose.set('debug', true);
@@ -18,9 +14,7 @@ export async function setupMongo(): Promise<Connection> {
     dbName: 'viron_test',
     autoIndex: true,
   });
-  conn.model(adminUsers.name, adminUsers.schema);
-  conn.model(auditLogs.name, auditLogs.schema);
-  conn.model(revokedTokens.name, revokedTokens.schema);
+  getModels(conn);
   return conn;
 }
 

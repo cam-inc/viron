@@ -11,7 +11,7 @@ import {
 } from 'openapi3-ts';
 import jsonSchemaRefParser from '@apidevtools/json-schema-ref-parser';
 import { load } from 'js-yaml';
-import { Match, match as matchPath } from 'path-to-regexp';
+import { match as matchPath } from 'path-to-regexp';
 import copy from 'fast-copy';
 import { lint } from '@viron/linter';
 import {
@@ -85,7 +85,7 @@ export interface OasXPageContent {
   type: XPageContentType;
   operationId: string;
   defaultParametersValue?: OasCustomParameters;
-  defaultRequestBodyValues?: OasCustomRequestBody;
+  defaultRequestBodyValue?: OasCustomRequestBody;
   pagination?: boolean;
   autoRefreshSec?: number;
   actions?: OasXPageContentActions;
@@ -274,10 +274,6 @@ export const loadResolvedOas = async (
 const toExpressStylePath = (path: string): string =>
   path.replace(/{/g, ':').replace(/}/g, '');
 
-// uri(ex.`/users/1`) が oasのpath定義(ex.`/users/{userId}`) にヒットするか
-const match = (uri: string, path: string): Match =>
-  matchPath(toExpressStylePath(path))(uri);
-
 // uriにヒットするpathとpathItemを取得する
 export const getPathItem = (
   uri: string,
@@ -285,12 +281,26 @@ export const getPathItem = (
 ): {
   path: string | null;
   pathItem: PathItemObject | null;
+  params: Record<string, string> | null;
 } => {
   const { paths } = oas;
-  const matchedPath = Object.keys(paths).find((p: string) => !!match(uri, p));
+  let matchObj: { params: Record<string, string> } | undefined;
+  const matchedPath = Object.keys(paths).find((p: string) => {
+    const matcher =
+      typeof paths[p]['x-viron-path-matcher'] === 'function'
+        ? paths[p]['x-viron-path-matcher']
+        : matchPath(toExpressStylePath(p));
+    paths[p]['x-viron-path-matcher'] = matcher; // cache
+    const m = matcher(uri);
+    if (m) {
+      matchObj = m;
+    }
+    return !!m;
+  });
   return {
     path: matchedPath ?? null,
     pathItem: matchedPath ? paths[matchedPath] : null,
+    params: matchObj ? matchObj.params : null,
   };
 };
 
@@ -312,16 +322,20 @@ const findResourceId = (
   return resourceId ?? null;
 };
 
+// oasの$refを解決する
+export const dereference = async (
+  oas: VironOpenAPIObject
+): Promise<VironOpenAPIObject> => {
+  return (await jsonSchemaRefParser.dereference(oas)) as VironOpenAPIObject;
+};
+
 // uri,methodに対応するopeartionを取得
 export const findOperation = async (
   uri: string,
   method: string,
   oas: VironOpenAPIObject
 ): Promise<OperationObject | null> => {
-  const dereferencedOas = (await jsonSchemaRefParser.dereference(
-    oas
-  )) as VironOpenAPIObject;
-  const { pathItem } = getPathItem(uri, dereferencedOas);
+  const { pathItem } = getPathItem(uri, oas);
   return pathItem?.[method.toLocaleLowerCase()] ?? null;
 };
 

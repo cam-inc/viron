@@ -4,7 +4,7 @@ import { REVOKED_TOKEN_RETENTION_SEC } from '../../../constants';
 
 export const name = 'revokedtokens';
 
-const schemaDefinition: SchemaDefinition = {
+export const schemaDefinition: SchemaDefinition = {
   token: {
     type: Schema.Types.String,
     required: true,

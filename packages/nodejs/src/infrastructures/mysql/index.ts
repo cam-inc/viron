@@ -1,1 +1,2 @@
-export * as models from './models';
+export { createConnection } from './connection';
+export { getModels, models, MysqlModels } from './models';

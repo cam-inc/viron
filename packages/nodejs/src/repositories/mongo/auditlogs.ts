@@ -1,5 +1,8 @@
 import { Connection, FilterQuery, QueryOptions } from 'mongoose';
-import { mongo } from '../../infrastructures';
+import {
+  AuditLogDocument,
+  AuditLogModel,
+} from '../../infrastructures/mongo/models/auditlogs';
 import { domainsAuditLog } from '../../domains';
 import { repositoryContainer } from '..';
 import {
@@ -10,14 +13,14 @@ import {
   normalizeMongoFilterQuery,
 } from '../../helpers';
 
-const getModel = (): mongo.models.auditLogs.AuditLogModel => {
+const getModel = (): AuditLogModel => {
   const conn = repositoryContainer.conn as Connection;
-  return conn.models.auditlogs as mongo.models.auditLogs.AuditLogModel;
+  return conn.models.auditlogs as AuditLogModel;
 };
 
 const convertConditions = (
-  conditions: FilterQuery<mongo.models.auditLogs.AuditLogDocument>
-): FilterQuery<mongo.models.auditLogs.AuditLogDocument> => {
+  conditions: FilterQuery<AuditLogDocument>
+): FilterQuery<AuditLogDocument> => {
   if (conditions.id) {
     conditions._id = conditions.id;
     delete conditions.id;
@@ -34,7 +37,7 @@ export const findOneById = async (
 };
 
 export const find = async (
-  conditions: FilterQuery<mongo.models.auditLogs.AuditLogDocument> = {},
+  conditions: FilterQuery<AuditLogDocument> = {},
   sort: string[] | null = null,
   options?: QueryOptions
 ): Promise<domainsAuditLog.AuditLog[]> => {
@@ -50,7 +53,7 @@ export const find = async (
 };
 
 export const findWithPager = async (
-  conditions: FilterQuery<mongo.models.auditLogs.AuditLogDocument> = {},
+  conditions: FilterQuery<AuditLogDocument> = {},
   size?: number,
   page?: number,
   sort: string[] | null = null
@@ -67,7 +70,7 @@ export const findWithPager = async (
 };
 
 export const count = async (
-  conditions: FilterQuery<mongo.models.auditLogs.AuditLogDocument> = {}
+  conditions: FilterQuery<AuditLogDocument> = {}
 ): Promise<number> => {
   const model = getModel();
   return await model.countDocuments(

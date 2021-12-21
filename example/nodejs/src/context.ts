@@ -67,12 +67,12 @@ export class Context {
    * Preflight store
    */
   public async preflightStore(): Promise<void> {
-    const mainConfig = this.config.store.main;
+    const { main: configMain, vironLib: configVironLib } = this.config.store;
 
     switch (this.mode) {
       case MODE.MONGO: {
         // eslint-disable-next-line no-case-declarations
-        const configMongo = mainConfig as MongoConfig;
+        const configMongo = configMain as MongoConfig;
         this.stores = {
           main: await preflightMongo(configMongo),
         };
@@ -83,7 +83,7 @@ export class Context {
       }
       case MODE.MYSQL: {
         // eslint-disable-next-line no-case-declarations
-        const configMysql = mainConfig as MysqlConfig;
+        const configMysql = configMain as MysqlConfig;
         this.stores = {
           main: await preflightMysql(configMysql),
         };
@@ -103,7 +103,7 @@ export class Context {
         throw noSetEnvMode();
     }
 
-    repositoryContainer.init(this.mode, this.stores.main.instance);
+    repositoryContainer.init(this.mode, undefined, configVironLib);
   }
 }
 
