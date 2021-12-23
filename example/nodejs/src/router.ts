@@ -79,7 +79,7 @@ export async function register(app: Express, routes: Route[]): Promise<void> {
     app.use(middleware);
     apiDefinition = merge(apiDefinition, apiDoc);
   });
-  apiDefinition = domainsOas.dereference(
+  apiDefinition = await domainsOas.dereference(
     apiDefinition as domainsOas.VironOpenAPIObject
   );
 
