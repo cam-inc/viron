@@ -42,21 +42,6 @@ describe('domains/oas', () => {
     });
 
     it('Get an oas that filtered by roleIds', async () => {
-      sandbox
-        .stub(domainsAdminrole, 'hasPermissionByResourceId')
-        .withArgs(
-          'editor',
-          'user',
-          sinon.match([PERMISSION.READ, PERMISSION.WRITE])
-        )
-        .resolves(false)
-        .withArgs(
-          'editor',
-          'blog',
-          sinon.match([PERMISSION.READ, PERMISSION.WRITE])
-        )
-        .resolves(true);
-
       const roleIds = ['editor'];
       const pageUsers = {
         id: 'users',
@@ -136,11 +121,35 @@ describe('domains/oas', () => {
         },
       };
 
+      sandbox
+        .stub(domainsAdminrole, 'hasPermissionByResourceId')
+        .withArgs(
+          'editor',
+          'user',
+          sinon.match([PERMISSION.READ, PERMISSION.WRITE, PERMISSION.ALL])
+        )
+        .resolves(false)
+        .withArgs(
+          'editor',
+          'blog',
+          sinon.match([PERMISSION.READ, PERMISSION.WRITE, PERMISSION.ALL])
+        )
+        .resolves(true);
+      sandbox
+        .stub(domainsAdminrole, 'hasPermission')
+        .withArgs('editor', '/users', 'get', oas)
+        .resolves(false)
+        .withArgs('editor', '/blogs', 'get', oas)
+        .resolves(true);
+
       const expects = Object.assign(copy(oas), {
         info: {
           title: 'test',
           version: '0.0.1',
           'x-pages': [pageBlogs],
+        },
+        paths: {
+          '/blogs': pathItemBlogs,
         },
       });
       const result = await get(oas, {}, roleIds);

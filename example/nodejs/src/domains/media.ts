@@ -1,4 +1,8 @@
-import { ListWithPager } from '@viron/lib';
+import {
+  ListWithPager,
+  TABLE_SORT_DELIMITER,
+  TABLE_SORT_ORDER,
+} from '@viron/lib';
 import { FindConditions, getMediaRepository } from '../repositories';
 
 export interface Media {
@@ -34,7 +38,7 @@ export const list = async (
   conditions?: FindConditions<Media>,
   size?: number,
   page?: number,
-  sort?: string[]
+  sort = [`createdAt${TABLE_SORT_DELIMITER}${TABLE_SORT_ORDER.DESC}`]
 ): Promise<ListWithPager<MediaView>> => {
   const repository = getMediaRepository();
   const result = await repository.findWithPager(conditions, size, page, sort);

@@ -47,9 +47,10 @@ paths:
       operationId: createMedia
       tags:
         - media
-      summary: post media 
+      summary: post media
       description: メディアアップロード
       requestBody:
+        required: true
         content:
           multipart/form-data:
             schema:
@@ -110,7 +111,7 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Media'
-    
+
     Media:
       type: object
       properties:
@@ -149,5 +150,3 @@ components:
       required:
         - name
         - uploadData
-
-

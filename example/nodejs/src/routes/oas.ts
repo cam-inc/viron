@@ -1,14 +1,9 @@
 import { domainsOas } from '@viron/lib';
-import { ctx } from '../context';
-import { RouteContext } from '../application';
+import * as controllers from '../controllers/oas';
+import { Route } from '../router';
 
-// oas取得
-export const getOas = async (context: RouteContext): Promise<void> => {
-  const oas = await domainsOas.get(
-    context.req._context.apiDefinition,
-    ctx.config.oas.infoExtentions,
-    context.user?.roleIds
-  );
-
-  context.res.json(oas);
+export const routeOas: Route = {
+  name: 'oas',
+  oasPath: domainsOas.getPath('oas'),
+  controllers,
 };

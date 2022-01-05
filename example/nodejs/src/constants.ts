@@ -17,4 +17,4 @@ export const AUTHENTICATION_RESULT_TYPE = {
   INVALID: 'invalid',
 } as const;
 
-export const LIMIT_FILE_SIZE = 2000000;
+export const LIMIT_MEDIA_FILE_SIZE = 2000000;

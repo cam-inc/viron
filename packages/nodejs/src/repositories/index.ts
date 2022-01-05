@@ -3,8 +3,9 @@ import {
   Connection as MongooseConnection,
   FilterQuery as MongoFilterQuery,
   QueryOptions as MongoQueryOptions,
+  ConnectOptions as MongoConnectOptions,
 } from 'mongoose';
-import { Sequelize, Dialect } from 'sequelize';
+import { Sequelize, Dialect, Options as MysqlConnectOptions } from 'sequelize';
 import {
   FindOptions as MysqlFindOptions,
   WhereOptions as MysqlWhereOptions,
@@ -22,6 +23,14 @@ import { repositoryUninitialized } from '../errors';
 import { ListWithPager } from '../helpers';
 import * as mongoRepositories from './mongo';
 import * as mysqlRepositories from './mysql';
+import {
+  createConnection as mongoCreateConnection,
+  getModels as mongoGetModels,
+} from '../infrastructures/mongo';
+import {
+  createConnection as mysqlCreateConnection,
+  getModels as mysqlGetModels,
+} from '../infrastructures/mysql';
 
 type Names = keyof typeof mongoRepositories & keyof typeof mysqlRepositories;
 
@@ -30,6 +39,15 @@ export type FindConditions<Entity> =
   | MysqlWhereOptions<Entity>;
 
 export type FindOptions<Entity> = MongoQueryOptions | MysqlFindOptions<Entity>;
+
+export interface MongoConfig {
+  openUri: string;
+  connectOptions: MongoConnectOptions;
+}
+
+export interface MysqlConfig {
+  connectOptions: MysqlConnectOptions;
+}
 
 export interface Repository<Entity, CreateAttributes, UpdateAttributes> {
   findOneById: (id: string) => Promise<Entity | null>;
@@ -66,7 +84,8 @@ export class RepositoryContainer {
 
   async init(
     storeType: StoreType,
-    conn: Sequelize | MongooseConnection
+    conn?: Sequelize | MongooseConnection,
+    config?: MongoConfig | MysqlConfig
   ): Promise<RepositoryContainer> {
     if (this.initialized) {
       return this;
@@ -74,7 +93,14 @@ export class RepositoryContainer {
 
     switch (storeType) {
       case STORE_TYPE.MONGO: {
-        this.conn = conn as MongooseConnection;
+        const configMongo = config as MongoConfig;
+        this.conn = conn
+          ? (conn as MongooseConnection)
+          : await mongoCreateConnection(
+              configMongo.openUri,
+              configMongo.connectOptions
+            );
+        mongoGetModels(this.conn);
         this.repositories = mongoRepositories;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -83,13 +109,13 @@ export class RepositoryContainer {
         const casbinMongooseAdapter = await MongooseAdapter.newAdapter(url, {
           dbName: this.conn.name,
           autoIndex: mongooseConfig.autoIndex,
-          user: options.user,
-          pass: options.password,
-          useNewUrlParser: options.useNewUrlParser,
-          useCreateIndex: mongooseConfig.useCreateIndex,
-          authSource: options.authSource,
-          useFindAndModify: mongooseConfig.useFindAndModify,
-          useUnifiedTopology: options.useUnifiedTopology,
+          user: options.user ?? options.credentials?.username,
+          pass: options.password ?? options.credentials?.password,
+          useNewUrlParser: true,
+          useCreateIndex: true,
+          authSource: options.authSource ?? options.credentials?.source,
+          useFindAndModify: false,
+          useUnifiedTopology: true,
           ssl: options.ssl,
           sslValidate: options.sslValidate,
           sslCA: options.sslCA,
@@ -101,7 +127,11 @@ export class RepositoryContainer {
         break;
       }
       case STORE_TYPE.MYSQL: {
-        this.conn = conn as Sequelize;
+        const configMysql = config as MysqlConfig;
+        this.conn = conn
+          ? (conn as Sequelize)
+          : await mysqlCreateConnection(configMysql.connectOptions);
+        mysqlGetModels(this.conn);
         this.repositories = mysqlRepositories;
 
         const casbinSequelizeAdapter = await SequelizeAdapter.newAdapter({

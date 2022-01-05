@@ -1,4 +1,8 @@
-import { OAS_X_SKIP_AUDITLOG } from '../constants';
+import {
+  OAS_X_SKIP_AUDITLOG,
+  TABLE_SORT_DELIMITER,
+  TABLE_SORT_ORDER,
+} from '../constants';
 import {
   ListWithPager,
   listSchemaPathRegExp,
@@ -40,7 +44,7 @@ export const list = async (
   conditions?: FindConditions<AuditLog>,
   size?: number,
   page?: number,
-  sort?: string[]
+  sort = [`createdAt${TABLE_SORT_DELIMITER}${TABLE_SORT_ORDER.DESC}`]
 ): Promise<ListWithPager<AuditLog>> => {
   const repository = repositoryContainer.getAuditLogRepository();
   return repository.findWithPager(conditions, size, page, sort);
