@@ -1,5 +1,4 @@
-import { Op, Sequelize } from 'sequelize';
-import { FindOptions, WhereOptions } from 'sequelize/types';
+import { FindOptions, Op, Sequelize, WhereOptions } from 'sequelize';
 import { AdminUserModelCtor } from '../../infrastructures/mysql/models/adminusers';
 import { domainsAdminUser } from '../../domains';
 import {
