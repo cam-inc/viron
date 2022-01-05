@@ -1,6 +1,12 @@
 import _ from 'lodash';
 import React, { useCallback, useMemo } from 'react';
 import { Validate } from 'react-hook-form';
+import Base64Reader, {
+  Props as Base64ReaderProps,
+} from '$components/base64Reader';
+import BinaryStringReader, {
+  Props as BinaryStringReaderProps,
+} from '$components/binaryStringReader';
 import Select from '$components/select';
 import Textarea from '$components/textarea';
 import Textinput from '$components/textinput';
@@ -88,6 +94,38 @@ const SchemaOfTypeString: React.FC<Props> = ({
       registerOptions,
     ]
   );
+
+  // File Uploads
+  const handleBinaryStringReaderChange = useCallback<
+    BinaryStringReaderProps['onChange']
+  >(
+    (binaryString) => {
+      setValue(name, binaryString);
+    },
+    [setValue]
+  );
+  const handleBase64ReaderChange = useCallback<Base64ReaderProps['onChange']>(
+    (base64) => {
+      setValue(name, base64);
+    },
+    [setValue]
+  );
+
+  if (schema.format === 'binary') {
+    return (
+      <div>
+        <BinaryStringReader onChange={handleBinaryStringReaderChange} />
+      </div>
+    );
+  }
+
+  if (schema.format === 'base64') {
+    return (
+      <div>
+        <Base64Reader onChange={handleBase64ReaderChange} />
+      </div>
+    );
+  }
 
   if (isDynamicEnumEnabled) {
     return (

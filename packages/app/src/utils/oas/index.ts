@@ -7,6 +7,7 @@ import { Endpoint, URL } from '$types/index';
 import {
   Content,
   Document,
+  Encoding,
   Info,
   MediaType,
   Method,
@@ -575,15 +576,13 @@ export const constructRequestInfo = function (
         const style = p.style || 'form';
         // The explode value in parameter object defaults to `true` when `style` value is `form`.
         // @see:https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#fixed-fields-10
-        let explode: boolean;
+        let explode = p.explode;
         if (_.isUndefined(p.explode)) {
           if (style === 'form') {
             explode = true;
           } else {
             explode = false;
           }
-        } else {
-          explode = p.explode;
         }
         queryParams.push(serialize(p.name, p.value, style, explode));
       });
@@ -667,8 +666,15 @@ export const constructRequestInit = function (
   requestInit.headers = headers;
   if (!!requestPayloads.requestBody) {
     const contentType = pickContentType(requestPayloads.requestBody.content);
-    headers['Content-Type'] = contentType;
-    requestInit.body = convert(requestPayloads.requestBody.value, contentType);
+    // Do not explicitly set the Content-Type header on the request. Doing so will prevent the browser from being able to set the Content-Type header with the boundary expression it will use to delimit form fields in the request body.
+    if (contentType !== 'multipart/form-data') {
+      headers['Content-Type'] = contentType;
+    }
+    requestInit.body = encord(
+      requestPayloads.requestBody.value,
+      contentType,
+      requestPayloads.requestBody.content[contentType]
+    );
   }
   return requestInit;
 };
@@ -721,23 +727,44 @@ export const constructRequestPayloadRequestBody = function (
   return requestPayloadRequestBody;
 };
 
-// TODO: renameしたい。
-export const convert = function (
+export const encord = function (
   value: RequestPayloadRequestBody['value'],
-  contentType: string
-): string {
+  contentType: string,
+  mediaType: MediaType
+): string | URLSearchParams | FormData {
   switch (contentType) {
+    case 'application/octet-stream':
     case 'application/json':
       return JSON.stringify(value);
-    case 'application/x-www-form-urlencoded':
-      // TODO
-      return JSON.stringify(value);
-    case 'application/octet-stream':
-      // TODO
-      return JSON.stringify(value);
-    case 'multipart/form-data':
-      // TODO
-      return JSON.stringify(value);
+    case 'application/x-www-form-urlencoded': {
+      // @see: https://datatracker.ietf.org/doc/html/rfc1866#section-8.2.1
+      const ret: string[] = [];
+      Object.entries(value).forEach(([key, value]) => {
+        const encoding = mediaType.encoding?.[key];
+        // The property with the key in the root schema shall exist whenever with this content type.
+        const schema = mediaType.schema.properties?.[key] as Schema;
+        // The behavior follows the same values as query parameters, including default values.
+        const style = encoding?.style || 'form';
+        let explode = encoding?.explode;
+        if (_.isUndefined(explode)) {
+          if (style === 'form') {
+            explode = true;
+          } else {
+            explode = false;
+          }
+        }
+        ret.push(serialize(key, value, style, explode));
+      });
+      return ret.join('&');
+    }
+    case 'multipart/form-data': {
+      const ret = new FormData();
+      Object.entries(value).forEach(([key, value]) => {
+        // TODO: encodingを参照する必要がある。
+        //ret.append(key, value);
+      });
+      return ret;
+    }
     case 'image/jpeg':
     case 'image/png':
       // TODO

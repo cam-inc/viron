@@ -464,6 +464,36 @@
           "200": {
             "$ref": "#/components/responses/Empty"
           }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "BASE64": {
+                    "type": "string",
+                    "format": "base64"
+                  },
+                  "BINARY": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": ["BASE64", "BINARY"]
+              },
+              "encoding": {
+                "id": {
+                },
+                "BASE64": {
+                }
+              }
+            }
+          }
         }
       }
     },
