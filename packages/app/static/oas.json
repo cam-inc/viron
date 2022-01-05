@@ -484,7 +484,7 @@
                     "format": "binary"
                   }
                 },
-                "required": ["BASE64", "BINARY"]
+                "required": ["BINARY"]
               },
               "encoding": {
                 "id": {

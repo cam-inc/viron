@@ -4,9 +4,7 @@ import { Validate } from 'react-hook-form';
 import Base64Reader, {
   Props as Base64ReaderProps,
 } from '$components/base64Reader';
-import BinaryStringReader, {
-  Props as BinaryStringReaderProps,
-} from '$components/binaryStringReader';
+import FileReader, { Props as FileReaderProps } from '$components/fileReader';
 import Select from '$components/select';
 import Textarea from '$components/textarea';
 import Textinput from '$components/textinput';
@@ -96,11 +94,9 @@ const SchemaOfTypeString: React.FC<Props> = ({
   );
 
   // File Uploads
-  const handleBinaryStringReaderChange = useCallback<
-    BinaryStringReaderProps['onChange']
-  >(
-    (binaryString) => {
-      setValue(name, binaryString);
+  const handleFileReaderChange = useCallback<FileReaderProps['onChange']>(
+    (file) => {
+      setValue(name, file);
     },
     [setValue]
   );
@@ -114,7 +110,7 @@ const SchemaOfTypeString: React.FC<Props> = ({
   if (schema.format === 'binary') {
     return (
       <div>
-        <BinaryStringReader onChange={handleBinaryStringReaderChange} />
+        <FileReader onChange={handleFileReaderChange} />
       </div>
     );
   }

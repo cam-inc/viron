@@ -760,11 +760,11 @@ export const encord = function (
     case 'multipart/form-data': {
       const ret = new FormData();
       Object.entries(value).forEach(([key, value]) => {
-        // TODO: encodingを参照する必要がある。
-        //ret.append(key, value);
+        ret.append(key, value as string | Blob);
       });
       return ret;
     }
+    // TODO: サポートすべき？
     case 'image/jpeg':
     case 'image/png':
       // TODO
