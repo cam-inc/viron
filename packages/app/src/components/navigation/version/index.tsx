@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import React from 'react';
-import { ON, On } from '$constants/index';
+import { On } from '$constants/index';
 import pkg from '../../../../package.json';
 
 type Props = {
@@ -8,14 +8,7 @@ type Props = {
 };
 const Version: React.FC<Props> = ({ on }) => {
   return (
-    <div
-      className={classnames('text-xxs', {
-        'text-on-background': on === ON.BACKGROUND,
-        'text-on-surface': on === ON.SURFACE,
-        'text-on-primary': on === ON.PRIMARY,
-        'text-on-complementary': on === ON.COMPLEMENTARY,
-      })}
-    >
+    <div className={classnames('text-xxs', `text-on-${on}`)}>
       ver. {pkg.version}
     </div>
   );

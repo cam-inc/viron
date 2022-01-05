@@ -6,7 +6,7 @@ import { AiOutlineRight } from '@react-icons/all-files/ai/AiOutlineRight';
 import classnames from 'classnames';
 import React, { useCallback, useMemo, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { On, ON } from '$constants/index';
+import { On } from '$constants/index';
 import { Schema } from '$types/oas';
 import { UseActiveReturn, useError } from '../../hooks/index';
 import Info from '../../parts/info';
@@ -109,12 +109,8 @@ const Container: React.FC<Props> = ({
 
   return (
     <div
-      className={classnames('flex flex-col gap-2 text-xs', {
+      className={classnames('flex flex-col gap-2 text-xs', `text-on-${on}`, {
         'opacity-25': !isActive,
-        'text-on-background': on === ON.BACKGROUND,
-        'text-on-surface': on === ON.SURFACE,
-        'text-on-primary': on === ON.PRIMARY,
-        'text-on-complementary': on === ON.COMPLEMENTARY,
       })}
     >
       {/* Head */}
@@ -139,17 +135,7 @@ const Container: React.FC<Props> = ({
       <div
         className={classnames(
           'flex-1 flex flex-col gap-2 ml-1/2em pl-1/2em border-l',
-          {
-            hidden: !isActive || !isOpened,
-            'border-on-background-faint hover:border-on-background':
-              on === ON.BACKGROUND,
-            'border-on-surface-faint hover:border-on-surface':
-              on === ON.SURFACE,
-            'border-on-primary-faint hover:border-on-primary':
-              on === ON.PRIMARY,
-            'border-on-complementary-faint hover:border-on-complementary':
-              on === ON.COMPLEMENTARY,
-          }
+          `border-on-${on}-faint hover:border-on-${on}`
         )}
       >
         {/* Error */}
