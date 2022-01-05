@@ -35,7 +35,7 @@ module.exports = {
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
     'import/order': [
-      'error',
+      'warn',
       {
         alphabetize: { order: 'asc', caseInsensitive: false },
         groups: [
