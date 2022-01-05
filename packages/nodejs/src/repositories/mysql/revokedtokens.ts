@@ -1,5 +1,4 @@
-import { Sequelize } from 'sequelize';
-import { FindOptions, WhereOptions } from 'sequelize/types';
+import { FindOptions, Sequelize, WhereOptions } from 'sequelize';
 import { domainsAuth } from '../../domains';
 import { RevokedTokenModelCtor } from '../../infrastructures/mysql/models/revokedtokens';
 import { repositoryContainer } from '..';

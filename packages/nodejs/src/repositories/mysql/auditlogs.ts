@@ -1,5 +1,4 @@
-import { Sequelize } from 'sequelize';
-import { FindOptions, WhereOptions } from 'sequelize/types';
+import { FindOptions, Sequelize, WhereOptions } from 'sequelize';
 import { AuditLogModelCtor } from '../../infrastructures/mysql/models/auditlogs';
 import { domainsAuditLog } from '../../domains';
 import { repositoryContainer } from '..';

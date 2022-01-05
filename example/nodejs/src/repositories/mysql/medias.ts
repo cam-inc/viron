@@ -1,4 +1,4 @@
-import { FindOptions, WhereOptions } from 'sequelize/types';
+import { FindOptions, WhereOptions } from 'sequelize';
 import {
   getMysqlFindOptions,
   getMysqlSortOptions,
