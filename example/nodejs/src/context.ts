@@ -103,7 +103,7 @@ export class Context {
         throw noSetEnvMode();
     }
 
-    repositoryContainer.init(this.mode, undefined, configVironLib);
+    await repositoryContainer.init(this.mode, undefined, configVironLib);
   }
 }
 
