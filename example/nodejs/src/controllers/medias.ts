@@ -18,7 +18,7 @@ export const createMedia = async (context: RouteContext): Promise<void> => {
   const key = uploadData.split(AWSS3Config.bucketName).pop();
   const requestBody = {
     name: context.requestBody.name,
-    url: `https://${AWSS3Config.mediaDomain}/${key}`,
+    url: `https://${AWSS3Config.mediaDomain}${key}`,
     mimeType: context.req.file.mimetype,
   };
   const media = await createOne(requestBody);

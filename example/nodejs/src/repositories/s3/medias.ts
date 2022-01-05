@@ -21,6 +21,7 @@ export const uploadMedia = (): MultiPartBodyParser => {
           const fileExtention = path.extname(file.originalname);
           cb(null, `${uuidv4()}${fileExtention}`);
         },
+        contentType: multerS3.AUTO_CONTENT_TYPE,
       }),
       limits: { fileSize: LIMIT_MEDIA_FILE_SIZE },
     }).single(key),
