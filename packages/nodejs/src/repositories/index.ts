@@ -31,6 +31,9 @@ import {
   createConnection as mysqlCreateConnection,
   getModels as mysqlGetModels,
 } from '../infrastructures/mysql';
+import { getDebug } from '../logging';
+
+const debug = getDebug('repositories');
 
 type Names = keyof typeof mongoRepositories & keyof typeof mysqlRepositories;
 
@@ -105,6 +108,11 @@ export class RepositoryContainer {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { url, options } = (this.conn.getClient() as any).s;
+        debug(
+          'Init casbin-mongoose-adapter. url: %s, options: %O',
+          url,
+          options
+        );
         const mongooseConfig = this.conn.config;
         const casbinMongooseAdapter = await MongooseAdapter.newAdapter(url, {
           dbName: this.conn.name,
@@ -134,6 +142,7 @@ export class RepositoryContainer {
         mysqlGetModels(this.conn);
         this.repositories = mysqlRepositories;
 
+        debug('Init casbin-sequelize-adapter. options: %O', this.conn.config);
         const casbinSequelizeAdapter = await SequelizeAdapter.newAdapter({
           dialect: this.conn.getDialect() as Dialect,
           database: this.conn.config.database,
@@ -157,6 +166,7 @@ export class RepositoryContainer {
     this.initialized = true;
     this.casbinSyncedTime = Date.now();
     //this.casbin.enableLog(true);
+    debug('RepositoryContainer initialized!');
     return this;
   }
 
