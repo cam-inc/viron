@@ -4,7 +4,7 @@
   "description": "A toolkit to speedily build a viron api server",
   "main": "dist/server.js",
   "dependencies": {
-    "@viron/lib": "0.0.1-beta.6",
+    "@viron/lib": "0.0.1-beta.8",
     "accepts": "^1.3.7",
     "aws-sdk": "^2.985.0",
     "compression": "^1.7.4",
@@ -79,7 +79,7 @@
     "clean": "npm run clear",
     "clear": "rm -rf dist",
     "build": "npm run clear && tsc --project tsconfig.production.json && cp -fr src/openapi dist/",
-    "start": "DEBUG=* node dist/server.js",
+    "start": "node dist/server.js",
     "test": "jest -c ./jest.config.ts",
     "test:watch": "jest --watch",
     "coverage": "jest --coverage"
