@@ -11,7 +11,10 @@ import {
   WhereOptions as MysqlWhereOptions,
 } from 'sequelize/types';
 import MongooseAdapter from 'casbin-mongoose-adapter';
-import { SequelizeAdapter } from 'casbin-sequelize-adapter';
+import {
+  SequelizeAdapter,
+  SequelizeAdapterOptions,
+} from 'casbin-sequelize-adapter';
 import {
   domainsAdminRole,
   domainsAdminUser,
@@ -108,13 +111,8 @@ export class RepositoryContainer {
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { url, options } = (this.conn.getClient() as any).s;
-        debug(
-          'Init casbin-mongoose-adapter. url: %s, options: %O',
-          url,
-          options
-        );
         const mongooseConfig = this.conn.config;
-        const casbinMongooseAdapter = await MongooseAdapter.newAdapter(url, {
+        const casbinMongooseAdapterOptions: MongoConnectOptions = {
           dbName: this.conn.name,
           autoIndex: mongooseConfig.autoIndex,
           user: options.user ?? options.credentials?.username,
@@ -127,7 +125,16 @@ export class RepositoryContainer {
           ssl: options.ssl,
           sslValidate: options.sslValidate,
           sslCA: options.sslCA,
-        });
+        };
+        debug(
+          'Init casbin-mongoose-adapter. url: %s, options: %O',
+          url,
+          casbinMongooseAdapterOptions
+        );
+        const casbinMongooseAdapter = await MongooseAdapter.newAdapter(
+          url,
+          casbinMongooseAdapterOptions
+        );
         this.casbin = await newEnforcer(
           domainsAdminRole.rbacModel,
           casbinMongooseAdapter
@@ -142,8 +149,7 @@ export class RepositoryContainer {
         mysqlGetModels(this.conn);
         this.repositories = mysqlRepositories;
 
-        debug('Init casbin-sequelize-adapter. options: %O', this.conn.config);
-        const casbinSequelizeAdapter = await SequelizeAdapter.newAdapter({
+        const casbinSequelizeAdapterOptions: SequelizeAdapterOptions = {
           dialect: this.conn.getDialect() as Dialect,
           database: this.conn.config.database,
           username: this.conn.config.username,
@@ -154,7 +160,14 @@ export class RepositoryContainer {
             : undefined,
           ssl: this.conn.config.ssl,
           protocol: this.conn.config.protocol,
-        });
+        };
+        debug(
+          'Init casbin-sequelize-adapter. options: %O',
+          casbinSequelizeAdapterOptions
+        );
+        const casbinSequelizeAdapter = await SequelizeAdapter.newAdapter(
+          casbinSequelizeAdapterOptions
+        );
         this.casbin = await newEnforcer(
           domainsAdminRole.rbacModel,
           casbinSequelizeAdapter
