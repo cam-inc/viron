@@ -11,6 +11,10 @@ export const repositoryUninitialized = (): VironError => {
   return new VironError(`Uninitialized repository is not available`, 500);
 };
 
+export const repositoryInitializationError = (): VironError => {
+  return new VironError(`Either Db Conneciton or Config is required.`, 400);
+};
+
 export const jwtUninitialized = (): VironError => {
   return new VironError(`Uninitialized jwt is not available`, 500);
 };

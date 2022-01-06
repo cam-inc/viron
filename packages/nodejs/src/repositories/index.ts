@@ -22,7 +22,10 @@ import {
   domainsAuth,
 } from '../domains';
 import { STORE_TYPE, StoreType } from '../constants';
-import { repositoryUninitialized } from '../errors';
+import {
+  repositoryInitializationError,
+  repositoryUninitialized,
+} from '../errors';
 import { ListWithPager } from '../helpers';
 import * as mongoRepositories from './mongo';
 import * as mysqlRepositories from './mysql';
@@ -97,14 +100,18 @@ export class RepositoryContainer {
       return this;
     }
 
+    if (!conn && !config) {
+      throw repositoryInitializationError();
+    }
+
     switch (storeType) {
       case STORE_TYPE.MONGO: {
-        const configMongo = config as MongoConfig;
+        const mongoConfig = config as MongoConfig;
         this.conn = conn
           ? (conn as MongooseConnection)
           : await mongoCreateConnection(
-              configMongo.openUri,
-              configMongo.connectOptions
+              mongoConfig.openUri,
+              mongoConfig.connectOptions
             );
         mongoGetModels(this.conn);
         this.repositories = mongoRepositories;
@@ -114,7 +121,8 @@ export class RepositoryContainer {
         const mongooseConfig = this.conn.config;
         const casbinMongooseAdapterOptions: MongoConnectOptions = {
           dbName: this.conn.name,
-          autoIndex: mongooseConfig.autoIndex,
+          autoIndex:
+            mongooseConfig.autoIndex ?? mongoConfig?.connectOptions?.autoIndex,
           user: options.user ?? options.credentials?.username,
           pass: options.password ?? options.credentials?.password,
           useNewUrlParser: true,
@@ -122,9 +130,10 @@ export class RepositoryContainer {
           authSource: options.authSource ?? options.credentials?.source,
           useFindAndModify: false,
           useUnifiedTopology: true,
-          ssl: options.ssl,
-          sslValidate: options.sslValidate,
-          sslCA: options.sslCA,
+          ssl: options.ssl ?? mongoConfig?.connectOptions?.ssl,
+          sslValidate:
+            options.sslValidate ?? mongoConfig?.connectOptions?.sslValidate,
+          sslCA: options.sslCA ?? mongoConfig?.connectOptions?.sslCA,
         };
         debug(
           'Init casbin-mongoose-adapter. url: %s, options: %O',
@@ -142,10 +151,10 @@ export class RepositoryContainer {
         break;
       }
       case STORE_TYPE.MYSQL: {
-        const configMysql = config as MysqlConfig;
+        const mysqlConfig = config as MysqlConfig;
         this.conn = conn
           ? (conn as Sequelize)
-          : await mysqlCreateConnection(configMysql.connectOptions);
+          : await mysqlCreateConnection(mysqlConfig.connectOptions);
         mysqlGetModels(this.conn);
         this.repositories = mysqlRepositories;
 
