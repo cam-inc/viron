@@ -24,7 +24,11 @@ export const middlewareErrorHandler = (): ErrorRequestHandler => {
       res.statusCode = 500;
     }
 
-    logger.error('An error occured. %o', err);
+    logger.error(
+      'An error occured. %o, %s',
+      err,
+      err.stack ?? new Error().stack
+    );
 
     const accept = accepts(req);
     switch (accept.type(['json', 'text'])) {

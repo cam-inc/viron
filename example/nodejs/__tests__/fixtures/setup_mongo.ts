@@ -13,6 +13,7 @@ export async function setupMongo(): Promise<void> {
   // 認証不要のため消す
   delete config.connectOptions.user;
   delete config.connectOptions.pass;
+  delete config.connectOptions.authSource;
 }
 
 afterAll(() => {

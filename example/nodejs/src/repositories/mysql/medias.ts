@@ -1,4 +1,4 @@
-import { FindOptions, WhereOptions } from 'sequelize/types';
+import { FindOptions, WhereOptions } from 'sequelize';
 import {
   getMysqlFindOptions,
   getMysqlSortOptions,
@@ -8,7 +8,7 @@ import {
 } from '@viron/lib';
 import { ctx } from '../../context';
 import { Media, MediaCreateAttributes } from '../../domains/media';
-import { MediaModelCtor } from '../../stores/definitions/mysql/medias';
+import { MediaModelCtor } from '../../infrastructures/mysql/models/medias';
 
 const getModel = (): MediaModelCtor =>
   ctx.stores.main.models.medias as MediaModelCtor;

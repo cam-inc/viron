@@ -6,7 +6,7 @@ import {
   FindOptions as MysqlFindOptions,
   Order as MysqlOrder,
   WhereOptions as MysqlWhereOptions,
-} from 'sequelize/types';
+} from 'sequelize';
 import {
   DEFAULT_PAGER_SIZE,
   DEFAULT_PAGER_PAGE,

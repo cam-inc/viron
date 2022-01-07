@@ -413,7 +413,9 @@ export type Schema = {
     | 'date-time'
     | 'password'
     | 'wyswyg'
-    | 'multiline';
+    | 'multiline'
+    | 'base64'
+    | 'binary';
   // The default value represents what would be assumed by the consumer of the input as the value of the schema if one is not provided. Unlike JSON Schema, the value MUST conform to the defined type for the Schema Object defined at the same level. For example, if type is string, then default can be "foo" but cannot be 1.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-6.2
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -652,13 +654,14 @@ export type RuntimeExpression = string;
 // [extendable] Provides schema and examples for the media type identified by its key.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#media-type-object
 export type MediaType = {
-  schema?: Schema;
+  // NOTE: The schema property is defined as optional one according to the OAS spec, but we consider it to be required one.
+  schema: Schema;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   example?: any;
   examples?: {
     [key: string]: Example;
   };
-  encoding: {
+  encoding?: {
     [key: string]: Encoding;
   };
 };

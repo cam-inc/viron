@@ -1,4 +1,4 @@
-import { FindOptions, WhereOptions } from 'sequelize/types';
+import { FindOptions, WhereOptions } from 'sequelize';
 import {
   getMysqlFindOptions,
   getMysqlSortOptions,
@@ -12,7 +12,7 @@ import {
   UserCreateAttributes,
   UserUpdateAttributes,
 } from '../../domains/user';
-import { UserModelCtor } from '../../stores/definitions/mysql/users';
+import { UserModelCtor } from '../../infrastructures/mysql/models/users';
 
 const getModel = (): UserModelCtor =>
   ctx.stores.main.models.users as UserModelCtor;

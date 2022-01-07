@@ -1,4 +1,4 @@
-import { FindOptions, WhereOptions } from 'sequelize/types';
+import { FindOptions, WhereOptions } from 'sequelize';
 import {
   getMysqlFindOptions,
   getMysqlSortOptions,
@@ -12,7 +12,7 @@ import {
   ArticleCreateAttributes,
   ArticleUpdateAttributes,
 } from '../../domains/article';
-import { ArticleModelCtor } from '../../stores/definitions/mysql/articles';
+import { ArticleModelCtor } from '../../infrastructures/mysql/models/articles';
 
 const getModel = (): ArticleModelCtor =>
   ctx.stores.main.models.articles as ArticleModelCtor;
