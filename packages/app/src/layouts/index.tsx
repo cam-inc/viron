@@ -1,10 +1,10 @@
 import classnames from 'classnames';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
-import ErrorBoundary from '$components/errorBoundary';
-import Drawer, { useDrawer } from '$components/drawer';
-import { ON } from '$constants/index';
-import { useAppScreenGlobalStateValue } from '$store/index';
+import ErrorBoundary from '~/components/errorBoundary';
+import Drawer, { useDrawer } from '~/portals/drawer';
+import { useAppScreenGlobalStateValue } from '~/store';
+import { COLOR_SYSTEM } from '~/types';
 
 export type Props = {
   renderAppBar?: (args: {
@@ -123,7 +123,7 @@ const Layout: React.FC<Props> = ({
                 }
               )}
             >
-              <ErrorBoundary on={ON.PRIMARY}>
+              <ErrorBoundary on={COLOR_SYSTEM.PRIMARY}>
                 {renderAppBar({
                   className: 'h-full overflow-x-auto overscroll-x-contain',
                   openNavigation,
@@ -136,7 +136,7 @@ const Layout: React.FC<Props> = ({
         {/* region: Navigation */}
         {renderNavigation && lg && (
           <div className="fixed z-layout-navigation top-[8px] left-0 bottom-0 w-[160px] bg-thm-surface text-thm-on-surface shadow-01dp border-r border-thm-on-surface-faint overflow-y-scroll overscroll-y-contain">
-            <ErrorBoundary on={ON.SURFACE}>
+            <ErrorBoundary on={COLOR_SYSTEM.SURFACE}>
               {renderNavigation({
                 className: '',
                 openNavigation,
@@ -157,7 +157,7 @@ const Layout: React.FC<Props> = ({
               }
             )}
           >
-            <ErrorBoundary on={ON.BACKGROUND}>
+            <ErrorBoundary on={COLOR_SYSTEM.BACKGROUND}>
               {renderSubBody({
                 className: '',
                 openNavigation,
@@ -178,7 +178,7 @@ const Layout: React.FC<Props> = ({
             }
           )}
         >
-          <ErrorBoundary on={ON.BACKGROUND}>
+          <ErrorBoundary on={COLOR_SYSTEM.BACKGROUND}>
             {renderBody({
               className: 'flex-1',
               openNavigation,
@@ -189,7 +189,7 @@ const Layout: React.FC<Props> = ({
       </div>
       {renderNavigation && (
         <Drawer {...drawer.bind}>
-          <ErrorBoundary on={ON.SURFACE}>
+          <ErrorBoundary on={COLOR_SYSTEM.SURFACE}>
             {renderNavigation({
               className: '',
               openNavigation,

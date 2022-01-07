@@ -1,55 +1,35 @@
-import { BiShareAlt } from '@react-icons/all-files/bi/BiShareAlt';
-import React from 'react';
-import Button, {
-  SIZE as BUTTON_SIZE,
-  VARIANT as BUTTON_VARIANT,
-} from '$components/button';
-import { ON } from '$constants/index';
-import { useEndpointListGlobalStateValue } from '$store/index';
-import { ClassName, EndpointForDistribution } from '$types/index';
+import React, { useCallback } from 'react';
+import { SIZE as BUTTON_SIZE } from '~/components/button';
+import TextButton, { Props as TextButtonProps } from '~/components/button/text';
+import Error, { useError } from '~/components/error';
+import ShareIcon from '~/components/icon/share/outline';
+import { useEndpoint } from '~/hooks/endpoint';
+import { ClassName, COLOR_SYSTEM } from '~/types';
 
 type Props = {
   className?: ClassName;
 };
 const Export: React.FC<Props> = ({ className = '' }) => {
-  const endpointList = useEndpointListGlobalStateValue();
+  const { export: _export } = useEndpoint();
+  const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
 
-  const handleClick = function () {
-    // Omit some data to minimize the json file size.
-    const data: EndpointForDistribution[] = endpointList.map(function (
-      endpoint
-    ) {
-      return {
-        ...endpoint,
-        authConfigs: null,
-        document: null,
-      };
-    });
-    const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: 'application/json',
-    });
-    const blobURL = URL.createObjectURL(blob);
-    const anchorElement = document.createElement('a');
-    anchorElement.setAttribute('download', 'endpoints.json');
-    anchorElement.href = blobURL;
-    anchorElement.style.display = 'none';
-    document.body.appendChild(anchorElement);
-    anchorElement.click();
-    // clean up.
-    document.body.removeChild(anchorElement);
-    URL.revokeObjectURL(blobURL);
-  };
+  const handleClick = useCallback<TextButtonProps['onClick']>(() => {
+    const result = _export();
+    error.setError(result.error);
+  }, [_export, error.setError]);
 
   return (
-    <Button
-      on={ON.PRIMARY}
-      variant={BUTTON_VARIANT.TEXT}
-      size={BUTTON_SIZE.SM}
-      Icon={BiShareAlt}
-      label="Share"
-      className={className}
-      onClick={handleClick}
-    />
+    <>
+      <TextButton
+        className={className}
+        cs={COLOR_SYSTEM.PRIMARY_CONTAINER}
+        size={BUTTON_SIZE.SM}
+        label="Export"
+        Icon={ShareIcon}
+        onClick={handleClick}
+      />
+      <Error {...error.bind} />
+    </>
   );
 };
 export default Export;

@@ -4,7 +4,7 @@ import { BiFolder } from '@react-icons/all-files/bi/BiFolder';
 import { BiFolderOpen } from '@react-icons/all-files/bi/BiFolderOpen';
 import classnames from 'classnames';
 import React, { useMemo, useState } from 'react';
-import { Info } from '$types/oas';
+import { Info } from '~/types/oas';
 
 type Partial = {
   group: string;

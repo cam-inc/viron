@@ -1,9 +1,8 @@
 import React, { useCallback, useMemo } from 'react';
-import Error from '$components/error';
-import Spinner from '$components/spinner';
-import { ON } from '$constants/index';
-import { ClassName, Endpoint } from '$types/index';
-import { Document, Info, TableColumn } from '$types/oas';
+import Error from '~/components/error';
+import Spinner from '~/components/spinner';
+import { ClassName, COLOR_SYSTEM, Endpoint } from '~/types';
+import { Document, Info, TableColumn } from '~/types/oas';
 import { UseBaseReturn } from '../../_hooks/useBase';
 import { UseDescendantsReturn } from '../../_hooks/useDescendants';
 import NumberContent from '../../_types/_number/index';
@@ -44,10 +43,10 @@ const Body: React.FC<Props> = ({
   const elm = useMemo<JSX.Element>(
     function () {
       if (base.isPending) {
-        return <Spinner className="w-4" on={ON.SURFACE} />;
+        return <Spinner className="w-4" on={COLOR_SYSTEM.SURFACE} />;
       }
       if (base.error) {
-        return <Error on={ON.SURFACE} error={base.error} />;
+        return <Error on={COLOR_SYSTEM.SURFACE} error={base.error} />;
       }
       switch (content.type) {
         case 'number':

@@ -1,31 +1,40 @@
-import { AiFillGithub } from '@react-icons/all-files/ai/AiFillGithub';
-import { AiFillTwitterCircle } from '@react-icons/all-files/ai/AiFillTwitterCircle';
 import React from 'react';
-import Link from '$components/link';
-import { On, URL } from '$constants/index';
+import { Props as BaseProps } from '~/components';
+import GithubIcon from '~/components/icon/github/solid';
+import TwitterIcon from '~/components/icon/twitter/solid';
+import Link from '~/components/link';
+import { URL } from '~/constants';
+import { Pathname, URL as _URL } from '~/types';
 
-type Props = {
-  on: On;
-};
+const links: {
+  to: Pathname | _URL;
+  icon: JSX.Element;
+}[] = [
+  {
+    to: URL.GITHUB,
+    icon: <GithubIcon className="w-em" />,
+  },
+  {
+    to: URL.TWITTER,
+    icon: <TwitterIcon className="w=em" />,
+  },
+];
+
+type Props = BaseProps;
 const Services: React.FC<Props> = ({ on }) => {
-  const _className = `text-thm-on-${on} hover:text-thm-on-${on}-high focus:outline-none focus:ring-2 focus:ring-thm-on-${on} focus:text-thm-on-${on}-high active:text-thm-on-${on}-high`;
-
   return (
     <ul className="flex justify-center gap-2 text-2xl">
-      <li>
-        <Link on={on} to={URL.GITHUB} className="block">
-          <div className={_className}>
-            <AiFillGithub />
-          </div>
-        </Link>
-      </li>
-      <li>
-        <Link on={on} to={URL.TWITTER} className="block">
-          <div className={_className}>
-            <AiFillTwitterCircle />
-          </div>
-        </Link>
-      </li>
+      {links.map((item) => (
+        <li key={item.to}>
+          <Link className="block group focus:outline-none" on={on} to={item.to}>
+            <div
+              className={`text-2xl text-thm-on-${on} group-hover:text-thm-on-${on}-low group-active:text-thm-on-${on}-slight group-focus:ring-2 group-focus:ring-thm-on-${on}`}
+            >
+              {item.icon}
+            </div>
+          </Link>
+        </li>
+      ))}
     </ul>
   );
 };

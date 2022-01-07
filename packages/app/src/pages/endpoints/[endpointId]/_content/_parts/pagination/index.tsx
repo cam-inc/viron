@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import React from 'react';
-import PaginationComponent from '$components/pagination';
-import { ON } from '$constants/index';
-import { Document } from '$types/oas';
-import { mergeTablePagerRequestValue } from '$utils/oas';
+import PaginationComponent from '~/components/pagination';
+import { COLOR_SYSTEM } from '~/types';
+import { Document } from '~/types/oas';
+import { mergeTablePagerRequestValue } from '~/utils/oas';
 import { UseBaseReturn } from '../../_hooks/useBase';
 
 type Props = {
@@ -40,7 +40,7 @@ const Pagination: React.FC<Props> = ({ document, base }) => {
   return (
     <div>
       <PaginationComponent
-        on={ON.SURFACE}
+        on={COLOR_SYSTEM.SURFACE}
         current={current}
         max={max}
         onRequestChange={handlePaginationRequestChange}

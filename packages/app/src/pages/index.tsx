@@ -1,17 +1,19 @@
 import classnames from 'classnames';
 import { navigate, PageProps } from 'gatsby';
 import React, { useCallback } from 'react';
-import Button, {
-  SIZE as BUTTON_SIZE,
-  VARIANT as BUTTON_VARIANT,
-} from '$components/button';
-import Logo from '$components/logo';
-import Metadata from '$components/metadata';
-import NavigationLinks from '$components/navigation/links';
-import NavigationServices from '$components/navigation/services';
-import { ON, URL } from '$constants/index';
-import Layout, { Props as LayoutProps } from '$layouts/index';
-import useTheme from '$hooks/theme';
+import { SIZE as BUTTON_SIZE } from '~/components/button';
+import FilledButton from '~/components/button/filled';
+import BookOpenIcon from '~/components/icon/bookOpen/outline';
+import ColorSwatchIcon from '~/components/icon/colorSwatch/outline';
+import UserGroupIcon from '~/components/icon/userGroup/outline';
+import Logo from '~/components/logo';
+import Metadata from '~/components/metadata';
+import NavigationLinks from '~/components/navigation/links';
+import NavigationServices from '~/components/navigation/services';
+import { URL } from '~/constants';
+import Layout, { Props as LayoutProps } from '~/layouts';
+import useTheme from '~/hooks/theme';
+import { COLOR_SYSTEM } from '~/types';
 import pkg from '../../package.json';
 
 type Props = PageProps;
@@ -63,12 +65,11 @@ const IndexPage: React.FC<Props> = () => {
           </div>
           <div className="mb-8 max-w-75% text-sm leading-10">
             Visit{' '}
-            <Button
-              className="inline-flex"
-              on={ON.SURFACE_VARIANT}
-              variant={BUTTON_VARIANT.PAPER}
-              label="Dashboard"
+            <FilledButton
+              cs={COLOR_SYSTEM.PRIMARY}
               size={BUTTON_SIZE.SM}
+              label="Dashboard"
+              Icon={ColorSwatchIcon}
               onClick={handleDashboardButtonClick}
             />{' '}
             to administrate your services. To learn more about Viron{' '}
@@ -78,30 +79,28 @@ const IndexPage: React.FC<Props> = () => {
               right="text-thm-secondary"
             />
             , read{' '}
-            <Button
-              className="inline-flex"
-              on={ON.SURFACE_VARIANT}
-              variant={BUTTON_VARIANT.PAPER}
-              label="Documentation"
+            <FilledButton
+              cs={COLOR_SYSTEM.PRIMARY}
               size={BUTTON_SIZE.SM}
+              label="Documentation"
+              Icon={BookOpenIcon}
               onClick={handleDocumentationButtonClick}
             />
             . Your{' '}
-            <Button
-              className="inline-flex"
-              on={ON.SURFACE_VARIANT}
-              variant={BUTTON_VARIANT.PAPER}
-              label="Contributions"
+            <FilledButton
+              cs={COLOR_SYSTEM.PRIMARY}
               size={BUTTON_SIZE.SM}
+              label="Contribution"
+              Icon={UserGroupIcon}
               onClick={handleContributionButtonClick}
             />{' '}
             are always welcomed.
           </div>
           <div className="py-2 px-8 mb-2 border-t border-b border-dotted border-thm-on-surface-slight">
-            <NavigationLinks on={ON.SURFACE_VARIANT} />
+            <NavigationLinks on={COLOR_SYSTEM.SURFACE_VARIANT} />
           </div>
           <div>
-            <NavigationServices on={ON.SURFACE_VARIANT} />
+            <NavigationServices on={COLOR_SYSTEM.SURFACE_VARIANT} />
           </div>
         </div>
       </div>

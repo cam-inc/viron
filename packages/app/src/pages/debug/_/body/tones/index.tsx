@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tone as ToneType } from '$utils/colorSystem';
+import { Tone as ToneType } from '~/utils/colorSystem';
 import Tone from '../tone';
 
 export type Props = { title: string; list: ToneType[] };

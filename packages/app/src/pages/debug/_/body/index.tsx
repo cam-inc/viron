@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Props as LayoutProps } from '$layouts/index';
-import { X_Theme, X_THEME } from '$types/oas';
-import { getTokens, Tokens } from '$utils/colorSystem';
+import { Props as LayoutProps } from '~/layouts';
+import { X_Theme, X_THEME } from '~/types/oas';
+import { getTokens, Tokens } from '~/utils/colorSystem';
 import Mode from './mode';
 import Preview from './preview';
 import ThemeSelect, { Props as ThemeSelectProps } from './themeSelect';

@@ -1,6 +1,6 @@
 import { atom } from 'recoil';
-import { X_Theme, X_THEME } from '$types/oas';
-import { isBrowser } from '$utils/index';
+import { X_Theme, X_THEME } from '~/types/oas';
+import { isBrowser } from '~/utils';
 
 const NAME = 'app';
 const KEY = {

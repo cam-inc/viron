@@ -1,14 +1,12 @@
-import { BiSidebar } from '@react-icons/all-files/bi/BiSidebar';
 import React, { useCallback } from 'react';
-import Button, {
-  SIZE as BUTTON_SIZE,
-  VARIANT as BUTTON_VARIANT,
-} from '$components/button';
-import { ON } from '$constants/index';
-import { Props as LayoutProps } from '$layouts/index';
-import { useAppScreenGlobalStateValue } from '$store/index';
-import Export from './export/index';
-import Import from './import/index';
+import { SIZE as BUTTON_SIZE } from '~/components/button';
+import TextButton from '~/components/button/text';
+import MenuAlt1Icon from '~/components/icon/menuAlt1/outline';
+import { Props as LayoutProps } from '~/layouts';
+import { useAppScreenGlobalStateValue } from '~/store';
+import { COLOR_SYSTEM } from '~/types';
+import Export from './export';
+import Import from './import';
 
 type Props = Parameters<NonNullable<LayoutProps['renderAppBar']>>[0];
 const Appbar: React.FC<Props> = ({ className = '', openNavigation }) => {
@@ -27,12 +25,11 @@ const Appbar: React.FC<Props> = ({ className = '', openNavigation }) => {
       <div className="flex justify-center items-center h-full px-4">
         <div className="flex-none">
           {!lg && (
-            <Button
-              variant={BUTTON_VARIANT.TEXT}
-              size={BUTTON_SIZE['2XL']}
-              on={ON.PRIMARY}
-              Icon={BiSidebar}
-              className={className}
+            <TextButton
+              cs={COLOR_SYSTEM.PRIMARY_CONTAINER}
+              size={BUTTON_SIZE.SM}
+              label="Dashboard"
+              Icon={MenuAlt1Icon}
               onClick={handleNavButtonClick}
             />
           )}

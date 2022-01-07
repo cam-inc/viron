@@ -1,13 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import Table, { Props as TableProps } from '$components/table';
-import { ON } from '$constants/index';
-import { Endpoint } from '$types/index';
-import { Document, Info, TableColumn, TABLE_SORT } from '$types/oas';
+import Table, { Props as TableProps } from '~/components/table';
+import { COLOR_SYSTEM, Endpoint } from '~/types';
+import { Document, Info, TableColumn, TABLE_SORT } from '~/types/oas';
 import {
   getTableColumns,
   getTableRows,
   mergeTableSortRequestValue,
-} from '$utils/oas';
+} from '~/utils/oas';
 import { UseBaseReturn } from '../../_hooks/useBase';
 import { UseDescendantsReturn } from '../../_hooks/useDescendants';
 import Descendant, { Props as DescendantProps } from '../../_parts/descendant';
@@ -115,7 +114,7 @@ const _ContentTable: React.FC<Props> = ({
   return (
     <>
       <Table
-        on={ON.SURFACE}
+        on={COLOR_SYSTEM.SURFACE}
         columns={columns}
         dataSource={dataSource}
         renderActions={descendants.length ? renderActions : undefined}

@@ -1,21 +1,21 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { HTTPStatusCode } from '$constants/index';
-import { BaseError, getHTTPError, NetworkError } from '$errors/index';
-import { Endpoint } from '$types/index';
+import { HTTPStatusCode } from '~/constants';
+import { BaseError, getHTTPError, NetworkError } from '~/errors';
+import { Endpoint } from '~/types';
 import {
   Document,
   Info,
   Request as RequestType,
   RequestValue,
-} from '$types/oas';
-import { promiseErrorHandler } from '$utils/index';
+} from '~/types/oas';
+import { promiseErrorHandler } from '~/utils';
 import {
   cleanupRequestValue,
   constructRequestInfo,
   constructRequestInit,
   constructRequestPayloads,
   getRequest,
-} from '$utils/oas';
+} from '~/utils/oas';
 import useAutoRefresh from './useAutoRefresh';
 
 export type UseBaseReturn = {

@@ -1,11 +1,11 @@
 import _ from 'lodash';
 import React, { useEffect } from 'react';
 import { useFieldArray, Validate } from 'react-hook-form';
-import _Schema from '$components/schema';
-import { Schema } from '$types/oas';
-import { getDefaultValue } from '$utils/oas';
-import { getRegisterOptions } from '$utils/oas/v8n';
-import { useNameForError } from '../../hooks/index';
+import _Schema from '~/components/schema';
+import { Schema } from '~/types/oas';
+import { getDefaultValue } from '~/utils/oas';
+import { getRegisterOptions } from '~/utils/oas/v8n';
+import { useNameForError } from '../../hooks';
 import { Props } from '../../index';
 
 const SchemaOfTypeArray: React.FC<Props> = ({

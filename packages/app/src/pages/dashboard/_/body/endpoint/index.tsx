@@ -1,26 +1,20 @@
-import { AiFillDelete } from '@react-icons/all-files/ai/AiFillDelete';
-import { BiDotsVerticalRounded } from '@react-icons/all-files/bi/BiDotsVerticalRounded';
-import { BiInfoCircle } from '@react-icons/all-files/bi/BiInfoCircle';
-import { BiMove } from '@react-icons/all-files/bi/BiMove';
-import { ImQrcode } from '@react-icons/all-files/im/ImQrcode';
 import classnames from 'classnames';
 import _ from 'lodash';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import Button from '$components/button';
-import Error from '$components/error';
-import Modal, { useModal } from '$components/modal';
-import Paper from '$components/paper';
-import Popover, { usePopover } from '$components/popover';
-import Spinner from '$components/spinner';
-import { ON, HTTP_STATUS_CODE } from '$constants/index';
-import { BaseError, HTTPUnexpectedError, NetworkError } from '$errors/index';
+import Error from '~/components/error';
+import Paper from '~/components/paper';
+import Spinner from '~/components/spinner';
+import { HTTP_STATUS } from '~/constants';
+import { BaseError, HTTPUnexpectedError, NetworkError } from '~/errors';
 import {
   useAppScreenGlobalStateValue,
   useEndpointListGlobalState,
-} from '$store/index';
-import { ClassName, Endpoint } from '$types/index';
-import { promiseErrorHandler } from '$utils/index';
+} from '~/store';
+import Modal, { useModal } from '~/portals/modal';
+import Popover, { usePopover } from '~/portals/popover';
+import { ClassName, COLOR_SYSTEM, Endpoint } from '~/types';
+import { promiseErrorHandler } from '~/utils';
 import Enter from './enter';
 import Info from './info';
 import QRCode from './qrcode/index';
@@ -224,8 +218,8 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove, className = '' }) => {
           return;
         }
         if (
-          response.status === HTTP_STATUS_CODE.UNAUTHORIZED ||
-          response.status === HTTP_STATUS_CODE.FORBIDDEN
+          response.status === HTTP_STATUS.UNAUTHORIZED.code ||
+          response.status === HTTP_STATUS.FORBIDDEN.code
         ) {
           setIsSigninRequired(true);
           setIsPending(false);
@@ -249,9 +243,9 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove, className = '' }) => {
 
   if (error) {
     return (
-      <Paper elevation={0} shadowElevation={0}>
+      <Paper on={COLOR_SYSTEM.SURFACE} shadowElevation={0}>
         <div className={classnames('p-2', className)}>
-          <Error on={ON.SURFACE} error={error} />
+          <Error on={COLOR_SYSTEM.SURFACE} error={error} />
         </div>
       </Paper>
     );
@@ -259,14 +253,14 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove, className = '' }) => {
 
   if (isPending) {
     return (
-      <Paper elevation={0} shadowElevation={0}>
+      <Paper on={COLOR_SYSTEM.SURFACE} shadowElevation={0}>
         <div
           className={classnames(
             'min-h-[72px] p-2 flex items-center justify-center',
             className
           )}
         >
-          <Spinner on={ON.SURFACE} className="w-4" />
+          <Spinner on={COLOR_SYSTEM.SURFACE} className="w-4" />
         </div>
       </Paper>
     );
@@ -278,8 +272,8 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove, className = '' }) => {
         {droppablePrev.isDroppable && (
           <div
             className={classnames('flex-none w-4 relative', {
-              'text-on-background-low': !droppablePrev.isOver,
-              'text-on-background-high': droppablePrev.isOver,
+              'text-thm-on-background-low': !droppablePrev.isOver,
+              'text-thm-on-background-high': droppablePrev.isOver,
             })}
             ref={droppablePrevTargetRef}
           >
@@ -288,7 +282,11 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove, className = '' }) => {
             <div className="absolute top-0 right-0 left-0 m-auto w-0 h-full border-l border-current border-dashed" />
           </div>
         )}
-        <Paper className="flex-1 min-w-0" elevation={0} shadowElevation={0}>
+        <Paper
+          className="flex-1 min-w-0"
+          on={COLOR_SYSTEM.SURFACE}
+          shadowElevation={0}
+        >
           <div
             className={classnames('p-2 flex flex-col gap-2 h-full', {
               'opacity-50': draggable.isDragging,
@@ -300,35 +298,32 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove, className = '' }) => {
                 <Thumbnail className="" endpoint={endpoint} />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-on-surface-low text-xxs truncate">
+                <div className="text-thm-on-surface-low text-xxs truncate">
                   {endpoint.id}
                 </div>
-                <div className="text-on-surface-high text-xs truncate">
+                <div className="text-thm-on-surface-high text-xs truncate">
                   {endpoint.document?.info.title || '---'}
                 </div>
               </div>
               <div className="flex-none">
                 <div ref={menuPopover.targetRef}>
-                  <Button
-                    on={ON.SURFACE}
-                    variant="text"
-                    Icon={BiDotsVerticalRounded}
-                    onClick={handleMenuClick}
-                  />
+                  <button onClick={handleMenuClick}>menu</button>
                 </div>
               </div>
               {/* TODO: 画面サイズではなく入力タイプに応じて表示の出し分けを行うこと。*/}
               {lg && (
                 <div className="flex-none">
                   <div ref={draggableTargetRef}>
-                    <Button on={ON.SURFACE} variant="text" Icon={BiMove} />
+                    <button>drag</button>
                   </div>
                 </div>
               )}
             </div>
             {/* Body */}
-            <div className="flex-1 py-2 border-t border-b border-dotted border-on-surface-faint">
-              <div className="text-on-surface-low text-xxs">{endpoint.url}</div>
+            <div className="flex-1 py-2 border-t border-b border-dotted border-thm-on-surface-faint">
+              <div className="text-thm-on-surface-low text-xxs">
+                {endpoint.url}
+              </div>
               <div className="text-xxs">
                 {endpoint.isPrivate ? 'private' : 'public'}
               </div>
@@ -348,8 +343,8 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove, className = '' }) => {
         {droppableNext.isDroppable && (
           <div
             className={classnames('flex-none w-4 relative', {
-              'text-on-background-low': !droppableNext.isOver,
-              'text-on-background-high': droppableNext.isOver,
+              'text-thm-on-background-low': !droppableNext.isOver,
+              'text-thm-on-background-high': droppableNext.isOver,
             })}
             ref={droppableNextTargetRef}
           >
@@ -361,27 +356,9 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove, className = '' }) => {
       </div>
       {/* Menu */}
       <Popover {...menuPopover.bind}>
-        <Button
-          on={ON.SURFACE}
-          variant="text"
-          Icon={BiInfoCircle}
-          label="Info"
-          onClick={handleInfoClick}
-        />
-        <Button
-          on="surface"
-          variant="text"
-          Icon={ImQrcode}
-          label="QR Code"
-          onClick={handleQRCodeClick}
-        />
-        <Button
-          on="surface"
-          variant="text"
-          Icon={AiFillDelete}
-          label="Remove"
-          onClick={handleRemoveClick}
-        />
+        <button onClick={handleInfoClick}>info</button>
+        <button onClick={handleQRCodeClick}>qrcode</button>
+        <button onClick={handleRemoveClick}>remove</button>
       </Popover>
       {/* Info */}
       <Modal {...infoModal.bind}>

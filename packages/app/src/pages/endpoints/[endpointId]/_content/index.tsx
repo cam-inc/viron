@@ -1,12 +1,12 @@
 import classnames from 'classnames';
 import React, { useCallback, useState } from 'react';
-import Paper from '$components/paper/index';
-import { Endpoint } from '$types/index';
-import { Document, Info } from '$types/oas';
+import Paper from '~/components/paper';
+import { COLOR_SYSTEM, Endpoint } from '~/types';
+import { Document, Info } from '~/types/oas';
 import useContent from './_hooks/useContent';
-import Body from './_parts/body/index';
-import Head, { Props as HeadProps } from './_parts/head/index';
-import Tail from './_parts/tail/index';
+import Body from './_parts/body';
+import Head, { Props as HeadProps } from './_parts/head';
+import Tail from './_parts/tail';
 
 export type Props = {
   endpoint: Endpoint;
@@ -48,7 +48,7 @@ const _Content: React.FC<Props> = ({
   }, []);
 
   return (
-    <Paper elevation={0} shadowElevation={0}>
+    <Paper on={COLOR_SYSTEM.SURFACE} shadowElevation={0}>
       <div id={content.id}>
         <Head
           className="p-2"
@@ -67,7 +67,7 @@ const _Content: React.FC<Props> = ({
           onColumnsFilterChange={handleColumnsFilterChange}
         />
         <Body
-          className={classnames('p-2 border-t border-on-surface-faint', {
+          className={classnames('p-2 border-t border-thm-on-surface-faint', {
             hidden: !isOpened,
           })}
           endpoint={endpoint}
@@ -78,7 +78,7 @@ const _Content: React.FC<Props> = ({
           omittedColumns={omittedColumns}
         />
         <Tail
-          className={classnames('p-2 border-t border-on-surface-faint', {
+          className={classnames('p-2 border-t border-thm-on-surface-faint', {
             hidden: !isOpened,
           })}
           document={document}

@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { On } from '$constants/index';
-import { Endpoint } from '$types/index';
-import { Document, Schema } from '$types/oas';
+import { Props as BaseProps } from '~/components';
+import { Endpoint } from '~/types';
+import { Document, Schema } from '~/types/oas';
 import { useActive, UseEliminateReturn } from './hooks/index';
 import Container from './parts/container';
 import SchemaOfTypeArray from './types/array';
@@ -12,10 +12,9 @@ import SchemaOfTypeNumber from './types/number';
 import SchemaOfTypeString from './types/string';
 import SchemaOfTypeObject from './types/object';
 
-export type Props = {
+export type Props = BaseProps & {
   endpoint: Endpoint;
   document: Document;
-  on: On;
   name: string;
   schema: Schema;
   register: UseFormReturn['register'];
@@ -32,9 +31,9 @@ export type Props = {
   activeRef: UseEliminateReturn['ref'];
 };
 const _Schema: React.FC<Props> = ({
+  on,
   endpoint,
   document,
-  on,
   name,
   schema,
   register,
@@ -50,25 +49,22 @@ const _Schema: React.FC<Props> = ({
   isDeepActive,
   activeRef,
 }) => {
-  const Component = useMemo<React.FC<Props>>(
-    function () {
-      switch (schema.type) {
-        case 'string':
-          return SchemaOfTypeString;
-        case 'number':
-          return SchemaOfTypeNumber;
-        case 'integer':
-          return SchemaOfTypeInteger;
-        case 'object':
-          return SchemaOfTypeObject;
-        case 'array':
-          return SchemaOfTypeArray;
-        case 'boolean':
-          return SchemaOfTypeBoolean;
-      }
-    },
-    [schema]
-  );
+  const Component = useMemo<React.FC<Props>>(() => {
+    switch (schema.type) {
+      case 'string':
+        return SchemaOfTypeString;
+      case 'number':
+        return SchemaOfTypeNumber;
+      case 'integer':
+        return SchemaOfTypeInteger;
+      case 'object':
+        return SchemaOfTypeObject;
+      case 'array':
+        return SchemaOfTypeArray;
+      case 'boolean':
+        return SchemaOfTypeBoolean;
+    }
+  }, [schema]);
 
   const { isActive, isActiveSwitchable, activate, inactivate, switchActive } =
     useActive({

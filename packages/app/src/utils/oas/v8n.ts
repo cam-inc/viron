@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { RegisterOptions, Validate } from 'react-hook-form';
-import { Schema } from '$types/oas';
-import { email } from '$utils/v8n';
+import { Schema } from '~/types/oas';
+import { email } from '~/utils/v8n';
 
 export const getRegisterOptions = function ({
   required,

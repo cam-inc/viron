@@ -4,7 +4,7 @@ import {
   initReactI18next,
   useTranslation as useTranslationI18n,
 } from 'react-i18next';
-import { isDevelopment } from '$utils/index';
+import { isDevelopment } from '~/utils';
 import resourceEn from './resources/en';
 import resourceJa from './resources/ja';
 

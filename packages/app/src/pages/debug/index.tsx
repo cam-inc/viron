@@ -1,8 +1,8 @@
 import { PageProps } from 'gatsby';
 import React, { useCallback } from 'react';
-import Metadata from '$components/metadata';
-import Layout, { Props as LayoutProps } from '$layouts/index';
-import useTheme from '$hooks/theme';
+import Metadata from '~/components/metadata';
+import Layout, { Props as LayoutProps } from '~/layouts';
+import useTheme from '~/hooks/theme';
 import AppBar from './_/appBar';
 import Body from './_/body';
 import Navigation from './_/navigation';

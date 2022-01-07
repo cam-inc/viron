@@ -1,13 +1,12 @@
 import classnames from 'classnames';
 import React, { useCallback } from 'react';
-import Logo from '$components/logo';
-import Navigation, { Props as NavigationProps } from '$components/navigation';
-import NavigationLinks from '$components/navigation/links';
-import NavigationServices from '$components/navigation/services';
-import NavigationVersion from '$components/navigation/version';
-import { ON } from '$constants/index';
-import { Props as LayoutProps } from '$layouts/index';
-import { ClassName } from '$types/index';
+import Logo from '~/components/logo';
+import Navigation, { Props as NavigationProps } from '~/components/navigation';
+import NavigationLinks from '~/components/navigation/links';
+import NavigationServices from '~/components/navigation/services';
+import NavigationVersion from '~/components/navigation/version';
+import { Props as LayoutProps } from '~/layouts';
+import { ClassName, COLOR_SYSTEM } from '~/types';
 
 type Props = {
   className?: ClassName;
@@ -37,13 +36,13 @@ const _Navigation: React.FC<Props> = ({ className = '' }) => {
       return (
         <div className="p-2">
           <div className="flex justify-center py-2 border-t border-dotted border-thm-on-surface-low">
-            <NavigationLinks on={ON.SURFACE} />
+            <NavigationLinks on={COLOR_SYSTEM.SURFACE} />
           </div>
           <div className="flex justify-center py-2 border-t border-dotted border-thm-on-surface-low">
-            <NavigationServices on={ON.SURFACE} />
+            <NavigationServices on={COLOR_SYSTEM.SURFACE} />
           </div>
           <div className="flex justify-center py-2 border-t border-dotted border-thm-on-surface-low">
-            <NavigationVersion on={ON.SURFACE} />
+            <NavigationVersion on={COLOR_SYSTEM.SURFACE} />
           </div>
         </div>
       );
@@ -53,7 +52,7 @@ const _Navigation: React.FC<Props> = ({ className = '' }) => {
 
   return (
     <Navigation
-      on={ON.SURFACE}
+      on={COLOR_SYSTEM.SURFACE}
       className={classnames(className, 'h-full')}
       renderHead={renderHead}
       renderTail={renderTail}

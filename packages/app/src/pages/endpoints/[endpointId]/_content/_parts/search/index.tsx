@@ -1,12 +1,10 @@
 import { AiOutlineSearch } from '@react-icons/all-files/ai/AiOutlineSearch';
 import React, { useCallback } from 'react';
-import Button from '$components/button';
-import Drawer, { useDrawer } from '$components/drawer';
-import Popover, { usePopover } from '$components/popover';
-import RequestComponent from '$components/request';
-import { ON } from '$constants/index';
-import { Endpoint } from '$types/index';
-import { Document, RequestValue } from '$types/oas';
+import RequestComponent from '~/components/request';
+import Drawer, { useDrawer } from '~/portals/drawer';
+import Popover, { usePopover } from '~/portals/popover';
+import { COLOR_SYSTEM, Endpoint } from '~/types';
+import { Document, RequestValue } from '~/types/oas';
 import { UseBaseReturn } from '../../_hooks/useBase';
 
 type Props = {
@@ -46,16 +44,13 @@ const Search: React.FC<Props> = ({ endpoint, document, base }) => {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <Button
-          on={ON.SURFACE}
-          variant="text"
-          Icon={AiOutlineSearch}
-          onClick={handleButtonClick}
-        />
+        <button onClick={handleButtonClick}>
+          <AiOutlineSearch />
+        </button>
       </div>
       <Drawer {...drawer.bind}>
         <RequestComponent
-          on={ON.SURFACE}
+          on={COLOR_SYSTEM.SURFACE}
           endpoint={endpoint}
           document={document}
           request={base.request}
@@ -65,7 +60,7 @@ const Search: React.FC<Props> = ({ endpoint, document, base }) => {
         />
       </Drawer>
       <Popover {...popover.bind}>
-        <div className="text-on-surface whitespace-nowrap">Search</div>
+        <div className="text-thm-on-surface whitespace-nowrap">Search</div>
       </Popover>
     </>
   );

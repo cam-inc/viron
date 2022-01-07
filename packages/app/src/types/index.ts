@@ -3,25 +3,48 @@ import {
   RequestRequestBodyValue,
   Document,
   OperationId,
-} from '$types/oas';
+} from '~/types/oas';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type JsonStringifiable = any;
+export const COLOR_SYSTEM = {
+  PRIMARY: 'primary',
+  PRIMARY_CONTAINER: 'primary-container',
+  SECONDARY: 'secondary',
+  SECONDARY_CONTAINER: 'secondary-container',
+  TERTIARY: 'tertiary',
+  TERTIARY_CONTAINER: 'tertiary-container',
+  ERROR: 'error',
+  ERROR_CONTAINER: 'error-container',
+  SURFACE: 'surface',
+  SURFACE_VARIANT: 'surface-variant',
+  BACKGROUND: 'background',
+} as const;
+export type ColorSystem = typeof COLOR_SYSTEM[keyof typeof COLOR_SYSTEM];
+
+export type JsonStringifiable = Parameters<typeof JSON.stringify>[0];
 export type URL = string;
 export type Pathname = string;
 export type EMail = string;
+
+export type EndpointGroupID = string;
+export type EndpointGroup = {
+  id: EndpointGroupID;
+  name: string;
+};
 
 export type EndpointID = string;
 export type Endpoint = {
   id: EndpointID;
   url: URL;
   isPrivate: boolean;
-  authConfigs: AuthConfigsResponse | null;
-  document: Document | null;
+  authConfigs?: AuthConfigsResponse;
+  document?: Document;
+  group?: EndpointGroup;
 };
-export type EndpointForDistribution = Endpoint & {
-  authConfigs: null;
-  document: null;
+export type EndpointForDistribution = Pick<Endpoint, 'id' | 'url'>;
+
+export type Distribution = {
+  endpointList: EndpointForDistribution[];
+  endpointGroupList: EndpointGroup[];
 };
 
 export type ClassName = string;

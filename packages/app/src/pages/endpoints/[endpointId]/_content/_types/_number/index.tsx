@@ -1,8 +1,8 @@
 import React from 'react';
-import Error from '$components/error';
-import { ON } from '$constants/index';
-import { Document, Info } from '$types/oas';
-import { getNumber } from '$utils/oas';
+import Error from '~/components/error';
+import { COLOR_SYSTEM } from '~/types';
+import { Document, Info } from '~/types/oas';
+import { getNumber } from '~/utils/oas';
 import { UseBaseReturn } from '../../_hooks/useBase';
 
 type Props = {
@@ -13,12 +13,12 @@ type Props = {
 const _ContentNumber: React.FC<Props> = ({ base }) => {
   const result = getNumber(base.data);
   if (result.isFailure()) {
-    return <Error on={ON.SURFACE} error={result.value} />;
+    return <Error on={COLOR_SYSTEM.SURFACE} error={result.value} />;
   }
 
   return (
     <div className="flex justify-end">
-      <div className="text-2xl font-bold text-on-surface">
+      <div className="text-2xl font-bold text-thm-on-surface">
         {result.value.toLocaleString()}
       </div>
     </div>

@@ -3,17 +3,22 @@ import { navigate, PageProps } from 'gatsby';
 import _ from 'lodash';
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRecoilState } from 'recoil';
-import Error from '$components/error';
-import Metadata from '$components/metadata';
-import { ON, HTTPStatusCode } from '$constants/index';
-import { BaseError, getHTTPError, NetworkError, OASError } from '$errors/index';
-import useTheme from '$hooks/theme';
-import Layout, { Props as LayoutProps } from '$layouts/index';
-import { oneState } from '$store/selectors/endpoint';
-import { Document, Info } from '$types/oas';
-import { promiseErrorHandler } from '$utils/index';
-import { lint, resolve } from '$utils/oas';
+import Error from '~/components/error';
+import Metadata from '~/components/metadata';
+import { HTTPStatusCode } from '~/constants';
+import {
+  BaseError,
+  getHTTPError,
+  NetworkError,
+  OASError,
+} from '~/errors/index';
+import useTheme from '~/hooks/theme';
+import Layout, { Props as LayoutProps } from '~/layouts/index';
+import { useEndpointListItemGlobalState } from '~/store';
+import { COLOR_SYSTEM } from '~/types';
+import { Document, Info } from '~/types/oas';
+import { promiseErrorHandler } from '~/utils';
+import { lint, resolve } from '~/utils/oas';
 import Appbar from './_appbar/index';
 import Body, { Props as BodyProps } from './_body';
 import Navigation, { Props as NavigationProps } from './_navigation';
@@ -25,9 +30,9 @@ type PageId = Info['x-pages'][number]['id'];
 
 type Props = PageProps;
 const EndpointOnePage: React.FC<Props> = ({ params }) => {
-  const [endpoint, setEndpoint] = useRecoilState(
-    oneState({ id: params.endpointId })
-  );
+  const [endpoint, setEndpoint] = useEndpointListItemGlobalState({
+    id: params.endpointId,
+  });
   const [document, setDocument] = useState<Document | null>(null);
   const [isPending, setIsPending] = useState<boolean>(true);
   const [error, setError] = useState<BaseError | null>(null);
@@ -214,7 +219,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
         return <div>TODO: pending...</div>;
       }
       if (error) {
-        return <Error on={ON.BACKGROUND} error={error} />;
+        return <Error on={COLOR_SYSTEM.BACKGROUND} error={error} />;
       }
       const page = _.find(document.info['x-pages'], function (page) {
         return page.id === selectedPageId;

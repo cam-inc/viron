@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { X_Theme, X_THEME } from '$types/oas';
+import { X_Theme, X_THEME } from '~/types/oas';
 
 export type Props = {
   theme: X_Theme;

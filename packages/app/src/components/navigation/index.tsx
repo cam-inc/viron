@@ -1,11 +1,8 @@
 import classnames from 'classnames';
 import React from 'react';
-import { On } from '$constants/index';
-import { ClassName } from '$types/index';
+import { Props as BaseProps } from '~/components';
 
-export type Props = {
-  on: On;
-  className?: ClassName;
+export type Props = BaseProps & {
   renderHead?: () => JSX.Element | null;
   renderBody?: () => JSX.Element | null;
   renderTail?: () => JSX.Element | null;

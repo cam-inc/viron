@@ -1,10 +1,9 @@
 import React, { useCallback, useState } from 'react';
-import Drawer, { useDrawer } from '$components/drawer';
-import RequestComponent from '$components/request';
-import { ON } from '$constants/index';
-import { BaseError } from '$errors/index';
-import { Endpoint } from '$types/index';
-import { Document, RequestValue } from '$types/oas';
+import RequestComponent from '~/components/request';
+import { BaseError } from '~/errors';
+import Drawer, { useDrawer } from '~/portals/drawer';
+import { COLOR_SYSTEM, Endpoint } from '~/types';
+import { Document, RequestValue } from '~/types/oas';
 import Action from '../action';
 import { UseDescendantsReturn } from '../../_hooks/useDescendants';
 
@@ -59,7 +58,7 @@ const Descendant: React.FC<Props> = ({
       <Action request={descendant.request} onClick={handleClick} />
       <Drawer {...drawer.bind}>
         <RequestComponent
-          on={ON.SURFACE}
+          on={COLOR_SYSTEM.SURFACE}
           endpoint={endpoint}
           document={document}
           request={descendant.request}

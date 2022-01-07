@@ -1,11 +1,11 @@
 import _ from 'lodash';
 import React, { useCallback, useMemo } from 'react';
 import { Validate } from 'react-hook-form';
-import Select from '$components/select';
-import Textarea from '$components/textarea';
-import Textinput from '$components/textinput';
-import Wyswyg, { Props as WyswygProps } from '$components/wyswyg';
-import { getRegisterOptions } from '$utils/oas/v8n';
+import Select from '~/components/select';
+import Textarea from '~/components/textarea';
+import Textinput from '~/components/textinput';
+import Wyswyg, { Props as WyswygProps } from '~/components/wyswyg';
+import { getRegisterOptions } from '~/utils/oas/v8n';
 import { useAutocomplete, useDynamicEnum, useNameForError } from '../../hooks';
 import { Props } from '../../index';
 

@@ -1,7 +1,7 @@
 import { normal as normalBlend } from 'color-blend';
 import { CSSProperties } from 'react';
-import { RGB, Hue, HSL } from '$types/index';
-import { X_Theme, X_THEME } from '$types/oas';
+import { RGB, Hue, HSL } from '~/types';
+import { X_Theme, X_THEME } from '~/types/oas';
 
 export const THEME_HUE: Record<X_Theme, Hue> = {
   [X_THEME.RED]: 0,

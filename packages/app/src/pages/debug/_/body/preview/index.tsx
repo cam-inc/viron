@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
-import { HSL } from '$types/index';
-import { Mode, ModeName, MODE_NAME, Tokens } from '$utils/colorSystem';
+import { HSL } from '~/types';
+import { Mode, ModeName, MODE_NAME, Tokens } from '~/utils/colorSystem';
 
 export type Props = {
   tokens: Tokens;

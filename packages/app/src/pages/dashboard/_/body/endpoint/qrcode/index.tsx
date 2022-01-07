@@ -1,9 +1,8 @@
 import qrcode from 'qrcode';
 import React, { useEffect, useRef, useState } from 'react';
-import { ON } from '$constants/index';
-import Error from '$components/error';
-import { BaseError } from '$errors/index';
-import { Endpoint, EndpointForDistribution } from '$types/index';
+import Error from '~/components/error';
+import { BaseError } from '~/errors';
+import { COLOR_SYSTEM, Endpoint, EndpointForDistribution } from '~/types';
 
 type Props = {
   endpoint: Endpoint;
@@ -20,8 +19,6 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
       }
       const _endpoint: EndpointForDistribution = {
         ...endpoint,
-        authConfigs: null,
-        document: null,
       };
       const data = `${
         new URL(location.href).origin
@@ -38,7 +35,7 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
   );
 
   if (error) {
-    return <Error on={ON.SURFACE} error={error} />;
+    return <Error on={COLOR_SYSTEM.SURFACE} error={error} />;
   }
   return (
     <div className="flex justify-center">

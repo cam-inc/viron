@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import React from 'react';
-import { Tone } from '$utils/colorSystem';
+import { Tone } from '~/utils/colorSystem';
 
 export type Props = Tone;
 const _Tone: React.FC<Props> = ({ hsl, level }) => {

@@ -1,20 +1,17 @@
-import { ImExit } from '@react-icons/all-files/im/ImExit';
 import _ from 'lodash';
 import React, { useCallback, useMemo } from 'react';
-import Button from '$components/button';
-import Drawer, { useDrawer } from '$components/drawer';
-import Request from '$components/request';
-import { ON } from '$constants/index';
-import { AuthConfig, Endpoint } from '$types/index';
-import { Document, Request as TypeRequest, RequestValue } from '$types/oas';
-import { promiseErrorHandler } from '$utils/index';
+import Request from '~/components/request';
+import Drawer, { useDrawer } from '~/portals/drawer';
+import { AuthConfig, COLOR_SYSTEM, Endpoint } from '~/types';
+import { Document, Request as TypeRequest, RequestValue } from '~/types/oas';
+import { promiseErrorHandler } from '~/utils';
 import {
   constructRequestInfo,
   constructRequestInit,
   constructRequestPayloads,
   getRequest,
   resolve,
-} from '$utils/oas/index';
+} from '~/utils/oas';
 
 type Props = {
   endpoint: Endpoint;
@@ -121,16 +118,10 @@ const Signout: React.FC<Props> = ({
       document = resolve(document);
       return (
         <>
-          <Button
-            on="surface"
-            Icon={ImExit}
-            label="Signout"
-            size="xs"
-            onClick={handleClick}
-          />
+          <button onClick={handleClick}>signout</button>
           <Drawer {...drawer.bind}>
             <Request
-              on={ON.SURFACE}
+              on={COLOR_SYSTEM.SURFACE}
               endpoint={endpoint}
               document={document}
               request={request as TypeRequest}

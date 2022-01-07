@@ -1,9 +1,7 @@
 import { AiFillPushpin } from '@react-icons/all-files/ai/AiFillPushpin';
 import { AiOutlinePushpin } from '@react-icons/all-files/ai/AiOutlinePushpin';
 import React, { useCallback } from 'react';
-import Button from '$components/button';
-import Popover, { usePopover } from '$components/popover';
-import { ON } from '$constants/index';
+import Popover, { usePopover } from '~/portals/popover';
 
 export type Props = {
   isActive: boolean;
@@ -38,15 +36,12 @@ const Pin: React.FC<Props> = ({ isActive, onClick }) => {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <Button
-          on={ON.SURFACE}
-          variant="text"
-          Icon={isActive ? AiFillPushpin : AiOutlinePushpin}
-          onClick={handleButtonClick}
-        />
+        <button onClick={handleButtonClick}>
+          {isActive ? <AiFillPushpin /> : <AiOutlinePushpin />}
+        </button>
       </div>
       <Popover {...popover.bind}>
-        <div className="text-on-surface whitespace-nowrap">
+        <div className="text-thm-on-surface whitespace-nowrap">
           {isActive ? 'Unpin' : 'Pin'}
         </div>
       </Popover>

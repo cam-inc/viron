@@ -1,5 +1,5 @@
 import { AtomEffect } from 'recoil';
-import { get, Key, set } from '$storage/index';
+import { get, Key, set } from '~/storage';
 
 // For detail about Atom Effects,
 // @see: https://recoiljs.org/docs/guides/atom-effects

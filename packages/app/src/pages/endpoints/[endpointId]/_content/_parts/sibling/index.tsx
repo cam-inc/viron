@@ -1,10 +1,9 @@
 import React, { useCallback, useState } from 'react';
-import Drawer, { useDrawer } from '$components/drawer';
-import RequestComponent from '$components/request';
-import { ON } from '$constants/index';
-import { BaseError } from '$errors/index';
-import { Endpoint } from '$types/index';
-import { Document, RequestValue } from '$types/oas';
+import RequestComponent from '~/components/request';
+import { BaseError } from '~/errors/index';
+import Drawer, { useDrawer } from '~/portals/drawer';
+import { COLOR_SYSTEM, Endpoint } from '~/types';
+import { Document, RequestValue } from '~/types/oas';
 import Action from '../action';
 import { UseSiblingsReturn } from '../../_hooks/useSiblings';
 
@@ -54,7 +53,7 @@ const Sibling: React.FC<Props> = ({
       <Action request={sibling.request} onClick={handleClick} />
       <Drawer {...drawer.bind}>
         <RequestComponent
-          on={ON.SURFACE}
+          on={COLOR_SYSTEM.SURFACE}
           endpoint={endpoint}
           document={document}
           request={sibling.request}

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Props as LayoutProps } from '$layouts/index';
-import { Endpoint } from '$types/index';
-import { Document, Info } from '$types/oas';
+import { Props as LayoutProps } from '~/layouts';
+import { Endpoint } from '~/types';
+import { Document, Info } from '~/types/oas';
 import Content, { Props as ContentProps } from '../_content/index';
 
 export type Props = {

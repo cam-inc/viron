@@ -1,6 +1,6 @@
 import React from 'react';
-import { HSL } from '$types/index';
-import { Mode } from '$utils/colorSystem';
+import { HSL } from '~/types';
+import { Mode } from '~/utils/colorSystem';
 
 export type Props = {
   title: string;

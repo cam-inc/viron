@@ -35,20 +35,7 @@ module.exports = {
       options: {
         // Edit the paths option in the tsconfig.json file as well.
         alias: {
-          $src: 'src',
-          $components: 'src/components',
-          $constants: 'src/constants',
-          $errors: 'src/errors',
-          $hooks: 'src/hooks',
-          $i18n: 'src/i18n',
-          $layouts: 'src/layouts',
-          $oas: 'src/oas',
-          $storage: 'src/storage',
-          $store: 'src/store',
-          $styles: 'src/styles',
-          $types: 'src/types',
-          $utils: 'src/utils',
-          $wrappers: 'src/wrappers',
+          '~': './src',
         },
       },
     },

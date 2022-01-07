@@ -9,7 +9,16 @@ import {
   screen as appScreenAtom,
   theme as appThemeAtom,
 } from './atoms/app';
-import { list as endpointListAtom } from './atoms/endpoint';
+import {
+  list as endpointListAtom,
+  groupList as endpointGroupListAtom,
+} from './atoms/endpoint';
+import {
+  listByGroup as endpointListByGroupSelector,
+  listUngrouped as endpointListUngroupedSelector,
+  listItem as endpointListItemSelector,
+  groupListItem as endpointGroupListItemSelector,
+} from './selectors/endpoint';
 
 /**
  * Rename recoil functions to make them abstract.
@@ -56,3 +65,36 @@ export const useEndpointListGlobalStateValue = () =>
   useGlobalStateValue(endpointListAtom);
 export const useEndpointListGlobalStateSet = () =>
   useGlobalStateSet(endpointListAtom);
+
+export const useEndpointGroupListGlobalState = () =>
+  useGlobalState(endpointGroupListAtom);
+export const useEndpointGroupListGlobalStateValue = () =>
+  useGlobalStateValue(endpointGroupListAtom);
+export const useEndpointGroupListGlobalStateSet = () =>
+  useGlobalStateSet(endpointGroupListAtom);
+
+export const useEndpointListByGroupGlobalStateValue = () =>
+  useGlobalStateValue(endpointListByGroupSelector);
+
+export const useEndpointListUngroupedGlobalStateValue = () =>
+  useGlobalStateValue(endpointListUngroupedSelector);
+
+export const useEndpointListItemGlobalState = (
+  params: Parameters<typeof endpointListItemSelector>[0]
+) => useGlobalState(endpointListItemSelector(params));
+export const useEndpointListItemGlobalStateValue = (
+  params: Parameters<typeof endpointListItemSelector>[0]
+) => useGlobalStateValue(endpointListItemSelector(params));
+export const useEndpointListItemGlobalStateSet = (
+  params: Parameters<typeof endpointListItemSelector>[0]
+) => useGlobalStateSet(endpointListItemSelector(params));
+
+export const useEndpointGroupListItemGlobalState = (
+  params: Parameters<typeof endpointGroupListItemSelector>[0]
+) => useGlobalState(endpointGroupListItemSelector(params));
+export const useEndpointGroupListItemGlobalStateValue = (
+  params: Parameters<typeof endpointGroupListItemSelector>[0]
+) => useGlobalStateValue(endpointGroupListItemSelector(params));
+export const useEndpointGroupListItemGlobalStateSet = (
+  params: Parameters<typeof endpointGroupListItemSelector>[0]
+) => useGlobalStateSet(endpointGroupListItemSelector(params));

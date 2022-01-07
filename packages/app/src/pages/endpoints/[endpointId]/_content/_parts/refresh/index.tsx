@@ -1,8 +1,6 @@
 import { AiOutlineReload } from '@react-icons/all-files/ai/AiOutlineReload';
 import React, { useCallback } from 'react';
-import Button from '$components/button';
-import Popover, { usePopover } from '$components/popover';
-import { ON } from '$constants/index';
+import Popover, { usePopover } from '~/portals/popover';
 import { UseBaseReturn } from '../../_hooks/useBase';
 
 type Props = {
@@ -34,15 +32,12 @@ const Refresh: React.FC<Props> = ({ base }) => {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <Button
-          on={ON.SURFACE}
-          variant="text"
-          Icon={AiOutlineReload}
-          onClick={handleButtonClick}
-        />
+        <button onClick={handleButtonClick}>
+          <AiOutlineReload />
+        </button>
       </div>
       <Popover {...popover.bind}>
-        <div className="text-on-surface whitespace-nowrap">Refresh</div>
+        <div className="text-thm-on-surface whitespace-nowrap">Refresh</div>
       </Popover>
     </>
   );

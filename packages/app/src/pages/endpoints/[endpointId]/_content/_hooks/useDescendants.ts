@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import { useMemo } from 'react';
-import { HTTPStatusCode } from '$constants/index';
-import { BaseError, getHTTPError, NetworkError } from '$errors/index';
-import { Endpoint } from '$types/index';
+import { HTTPStatusCode } from '~/constants';
+import { BaseError, getHTTPError, NetworkError } from '~/errors';
+import { Endpoint } from '~/types';
 import {
   Document,
   Info,
@@ -10,8 +10,8 @@ import {
   OperationId,
   Request,
   RequestValue,
-} from '$types/oas';
-import { promiseErrorHandler } from '$utils/index';
+} from '~/types/oas';
+import { promiseErrorHandler } from '~/utils';
 import {
   cleanupRequestValue,
   constructRequestInfo,
@@ -20,7 +20,7 @@ import {
   getContentBaseOperationResponseKeys,
   getRequest,
   getRequestParameterKeys,
-} from '$utils/oas';
+} from '~/utils/oas';
 
 export type UseDescendantsReturn = {
   request: Request;

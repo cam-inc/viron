@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { RequestPayloadParameter, Style } from '$types/oas';
+import { RequestPayloadParameter, Style } from '~/types/oas';
 
 type Variable = RequestPayloadParameter['value'];
 

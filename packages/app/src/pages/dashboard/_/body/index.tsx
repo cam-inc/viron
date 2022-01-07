@@ -1,17 +1,27 @@
-import { BiPlusCircle } from '@react-icons/all-files/bi/BiPlusCircle';
 import classnames from 'classnames';
 import React, { useCallback } from 'react';
-import Modal, { useModal } from '$components/modal';
-import Notification, { useNotification } from '$components/notification';
-import { useTranslation } from '$i18n/index';
-import { Props as LayoutProps } from '$layouts/index';
-import { useEndpointListGlobalStateValue } from '$store/index';
-import Endpoint, { Props as EndpointProps } from './endpoint/index';
-import Add, { Props as AddProps } from './add';
+import { SIZE as BUTTON_SIZE } from '~/components/button';
+import TextButton, { Props as TextButtonProps } from '~/components/button/text';
+import FolderIcon from '~/components/icon/folder/outline';
+import PlusCircleIcon from '~/components/icon/plusCircle/outline';
+import { useTranslation } from '~/i18n/index';
+import { Props as LayoutProps } from '~/layouts/index';
+import Modal, { useModal } from '~/portals/modal';
+import Notification, { useNotification } from '~/portals/notification';
+import {
+  useEndpointListByGroupGlobalStateValue,
+  useEndpointListUngroupedGlobalStateValue,
+} from '~/store/index';
+import { COLOR_SYSTEM } from '~/types';
+import Endpoint, { Props as EndpointProps } from './endpoint';
+import EndpointGroup from './endpointGroup';
+import AddEndpoint, { Props as AddEndpointProps } from './addGroup';
+import AddGroup, { Props as AddGroupProps } from './addGroup';
 
 export type Props = Parameters<LayoutProps['renderBody']>[0];
 const Body: React.FC<Props> = ({ className = '' }) => {
-  const endpointList = useEndpointListGlobalStateValue();
+  const endpointListByGroup = useEndpointListByGroupGlobalStateValue();
+  const endpointListUngrouped = useEndpointListUngroupedGlobalStateValue();
 
   const notification = useNotification();
   const handleRemove = useCallback<EndpointProps['onRemove']>(
@@ -21,60 +31,105 @@ const Body: React.FC<Props> = ({ className = '' }) => {
     [notification]
   );
 
-  const modal = useModal();
-  const handleAddButtonClick = useCallback(
-    function () {
-      modal.open();
-    },
-    [modal]
-  );
-
   const { t } = useTranslation();
 
-  const handleAdd = useCallback<AddProps['onAdd']>(
-    function () {
-      modal.close();
-    },
-    [modal]
-  );
+  const modalAddEndpoint = useModal();
+  const handleAddEndpointClick = useCallback<TextButtonProps['onClick']>(() => {
+    modalAddEndpoint.open();
+  }, [modalAddEndpoint.open]);
+  const handleAddEndpointAdd = useCallback<AddEndpointProps['onAdd']>(() => {
+    modalAddEndpoint.close();
+  }, [modalAddEndpoint.close]);
+  const handleAddEndpointCancelClick = useCallback<
+    AddEndpointProps['onCancelClick']
+  >(() => {
+    modalAddEndpoint.close();
+  }, [modalAddEndpoint.close]);
+
+  const modalAddGroup = useModal();
+  const handleAddGroupClick = useCallback<TextButtonProps['onClick']>(() => {
+    modalAddGroup.open();
+  }, [modalAddGroup.open]);
+  const handleAddGroupAdd = useCallback<AddGroupProps['onAdd']>(() => {
+    modalAddGroup.close();
+  }, [modalAddGroup.close]);
+  const handleAddGroupCancelClick = useCallback<
+    AddGroupProps['onCancelClick']
+  >(() => {
+    modalAddGroup.close();
+  }, [modalAddGroup.close]);
 
   return (
     <>
-      <div
-        className={classnames('p-2', className)}
-        style={{
-          display: 'grid',
-          gridGap: '8px',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gridAutoRows: 'auto',
-        }}
-      >
-        {endpointList.map(function (endpoint) {
-          return (
-            <div key={endpoint.id}>
-              <Endpoint endpoint={endpoint} onRemove={handleRemove} />
-            </div>
-          );
-        })}
+      <div className={classnames('p-4 flex flex-col gap-2', className)}>
         <div>
-          <button
-            className="block w-full h-full p-2 min-h-[160px] flex flex-col items-center justify-center border border-dashed focus:outline-none focus:ring-2 border-on-background rounded text-on-background hover:bg-on-background-faint hover:text-on-background-high hover:border-on-background-high focus:bg-on-background-faint focus:ring-on-background-high active:bg-on-background-faint active:text-on-background-high"
-            onClick={handleAddButtonClick}
-          >
-            <BiPlusCircle
-              className="mb-2"
-              style={{
-                fontSize: '48px',
-              }}
+          <div>
+            <TextButton
+              cs={COLOR_SYSTEM.SECONDARY}
+              label="Add Endpoint"
+              Icon={PlusCircleIcon}
+              size={BUTTON_SIZE.XS}
+              onClick={handleAddEndpointClick}
             />
-            <div>ADD</div>
-          </button>
+          </div>
         </div>
-        <div />
-        <div />
+        <div>
+          <div className="flex items-center gap-2">
+            <div className="flex-none text-thm-on-surface text-sm">
+              Endpoints
+            </div>
+            <div className="flex-1 border-t border-dashed border-thm-on-surface-slight" />
+            <div className="flex-none flex items-center gap-2">
+              <div>
+                <TextButton
+                  cs={COLOR_SYSTEM.SECONDARY}
+                  label="Add Group"
+                  Icon={FolderIcon}
+                  size={BUTTON_SIZE.XS}
+                  onClick={handleAddGroupClick}
+                />
+              </div>
+            </div>
+          </div>
+          <ul>
+            {endpointListByGroup.map((item) => (
+              <li key={item.group.id}>
+                <EndpointGroup group={item.group} list={item.list} />
+                <ul>
+                  <div>{item.group?.name || 'Ungrouped'}</div>
+                  {item.list.map((endpoint) => (
+                    <li key={endpoint.id}>
+                      <Endpoint endpoint={endpoint} onRemove={handleRemove} />
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+            {endpointListUngrouped.length && (
+              <li>
+                <ul>
+                  {endpointListUngrouped.map((endpoint) => (
+                    <li key={endpoint.id}>
+                      <Endpoint endpoint={endpoint} onRemove={handleRemove} />
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            )}
+          </ul>
+        </div>
       </div>
-      <Modal {...modal.bind}>
-        <Add onAdd={handleAdd} />
+      <Modal {...modalAddEndpoint.bind}>
+        <AddEndpoint
+          onAdd={handleAddEndpointAdd}
+          onCancelClick={handleAddEndpointCancelClick}
+        />
+      </Modal>
+      <Modal {...modalAddGroup.bind}>
+        <AddGroup
+          onAdd={handleAddGroupAdd}
+          onCancelClick={handleAddGroupCancelClick}
+        />
       </Modal>
       <Notification {...notification.bind}>
         <div>{t('deleted')}</div>

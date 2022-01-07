@@ -1,13 +1,13 @@
 import classnames from 'classnames';
 import { Link } from 'gatsby';
 import React, { useCallback } from 'react';
-import Logo from '$components/logo';
-import Navigation, { Props as NavigationProps } from '$components/navigation';
-import NavigationLinks from '$components/navigation/links';
-import NavigationServices from '$components/navigation/services';
-import NavigationVersion from '$components/navigation/version';
-import { ON } from '$constants/index';
-import { Props as LayoutProps } from '$layouts/index';
+import Logo from '~/components/logo';
+import Navigation, { Props as NavigationProps } from '~/components/navigation';
+import NavigationLinks from '~/components/navigation/links';
+import NavigationServices from '~/components/navigation/services';
+import NavigationVersion from '~/components/navigation/version';
+import { Props as LayoutProps } from '~/layouts';
+import { COLOR_SYSTEM } from '~/types';
 import Pages, { Props as PagesProps } from '../_pages';
 
 export type Props = {
@@ -31,8 +31,8 @@ const _Navigation: React.FC<Props> = ({
         >
           <Logo
             className="h-8 drop-shadow-01dp"
-            left="text-primary"
-            right="text-primary-variant"
+            left="text-thm-primary"
+            right="text-thm-primary-variant"
           />
         </Link>
       );
@@ -50,7 +50,7 @@ const _Navigation: React.FC<Props> = ({
   const renderBody = useCallback<NonNullable<NavigationProps['renderBody']>>(
     function () {
       return (
-        <div className="text-on-surface border-t border-on-surface-faint">
+        <div className="text-thm-on-surface border-t border-thm-on-surface-faint">
           <Pages
             pages={pages}
             selectedPageId={selectedPageId}
@@ -67,13 +67,13 @@ const _Navigation: React.FC<Props> = ({
       return (
         <div className="px-2">
           <div className="flex justify-center py-2">
-            <NavigationLinks on={ON.SURFACE} />
+            <NavigationLinks on={COLOR_SYSTEM.SURFACE} />
           </div>
-          <div className="flex justify-center py-2 border-t-2 border-on-surface-faint">
-            <NavigationServices on={ON.SURFACE} />
+          <div className="flex justify-center py-2 border-t-2 border-thm-on-surface-faint">
+            <NavigationServices on={COLOR_SYSTEM.SURFACE} />
           </div>
-          <div className="flex justify-center py-2 border-t-2 border-on-surface-faint">
-            <NavigationVersion on={ON.SURFACE} />
+          <div className="flex justify-center py-2 border-t-2 border-thm-on-surface-faint">
+            <NavigationVersion on={COLOR_SYSTEM.SURFACE} />
           </div>
         </div>
       );
@@ -83,7 +83,7 @@ const _Navigation: React.FC<Props> = ({
 
   return (
     <Navigation
-      on={ON.SURFACE}
+      on={COLOR_SYSTEM.SURFACE}
       className={classnames(className, 'h-full')}
       renderHead={renderHead}
       renderBody={renderBody}

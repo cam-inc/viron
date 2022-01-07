@@ -1,33 +1,27 @@
-import { BiCaretDownSquare } from '@react-icons/all-files/bi/BiCaretDownSquare';
-import { BiCaretRightSquare } from '@react-icons/all-files/bi/BiCaretRightSquare';
 import classnames from 'classnames';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import Button, {
-  SIZE as BUTTON_SIZE,
-  VARIANT as BUTTON_VARIANT,
-} from '$components/button';
-import Operation from '$components/operation';
-import Schema from '$components/schema';
-import { useEliminate } from '$components/schema/hooks/index';
-import { On, ON } from '$constants/index';
-import { ClassName, Endpoint } from '$types/index';
+import { Props as BaseProps } from '~/components';
+import ChevronDownIcon from '~/components/icon/chevronDown/outline';
+import ChevronRightIcon from '~/components/icon/chevronRight/outline';
+import Operation from '~/components/operation';
+import Schema from '~/components/schema';
+import { useEliminate } from '~/components/schema/hooks/index';
+import { Endpoint } from '~/types/index';
 import {
   Document,
   Request,
   RequestValue,
   Schema as SchemaType,
-} from '$types/oas';
-import { pickContentType } from '$utils/oas';
+} from '~/types/oas';
+import { pickContentType } from '~/utils/oas';
 
-export type Props = {
-  on: On;
+export type Props = BaseProps & {
   endpoint: Endpoint;
   document: Document;
   request: Request;
   defaultValues?: RequestValue;
   onSubmit: (requestValue: RequestValue) => void;
-  className?: ClassName;
   renderHead?: () => JSX.Element | null;
 };
 const _Request: React.FC<Props> = ({
@@ -83,7 +77,7 @@ const _Request: React.FC<Props> = ({
           <div
             className={classnames(
               'flex-none p-2 border-b-2',
-              `border-on-${on}-faint`
+              `border-thm-on-${on}-faint`
             )}
           >
             {renderHead()}
@@ -93,10 +87,10 @@ const _Request: React.FC<Props> = ({
         <div
           className={classnames(
             'flex-none flex gap-2 border-b-2',
-            `text-on-${on} border-on-${on}-faint`
+            `text-thm-on-${on} border-thm-on-${on}-faint`
           )}
         >
-          <div className={classnames('flex-none p-2', `bg-on-${on}-faint`)}>
+          <div className={classnames('flex-none p-2', `bg-on-thm-${on}-faint`)}>
             <div className="flex items-center h-[22px]">
               <button
                 type="button"
@@ -104,9 +98,9 @@ const _Request: React.FC<Props> = ({
                 onClick={handleCommonHeadOpenerClick}
               >
                 {isCommonHeadOpened ? (
-                  <BiCaretDownSquare />
+                  <ChevronDownIcon className="w-em" />
                 ) : (
-                  <BiCaretRightSquare />
+                  <ChevronRightIcon className="w-em" />
                 )}
               </button>
             </div>
@@ -120,7 +114,7 @@ const _Request: React.FC<Props> = ({
               <div
                 className={classnames(
                   'pt-2 mt-2 border-t',
-                  `border-on-${on}-faint`
+                  `border-thm-on-${on}-faint`
                 )}
               >
                 <Operation
@@ -208,17 +202,12 @@ const _Request: React.FC<Props> = ({
         <div
           className={classnames(
             'flex-none p-2 border-t-2',
-            `border-on-${on}-faint`
+            `border-thm-on-${on}-faint`
           )}
         >
-          <Button
-            className="w-full"
-            on={ON.SURFACE}
-            variant={BUTTON_VARIANT.PAPER}
-            size={BUTTON_SIZE.LG}
-            type="submit"
-            label="submit"
-          />
+          <button className="w-full" type="submit">
+            submit
+          </button>
         </div>
       </form>
     </div>

@@ -4,15 +4,10 @@ import { BiCheckbox } from '@react-icons/all-files/bi/BiCheckbox';
 import { BiCheckboxSquare } from '@react-icons/all-files/bi/BiCheckboxSquare';
 import classnames from 'classnames';
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
-import Button, {
-  SIZE as BUTTON_SIZE,
-  VARIANT as BUTTON_VARIANT,
-} from '$components/button';
-import Drawer, { useDrawer } from '$components/drawer';
-import Popover, { usePopover } from '$components/popover';
-import { ON } from '$constants/index';
-import { Document, Info, TableColumn } from '$types/oas';
-import { getTableColumns } from '$utils/oas';
+import Drawer, { useDrawer } from '~/portals/drawer';
+import Popover, { usePopover } from '~/portals/popover';
+import { Document, Info, TableColumn } from '~/types/oas';
+import { getTableColumns } from '~/utils/oas';
 
 export type Props = {
   document: Document;
@@ -102,17 +97,14 @@ const Filter: React.FC<Props> = ({ document, content, omitted, onChange }) => {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <Button
-          on={ON.SURFACE}
-          variant="text"
-          Icon={omitted.length ? AiFillFilter : AiOutlineFilter}
-          onClick={handleButtonClick}
-        />
+        <button onClick={handleButtonClick}>
+          {omitted.length ? <AiFillFilter /> : <AiOutlineFilter />}
+        </button>
       </div>
       <Drawer {...drawer.bind}>
-        <div className="h-full flex flex-col text-on-surface">
+        <div className="h-full flex flex-col text-thm-on-surface">
           {/* Head */}
-          <div className="flex-none p-2 border-b-2 border-on-surface-faint">
+          <div className="flex-none p-2 border-b-2 border-thm-on-surface-faint">
             <div>Filter</div>
           </div>
           {/* Body */}
@@ -120,7 +112,7 @@ const Filter: React.FC<Props> = ({ document, content, omitted, onChange }) => {
             <div className="flex-none px-2">
               <button
                 className={classnames(
-                  'block w-full py-2 flex items-center gap-2 border-b border-on-surface',
+                  'block w-full py-2 flex items-center gap-2 border-b border-thm-on-surface',
                   {}
                 )}
                 onClick={handleToggleAllClick}
@@ -137,10 +129,12 @@ const Filter: React.FC<Props> = ({ document, content, omitted, onChange }) => {
                       key={column.key}
                       data-key={column.key}
                       className={classnames(
-                        'py-2 flex items-center gap-2 border-b border-on-surface-faint',
+                        'py-2 flex items-center gap-2 border-b border-thm-on-surface-faint',
                         {
-                          'text-on-surface': !newOmitted.includes(column.key),
-                          'text-on-surface-slight': newOmitted.includes(
+                          'text-thm-on-surface': !newOmitted.includes(
+                            column.key
+                          ),
+                          'text-thm-on-surface-slight': newOmitted.includes(
                             column.key
                           ),
                         }
@@ -160,15 +154,10 @@ const Filter: React.FC<Props> = ({ document, content, omitted, onChange }) => {
             </div>
           </div>
           {/* Tail */}
-          <div className="flex-none p-2 border-t-2 border-on-surface-faint">
-            <Button
-              className="w-full"
-              on={ON.SURFACE}
-              variant={BUTTON_VARIANT.PAPER}
-              size={BUTTON_SIZE.LG}
-              label="apply"
-              onClick={handleApplyClick}
-            />
+          <div className="flex-none p-2 border-t-2 border-thm-on-surface-faint">
+            <button className="w-full" onClick={handleApplyClick}>
+              apply
+            </button>
           </div>
         </div>
       </Drawer>

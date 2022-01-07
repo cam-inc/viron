@@ -8,10 +8,8 @@ import { BiSticker } from '@react-icons/all-files/bi/BiSticker';
 import { BiTestTube } from '@react-icons/all-files/bi/BiTestTube';
 import { BiTrash } from '@react-icons/all-files/bi/BiTrash';
 import React, { useCallback, useMemo } from 'react';
-import Button from '$components/button';
-import Popover, { usePopover } from '$components/popover';
-import { ON } from '$constants/index';
-import { METHOD, Request } from '$types/oas';
+import Popover, { usePopover } from '~/portals/popover';
+import { METHOD, Request } from '~/types/oas';
 
 type Props = {
   request: Request;
@@ -89,15 +87,12 @@ const Action: React.FC<Props> = ({ request, onClick }) => {
         onMouseEnter={handleRootMouseEnter}
         onMouseLeave={handleRootMouseLeave}
       >
-        <Button
-          on={ON.SURFACE}
-          variant="text"
-          Icon={Icon}
-          onClick={handleClick}
-        />
+        <button onClick={handleClick}>
+          <Icon />
+        </button>
       </div>
       <Popover {...popover.bind}>
-        <div className="text-on-surface whitespace-nowrap">{info}</div>
+        <div className="text-thm-on-surface whitespace-nowrap">{info}</div>
       </Popover>
     </>
   );

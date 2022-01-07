@@ -1,9 +1,9 @@
 import { lint as _lint, LintReturn } from '@viron/linter';
 import { JSONPath } from 'jsonpath-plus';
 import _ from 'lodash';
-import { EnvironmentalVariable } from '$constants/index';
-import { Failure, OASError, Result, Success } from '$errors/index';
-import { Endpoint, URL } from '$types/index';
+import { EnvironmentalVariable } from '~/constants';
+import { Failure, OASError, Result, Success } from '~/errors';
+import { Endpoint, URL } from '~/types';
 import {
   Content,
   Document,
@@ -31,13 +31,13 @@ import {
   TABLE_SORT,
   X_Autocomplete,
   X_Table,
-} from '$types/oas';
-import { isRelativeURL } from '$utils/index';
-import { serialize } from '$utils/oas/style';
+} from '~/types/oas';
+import { isRelativeURL } from '~/utils';
+import { serialize } from '~/utils/oas/style';
 
 // Check whether a OAS document is support by us.
-export const lint = function (document: Record<string, unknown>): LintReturn {
-  return _lint(document);
+export const lint = function (document: unknown): LintReturn {
+  return _lint(document as Parameters<typeof _lint>[0]);
 };
 
 // TODO: To support $ref values not starting with a # letter.

@@ -1,10 +1,8 @@
 import { BiCaretDownSquare } from '@react-icons/all-files/bi/BiCaretDownSquare';
 import { BiCaretRightSquare } from '@react-icons/all-files/bi/BiCaretRightSquare';
 import React, { useCallback } from 'react';
-import Button from '$components/button';
-import { ON } from '$constants/index';
-import { ClassName, Endpoint } from '$types/index';
-import { Document, Info } from '$types/oas';
+import { ClassName, Endpoint } from '~/types';
+import { Document, Info } from '~/types/oas';
 import { UseBaseReturn } from '../../_hooks/useBase';
 import { UseSiblingsReturn } from '../../_hooks/useSiblings';
 import Filter, { Props as FilterProps } from '../filter/index';
@@ -87,15 +85,12 @@ const Head: React.FC<Props> = ({
     <div className={className}>
       <div className="flex items-center">
         <div className="flex-none mr-2">
-          <Button
-            on={ON.SURFACE}
-            variant="text"
-            Icon={isOpened ? BiCaretDownSquare : BiCaretRightSquare}
-            onClick={handleOpenerClick}
-          />
+          <button onClick={handleOpenerClick}>
+            {isOpened ? <BiCaretDownSquare /> : <BiCaretRightSquare />}
+          </button>
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-on-surface-high">
+          <div className="text-thm-on-surface-high">
             {content.title || content.id}
           </div>
         </div>

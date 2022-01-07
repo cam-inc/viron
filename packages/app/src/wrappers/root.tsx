@@ -9,24 +9,25 @@ import resolveConfig from 'tailwindcss/resolveConfig';
 import { TailwindConfig } from 'tailwindcss/tailwind-config';
 // @ts-ignore
 import tailwindConfig from '../../tailwind.config';
-import ErrorBoundary from '$components/errorBoundary';
-import Spinner from '$components/spinner';
-import { ON } from '$constants/index';
-import '$i18n/index';
+import Error, { useError } from '~/components/error';
+import ErrorBoundary from '~/components/errorBoundary';
+import Spinner from '~/components/spinner';
+import { UnhandledError } from '~/errors';
+import '~/i18n';
 import {
   GlobalStateProvider,
   useAppIsLaunchedGlobalState,
   useAppScreenGlobalStateSet,
   useAppThemeGlobalStateValue,
-} from '$store/index';
-import '$styles/global.css';
-import { ClassName } from '$types/index';
-import { getCustomProperties } from '$utils/colorSystem';
-import DrawerWrapper from '$wrappers/drawer';
-import ModalWrapper from '$wrappers/modal';
-import NotificationWrapper from '$wrappers/notification';
-import PopoverWrapper from '$wrappers/popover';
-import ProgressWrapper from '$wrappers/progress';
+} from '~/store';
+import '~/styles/global.css';
+import { ClassName, COLOR_SYSTEM } from '~/types';
+import { getCustomProperties } from '~/utils/colorSystem';
+import DrawerWrapper from '~/wrappers/drawer';
+import ModalWrapper from '~/wrappers/modal';
+import NotificationWrapper from '~/wrappers/notification';
+import PopoverWrapper from '~/wrappers/popover';
+import ProgressWrapper from '~/wrappers/progress';
 
 type Props = {
   pluginOptions: PluginOptions;
@@ -40,7 +41,7 @@ const RootWrapper: React.FC<Props> = (props) => {
         <HelmetProvider>
           <DndProvider backend={HTML5Backend}>
             <GlobalStateProvider>
-              <ErrorBoundary on={ON.BACKGROUND}>
+              <ErrorBoundary on={COLOR_SYSTEM.BACKGROUND}>
                 {/* Need to wrap a react component to encapsulate all state related processes inside the RecoilRoot component. */}
                 <Root {...props} />
               </ErrorBoundary>
@@ -53,7 +54,6 @@ const RootWrapper: React.FC<Props> = (props) => {
 };
 export default RootWrapper;
 
-// the name doesn't matter. It's just a local component.
 const Root: React.FC<Props> = ({ children }) => {
   // Entry point.
   const { launch, isLaunched, style } = useRoot();
@@ -61,10 +61,26 @@ const Root: React.FC<Props> = ({ children }) => {
     launch();
   }, []);
 
+  // Handle non-react-related errors that are dismissed.
+  const error = useError({
+    on: COLOR_SYSTEM.SURFACE,
+    withModal: true,
+  });
+  useEffect(() => {
+    const handler = (e: ErrorEvent) => {
+      error.setError(new UnhandledError(e.message));
+    };
+    window.addEventListener('error', handler);
+    return () => {
+      window.removeEventListener('error', handler);
+    };
+  }, [error.setError]);
+
   return (
     <>
       {style}
       <div id="root" className="relative font-mono">
+        {/* TODO: iphone実機確認 */}
         <div className="min-h-screen">{children}</div>
         <DrawerWrapper className="fixed inset-0 z-wrapper-drawer" />
         <ModalWrapper className="fixed inset-0 z-wrapper-modal" />
@@ -73,6 +89,7 @@ const Root: React.FC<Props> = ({ children }) => {
         <ProgressWrapper className="fixed inset-0 z-wrapper-progress" />
         <Splash isActive={!isLaunched} className="fixed inset-0 z-splash" />
       </div>
+      <Error {...error.bind} />
     </>
   );
 };
@@ -166,7 +183,7 @@ const Splash: React.FC<{ isActive: boolean; className?: ClassName }> = ({
   return (
     <div
       className={classnames(
-        'flex items-center justify-center bg-surface transition',
+        'flex items-center justify-center bg-thm-surface transition',
         {
           'opacity-100 scale-100 pointer-events-auto': isActive,
           'opacity-0 scale-110 pointer-events-none': !isActive,
@@ -174,7 +191,7 @@ const Splash: React.FC<{ isActive: boolean; className?: ClassName }> = ({
         className
       )}
     >
-      <Spinner className="flex-none w-12" on={ON.SURFACE} />
+      <Spinner className="flex-none w-12" on={COLOR_SYSTEM.SURFACE} />
     </div>
   );
 };

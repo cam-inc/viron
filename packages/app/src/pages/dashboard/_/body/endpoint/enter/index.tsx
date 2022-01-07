@@ -1,9 +1,6 @@
-import { ImEnter } from '@react-icons/all-files/im/ImEnter';
 import { navigate } from 'gatsby';
 import React, { useCallback, useMemo } from 'react';
-import Button from '$components/button';
-import { ON } from '$constants/index';
-import { Endpoint } from '$types/index';
+import { Endpoint } from '~/types';
 
 type Props = {
   endpoint: Endpoint;
@@ -19,15 +16,7 @@ const Enter: React.FC<Props> = ({ endpoint, isSigninRequired }) => {
 
   const elm = useMemo<JSX.Element>(
     function () {
-      return (
-        <Button
-          on={ON.SURFACE}
-          Icon={ImEnter}
-          label="Enter"
-          size="xs"
-          onClick={handleClick}
-        />
-      );
+      return <button onClick={handleClick}>enter</button>;
     },
     [handleClick]
   );

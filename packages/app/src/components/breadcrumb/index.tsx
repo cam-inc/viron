@@ -1,28 +1,23 @@
-import { BiChevronRight } from '@react-icons/all-files/bi/BiChevronRight';
 import classnames from 'classnames';
 import React from 'react';
-import { On } from '$constants/index';
-import { ClassName } from '$types/index';
+import { Props as BaseProps } from '~/components';
+import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 
-export type Props = {
-  on: On;
+export type Props = BaseProps & {
   list: string[];
-  className?: ClassName;
 };
 const Breadcrumb: React.FC<Props> = ({ on, list, className = '' }) => {
   return (
-    <div className={classnames('', `text-on-${on}`, className)}>
+    <div className={classnames(`text-thm-on-${on}`, className)}>
       <div className="flex items-center gap-1">
-        {list.map(function (label) {
-          return (
-            <React.Fragment key={label}>
-              <div className="">{label}</div>
-              <div className="">
-                <BiChevronRight />
-              </div>
-            </React.Fragment>
-          );
-        })}
+        {list.map((label) => (
+          <React.Fragment key={label}>
+            <div className="">{label}</div>
+            <div className="">
+              <ChevronRightIcon className="w-em" />
+            </div>
+          </React.Fragment>
+        ))}
       </div>
     </div>
   );

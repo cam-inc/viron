@@ -1,30 +1,27 @@
 import { IconType } from '@react-icons/all-files';
-import { AiFillApi } from '@react-icons/all-files/ai/AiFillApi';
 import { AiFillGoogleCircle } from '@react-icons/all-files/ai/AiFillGoogleCircle';
 import { AiOutlineLogin } from '@react-icons/all-files/ai/AiOutlineLogin';
 import { navigate } from 'gatsby';
 import _ from 'lodash';
 import React, { useCallback, useMemo, useState } from 'react';
-import Button from '$components/button';
-import Error from '$components/error';
-import Drawer, { useDrawer } from '$components/drawer';
-import Modal, { useModal } from '$components/modal';
-import Request, { Props as RequestProps } from '$components/request';
+import Error from '~/components/error';
+import Request, { Props as RequestProps } from '~/components/request';
 import {
   ENVIRONMENTAL_VARIABLE,
   OAUTH_REDIRECT_URI,
-  ON,
   HTTPStatusCode,
-} from '$constants/index';
-import { BaseError, getHTTPError, NetworkError } from '$errors/index';
-import { remove, KEY, set } from '$storage/index';
-import { AuthConfig, Endpoint } from '$types/index';
+} from '~/constants';
+import { BaseError, getHTTPError, NetworkError } from '~/errors';
+import Drawer, { useDrawer } from '~/portals/drawer';
+import Modal, { useModal } from '~/portals/modal';
+import { remove, KEY, set } from '~/storage';
+import { AuthConfig, COLOR_SYSTEM, Endpoint } from '~/types';
 import {
   Request as RequestType,
   RequestParametersValue,
   RequestValue,
-} from '$types/oas';
-import { promiseErrorHandler } from '$utils/index';
+} from '~/types/oas';
+import { promiseErrorHandler } from '~/utils';
 import {
   constructRequestInfo,
   constructRequestInit,
@@ -32,7 +29,7 @@ import {
   getRequest,
   replaceEnvironmentalVariableOfDefaultRequestParametersValue,
   resolve,
-} from '$utils/oas/index';
+} from '~/utils/oas';
 
 type Props = {
   endpoint: Endpoint;
@@ -81,22 +78,10 @@ const Signin: React.FC<Props> = ({ endpoint, isSigninRequired }) => {
         <>
           <div className="flex items-center gap-2">
             {authconfigOAuth && (
-              <Button
-                on="surface"
-                Icon={AiFillApi}
-                label="Signin(OAuth)"
-                size="xs"
-                onClick={handleOAuthClick}
-              />
+              <button onClick={handleOAuthClick}>oauth signin</button>
             )}
             {authconfigEmail && (
-              <Button
-                on="surface"
-                Icon={AiFillApi}
-                label="Signin(Email)"
-                size="xs"
-                onClick={handleEmailClick}
-              />
+              <button onClick={handleEmailClick}>email signin</button>
             )}
           </div>
           <Drawer {...drawerOAuth.bind}>
@@ -214,7 +199,7 @@ const OAuth: React.FC<{
   const renderHead = useCallback<NonNullable<RequestProps['renderHead']>>(
     function () {
       return (
-        <div className="flex items-center text-on-surface">
+        <div className="flex items-center text-thm-on-surface">
           <Icon className="mr-1" />
           <div className="text-xs">OAuth</div>
         </div>
@@ -225,19 +210,25 @@ const OAuth: React.FC<{
 
   if (!document) {
     return (
-      <Error on={ON.SURFACE} error={new BaseError('OAS document missing.')} />
+      <Error
+        on={COLOR_SYSTEM.SURFACE}
+        error={new BaseError('OAS document missing.')}
+      />
     );
   }
 
   if (!request) {
     return (
-      <Error on={ON.SURFACE} error={new BaseError('Request object missing.')} />
+      <Error
+        on={COLOR_SYSTEM.SURFACE}
+        error={new BaseError('Request object missing.')}
+      />
     );
   }
 
   return (
     <Request
-      on={ON.SURFACE}
+      on={COLOR_SYSTEM.SURFACE}
       endpoint={endpoint}
       document={document}
       defaultValues={defaultValues}
@@ -332,7 +323,7 @@ const Email: React.FC<{
   const renderHead = useCallback<NonNullable<RequestProps['renderHead']>>(
     function () {
       return (
-        <div className="flex items-center text-on-surface">
+        <div className="flex items-center text-thm-on-surface">
           <AiOutlineLogin className="mr-1" />
           <div className="text-xs">Email</div>
         </div>
@@ -343,20 +334,26 @@ const Email: React.FC<{
 
   if (!document) {
     return (
-      <Error on={ON.SURFACE} error={new BaseError('OAS document missing.')} />
+      <Error
+        on={COLOR_SYSTEM.SURFACE}
+        error={new BaseError('OAS document missing.')}
+      />
     );
   }
 
   if (!request) {
     return (
-      <Error on={ON.SURFACE} error={new BaseError('Request object missing.')} />
+      <Error
+        on={COLOR_SYSTEM.SURFACE}
+        error={new BaseError('Request object missing.')}
+      />
     );
   }
 
   return (
     <>
       <Request
-        on={ON.SURFACE}
+        on={COLOR_SYSTEM.SURFACE}
         endpoint={endpoint}
         document={document}
         defaultValues={defaultValues}
@@ -366,7 +363,7 @@ const Email: React.FC<{
         renderHead={renderHead}
       />
       <Modal {...errorModal.bind}>
-        {error && <Error on={ON.SURFACE} error={error} />}
+        {error && <Error on={COLOR_SYSTEM.SURFACE} error={error} />}
       </Modal>
     </>
   );

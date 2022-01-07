@@ -1,9 +1,9 @@
 import { BiXCircle } from '@react-icons/all-files/bi/BiXCircle';
 import classnames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Props as LayoutProps } from '$layouts/index';
-import { Endpoint } from '$types/index';
-import { Document, Info } from '$types/oas';
+import { Props as LayoutProps } from '~/layouts/index';
+import { Endpoint } from '~/types';
+import { Document, Info } from '~/types/oas';
 import Content, { Props as ContentProps } from '../_content/index';
 
 type Content = Info['x-pages'][number]['contents'][number];

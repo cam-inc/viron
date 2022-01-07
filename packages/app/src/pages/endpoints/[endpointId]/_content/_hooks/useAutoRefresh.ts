@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { Info } from '$types/oas';
+import { Info } from '~/types/oas';
 
 export type UseAutoRefreshReturn = {
   enabled: boolean;

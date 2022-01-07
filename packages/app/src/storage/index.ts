@@ -2,6 +2,7 @@ import store from 'store2';
 
 export const KEY = {
   ENDPOINT_LIST: 'endpointList',
+  ENDPOINT_GROUP_LIST: 'endpointGroupList',
   OAUTH_ENDPOINT_ID: 'oauthEndpointId',
 } as const;
 export type Key = typeof KEY[keyof typeof KEY];

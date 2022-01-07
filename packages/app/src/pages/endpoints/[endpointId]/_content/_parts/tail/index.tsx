@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { ClassName } from '$types/index';
-import { Document, Info } from '$types/oas';
+import { ClassName } from '~/types';
+import { Document, Info } from '~/types/oas';
 import { UseBaseReturn } from '../../_hooks/useBase';
 import Pagination from '../pagination/index';
 

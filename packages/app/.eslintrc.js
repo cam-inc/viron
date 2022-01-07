@@ -17,7 +17,10 @@ module.exports = {
     'no-empty-pattern': 'off',
     'no-extra-boolean-cast': 'off',
     'linebreak-style': ['error', 'unix'],
-    'react/jsx-no-bind': ['error', { ignoreRefs: true, allowFunctions: true }],
+    'react/jsx-no-bind': [
+      'error',
+      { ignoreRefs: true, allowFunctions: true, allowArrowFunctions: true },
+    ],
     'react/jsx-no-duplicate-props': 'error',
     'react/self-closing-comp': 'error',
     'react/prefer-es6-class': 'error',
