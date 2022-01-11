@@ -12,6 +12,11 @@ const links: {
   isExternal: boolean;
 }[] = [
   {
+    to: '/',
+    label: 'Home',
+    isExternal: false,
+  },
+  {
     to: '/dashboard',
     label: 'Dashboard',
     isExternal: false,

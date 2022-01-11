@@ -4,7 +4,7 @@ import { Props as BaseProps } from '~/components';
 import ExclamationIcon from '~/components/icon/exclamation/outline';
 import Link from '~/components/link';
 import { BaseError, HTTP401Error, HTTP403Error, NetworkError } from '~/errors';
-import Modal, { useModal } from '~/portals/modal';
+import Modal, { useModal } from '~/portals/modal/';
 import { error as logError, NAMESPACE } from '~/utils/logger';
 
 type Props = BaseProps & {

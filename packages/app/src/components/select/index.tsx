@@ -3,13 +3,13 @@ import React from 'react';
 import { Props as BaseProps } from '~/components';
 import { ClassName } from '~/types';
 
-type Props<T> = BaseProps & {
+type Props<T = unknown> = BaseProps & {
   list: T[];
   Select: React.FC<{ className: ClassName }>;
   Option: React.FC<{ className: ClassName; data: T }>;
   OptionBlank?: React.FC<{ className: ClassName }>;
 };
-const _Select = function <T>({
+const _Select = function <T = unknown>({
   on,
   list,
   Select,

@@ -9,19 +9,16 @@ import Export from './export';
 import Import from './import';
 
 type Props = Parameters<NonNullable<LayoutProps['renderAppBar']>>[0];
-const Appbar: React.FC<Props> = ({ className = '', openNavigation }) => {
+const Appbar: React.FC<Props> = ({ className, style, openNavigation }) => {
   const screen = useAppScreenGlobalStateValue();
   const { lg } = screen;
 
-  const handleNavButtonClick = useCallback(
-    function () {
-      openNavigation();
-    },
-    [openNavigation]
-  );
+  const handleNavButtonClick = useCallback(() => {
+    openNavigation();
+  }, [openNavigation]);
 
   return (
-    <div className={className}>
+    <div className={className} style={style}>
       <div className="flex justify-center items-center h-full px-4">
         <div className="flex-none">
           {!lg && (
@@ -36,11 +33,11 @@ const Appbar: React.FC<Props> = ({ className = '', openNavigation }) => {
         </div>
         <div className="flex-1 min-w-0" />
         <div className="flex-none">
-          <ul className="flex gap-2 text-xs text-thm-on-primary">
-            <li className="flex justify-center items-center">
+          <ul className="flex gap-2">
+            <li className="">
               <Export />
             </li>
-            <li className="flex justify-center items-center px-2">
+            <li className="">
               <Import />
             </li>
           </ul>

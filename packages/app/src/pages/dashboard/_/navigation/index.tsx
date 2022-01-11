@@ -11,7 +11,7 @@ import { ClassName, COLOR_SYSTEM } from '~/types';
 type Props = {
   className?: ClassName;
 } & Parameters<NonNullable<LayoutProps['renderNavigation']>>[0];
-const _Navigation: React.FC<Props> = ({ className = '' }) => {
+const _Navigation: React.FC<Props> = ({ className, style }) => {
   const renderHead = useCallback<NonNullable<NavigationProps['renderHead']>>(
     function () {
       return (
@@ -51,12 +51,14 @@ const _Navigation: React.FC<Props> = ({ className = '' }) => {
   );
 
   return (
-    <Navigation
-      on={COLOR_SYSTEM.SURFACE}
-      className={classnames(className, 'h-full')}
-      renderHead={renderHead}
-      renderTail={renderTail}
-    />
+    <nav className={classnames(className, 'h-full')} style={style}>
+      <Navigation
+        on={COLOR_SYSTEM.SURFACE}
+        className="h-full"
+        renderHead={renderHead}
+        renderTail={renderTail}
+      />
+    </nav>
   );
 };
 export default _Navigation;

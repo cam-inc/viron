@@ -44,7 +44,7 @@ const Modal: React.FC<Props> = ({ isOpened, onRequestClose, children }) => {
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div
             className={classnames(
-              'min-w-25% max-w-75% min-h-25% max-h-75% flex flex-col pointer-events-auto transition duration-300 transform',
+              'min-w-50% max-w-75% max-h-75% flex flex-col pointer-events-auto transition duration-300 transform',
               {
                 'scale-100': isVisible,
                 'opacity-100': isVisible,
@@ -60,7 +60,7 @@ const Modal: React.FC<Props> = ({ isOpened, onRequestClose, children }) => {
                 </button>
               </div>
             </div>
-            <div className="min-h-0 flex-1 bg-thm-surface shadow-04dp p-4 rounded overflow-y-scroll overscroll-y-contain">
+            <div className="min-h-0 flex-1 bg-thm-surface shadow-01dp border border-thm-on-surface-faint p-4 rounded overflow-y-scroll overscroll-y-contain">
               {children}
             </div>
           </div>

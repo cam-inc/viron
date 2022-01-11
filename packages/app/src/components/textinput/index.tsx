@@ -1,7 +1,7 @@
 import classnames from 'classnames';
 import React, { useMemo } from 'react';
 import { FieldError } from 'react-hook-form';
-import { Props as BaseProps } from '~/components';
+import { Props as BaseProps } from '~/components/';
 import { ClassName } from '~/types';
 
 type Bind = {

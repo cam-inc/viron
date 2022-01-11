@@ -1,18 +1,18 @@
 import { PageProps } from 'gatsby';
 import React, { useCallback } from 'react';
 import Metadata from '~/components/metadata';
-import Layout, { Props as LayoutProps } from '~/layouts';
 import useTheme from '~/hooks/theme';
-import AppBar from './_/appBar';
-import Body from './_/body';
-import Navigation from './_/navigation';
+import Layout, { Props as LayoutProps } from '~/layouts/index';
+import Appbar from '../_/appBar';
+import Navigation from '../_/navigation';
+import Body from './_/body/';
 
 type Props = PageProps;
-const DebugPage: React.FC<Props> = () => {
+const DashboardEndpointsPage: React.FC<Props> = () => {
   useTheme();
 
   const renderAppBar = useCallback<NonNullable<LayoutProps['renderAppBar']>>(
-    (args) => <AppBar {...args} />,
+    (args) => <Appbar {...args} />,
     []
   );
 
@@ -27,7 +27,7 @@ const DebugPage: React.FC<Props> = () => {
 
   return (
     <>
-      <Metadata />
+      <Metadata title="Dashboard" />
       <Layout
         renderAppBar={renderAppBar}
         renderNavigation={renderNavigation}
@@ -36,4 +36,5 @@ const DebugPage: React.FC<Props> = () => {
     </>
   );
 };
-export default DebugPage;
+
+export default DashboardEndpointsPage;

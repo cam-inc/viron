@@ -396,7 +396,7 @@ export const usePopover = function <
         targetRef,
       },
     }),
-    [open, close, handleRequestClose]
+    [open, close, isOpened, handleRequestClose]
   );
   return ret;
 };

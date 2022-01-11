@@ -29,16 +29,16 @@ export type EndpointGroupID = string;
 export type EndpointGroup = {
   id: EndpointGroupID;
   name: string;
+  description?: string;
+  priority?: number;
 };
 
 export type EndpointID = string;
 export type Endpoint = {
   id: EndpointID;
   url: URL;
-  isPrivate: boolean;
   authConfigs?: AuthConfigsResponse;
-  document?: Document;
-  group?: EndpointGroup;
+  groupId?: EndpointGroupID;
 };
 export type EndpointForDistribution = Pick<Endpoint, 'id' | 'url'>;
 
@@ -49,34 +49,17 @@ export type Distribution = {
 
 export type ClassName = string;
 
+export type Authentication = {
+  list: AuthConfig[];
+  oas: Document;
+};
+
 export type AuthConfig = {
   type: 'email' | 'oauth' | 'oauthcallback' | 'signout';
   provider: 'viron' | 'google' | 'signout';
   operationId: OperationId;
   defaultParametersValue?: RequestParametersValue;
   defaultRequestBodyValue?: RequestRequestBodyValue;
-};
-
-export type AuthConfigsResponse = {
-  list: AuthConfig[];
-  oas: Document;
-};
-
-export type __AuthConfig = {
-  type: 'oauthcallback';
-  provider: 'viron' | 'google' | 'signout';
-  // This object contains only one key-value pair.
-  pathObject: {
-    '/xxxx': {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      [key in string]: any;
-    };
-  };
-  defaultParametersValue: {
-    redirectUri: '__VIRON_CALLBACK__';
-  };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  defaultRequestBodyValue: any;
 };
 
 // colors

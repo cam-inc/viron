@@ -8,7 +8,7 @@ import Body from './_/body';
 import Navigation from './_/navigation';
 
 type Props = PageProps;
-const HomePage: React.FC<Props> = () => {
+const DashboardPage: React.FC<Props> = () => {
   useTheme();
 
   const renderAppBar = useCallback<NonNullable<LayoutProps['renderAppBar']>>(
@@ -37,4 +37,4 @@ const HomePage: React.FC<Props> = () => {
   );
 };
 
-export default HomePage;
+export default DashboardPage;

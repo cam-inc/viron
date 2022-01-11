@@ -1,30 +1,34 @@
 import classnames from 'classnames';
 import _ from 'lodash';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { CSSProperties, useCallback, useEffect, useState } from 'react';
 import ErrorBoundary from '~/components/errorBoundary';
 import Drawer, { useDrawer } from '~/portals/drawer';
 import { useAppScreenGlobalStateValue } from '~/store';
-import { COLOR_SYSTEM } from '~/types';
+import { ClassName, COLOR_SYSTEM } from '~/types';
 
 export type Props = {
   renderAppBar?: (args: {
-    className: string;
+    className: ClassName;
+    style: CSSProperties;
     openNavigation: () => void;
     closeNavigation: () => void;
   }) => JSX.Element | null;
   renderNavigation?: (args: {
-    className: string;
+    className: ClassName;
+    style: CSSProperties;
     openNavigation: () => void;
     closeNavigation: () => void;
     isOnDrawer: boolean;
   }) => JSX.Element | null;
   renderBody: (args: {
-    className: string;
+    className: ClassName;
+    style: CSSProperties;
     openNavigation: () => void;
     closeNavigation: () => void;
   }) => JSX.Element | null;
   renderSubBody?: (args: {
-    className: string;
+    className: ClassName;
+    style: CSSProperties;
     openNavigation: () => void;
     closeNavigation: () => void;
   }) => JSX.Element | null;
@@ -37,15 +41,15 @@ const Layout: React.FC<Props> = ({
 }) => {
   const [isAppBarOpened, setIsAppBarOpened] = useState<boolean>(true);
   // Toggle app bar open status according to window.scrollY value.
-  useEffect(function () {
+  useEffect(() => {
     let isTicking = false;
     let prevScrollY = window.scrollY;
-    const handleScroll = function () {
+    const handleScroll = () => {
       if (isTicking) {
         return;
       }
       isTicking = true;
-      window.requestAnimationFrame(function () {
+      window.requestAnimationFrame(() => {
         let isToOpen = false;
         const currentScrollY = window.scrollY;
         // to close when scrolled downward and to open when upward.
@@ -79,28 +83,22 @@ const Layout: React.FC<Props> = ({
 
   // Show navigation with drawer depending on screen size.
   const screen = useAppScreenGlobalStateValue();
-  const { lg } = screen;
+  const { lg, height } = screen;
   const drawer = useDrawer({ position: 'left' });
-  const openNavigation = useCallback(
-    function () {
-      drawer.open();
-    },
-    [drawer]
-  );
-  const closeNavigation = useCallback(
-    function () {
-      drawer.close();
-    },
-    [drawer]
-  );
+  const openNavigation = useCallback(() => {
+    drawer.open();
+  }, [drawer.open]);
+  const closeNavigation = useCallback(() => {
+    drawer.close();
+  }, [drawer.close]);
 
   return (
     <>
       <div
         id="layout-index"
-        className="relative flex flex-col min-h-screen bg-thm-background text-thm-on-background"
+        className="bg-thm-background text-thm-on-background"
       >
-        {/* System Bar */}
+        {/* region: System Bar */}
         <div className="fixed z-layout-systembar top-0 right-0 left-0 h-[8px] bg-thm-secondary text-thm-on-secondary shadow-01dp" />
         {/* region: App Bar */}
         {renderAppBar && (
@@ -108,8 +106,8 @@ const Layout: React.FC<Props> = ({
             className={classnames(
               'fixed z-layout-appbar top-[8px] right-0 h-0',
               {
-                'left-[160px]': lg,
-                'left-0': !lg,
+                'left-[160px]': renderNavigation && lg,
+                'left-0': !(renderNavigation && lg),
               }
             )}
           >
@@ -125,7 +123,9 @@ const Layout: React.FC<Props> = ({
             >
               <ErrorBoundary on={COLOR_SYSTEM.PRIMARY}>
                 {renderAppBar({
-                  className: 'h-full overflow-x-auto overscroll-x-contain',
+                  className:
+                    'h-full overflow-x-auto overscroll-x-contain overflow-y-hidden',
+                  style: {},
                   openNavigation,
                   closeNavigation,
                 })}
@@ -135,10 +135,11 @@ const Layout: React.FC<Props> = ({
         )}
         {/* region: Navigation */}
         {renderNavigation && lg && (
-          <div className="fixed z-layout-navigation top-[8px] left-0 bottom-0 w-[160px] bg-thm-surface text-thm-on-surface shadow-01dp border-r border-thm-on-surface-faint overflow-y-scroll overscroll-y-contain">
+          <div className="fixed z-layout-navigation top-[8px] left-0 bottom-0 w-[160px] bg-thm-surface text-thm-on-surface shadow-01dp border-r-2 border-thm-on-surface-faint overflow-y-scroll overscroll-y-contain">
             <ErrorBoundary on={COLOR_SYSTEM.SURFACE}>
               {renderNavigation({
                 className: '',
+                style: {},
                 openNavigation,
                 closeNavigation,
                 isOnDrawer: false,
@@ -160,6 +161,7 @@ const Layout: React.FC<Props> = ({
             <ErrorBoundary on={COLOR_SYSTEM.BACKGROUND}>
               {renderSubBody({
                 className: '',
+                style: {},
                 openNavigation,
                 closeNavigation,
               })}
@@ -168,19 +170,19 @@ const Layout: React.FC<Props> = ({
         )}
         {/* region: Body */}
         <div
-          className={classnames(
-            'flex flex-col flex-1 min-h-full z-layout-body',
-            {
-              'pt-[8px]': !renderAppBar,
-              'pt-[72px]': renderAppBar,
-              'pl-[160px]': lg && renderNavigation,
-              'pb-[50vh]': renderSubBody,
-            }
-          )}
+          className={classnames('z-layout-body', {
+            'pt-[8px]': !renderAppBar,
+            'pt-[72px]': renderAppBar,
+            'pl-[160px]': lg && renderNavigation,
+            'pb-[50vh]': renderSubBody,
+          })}
         >
           <ErrorBoundary on={COLOR_SYSTEM.BACKGROUND}>
             {renderBody({
-              className: 'flex-1',
+              className: 'relative',
+              style: {
+                minHeight: `${height - (renderAppBar ? 72 : 8)}px`,
+              },
               openNavigation,
               closeNavigation,
             })}
@@ -192,6 +194,7 @@ const Layout: React.FC<Props> = ({
           <ErrorBoundary on={COLOR_SYSTEM.SURFACE}>
             {renderNavigation({
               className: '',
+              style: {},
               openNavigation,
               closeNavigation,
               isOnDrawer: true,

@@ -42,7 +42,7 @@ const Target: React.FC<{
   const [isPending, setIsPending] = useState<boolean>(false);
   const [isDone, setIsDone] = useState<boolean>(false);
   const [error, setError] = useState<BaseError | null>(null);
-  const { addEndpoint } = useEndpoint();
+  const { connect, addEndpoint } = useEndpoint();
 
   const handleImportClick = useCallback<
     FilledButtonProps['onClick']
@@ -51,11 +51,18 @@ const Target: React.FC<{
       return;
     }
     setIsPending(true);
-    const res = await addEndpoint(endpointForDistribution);
-    setError(res.error);
+    const connection = await connect(endpointForDistribution.url);
+    if (connection.error) {
+      setError(connection.error);
+      setIsPending(false);
+      setIsDone(true);
+      return;
+    }
+    const addition = await addEndpoint(endpointForDistribution);
+    setError(addition.error);
     setIsPending(false);
     setIsDone(true);
-  }, [isPending, isDone, addEndpoint]);
+  }, [isPending, isDone, connect, addEndpoint, endpointForDistribution]);
 
   return (
     <div className="flex items-center gap-4 border-l-4 border-thm-on-surface-slight pl-4">

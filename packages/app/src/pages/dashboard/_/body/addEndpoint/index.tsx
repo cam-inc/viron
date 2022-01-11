@@ -9,9 +9,10 @@ import FilledButton, {
 import OutlineButton, {
   Props as OutlineButtonProps,
 } from '~/components/button/outline';
+import Select from '~/components/select';
 import Textinput from '~/components/textinput';
 import { useEndpoint } from '~/hooks/endpoint';
-import { ClassName, COLOR_SYSTEM, Endpoint } from '~/types';
+import { ClassName, COLOR_SYSTEM, Endpoint, EndpointGroup } from '~/types';
 import { endpointId, url } from '~/utils/v8n';
 
 export type Props = {
@@ -24,9 +25,9 @@ const AddEndpoint: React.FC<Props> = ({
   onAdd,
   onCancelClick,
 }) => {
-  const { addEndpoint } = useEndpoint();
+  const { groupList, addEndpoint } = useEndpoint();
 
-  type Data = Pick<Endpoint, 'id' | 'url'> & { manual?: string };
+  type Data = Pick<Endpoint, 'id' | 'url' | 'groupId'> & { manual?: string };
   const schema = useMemo(
     () =>
       yup.object().shape({
@@ -41,6 +42,7 @@ const AddEndpoint: React.FC<Props> = ({
     formState,
     setError,
     clearErrors,
+    watch,
   } = useForm<Data>({
     resolver: yupResolver(schema),
   });
@@ -51,7 +53,7 @@ const AddEndpoint: React.FC<Props> = ({
         if (result.error) {
           setError('manual', {
             type: 'manual',
-            message: result.error.message,
+            message: result.error.name,
           });
           return;
         }
@@ -74,6 +76,7 @@ const AddEndpoint: React.FC<Props> = ({
         <div>
           <div className="text-thm-on-surface">Create an Endpoint.</div>
         </div>
+        <div>{formState.errors.manual?.message}</div>
         <div className="space-y-2">
           <Textinput
             type="text"
@@ -89,8 +92,26 @@ const AddEndpoint: React.FC<Props> = ({
             error={formState.errors.id}
             render={(bind) => <input {...bind} {...register('url')} />}
           />
+          <Select<EndpointGroup>
+            on={COLOR_SYSTEM.SURFACE}
+            list={groupList}
+            Select={({ className, children }) => (
+              <select
+                className={className}
+                value={watch('groupId')}
+                {...register('groupId')}
+              >
+                {children}
+              </select>
+            )}
+            Option={({ className, data }) => (
+              <option className={className} value={data.id}>
+                {data.name}
+              </option>
+            )}
+          />
         </div>
-        <div>
+        <div className="flex justify-end gap-2">
           <OutlineButton
             cs={COLOR_SYSTEM.PRIMARY}
             size={BUTTON_SIZE.BASE}

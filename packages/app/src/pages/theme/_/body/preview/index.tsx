@@ -30,23 +30,30 @@ const _Preview: React.FC<{
     primary,
     onPrimary,
     secondary,
-    onSecondary,
     background,
     onBackground,
+    surface,
+    onSurface,
   } = mode;
   const hsl = useCallback(({ h, s, l }: HSL) => `hsl(${h}, ${s}%, ${l}%)`, []);
   return (
     <div>
-      <div className="text-thm-on-background text-xxs mb-2 ">{title}</div>
+      <div className="text-thm-on-background text-xs mb-2 ">{title}</div>
       <div className="rounded overflow-hidden border-2 border-thm-on-background">
         <div
-          className="text-xxs"
+          className="relative text-xxs"
           style={{
             backgroundColor: hsl(background),
           }}
         >
           <div
-            className="p-2"
+            className="relative h-2 shadow-01dp z-layout-systembar"
+            style={{
+              backgroundColor: hsl(secondary),
+            }}
+          />
+          <div
+            className="relative pl-16 h-8 shadow-01dp z-layout-appbar"
             style={{
               color: hsl(onPrimary),
               backgroundColor: hsl(primary),
@@ -54,9 +61,9 @@ const _Preview: React.FC<{
           >
             appbar
           </div>
-          <div className="p-2">
+          <div className="relative pl-16 h-[240px] z-layout-body">
             <div
-              className=""
+              className="p-2"
               style={{
                 color: hsl(onBackground),
               }}
@@ -64,14 +71,16 @@ const _Preview: React.FC<{
               on background
             </div>
           </div>
-          <div
-            className="p-2"
-            style={{
-              color: hsl(onSecondary),
-              backgroundColor: hsl(secondary),
-            }}
-          >
-            footer
+          <div className="absolute top-2 left-0 bottom-0 w-16 z-layout-navigation">
+            <div
+              className="h-full"
+              style={{
+                color: hsl(onSurface),
+                backgroundColor: hsl(surface),
+              }}
+            >
+              on background
+            </div>
           </div>
         </div>
       </div>

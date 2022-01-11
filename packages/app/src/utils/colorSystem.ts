@@ -1,5 +1,6 @@
 import { normal as normalBlend } from 'color-blend';
 import { CSSProperties } from 'react';
+import { BaseError } from '~/errors';
 import { RGB, Hue, HSL } from '~/types';
 import { X_Theme, X_THEME } from '~/types/oas';
 
@@ -925,7 +926,7 @@ export const getTones = (hsl: HSL): Tone[] => {
 export const pickTone = (tones: Tone[], level: Tone['level']): Tone => {
   const tone = tones.find((tone) => tone.level === level);
   if (!tone) {
-    throw new Error('TODO');
+    throw new BaseError('Tone not found.');
   }
   return tone;
 };

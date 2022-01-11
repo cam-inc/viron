@@ -17,6 +17,7 @@ import {
   listByGroup as endpointListByGroupSelector,
   listUngrouped as endpointListUngroupedSelector,
   listItem as endpointListItemSelector,
+  groupListSorted as endpointGroupListSortedSelector,
   groupListItem as endpointGroupListItemSelector,
 } from './selectors/endpoint';
 
@@ -88,6 +89,9 @@ export const useEndpointListItemGlobalStateValue = (
 export const useEndpointListItemGlobalStateSet = (
   params: Parameters<typeof endpointListItemSelector>[0]
 ) => useGlobalStateSet(endpointListItemSelector(params));
+
+export const useEndpointGroupListSortedGlobalStateValue = () =>
+  useGlobalStateValue(endpointGroupListSortedSelector);
 
 export const useEndpointGroupListItemGlobalState = (
   params: Parameters<typeof endpointGroupListItemSelector>[0]

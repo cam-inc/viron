@@ -1,8 +1,11 @@
+import { navigate as _navigate } from 'gatsby';
+import _ from 'lodash';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { HTTP_STATUS } from '~/constants';
+import { HTTP_STATUS, HTTPStatusCode } from '~/constants';
 import {
   BaseError,
   NetworkError,
+  HTTPUnexpectedError,
   FileReaderError,
   EndpointError,
   EndpointDuplicatedError,
@@ -11,41 +14,100 @@ import {
   EndpointGroupDuplicatedError,
   OASError,
   UnexpectedError,
+  getHTTPError,
 } from '~/errors';
 import {
   useEndpointListGlobalState,
-  useEndpointGroupListGlobalState,
+  useEndpointListByGroupGlobalStateValue,
+  useEndpointListUngroupedGlobalStateValue,
+  useEndpointGroupListGlobalStateSet,
+  useEndpointGroupListSortedGlobalStateValue,
 } from '~/store';
 import {
   Endpoint,
+  EndpointID,
   EndpointGroup,
+  EndpointGroupID,
   Distribution,
-  AuthConfigsResponse,
+  Authentication,
   URL,
 } from '~/types';
+import { Document, Request, RequestValue } from '~/types/oas';
 import { promiseErrorHandler } from '~/utils';
-import { lint, resolve } from '~/utils/oas';
+import {
+  lint,
+  resolve,
+  getRequest,
+  constructRequestInfo,
+  constructRequestInit,
+  constructRequestPayloads,
+} from '~/utils/oas';
 
 export type UseEndpointReturn = {
+  list: Endpoint[];
+  listByGroup: {
+    group: EndpointGroup;
+    list: Endpoint[];
+  }[];
+  listUngrouped: Endpoint[];
+  groupList: EndpointGroup[];
   connect: (url: URL) => Promise<
     | {
         error: BaseError;
       }
     | {
         error: null;
-        endpoint: Omit<Endpoint, 'id'>;
       }
   >;
-  addEndpoint: (data: Pick<Endpoint, 'id' | 'url'>) => Promise<
+  fetchDocument: (endpoint: Endpoint) => Promise<
     | {
         error: BaseError;
       }
     | {
         error: null;
-        endpoint: Endpoint;
+        document: Document | null;
+        authentication: Authentication;
       }
   >;
+  navigate: (endpoint: Endpoint) => void;
+  signout: (
+    endpoint: Endpoint,
+    authentication: Authentication
+  ) =>
+    | {
+        error: BaseError;
+      }
+    | {
+        error: null;
+        request: Request;
+        execute: (requestValue: RequestValue) => Promise<
+          | {
+              error: BaseError;
+            }
+          | {
+              error: null;
+            }
+        >;
+      };
+  addEndpoint: (endpoint: Endpoint) => Promise<
+    | {
+        error: BaseError;
+      }
+    | {
+        error: null;
+      }
+  >;
+  removeEndpoint: (endpointId: EndpointID) => void;
   addGroup: (endpointGroup: EndpointGroup) => {
+    error: EndpointGroupError | null;
+  };
+  removeGroup: (endpointGroupId: EndpointGroupID) => {
+    error: EndpointGroupError | null;
+  };
+  ascendGroup: (endpointGroupId: EndpointGroupID) => {
+    error: EndpointGroupError | null;
+  };
+  descendGroup: (endpointGroupId: EndpointGroupID) => {
     error: EndpointGroupError | null;
   };
   import: {
@@ -57,19 +119,23 @@ export type UseEndpointReturn = {
       type: 'file';
       accept: 'application/json';
       ref: React.MutableRefObject<HTMLInputElement | null>;
-      handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+      onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     };
   };
   export: () => { error: BaseError | null };
 };
 export const useEndpoint = (): UseEndpointReturn => {
   const [endpointList, setEndpointList] = useEndpointListGlobalState();
-  const [endpointGroupList, setEndpointGroupList] =
-    useEndpointGroupListGlobalState();
+  const setEndpointGroupList = useEndpointGroupListGlobalStateSet();
+  const endpointListByGroup = useEndpointListByGroupGlobalStateValue();
+  const endpointListUngrouped = useEndpointListUngroupedGlobalStateValue();
+  const endpointGroupList = useEndpointGroupListSortedGlobalStateValue();
 
   const connect = useCallback<UseEndpointReturn['connect']>(async (url) => {
     const [response, responseError] = await promiseErrorHandler(
-      fetch(url, { mode: 'cors' })
+      fetch(url, {
+        mode: 'cors',
+      })
     );
     // Could not establish a network connection to the endpoint.
     if (responseError) {
@@ -77,100 +143,205 @@ export const useEndpoint = (): UseEndpointReturn => {
         error: new NetworkError(responseError.message),
       };
     }
-    // The endpoint exists and its OAS document is open to public.
     if (response.ok) {
-      const document: unknown = await response.json();
-      const { isValid, errors } = lint(document);
-      if (isValid) {
-        return {
-          error: null,
-          endpoint: {
-            url,
-            isPrivate: true,
-            document: resolve(document as Record<string, unknown>),
-          },
-        };
-      } else {
-        return {
-          error: new OASError(
-            errors?.[0].message ||
-              'The OAS document is not of version we support.'
-          ),
-        };
-      }
-    }
-    // The endpoint exists but authentication is required to get an OAS document.
-    if (!response.ok && response.status === HTTP_STATUS.UNAUTHORIZED.code) {
-      // This is a pathname to which a request will be sent.
-      const authConfigsPath = response.headers.get('x-viron-authtypes-path');
-      // Viron needs to know how to authenticate.
-      if (!authConfigsPath) {
-        return {
-          error: new EndpointError(
-            'The x-viron-authtypes-path response header is missing.'
-          ),
-        };
-      }
-      const [authConfigsResponse, authConfigsResponseError] =
-        await promiseErrorHandler(
-          fetch(`${new globalThis.URL(url).origin}${authConfigsPath}`, {
-            mode: 'cors',
-          })
-        );
-      if (authConfigsResponseError) {
-        return {
-          error: new NetworkError(authConfigsResponseError.message),
-        };
-      }
-      const authConfigs: AuthConfigsResponse = await authConfigsResponse.json();
-      // TODO: validate more severely.
-      if (!authConfigs.oas || !authConfigs.list?.length) {
-        return {
-          error: new EndpointError(
-            `GET ${authConfigsPath} returns data not properly formatted.`
-          ),
-        };
-      }
       return {
         error: null,
-        endpoint: {
-          url,
-          isPrivate: true,
-          authConfigs,
-        },
       };
     }
+    // The endpoint exists but authentication is required to get an OAS document.
+    if (
+      !response.ok &&
+      (response.status === HTTP_STATUS.UNAUTHORIZED.code ||
+        response.status === HTTP_STATUS.FORBIDDEN.code)
+    ) {
+      return {
+        error: null,
+      };
+    }
+
     // Something enexpected happened.
     return {
       error: new UnexpectedError(),
     };
   }, []);
 
-  const addEndpoint = useCallback<UseEndpointReturn['addEndpoint']>(
-    async (data) => {
-      const connection = await connect(data.url);
-      if (connection.error) {
+  const fetchDocument = useCallback<UseEndpointReturn['fetchDocument']>(
+    async (endpoint) => {
+      // Ping to see whether the authorization cookie is valid.
+      const [response, responseError] = await promiseErrorHandler(
+        fetch(endpoint.url, {
+          mode: 'cors',
+          credentials: 'include',
+        })
+      );
+      if (responseError) {
         return {
-          error: connection.error,
+          error: new NetworkError(responseError.message),
         };
       }
+
+      if (
+        !(
+          response.ok ||
+          response.status === HTTP_STATUS.UNAUTHORIZED.code ||
+          response.status === HTTP_STATUS.FORBIDDEN.code
+        )
+      ) {
+        return {
+          error: new HTTPUnexpectedError(),
+        };
+      }
+
+      // This is a pathname to which a request will be sent.
+      const authenticationPath = response.headers.get('x-viron-authtypes-path');
+      // Viron needs to know how to authenticate.
+      if (!authenticationPath) {
+        return {
+          error: new EndpointError(
+            'The x-viron-authtypes-path response header is missing.'
+          ),
+        };
+      }
+      const [authenticationResponse, authenticationResponseError] =
+        await promiseErrorHandler(
+          fetch(
+            `${new globalThis.URL(endpoint.url).origin}${authenticationPath}`,
+            {
+              mode: 'cors',
+            }
+          )
+        );
+      if (authenticationResponseError) {
+        return {
+          error: new NetworkError(authenticationResponseError.message),
+        };
+      }
+      const authentication: Authentication =
+        await authenticationResponse.json();
+      // TODO: validate more severely.
+      if (!authentication.oas || !authentication.list?.length) {
+        return {
+          error: new EndpointError(
+            `GET ${authenticationPath} returns data not properly formatted.`
+          ),
+        };
+      }
+
+      let document: Document | null = null;
+      if (response.ok) {
+        const _document: unknown = await response.json();
+        const { isValid, errors } = lint(document);
+        if (!isValid) {
+          return {
+            error: new OASError(
+              errors?.[0].message ||
+                'The OAS document is not of version we support.'
+            ),
+          };
+        }
+        document = resolve(_document as Record<string, unknown>);
+      }
+
+      return {
+        error: null,
+        document,
+        authentication,
+      };
+    },
+    []
+  );
+
+  const navigate = useCallback<UseEndpointReturn['navigate']>((endpoint) => {
+    _navigate(`/endpoints/${endpoint.id}`);
+  }, []);
+
+  const addEndpoint = useCallback<UseEndpointReturn['addEndpoint']>(
+    async (endpoint) => {
       // Duplication check.
-      if (endpointList.find((item) => item.id === data.id)) {
+      if (endpointList.find((item) => item.id === endpoint.id)) {
         return {
           error: new EndpointDuplicatedError(),
         };
       }
-      const endpoint: Endpoint = {
-        id: data.id,
-        ...connection.endpoint,
-      };
       setEndpointList((currVal) => [...currVal, endpoint]);
       return {
         error: null,
-        endpoint,
       };
     },
-    [connect, endpointList, setEndpointList]
+    [endpointList, setEndpointList]
+  );
+
+  const signout = useCallback<UseEndpointReturn['signout']>(
+    (endpoint, authentication) => {
+      const authConfig = authentication.list.find(
+        (item) => item.type === 'signout'
+      );
+      if (!authConfig) {
+        return {
+          error: new BaseError('AuthConfig for signout not found.'),
+        };
+      }
+      const getRequestResult = getRequest(authentication.oas, {
+        operationId: authConfig.operationId,
+      });
+      if (getRequestResult.isFailure()) {
+        return {
+          error: new OASError('Request object not found.'),
+        };
+      }
+      const request = getRequestResult.value;
+      const execute = async (requestValue: RequestValue) => {
+        const requestPayloads = constructRequestPayloads(
+          request.operation,
+          _.merge(
+            {},
+            {
+              parameters: authConfig.defaultParametersValue,
+              requestBody: authConfig.defaultRequestBodyValue,
+            },
+            requestValue
+          )
+        );
+        const requestInfo = constructRequestInfo(
+          endpoint,
+          authentication.oas,
+          request,
+          requestPayloads
+        );
+        const requestInit = constructRequestInit(request, requestPayloads);
+        const [response, responseError] = await promiseErrorHandler(
+          fetch(requestInfo, requestInit)
+        );
+        if (!!responseError) {
+          return {
+            error: new NetworkError(responseError.message),
+          };
+        }
+        if (!response.ok) {
+          return {
+            error: getHTTPError(response.status as HTTPStatusCode),
+          };
+        }
+        return {
+          error: null,
+        };
+      };
+      return {
+        error: null,
+        request,
+        execute,
+      };
+    },
+    []
+  );
+
+  const removeEndpoint = useCallback<UseEndpointReturn['removeEndpoint']>(
+    (endpointId) => {
+      setEndpointList((currVal) =>
+        currVal.filter((item) => item.id !== endpointId)
+      );
+    },
+    [setEndpointList]
   );
 
   const addGroup = useCallback<UseEndpointReturn['addGroup']>(
@@ -189,6 +360,104 @@ export const useEndpoint = (): UseEndpointReturn => {
     [endpointGroupList, setEndpointGroupList]
   );
 
+  const removeGroup = useCallback<UseEndpointReturn['removeGroup']>(
+    (endpointGroupId) => {
+      // Remove group definition.
+      setEndpointGroupList((currVal) =>
+        currVal.filter((item) => item.id !== endpointGroupId)
+      );
+      // Remove groupId for each endpoint items.
+      setEndpointList((currVal) =>
+        currVal.map((item) => {
+          if (item.groupId === endpointGroupId) {
+            delete item.groupId;
+          }
+          return item;
+        })
+      );
+      return {
+        error: null,
+      };
+    },
+    [setEndpointGroupList, setEndpointList]
+  );
+
+  // TODO: 処理を綺麗に。
+  const ascendGroup = useCallback<UseEndpointReturn['ascendGroup']>(
+    (endpointGroupId) => {
+      setEndpointGroupList((currVal) => {
+        const ret = [...currVal]
+          .sort((a, b) => {
+            return (b.priority || 0) - (a.priority || 0);
+          })
+          .map((item, idx) => ({
+            ...item,
+            priority: currVal.length - idx - 1,
+          }));
+        const target = ret.find((item) => item.id === endpointGroupId);
+        if (!target) {
+          return ret;
+        }
+        return ret.map((item) => {
+          if (item.id === target.id) {
+            return {
+              ...item,
+              priority: item.priority + 1,
+            };
+          } else if (item.priority === target.priority + 1) {
+            return {
+              ...item,
+              priority: item.priority - 1,
+            };
+          }
+          return item;
+        });
+      });
+      return {
+        error: null,
+      };
+    },
+    [setEndpointGroupList]
+  );
+
+  // TODO: 処理を綺麗に。
+  const descendGroup = useCallback<UseEndpointReturn['descendGroup']>(
+    (endpointGroupId) => {
+      setEndpointGroupList((currVal) => {
+        const ret = [...currVal]
+          .sort((a, b) => {
+            return (b.priority || 0) - (a.priority || 0);
+          })
+          .map((item, idx) => ({
+            ...item,
+            priority: currVal.length - idx - 1,
+          }));
+        const target = ret.find((item) => item.id === endpointGroupId);
+        if (!target) {
+          return ret;
+        }
+        return ret.map((item) => {
+          if (item.id === target.id) {
+            return {
+              ...item,
+              priority: item.priority - 1,
+            };
+          } else if (item.priority === target.priority - 1) {
+            return {
+              ...item,
+              priority: item.priority + 1,
+            };
+          }
+          return item;
+        });
+      });
+      return {
+        error: null,
+      };
+    },
+    [setEndpointGroupList]
+  );
+
   const importInputElmRef: UseEndpointReturn['import']['bind']['ref'] =
     useRef(null);
   const [importData, setImportData] =
@@ -199,7 +468,7 @@ export const useEndpoint = (): UseEndpointReturn => {
     const execute = () => {
       importInputElmRef.current?.click();
     };
-    const handleChange: UseEndpointReturn['import']['bind']['handleChange'] = (
+    const handleChange: UseEndpointReturn['import']['bind']['onChange'] = (
       e
     ) => {
       const inputElement = e.currentTarget;
@@ -245,7 +514,7 @@ export const useEndpoint = (): UseEndpointReturn => {
         type: 'file',
         accept: 'application/json',
         ref: importInputElmRef,
-        handleChange,
+        onChange: handleChange,
       },
     };
   }, [importData, importError]);
@@ -286,13 +555,41 @@ export const useEndpoint = (): UseEndpointReturn => {
   // To prevent this hook from returning a new object instance every time it is used.
   const ret = useMemo<UseEndpointReturn>(
     () => ({
+      list: endpointList,
+      listByGroup: endpointListByGroup,
+      listUngrouped: endpointListUngrouped,
+      groupList: endpointGroupList,
       connect,
+      fetchDocument,
+      navigate,
+      signout,
       addEndpoint,
+      removeEndpoint,
       addGroup,
+      removeGroup,
+      ascendGroup,
+      descendGroup,
       import: _import,
       export: _export,
     }),
-    [connect, addGroup, addEndpoint, _import, _export]
+    [
+      endpointList,
+      endpointListByGroup,
+      endpointListUngrouped,
+      endpointGroupList,
+      connect,
+      fetchDocument,
+      navigate,
+      signout,
+      addEndpoint,
+      removeEndpoint,
+      addGroup,
+      removeGroup,
+      ascendGroup,
+      descendGroup,
+      _import,
+      _export,
+    ]
   );
   return ret;
 };

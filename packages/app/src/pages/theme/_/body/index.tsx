@@ -22,7 +22,8 @@ const Body: React.FC<Props> = ({ className = '' }) => {
 
   return (
     <div className={className}>
-      <div className="p-2">
+      <div className="p-4">
+        {/* theme selection */}
         <div className="mb-2">
           <ThemeSelect
             theme={theme}

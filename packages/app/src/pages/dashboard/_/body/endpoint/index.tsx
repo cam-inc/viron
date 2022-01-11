@@ -292,7 +292,7 @@ const _Endpoint: React.FC<Props> = ({ endpoint, onRemove, className = '' }) => {
               'opacity-50': draggable.isDragging,
             })}
           >
-            {/* Headd */}
+            {/* Head */}
             <div className="flex-none flex items-center gap-2">
               <div className="flex-none" ref={draggablePreviewRef}>
                 <Thumbnail className="" endpoint={endpoint} />

@@ -80,8 +80,7 @@ const Root: React.FC<Props> = ({ children }) => {
     <>
       {style}
       <div id="root" className="relative font-mono">
-        {/* TODO: iphone実機確認 */}
-        <div className="min-h-screen">{children}</div>
+        <div>{children}</div>
         <DrawerWrapper className="fixed inset-0 z-wrapper-drawer" />
         <ModalWrapper className="fixed inset-0 z-wrapper-modal" />
         <PopoverWrapper className="fixed inset-0 z-wrapper-popover" />
@@ -125,12 +124,12 @@ const useRoot = function (): UseRootReturn {
   // Watch screen size.
   useEffect(() => {
     const handler = function () {
-      const { clientWidth, clientHeight } = document.documentElement;
+      const { innerWidth, innerHeight } = window;
       setScreen(function (currVal) {
         return {
           ...currVal,
-          width: clientWidth,
-          height: clientHeight,
+          width: innerWidth,
+          height: innerHeight,
         };
       });
     };
