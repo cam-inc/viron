@@ -1,7 +1,6 @@
 require('dotenv').config({
   path: `.env.${process.env.NODE_ENV}`,
 });
-
 const package = require('./package.json');
 
 // @see: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/
@@ -53,5 +52,12 @@ module.exports = {
   // @see: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/#flags
   flags: {
     FAST_DEV: true,
+  },
+  // @see: https://www.gatsbyjs.com/docs/api-proxy/#advanced-proxying
+  developMiddleware: (app) => {
+    app.use((req, res, next) => {
+      res.set('x-viron-authtypes-path', '/authentication');
+      next();
+    });
   },
 };

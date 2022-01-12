@@ -89,7 +89,10 @@ export type UseEndpointReturn = {
             }
         >;
       };
-  addEndpoint: (endpoint: Endpoint) => Promise<
+  addEndpoint: (
+    endpoint: Endpoint,
+    options?: { resolveDuplication: boolean }
+  ) => Promise<
     | {
         error: BaseError;
       }
@@ -111,9 +114,11 @@ export type UseEndpointReturn = {
     error: EndpointGroupError | null;
   };
   import: {
-    data?: Distribution;
-    error?: BaseError;
-    execute: () => void;
+    execute: (
+      cb: (
+        result: { error: BaseError } | { error: null; data: Distribution }
+      ) => void
+    ) => void;
     bind: {
       className: 'hidden';
       type: 'file';
@@ -218,8 +223,18 @@ export const useEndpoint = (): UseEndpointReturn => {
       }
       const authentication: Authentication =
         await authenticationResponse.json();
+      const { isValid, errors } = lint(authentication.oas);
+      if (!isValid) {
+        return {
+          error: new OASError(
+            errors?.[0].message ||
+              'The OAS document is not of version we support.'
+          ),
+        };
+      }
+      authentication.oas = resolve(authentication.oas);
       // TODO: validate more severely.
-      if (!authentication.oas || !authentication.list?.length) {
+      if (!authentication.list?.length) {
         return {
           error: new EndpointError(
             `GET ${authenticationPath} returns data not properly formatted.`
@@ -230,7 +245,7 @@ export const useEndpoint = (): UseEndpointReturn => {
       let document: Document | null = null;
       if (response.ok) {
         const _document: unknown = await response.json();
-        const { isValid, errors } = lint(document);
+        const { isValid, errors } = lint(_document);
         if (!isValid) {
           return {
             error: new OASError(
@@ -256,14 +271,23 @@ export const useEndpoint = (): UseEndpointReturn => {
   }, []);
 
   const addEndpoint = useCallback<UseEndpointReturn['addEndpoint']>(
-    async (endpoint) => {
+    async (
+      endpoint,
+      { resolveDuplication } = { resolveDuplication: false }
+    ) => {
+      const _endpoint = { ...endpoint };
       // Duplication check.
-      if (endpointList.find((item) => item.id === endpoint.id)) {
-        return {
-          error: new EndpointDuplicatedError(),
-        };
+      if (endpointList.find((item) => item.id === _endpoint.id)) {
+        if (resolveDuplication) {
+          // TODO: 精度を高めること。
+          _endpoint.id = `${_endpoint.id}-${Math.random()}`;
+        } else {
+          return {
+            error: new EndpointDuplicatedError(),
+          };
+        }
       }
-      setEndpointList((currVal) => [...currVal, endpoint]);
+      setEndpointList((currVal) => [...currVal, _endpoint]);
       return {
         error: null,
       };
@@ -460,12 +484,12 @@ export const useEndpoint = (): UseEndpointReturn => {
 
   const importInputElmRef: UseEndpointReturn['import']['bind']['ref'] =
     useRef(null);
-  const [importData, setImportData] =
-    useState<UseEndpointReturn['import']['data']>();
-  const [importError, setImportError] =
-    useState<UseEndpointReturn['import']['error']>();
   const _import = useMemo<UseEndpointReturn['import']>(() => {
-    const execute = () => {
+    let cb: Parameters<UseEndpointReturn['import']['execute']>[0] = () => {
+      // to be overwritten.
+    };
+    const execute: UseEndpointReturn['import']['execute'] = (_cb) => {
+      cb = _cb;
       importInputElmRef.current?.click();
     };
     const handleChange: UseEndpointReturn['import']['bind']['onChange'] = (
@@ -484,7 +508,9 @@ export const useEndpoint = (): UseEndpointReturn => {
       reader.readAsText(file);
       reader.onload = () => {
         if (typeof reader.result !== 'string') {
-          setImportError(new FileReaderError('Invalid file type.'));
+          cb({
+            error: new FileReaderError('Invalid file type.'),
+          });
           cleanup();
           return;
         }
@@ -492,22 +518,27 @@ export const useEndpoint = (): UseEndpointReturn => {
         try {
           distribution = JSON.parse(reader.result);
         } catch {
-          setImportError(new FileReaderError('Invalid file data.'));
+          cb({
+            error: new FileReaderError('Invalid file data.'),
+          });
           cleanup();
           return;
         }
-        setImportData(distribution);
+        cb({
+          error: null,
+          data: distribution,
+        });
         cleanup();
         return;
       };
       reader.onerror = () => {
-        setImportError(new FileReaderError(reader.error?.message));
+        cb({
+          error: new FileReaderError(reader.error?.message),
+        });
         cleanup();
       };
     };
     return {
-      data: importData,
-      error: importError,
       execute,
       bind: {
         className: 'hidden',
@@ -517,22 +548,18 @@ export const useEndpoint = (): UseEndpointReturn => {
         onChange: handleChange,
       },
     };
-  }, [importData, importError]);
+  }, []);
 
   const _export = useCallback<UseEndpointReturn['export']>(() => {
     try {
-      // Omit some data to minimize the json file size.
       const data: Distribution = {
-        endpointList: endpointList.map((endpoint) => ({
-          id: endpoint.id,
-          url: endpoint.url,
-        })),
+        endpointList,
         endpointGroupList,
       };
       const blob = new Blob([JSON.stringify(data, null, 2)], {
         type: 'application/json',
       });
-      const blobURL = URL.createObjectURL(blob);
+      const blobURL = globalThis.URL.createObjectURL(blob);
       const anchorElement = document.createElement('a');
       anchorElement.setAttribute('download', 'endpoints.json');
       anchorElement.href = blobURL;
@@ -541,13 +568,13 @@ export const useEndpoint = (): UseEndpointReturn => {
       anchorElement.click();
       // clean up.
       document.body.removeChild(anchorElement);
-      URL.revokeObjectURL(blobURL);
+      globalThis.URL.revokeObjectURL(blobURL);
       return {
         error: null,
       };
-    } catch {
+    } catch (e) {
       return {
-        error: new EndpointExportError(),
+        error: new EndpointExportError(e.message),
       };
     }
   }, [endpointList, endpointGroupList]);

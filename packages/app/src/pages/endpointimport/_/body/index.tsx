@@ -1,157 +1,72 @@
 import { navigate } from 'gatsby';
 import { parse } from 'query-string';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import FilledButton, {
+  Props as FilledButtonProps,
+} from '~/components/button/filled';
 import Error from '~/components/error';
-import { HTTPStatusCode } from '~/constants/index';
-import {
-  BaseError,
-  getHTTPError,
-  NetworkError,
-  OASError,
-} from '~/errors/index';
+import { BaseError } from '~/errors/index';
+import { useEndpoint } from '~/hooks/endpoint';
 import { Props as LayoutProps } from '~/layouts';
-import { useEndpointListGlobalStateSet } from '~/store';
-import {
-  AuthConfigsResponse,
-  COLOR_SYSTEM,
-  Endpoint,
-  EndpointForDistribution,
-} from '~/types';
-import { promiseErrorHandler } from '~/utils';
-import { lint, resolve } from '~/utils/oas';
+import { COLOR_SYSTEM, Endpoint } from '~/types';
 
-export type Props = Parameters<LayoutProps['renderBody']>[0];
-const Body: React.FC<Props> = ({ className = '' }) => {
-  const setEndpointList = useEndpointListGlobalStateSet();
-
+export type Props = Parameters<LayoutProps['renderBody']>[0] & {
+  search: string;
+};
+const Body: React.FC<Props> = ({ style, className = '', search }) => {
+  const { connect, addEndpoint } = useEndpoint();
   const [error, setError] = useState<BaseError | null>(null);
   const [isPending, setIsPending] = useState<boolean>(true);
 
-  // TODO: 良い感じにsrc/pages/dashboard/_add/index.tsxと処理を統一したい。
-  useEffect(
-    function () {
-      const queries = parse(location.search);
-      let endpoint: EndpointForDistribution;
-      try {
-        endpoint = JSON.parse(
-          queries.endpoint as string
-        ) as EndpointForDistribution;
-      } catch {
-        setError(new BaseError('TODO'));
+  useEffect(() => {
+    setError(null);
+    setIsPending(true);
+
+    const queries = parse(search);
+    let endpoint: Endpoint;
+    try {
+      endpoint = JSON.parse(queries.endpoint as string) as Endpoint;
+    } catch {
+      setError(new BaseError('Broken endpoint data.'));
+      setIsPending(false);
+      return;
+    }
+
+    const f = async () => {
+      const connection = await connect(endpoint.url);
+      if (connection.error) {
+        setError(connection.error);
         setIsPending(false);
         return;
       }
-
-      const f = async function (): Promise<void> {
-        // Check whether the endpoint exists or not.
-        const [response, responseError] = await promiseErrorHandler(
-          fetch(endpoint.url, {
-            mode: 'cors',
-          })
-        );
-        if (!!responseError) {
-          setError(new NetworkError());
-          setIsPending(false);
-          return;
-        }
-        if (response.ok) {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const document: Record<string, any> = await response.json();
-          const { isValid, errors } = lint(document);
-          if (!isValid) {
-            setError(new OASError(errors?.[0]?.message));
-            setIsPending(false);
-            return;
-          }
-          setEndpointList(function (currVal) {
-            // ID duplication check.
-            let { id } = endpoint;
-            if (
-              !!currVal.find(function (endpoint) {
-                return endpoint.id === id;
-              })
-            ) {
-              id = `${id}-${Math.random()}`;
-            }
-            const _endpoint: Endpoint = {
-              ...endpoint,
-              id,
-              isPrivate: false,
-              document: resolve(document),
-            };
-            return [...currVal, _endpoint];
-          });
-          navigate('/dashboard');
-          return;
-        }
-        if (!response.ok && response.status === 401) {
-          const authconfigsPath = response.headers.get(
-            'x-viron-authtypes-path'
-          );
-          // TODO: 値のundefinedチェックに加えて、値の妥当性もチェックすること。
-          if (!authconfigsPath) {
-            // TODO: エラー表示。Viron仕様上、'x-viron-authtypes-path'レスポンスヘッダーは必須。
-            return;
-          }
-          const [authconfigsResponse, authconfigsResponseError] =
-            await promiseErrorHandler(
-              fetch(`${new URL(endpoint.url).origin}${authconfigsPath}`, {
-                mode: 'cors',
-              })
-            );
-          if (!!authconfigsResponseError) {
-            setError(new NetworkError());
-            setIsPending(false);
-            return;
-          }
-          const authConfigs: AuthConfigsResponse =
-            await authconfigsResponse.json();
-          // TODO: authConfigs値の妥当性をチェックする。
-          setEndpointList(function (currVal) {
-            // ID duplication check.
-            let { id } = endpoint;
-            if (
-              !!currVal.find(function (endpoint) {
-                return endpoint.id === id;
-              })
-            ) {
-              id = `${id}-${Math.random()}`;
-            }
-            const _endpoint: Endpoint = {
-              ...endpoint,
-              id,
-              isPrivate: true,
-              authConfigs,
-            };
-            return [...currVal, _endpoint];
-          });
-          navigate('/dashboard');
-          return;
-        }
-        if (!response.ok) {
-          const error = getHTTPError(response.status as HTTPStatusCode);
-          setError(error);
-          setIsPending(false);
-          return;
-        }
-        setError(new BaseError());
+      const addition = await addEndpoint(endpoint, {
+        resolveDuplication: true,
+      });
+      if (addition.error) {
+        setError(addition.error);
         setIsPending(false);
-      };
-      f();
-    },
-    [location, setEndpointList]
-  );
+        return;
+      }
+      setError(null);
+      setIsPending(false);
+    };
+    f();
+  }, []);
+
+  const handleButtonClick = useCallback<FilledButtonProps['onClick']>(() => {
+    navigate('/dashboard/endpoints');
+  }, []);
 
   if (isPending) {
     return (
-      <div className={className}>
+      <div style={style} className={className}>
         <div className="p-2">TODO: pending...</div>
       </div>
     );
   }
   if (error) {
     return (
-      <div className={className}>
+      <div style={style} className={className}>
         <div className="p-2">
           <Error on={COLOR_SYSTEM.BACKGROUND} error={error} />;
         </div>
@@ -159,11 +74,15 @@ const Body: React.FC<Props> = ({ className = '' }) => {
     );
   }
 
-  // TODO: 自動でnavigateするのでこれが表示されることはないはず。
   return (
-    <div className={className}>
+    <div style={style} className={className}>
       <div className="p-2">
-        <div>TODO: import完了</div>;
+        <div>TODO: import完了</div>
+        <FilledButton
+          cs={COLOR_SYSTEM.PRIMARY}
+          label="Back to Dashboard"
+          onClick={handleButtonClick}
+        />
       </div>
     </div>
   );

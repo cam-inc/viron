@@ -21,8 +21,8 @@ const EndpointImportPagge: React.FC<Props> = ({ location }) => {
   >((args) => <Navigation {...args} />, []);
 
   const renderBody = useCallback<LayoutProps['renderBody']>(
-    (args) => <Body {...args} />,
-    []
+    (args) => <Body {...args} search={location.search} />,
+    [location.search]
   );
 
   return (

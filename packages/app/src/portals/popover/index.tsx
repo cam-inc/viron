@@ -160,7 +160,7 @@ const PopoverLg: React.FC<Props> = ({
   const content = useMemo<JSX.Element | null>(() => {
     const space = 8;
     const commonClassName =
-      'p-2 rounded bg-thm-surface shadow-05dp overflow-scroll overscroll-contain';
+      'p-2 rounded bg-thm-surface border border-thm-on-surface-faint shadow-01dp overflow-scroll overscroll-contain';
     switch (placement) {
       case PLACEMENT.TOP_LEFT: {
         return (

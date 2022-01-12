@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import React, { useCallback, useState } from 'react';
 import FilledButton, {
   Props as FilledButtonProps,
@@ -34,7 +35,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
   return (
     <>
       <div className={className} style={style}>
-        <div className="space-y-2">
+        <div className="">
           {/* Head */}
           <div>
             <div className="p-4">
@@ -45,8 +46,8 @@ const Body: React.FC<Props> = ({ className, style }) => {
             </div>
           </div>
           {/* Body */}
-          <div className="p-4">
-            <div className="mb-4 flex justify-end">
+          <div className="">
+            <div className="p-4 flex justify-end">
               <FilledButton
                 cs={COLOR_SYSTEM.PRIMARY}
                 label="Add an Endpoint"
@@ -64,9 +65,12 @@ const Body: React.FC<Props> = ({ className, style }) => {
               </ul>
             )}
             {listUngrouped.length && (
-              <ul className="space-y-2">
+              <ul className="">
                 {listUngrouped.map((item) => (
-                  <li key={item.id}>
+                  <li
+                    key={item.id}
+                    className="p-2 hover:bg-thm-on-background-faint"
+                  >
                     <Item endpoint={item} />
                   </li>
                 ))}
@@ -89,7 +93,7 @@ type GroupProps = {
 };
 const Group: React.FC<GroupProps> = ({ group, list }) => {
   const [isOpened, setIsOpened] = useState<boolean>(true);
-  const handleHeadClick = useCallback(() => {
+  const handleToggleClick = useCallback<TextButtonProps['onClick']>(() => {
     setIsOpened((currVal) => !currVal);
   }, []);
 
@@ -98,21 +102,25 @@ const Group: React.FC<GroupProps> = ({ group, list }) => {
       {/* Head */}
       <div className="flex items-center gap-2">
         <div className="flex-none">
-          {isOpened ? (
-            <ChevronDownIcon className="w-em" />
-          ) : (
-            <ChevronRightIcon className="w-em" />
-          )}
+          <TextButton
+            cs={COLOR_SYSTEM.PRIMARY}
+            Icon={isOpened ? ChevronDownIcon : ChevronRightIcon}
+            onClick={handleToggleClick}
+          />
         </div>
         <div className="flex-1">
-          <button onClick={handleHeadClick}>{group.name}</button>
+          <div>{group.name}</div>
         </div>
       </div>
       {/* Body */}
       <div>
-        <ul>
+        <ul
+          className={classnames({
+            hidden: !isOpened,
+          })}
+        >
           {list.map((item) => (
-            <li key={item.id}>
+            <li key={item.id} className="p-2 hover:bg-thm-on-background-faint">
               <Item endpoint={item} />
             </li>
           ))}

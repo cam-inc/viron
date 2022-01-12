@@ -31,7 +31,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
   return (
     <>
       <div className={className} style={style}>
-        <div className="space-y-2">
+        <div className="">
           {/* Head */}
           <div>
             <div className="p-4">
@@ -42,8 +42,8 @@ const Body: React.FC<Props> = ({ className, style }) => {
             </div>
           </div>
           {/* Body */}
-          <div className="p-4">
-            <div className="mb-4 flex justify-end">
+          <div className="">
+            <div className="p-4 flex justify-end">
               <FilledButton
                 cs={COLOR_SYSTEM.PRIMARY}
                 label="Add a Group"
@@ -55,7 +55,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
               {groupList.map((group) => (
                 <li
                   key={group.id}
-                  className="p-2 border-b border-dashed last:border-t-0 last:border-b-0 border-thm-on-background-faint hover:bg-thm-on-background-faint"
+                  className="p-2 hover:bg-thm-on-background-faint"
                 >
                   <Item group={group} />
                 </li>

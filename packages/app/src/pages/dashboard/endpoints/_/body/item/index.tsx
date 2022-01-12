@@ -84,11 +84,7 @@ const Item: React.FC<Props> = ({ endpoint }) => {
     );
   }, [endpoint, error, isPending, document, authentication]);
 
-  return (
-    <div className="p-2 border border-thm-on-background-faint rounded">
-      {content}
-    </div>
-  );
+  return <div>{content}</div>;
 };
 export default Item;
 
@@ -165,11 +161,13 @@ const _Item: React.FC<{
                 label="Enter"
                 onClick={handleEnterClick}
               />
-              <Signout
-                endpoint={endpoint}
-                authentication={authentication}
-                onSignout={handleSignout}
-              />
+              {authentication.list.find((item) => item.type === 'signout') && (
+                <Signout
+                  endpoint={endpoint}
+                  authentication={authentication}
+                  onSignout={handleSignout}
+                />
+              )}
             </>
           ) : (
             <Signin endpoint={endpoint} authentication={authentication} />
@@ -199,7 +197,7 @@ const _Item: React.FC<{
       </Popover>
       {/* Info */}
       <Modal {...infoModal.bind}>
-        <Info endpoint={endpoint} />
+        <Info endpoint={endpoint} document={document || undefined} />
       </Modal>
       {/* QRCode */}
       <Modal {...qrcodeModal.bind}>

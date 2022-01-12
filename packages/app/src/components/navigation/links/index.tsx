@@ -17,7 +17,7 @@ const links: {
     isExternal: false,
   },
   {
-    to: '/dashboard',
+    to: '/dashboard/endpoints',
     label: 'Dashboard',
     isExternal: false,
   },

@@ -20,7 +20,7 @@ const HomePage: React.FC<Props> = () => {
   useTheme();
 
   const handleDashboardButtonClick = useCallback(function () {
-    navigate('/dashboard');
+    navigate('/dashboard/endpoints');
   }, []);
 
   const handleDocumentationButtonClick = useCallback(function () {

@@ -54,10 +54,7 @@ const Item: React.FC<Props> = ({ group }) => {
 
   return (
     <>
-      <div className="flex items-center gap-2">
-        <div className="flex-none">
-          <ChevronRightIcon className="w-em" />
-        </div>
+      <div className="flex items-center gap-2 border-l-2 border-thm-on-background-low pl-4">
         <div className="flex-1">
           <div className="text-base font-bold">{group.name}</div>
           <div className="flex items-center gap-2">

@@ -93,7 +93,7 @@ const _Error: React.FC<Props> = ({ className = '', on, error }) => {
           <div>
             <div>TODO: 認証が必要よ。</div>
             <div>
-              <Link on={on} to="/dashboard">
+              <Link on={on} to="/dashboard/endpoints">
                 home
               </Link>
             </div>

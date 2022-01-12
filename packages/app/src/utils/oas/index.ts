@@ -77,7 +77,7 @@ export const resolve = function (document: Record<string, unknown>): Document {
     },
   });
   // Assign contentIds.
-  (document as Document).info['x-pages'].forEach(function (page) {
+  (document as Document).info['x-pages']?.forEach(function (page) {
     page.contents.forEach(function (content, idx) {
       content.id = `${page.id}-${idx}`;
     });

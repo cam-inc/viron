@@ -37,13 +37,11 @@ export type EndpointID = string;
 export type Endpoint = {
   id: EndpointID;
   url: URL;
-  authConfigs?: AuthConfigsResponse;
   groupId?: EndpointGroupID;
 };
-export type EndpointForDistribution = Pick<Endpoint, 'id' | 'url'>;
 
 export type Distribution = {
-  endpointList: EndpointForDistribution[];
+  endpointList: Endpoint[];
   endpointGroupList: EndpointGroup[];
 };
 
