@@ -21,7 +21,7 @@ export const OAUTH_REDIRECT_URI = (function () {
   if (isSSR) {
     return '';
   }
-  return `${window.location.origin}/oauthredirect`;
+  return `${globalThis.location.origin}/oauthredirect`;
 })();
 
 export const HTTP_STATUS = {

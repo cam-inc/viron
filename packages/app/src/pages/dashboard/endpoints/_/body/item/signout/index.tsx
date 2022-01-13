@@ -17,9 +17,9 @@ export type Props = {
   onSignout: () => void;
 };
 const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
-  const { signout } = useEndpoint();
-  const _signout = useMemo<ReturnType<UseEndpointReturn['signout']>>(
-    () => signout(endpoint, authentication),
+  const { prepareSignout } = useEndpoint();
+  const signout = useMemo<ReturnType<UseEndpointReturn['prepareSignout']>>(
+    () => prepareSignout(endpoint, authentication),
     [endpoint, authentication]
   );
 
@@ -30,20 +30,20 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
 
   const handleSubmit = useCallback(
     async (requestValue: RequestValue) => {
-      if (_signout.error) {
+      if (signout.error) {
         return;
       }
-      const result = await _signout.execute(requestValue);
+      const result = await signout.execute(requestValue);
       if (result.error) {
         // TODO: エラー表示。
         return;
       }
       onSignout();
     },
-    [_signout, onSignout]
+    [signout, onSignout]
   );
 
-  if (_signout.error) {
+  if (signout.error) {
     return <Error on={COLOR_SYSTEM.BACKGROUND} error={_signout.error} />;
   }
 
@@ -59,9 +59,10 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
         <Request
           on={COLOR_SYSTEM.SURFACE}
           className="h-full"
-          endpoint={endpoint}
-          document={authentication.oas}
-          request={_signout.request}
+          endpoint={signout.endpoint}
+          document={signout.document}
+          request={signout.request}
+          defaultValues={signout.defaultValues}
           onSubmit={handleSubmit}
         />
       </Drawer>

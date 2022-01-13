@@ -41,6 +41,7 @@ import {
   constructRequestInfo,
   constructRequestInit,
   constructRequestPayloads,
+  cleanupRequestValue,
 } from '~/utils/oas';
 
 export type UseEndpointReturn = {
@@ -70,16 +71,43 @@ export type UseEndpointReturn = {
       }
   >;
   navigate: (endpoint: Endpoint) => void;
-  signout: (
+  prepareSigninOAuthCallback: (
     endpoint: Endpoint,
-    authentication: Authentication
+    authentication: Authentication,
+    defaultValues?: RequestValue
   ) =>
     | {
         error: BaseError;
       }
     | {
         error: null;
+        endpoint: Endpoint;
+        document: Document;
         request: Request;
+        defaultValues: RequestValue;
+        execute: (requestValue: RequestValue) => Promise<
+          | {
+              error: BaseError;
+            }
+          | {
+              error: null;
+            }
+        >;
+      };
+  prepareSignout: (
+    endpoint: Endpoint,
+    authentication: Authentication,
+    defaultValues?: RequestValue
+  ) =>
+    | {
+        error: BaseError;
+      }
+    | {
+        error: null;
+        endpoint: Endpoint;
+        document: Document;
+        request: Request;
+        defaultValues: RequestValue;
         execute: (requestValue: RequestValue) => Promise<
           | {
               error: BaseError;
@@ -295,8 +323,75 @@ export const useEndpoint = (): UseEndpointReturn => {
     [endpointList, setEndpointList]
   );
 
-  const signout = useCallback<UseEndpointReturn['signout']>(
-    (endpoint, authentication) => {
+  const prepareSigninOAuthCallback = useCallback<
+    UseEndpointReturn['prepareSigninOAuthCallback']
+  >((endpoint, authentication, defaultValues = {}) => {
+    const authConfig = authentication.list.find(
+      (item) => item.type === 'oauthcallback'
+    );
+    if (!authConfig) {
+      return {
+        error: new BaseError('AuthConfig for OAuth callback not found.'),
+      };
+    }
+    const getRequestResult = getRequest(authentication.oas, {
+      operationId: authConfig.operationId,
+    });
+    if (getRequestResult.isFailure()) {
+      return {
+        error: new OASError('Request object not found.'),
+      };
+    }
+    const request = getRequestResult.value;
+    defaultValues = _.merge(
+      {},
+      {
+        parameters: authConfig.defaultParametersValue,
+        requestBody: authConfig.defaultRequestBodyValue,
+      },
+      cleanupRequestValue(request, defaultValues)
+    );
+    const execute = async (requestValue: RequestValue) => {
+      const requestPayloads = constructRequestPayloads(
+        request.operation,
+        requestValue
+      );
+      const requestInfo = constructRequestInfo(
+        endpoint,
+        authentication.oas,
+        request,
+        requestPayloads
+      );
+      const requestInit = constructRequestInit(request, requestPayloads);
+      const [response, responseError] = await promiseErrorHandler(
+        fetch(requestInfo, requestInit)
+      );
+      if (!!responseError) {
+        return {
+          error: new NetworkError(responseError.message),
+        };
+      }
+      if (!response.ok) {
+        return {
+          error: getHTTPError(response.status as HTTPStatusCode),
+        };
+      }
+      return {
+        error: null,
+      };
+    };
+    return {
+      error: null,
+      endpoint,
+      document: authentication.oas,
+      request,
+      defaultValues,
+      execute,
+    };
+  }, []);
+
+  const prepareSignout = useCallback<UseEndpointReturn['prepareSignout']>(
+    (endpoint, authentication, defaultValues = {}) => {
       const authConfig = authentication.list.find(
         (item) => item.type === 'signout'
       );
@@ -314,17 +409,18 @@ export const useEndpoint = (): UseEndpointReturn => {
         };
       }
       const request = getRequestResult.value;
+      defaultValues = _.merge(
+        {},
+        {
+          parameters: authConfig.defaultParametersValue,
+          requestBody: authConfig.defaultRequestBodyValue,
+        },
+        cleanupRequestValue(request, defaultValues)
+      );
       const execute = async (requestValue: RequestValue) => {
         const requestPayloads = constructRequestPayloads(
           request.operation,
-          _.merge(
-            {},
-            {
-              parameters: authConfig.defaultParametersValue,
-              requestBody: authConfig.defaultRequestBodyValue,
-            },
-            requestValue
-          )
+          requestValue
         );
         const requestInfo = constructRequestInfo(
           endpoint,
@@ -352,7 +448,10 @@ export const useEndpoint = (): UseEndpointReturn => {
       };
       return {
         error: null,
+        endpoint,
+        document: authentication.oas,
         request,
+        defaultValues,
         execute,
       };
     },
@@ -589,7 +688,8 @@ export const useEndpoint = (): UseEndpointReturn => {
       connect,
       fetchDocument,
       navigate,
-      signout,
+      prepareSigninOAuthCallback,
+      prepareSignout,
       addEndpoint,
       removeEndpoint,
       addGroup,
@@ -607,7 +707,8 @@ export const useEndpoint = (): UseEndpointReturn => {
       connect,
       fetchDocument,
       navigate,
-      signout,
+      prepareSigninOAuthCallback,
+      prepareSignout,
       addEndpoint,
       removeEndpoint,
       addGroup,
