@@ -44,7 +44,7 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
   );
 
   if (signout.error) {
-    return <Error on={COLOR_SYSTEM.BACKGROUND} error={_signout.error} />;
+    return <Error on={COLOR_SYSTEM.BACKGROUND} error={signout.error} />;
   }
 
   return (

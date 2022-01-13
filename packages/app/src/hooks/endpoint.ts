@@ -671,9 +671,13 @@ export const useEndpoint = (): UseEndpointReturn => {
       return {
         error: null,
       };
-    } catch (e) {
+    } catch (e: unknown) {
+      let message = '';
+      if (e instanceof Error) {
+        message = e.message;
+      }
       return {
-        error: new EndpointExportError(e.message),
+        error: new EndpointExportError(message),
       };
     }
   }, [endpointList, endpointGroupList]);

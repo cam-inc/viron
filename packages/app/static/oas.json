@@ -118,7 +118,7 @@
         "title": "File Uploads全般",
         "contents": [
           {
-            "title": "Type of Number",
+            "title": "File Upload",
             "type": "number",
             "operationId": "get:/fileUploads/number"
           }

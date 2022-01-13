@@ -10,7 +10,8 @@ import {
   OAUTH_REDIRECT_URI,
   HTTPStatusCode,
 } from '~/constants';
-import { BaseError, getHTTPError } from '~/errors';
+import { BaseError, NetworkError, getHTTPError } from '~/errors';
+import { useEndpoint } from '~/hooks/endpoint';
 import Drawer, { useDrawer } from '~/portals/drawer';
 import Modal, { useModal } from '~/portals/modal';
 import { remove, KEY, set } from '~/storage';
@@ -185,6 +186,7 @@ const Email: React.FC<{
   document: Document;
   authConfig: AuthConfig;
 }> = ({ endpoint, document, authConfig }) => {
+  const { navigate } = useEndpoint();
   // Request and Response error handling.
   const [error, setError] = useState<BaseError | null>(null);
   const errorModal = useModal();
@@ -238,9 +240,9 @@ const Email: React.FC<{
         errorModal.open();
         return;
       }
-      navigate(`/endpoints/${endpoint.id}`);
+      navigate(endpoint);
     },
-    [endpoint, document, request, errorModal]
+    [endpoint, navigate, document, request, errorModal]
   );
 
   const defaultValues = useMemo<RequestValue>(

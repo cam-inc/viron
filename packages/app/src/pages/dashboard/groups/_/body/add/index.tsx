@@ -33,7 +33,9 @@ const Add: React.FC<Props> = ({ onAdd, onCancel }) => {
     formState,
     setError,
     clearErrors,
-  } = useForm<EndpointGroup>({ resolver: yupResolver(schema) });
+  } = useForm<EndpointGroup & { manual?: string }>({
+    resolver: yupResolver(schema),
+  });
   const handleSubmit = useMemo(
     () =>
       _handleSubmit((data) => {

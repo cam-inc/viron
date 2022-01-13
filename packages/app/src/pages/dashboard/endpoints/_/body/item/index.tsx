@@ -131,7 +131,7 @@ const _Item: React.FC<{
     <>
       <div className="flex items-center gap-2">
         <div className="flex-none">
-          <Thumbnail endpoint={endpoint} />
+          <Thumbnail endpoint={endpoint} document={document || undefined} />
         </div>
         <div className="flex-1">
           <div className="text-thm-on-background-low text-xs">

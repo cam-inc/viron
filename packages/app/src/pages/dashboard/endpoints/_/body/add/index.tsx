@@ -24,7 +24,6 @@ export type Props = {
 const AddEndpoint: React.FC<Props> = ({ className = '', onAdd, onCancel }) => {
   const { groupList, connect, addEndpoint } = useEndpoint();
 
-  type Data = Pick<Endpoint, 'id' | 'url' | 'groupId'> & { manual?: string };
   const schema = useMemo(
     () =>
       yup.object().shape({
@@ -40,7 +39,7 @@ const AddEndpoint: React.FC<Props> = ({ className = '', onAdd, onCancel }) => {
     setError,
     clearErrors,
     watch,
-  } = useForm<Data>({
+  } = useForm<Pick<Endpoint, 'id' | 'url' | 'groupId'> & { manual?: string }>({
     resolver: yupResolver(schema),
   });
   const handleSubmit = useMemo(
