@@ -1,6 +1,6 @@
 import { navigate as _navigate } from 'gatsby';
 import _ from 'lodash';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { HTTP_STATUS, HTTPStatusCode } from '~/constants';
 import {
   BaseError,

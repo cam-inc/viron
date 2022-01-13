@@ -5,21 +5,14 @@ import { parse } from 'query-string';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Error from '~/components/error';
 import Metadata from '~/components/metadata';
-import { HTTPStatusCode } from '~/constants';
-import {
-  BaseError,
-  getHTTPError,
-  NetworkError,
-  OASError,
-} from '~/errors/index';
+import { BaseError } from '~/errors/index';
+import { useEndpoint } from '~/hooks/endpoint';
 import useTheme from '~/hooks/theme';
 import Layout, { Props as LayoutProps } from '~/layouts/index';
-import { useEndpointListItemGlobalState } from '~/store';
+import { useEndpointListItemGlobalStateValue } from '~/store';
 import { COLOR_SYSTEM } from '~/types';
 import { Document, Info } from '~/types/oas';
-import { promiseErrorHandler } from '~/utils';
-import { lint, resolve } from '~/utils/oas';
-import Appbar from './_appbar/index';
+import Appbar from './_/appBar/index';
 import Body, { Props as BodyProps } from './_body';
 import Navigation, { Props as NavigationProps } from './_navigation';
 import Subbody from './_subbody';
@@ -27,73 +20,55 @@ import Subbody from './_subbody';
 const splitter = ',';
 
 type PageId = Info['x-pages'][number]['id'];
+type ContentId = Info['x-pages'][number]['contents'][number]['id'];
 
 type Props = PageProps;
-const EndpointOnePage: React.FC<Props> = ({ params }) => {
-  const [endpoint, setEndpoint] = useEndpointListItemGlobalState({
-    id: params.endpointId,
-  });
-  const [document, setDocument] = useState<Document | null>(null);
+const EndpointPage: React.FC<Props> = ({ params }) => {
   const [isPending, setIsPending] = useState<boolean>(true);
   const [error, setError] = useState<BaseError | null>(null);
+  const [document, setDocument] = useState<Document | null>(null);
+  const endpoint = useEndpointListItemGlobalStateValue({
+    id: params.endpointId,
+  });
+  const { connect, fetchDocument } = useEndpoint();
 
   useTheme(document);
 
-  // We don't use OAS documents stored in the recoil store on purpose. The reasons are below.
-  // - Unsure that the stored document is up-to-date.
-  useEffect(function () {
-    const f = async function (): Promise<void> {
-      if (!endpoint) {
-        setError(new BaseError('endpoint not found.'));
+  useEffect(() => {
+    setError(null);
+    setIsPending(true);
+    setDocument(null);
+    if (!endpoint) {
+      setError(new BaseError('endpoint not found.'));
+      setIsPending(false);
+      return;
+    }
+    const f = async () => {
+      const connection = await connect(endpoint.url);
+      if (connection.error) {
+        setError(connection.error);
         setIsPending(false);
         return;
       }
-      const [response, responseError] = await promiseErrorHandler(
-        fetch(endpoint.url, {
-          mode: 'cors',
-          credentials: 'include',
-        })
-      );
-
-      if (!!responseError) {
-        // Network error.
-        setError(new NetworkError(responseError.message));
+      const fetchDocumentResult = await fetchDocument(endpoint);
+      if (fetchDocumentResult.error) {
+        setError(fetchDocumentResult.error);
         setIsPending(false);
         return;
       }
-
-      if (!response.ok) {
-        // The authorization cookie is not valid.
-        const error = getHTTPError(response.status as HTTPStatusCode);
-        setError(error);
-        setIsPending(false);
+      const { document } = fetchDocumentResult;
+      if (!document) {
+        navigate('/dashboard/endpoints');
         return;
       }
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const document: Record<string, any> = await response.json();
-      const { isValid, errors } = lint(document);
-      if (!isValid) {
-        setError(new OASError(errors?.[0]?.message));
-        setIsPending(false);
-        return;
-      }
-
-      const _document = resolve(document);
-      // Just update the stored data so that other pages using endpoints data be affected.
-      setEndpoint({ ...endpoint, document: _document });
-      setDocument(_document);
+      setDocument(document);
       setIsPending(false);
     };
     f();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [endpoint, connect, fetchDocument]);
 
   const _navigate = useCallback(
-    function (
-      pageId: PageId,
-      pinnedContentIds: Info['x-pages'][number]['contents'][number]['id'][]
-    ) {
+    (pageId: PageId, pinnedContentIds: ContentId[]) => {
       pinnedContentIds = _.uniq(pinnedContentIds);
       navigate(
         `/endpoints/${
@@ -107,36 +82,28 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
   );
 
   const location = useLocation();
-  const selectedPageId = useMemo<string | null>(
-    function () {
-      if (!document) {
-        return null;
-      }
-      const queries = parse(location.search);
-      const selectedPageId = queries.selectedPageId;
-      if (typeof selectedPageId === 'string') {
-        return selectedPageId;
-      }
-      return document.info['x-pages'][0].id;
-    },
-    [location.search, document]
-  );
+  const selectedPageId = useMemo<PageId | null>(() => {
+    if (!document) {
+      return null;
+    }
+    const queries = parse(location.search);
+    const selectedPageId = queries.selectedPageId;
+    if (typeof selectedPageId === 'string') {
+      return selectedPageId;
+    }
+    return document.info['x-pages'][0].id;
+  }, [location.search, document]);
 
-  const pinnedContentIds = useMemo<
-    Info['x-pages'][number]['contents'][number]['id'][]
-  >(
-    function () {
-      const queries = parse(location.search);
-      const pinnedContentIds = queries.pinnedContentIds;
-      if (typeof pinnedContentIds !== 'string') {
-        return [];
-      }
-      return pinnedContentIds.split(splitter).filter(function (contentId) {
-        return !!contentId;
-      });
-    },
-    [location.search]
-  );
+  const pinnedContentIds = useMemo<ContentId[]>(() => {
+    const queries = parse(location.search);
+    const pinnedContentIds = queries.pinnedContentIds;
+    if (typeof pinnedContentIds !== 'string') {
+      return [];
+    }
+    return pinnedContentIds.split(splitter).filter(function (contentId) {
+      return !!contentId;
+    });
+  }, [location.search]);
 
   const handlePageSelect = useCallback<NavigationProps['onPageSelect']>(
     function (pageId) {
@@ -171,7 +138,7 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
   );
 
   const renderAppBar = useCallback<NonNullable<LayoutProps['renderAppBar']>>(
-    function (args) {
+    (args) => {
       if (isPending || !endpoint || !document || error) {
         return null;
       }
@@ -299,4 +266,4 @@ const EndpointOnePage: React.FC<Props> = ({ params }) => {
   );
 };
 
-export default EndpointOnePage;
+export default EndpointPage;

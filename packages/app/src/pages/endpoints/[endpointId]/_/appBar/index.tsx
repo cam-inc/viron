@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import Breadcrumb, { Props as BreadcrumbProps } from '~/components/breadcrumb';
+import TextButton, { Props as TextButtonProps } from '~/components/button/text';
 import CommonMark from '~/components/commonMark';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import ExternalLinkIcon from '~/components/icon/externalLink/outline';
@@ -7,19 +8,20 @@ import ServerIcon from '~/components/icon/server/outline';
 import TagIcon from '~/components/icon/tag/outline';
 import Link from '~/components/link';
 import Logo from '~/components/logo';
-import { Props as LayoutProps } from '~/layouts/index';
+import { Props as LayoutProps } from '~/layouts';
 import Popover, { usePopover } from '~/portals/popover';
 import { useAppScreenGlobalStateValue } from '~/store';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document, Info } from '~/types/oas';
 
-type Props = {
+type Props = Parameters<NonNullable<LayoutProps['renderAppBar']>>[0] & {
   endpoint: Endpoint;
   document: Document;
   page: Info['x-pages'][number];
-} & Parameters<NonNullable<LayoutProps['renderAppBar']>>[0];
-const Header: React.FC<Props> = ({
-  className = '',
+};
+const Appbar: React.FC<Props> = ({
+  className,
+  style,
   openNavigation,
   endpoint,
   document,
@@ -29,79 +31,60 @@ const Header: React.FC<Props> = ({
   const { lg } = screen;
 
   // Navigation Opener.
-  const handleNavButtonClick = useCallback(
-    function () {
-      openNavigation();
-    },
-    [openNavigation]
-  );
+  const handleNavButtonClick = useCallback(() => {
+    openNavigation();
+  }, [openNavigation]);
 
   // Endpoint Info.
-  const thumbnail = useMemo<JSX.Element>(
-    function () {
-      if (!endpoint?.document || !endpoint.document.info['x-thumbnail']) {
-        return (
-          <div className="h-full p-2 flex items-center">
-            <Logo
-              left="text-thm-on-background"
-              right="text-thm-on-background-low"
-            />
-          </div>
-        );
-      }
+  const thumbnail = useMemo<JSX.Element>(() => {
+    if (!document.info['x-thumbnail']) {
       return (
-        <div
-          className="h-full bg-cover bg-center"
-          style={{
-            backgroundImage: `url(${endpoint.document.info['x-thumbnail']})`,
-          }}
-        />
+        <div className="h-full p-2 flex items-center">
+          <Logo
+            left="text-thm-on-background"
+            right="text-thm-on-background-low"
+          />
+        </div>
       );
-    },
-    [endpoint]
-  );
+    }
+    return (
+      <div
+        className="h-full bg-cover bg-center"
+        style={{
+          backgroundImage: `url(${document.info['x-thumbnail']})`,
+        }}
+      />
+    );
+  }, [endpoint, document]);
   const endpointPopover = usePopover<HTMLButtonElement>();
-  const handleEndpointClick = useCallback(
-    function () {
-      endpointPopover.open();
-    },
-    [endpointPopover]
-  );
+  const handleEndpointClick = useCallback(() => {
+    endpointPopover.open();
+  }, [endpointPopover]);
 
   // Page Info.
-  const breadcrumbList = useMemo<BreadcrumbProps['list']>(
-    function () {
-      if (!page.group) {
-        return [];
-      }
-      return page.group.split('/');
-    },
-    [page.group]
-  );
+  const breadcrumbList = useMemo<BreadcrumbProps['list']>(() => {
+    if (!page.group) {
+      return [];
+    }
+    return page.group.split('/');
+  }, [page.group]);
   const pagePopover = usePopover<HTMLButtonElement>();
-  const handlePageClick = useCallback(
-    function () {
-      pagePopover.open();
-    },
-    [pagePopover]
-  );
+  const handlePageClick = useCallback(() => {
+    pagePopover.open();
+  }, [pagePopover]);
 
   // Contents Info
   const contentsPopover = usePopover<HTMLDivElement>();
-  const handleContentsClick = useCallback(
-    function () {
-      contentsPopover.open();
-    },
-    [contentsPopover]
-  );
-  /*
+  const handleContentsClick = useCallback(() => {
+    contentsPopover.open();
+  }, [contentsPopover]);
   const handleContentClick = useCallback<
-    (content: Info['x-pages'][number]['contents'][number]) => void
+    TextButtonProps<Info['x-pages'][number]['contents'][number]>['onClick']
   >(
-    function(content) {
+    (content) => {
       contentsPopover.close();
       const contentId = content.id;
-      const elm = window.document.querySelector(`#${contentId}`);
+      const elm = globalThis.document.querySelector(`#${contentId}`);
       if (!elm) {
         return;
       }
@@ -111,14 +94,10 @@ const Header: React.FC<Props> = ({
     },
     [contentsPopover]
   );
-  */
-  const handleContentClick = useCallback(() => {
-    // TODO: 上記と同じ処理を。
-  }, []);
 
   return (
     <>
-      <div className={className}>
+      <div style={style} className={className}>
         <div className="flex gap-2 items-center h-full px-4">
           {!lg && (
             <div className="flex-none">
@@ -186,9 +165,6 @@ const Header: React.FC<Props> = ({
             </div>
             <div className="flex-none px-1 rounded border border-thm-on-surface-low text-thm-on-surface-low text-xxs font-bold">
               ver.{document.info.version}
-            </div>
-            <div className="flex-none px-1 rounded border border-thm-on-surface-low text-thm-on-surface-low text-xxs font-bold">
-              {endpoint.isPrivate ? 'Private' : 'Public'}
             </div>
           </div>
           <div className="flex items-center gap-1">
@@ -288,19 +264,12 @@ const Header: React.FC<Props> = ({
         {page.contents.map(function (content) {
           return (
             <React.Fragment key={content.id}>
-              {/*
-              <Button<Info['x-pages'][number]['contents'][number]>
-                on={ON.SURFACE}
-                size={BUTTON_SIZE.SM}
-                variant={BUTTON_VARIANT.TEXT}
+              <TextButton<Info['x-pages'][number]['contents'][number]>
+                cs={COLOR_SYSTEM.PRIMARY}
                 label={content.title || content.id}
                 data={content}
                 onClick={handleContentClick}
               />
-               */}
-              <button onClick={handleContentClick}>
-                {content.title || content.id}
-              </button>
             </React.Fragment>
           );
         })}
@@ -308,4 +277,4 @@ const Header: React.FC<Props> = ({
     </>
   );
 };
-export default Header;
+export default Appbar;
