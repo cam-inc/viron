@@ -1,7 +1,12 @@
 import { navigate as _navigate } from 'gatsby';
 import _ from 'lodash';
 import { useCallback, useMemo, useRef } from 'react';
-import { HTTP_STATUS, HTTPStatusCode } from '~/constants';
+import {
+  HTTP_STATUS,
+  HTTPStatusCode,
+  ENVIRONMENTAL_VARIABLE,
+  OAUTH_REDIRECT_URI,
+} from '~/constants';
 import {
   BaseError,
   NetworkError,
@@ -16,6 +21,7 @@ import {
   UnexpectedError,
   getHTTPError,
 } from '~/errors';
+import { remove, KEY, set } from '~/storage';
 import {
   useEndpointListGlobalState,
   useEndpointListByGroupGlobalStateValue,
@@ -42,6 +48,7 @@ import {
   constructRequestInit,
   constructRequestPayloads,
   cleanupRequestValue,
+  replaceEnvironmentalVariableOfDefaultRequestParametersValue,
 } from '~/utils/oas';
 
 export type UseEndpointReturn = {
@@ -71,6 +78,38 @@ export type UseEndpointReturn = {
       }
   >;
   navigate: (endpoint: Endpoint) => void;
+  prepareSigninEmail: (
+    endpoint: Endpoint,
+    authentication: Authentication,
+    defaultValues?: RequestValue
+  ) =>
+    | { error: BaseError }
+    | {
+        error: null;
+        endpoint: Endpoint;
+        document: Document;
+        request: Request;
+        defaultValues: RequestValue;
+        execute: (
+          requestValue: RequestValue
+        ) => Promise<{ error: BaseError } | { error: null }>;
+      };
+  prepareSigninOAuth: (
+    endpoint: Endpoint,
+    authentication: Authentication,
+    defaultValues?: RequestValue
+  ) =>
+    | { error: BaseError }
+    | {
+        error: null;
+        endpoint: Endpoint;
+        document: Document;
+        request: Request;
+        defaultValues: RequestValue;
+        execute: (
+          requestValue: RequestValue
+        ) => Promise<{ error: BaseError } | { error: null }>;
+      };
   prepareSigninOAuthCallback: (
     endpoint: Endpoint,
     authentication: Authentication,
@@ -322,6 +361,144 @@ export const useEndpoint = (): UseEndpointReturn => {
     },
     [endpointList, setEndpointList]
   );
+
+  const prepareSigninEmail = useCallback<
+    UseEndpointReturn['prepareSigninEmail']
+  >((endpoint, authentication, defaultValues = {}) => {
+    const authConfig = authentication.list.find(
+      (item) => item.type === 'email'
+    );
+    if (!authConfig) {
+      return {
+        error: new BaseError('AuthConfig for email not found.'),
+      };
+    }
+    const getRequestResult = getRequest(authentication.oas, {
+      operationId: authConfig.operationId,
+    });
+    if (getRequestResult.isFailure()) {
+      return {
+        error: new OASError('Request object not found.'),
+      };
+    }
+    const request = getRequestResult.value;
+    defaultValues = _.merge(
+      {},
+      {
+        parameters: authConfig.defaultParametersValue,
+        requestBody: authConfig.defaultRequestBodyValue,
+      },
+      cleanupRequestValue(request, defaultValues)
+    );
+    const execute = async (requestValue: RequestValue) => {
+      const requestPayloads = constructRequestPayloads(
+        request.operation,
+        requestValue
+      );
+      const requestInfo = constructRequestInfo(
+        endpoint,
+        authentication.oas,
+        request,
+        requestPayloads
+      );
+      const requestInit = constructRequestInit(request, requestPayloads);
+      const [response, responseError] = await promiseErrorHandler(
+        fetch(requestInfo, requestInit)
+      );
+      if (!!responseError) {
+        return {
+          error: new NetworkError(responseError.message),
+        };
+      }
+      if (!response.ok) {
+        return {
+          error: getHTTPError(response.status as HTTPStatusCode),
+        };
+      }
+      return {
+        error: null,
+      };
+    };
+    return {
+      error: null,
+      endpoint,
+      document: authentication.oas,
+      request,
+      defaultValues,
+      execute,
+    };
+  }, []);
+
+  const prepareSigninOAuth = useCallback<
+    UseEndpointReturn['prepareSigninOAuth']
+  >((endpoint, authentication, defaultValues = {}) => {
+    const authConfig = authentication.list.find(
+      (item) => item.type === 'oauth'
+    );
+    if (!authConfig) {
+      return {
+        error: new BaseError('AuthConfig for OAuth not found.'),
+      };
+    }
+    const getRequestResult = getRequest(authentication.oas, {
+      operationId: authConfig.operationId,
+    });
+    if (getRequestResult.isFailure()) {
+      return {
+        error: new OASError('Request object not found.'),
+      };
+    }
+    const request = getRequestResult.value;
+    defaultValues = _.merge(
+      {},
+      {
+        parameters: replaceEnvironmentalVariableOfDefaultRequestParametersValue(
+          authConfig.defaultParametersValue || {},
+          {
+            [ENVIRONMENTAL_VARIABLE.OAUTH_REDIRECT_URI]: OAUTH_REDIRECT_URI,
+          }
+        ),
+        requestBody: authConfig.defaultRequestBodyValue,
+      },
+      cleanupRequestValue(request, defaultValues)
+    );
+    const execute = async (requestValue: RequestValue) => {
+      const requestPayloads = constructRequestPayloads(
+        request.operation,
+        requestValue
+      );
+      const requestInfo = constructRequestInfo(
+        endpoint,
+        authentication.oas,
+        request,
+        requestPayloads
+      );
+      try {
+        set(KEY.OAUTH_ENDPOINT_ID, endpoint.id);
+        globalThis.location.href = requestInfo.toString();
+      } catch (e: unknown) {
+        remove(KEY.OAUTH_ENDPOINT_ID);
+        let message = '';
+        if (e instanceof Error) {
+          message = e.message;
+        }
+        return {
+          error: new BaseError(message),
+        };
+      }
+      return {
+        error: null,
+      };
+    };
+    return {
+      error: null,
+      endpoint,
+      document: authentication.oas,
+      request,
+      defaultValues,
+      execute,
+    };
+  }, []);
 
   const prepareSigninOAuthCallback = useCallback<
     UseEndpointReturn['prepareSigninOAuthCallback']
@@ -692,6 +869,8 @@ export const useEndpoint = (): UseEndpointReturn => {
       connect,
       fetchDocument,
       navigate,
+      prepareSigninEmail,
+      prepareSigninOAuth,
       prepareSigninOAuthCallback,
       prepareSignout,
       addEndpoint,
@@ -711,6 +890,8 @@ export const useEndpoint = (): UseEndpointReturn => {
       connect,
       fetchDocument,
       navigate,
+      prepareSigninEmail,
+      prepareSigninOAuth,
       prepareSigninOAuthCallback,
       prepareSignout,
       addEndpoint,

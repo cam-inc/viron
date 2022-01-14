@@ -5,31 +5,12 @@ import FilledButton, {
 } from '~/components/button/filled';
 import Error from '~/components/error/';
 import Request, { Props as RequestProps } from '~/components/request';
-import {
-  ENVIRONMENTAL_VARIABLE,
-  OAUTH_REDIRECT_URI,
-  HTTPStatusCode,
-} from '~/constants';
-import { BaseError, NetworkError, getHTTPError } from '~/errors';
-import { useEndpoint } from '~/hooks/endpoint';
+import { BaseError } from '~/errors';
+import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
 import Drawer, { useDrawer } from '~/portals/drawer';
 import Modal, { useModal } from '~/portals/modal';
-import { remove, KEY, set } from '~/storage';
 import { Authentication, AuthConfig, COLOR_SYSTEM, Endpoint } from '~/types/';
-import {
-  Document,
-  Request as RequestType,
-  RequestParametersValue,
-  RequestValue,
-} from '~/types/oas';
-import { promiseErrorHandler } from '~/utils';
-import {
-  constructRequestInfo,
-  constructRequestInit,
-  constructRequestPayloads,
-  getRequest,
-  replaceEnvironmentalVariableOfDefaultRequestParametersValue,
-} from '~/utils/oas';
+import { RequestValue } from '~/types/oas';
 
 export type Props = {
   endpoint: Endpoint;
@@ -75,20 +56,12 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
       </div>
       <Drawer {...drawerOAuth.bind}>
         {authConfigOAuth && (
-          <OAuth
-            endpoint={endpoint}
-            document={authentication.oas}
-            authConfig={authConfigOAuth}
-          />
+          <OAuth endpoint={endpoint} authentication={authentication} />
         )}
       </Drawer>
       <Drawer {...drawerEmail.bind}>
         {authConfigEmail && (
-          <Email
-            endpoint={endpoint}
-            document={authentication.oas}
-            authConfig={authConfigEmail}
-          />
+          <Email endpoint={endpoint} authentication={authentication} />
         )}
       </Drawer>
     </>
@@ -98,55 +71,25 @@ export default Signin;
 
 const OAuth: React.FC<{
   endpoint: Endpoint;
-  document: Document;
-  authConfig: AuthConfig;
-}> = ({ endpoint, document, authConfig }) => {
-  const request = useMemo<RequestType | null>(() => {
-    const getRequestResult = getRequest(document, {
-      operationId: authConfig.operationId,
-    });
-    if (getRequestResult.isFailure()) {
-      return null;
-    }
-    return getRequestResult.value;
-  }, [document, authConfig]);
-
-  const defaultValues = useMemo<RequestValue>(
-    () => ({
-      parameters: replaceEnvironmentalVariableOfDefaultRequestParametersValue(
-        authConfig.defaultParametersValue as RequestParametersValue,
-        {
-          [ENVIRONMENTAL_VARIABLE.OAUTH_REDIRECT_URI]: OAUTH_REDIRECT_URI,
-        }
-      ),
-      requestBody: authConfig.defaultRequestBodyValue,
-    }),
-    [authConfig]
-  );
+  authentication: Authentication;
+}> = ({ endpoint, authentication }) => {
+  const { prepareSigninOAuth } = useEndpoint();
+  const signinOAuth = useMemo<
+    ReturnType<UseEndpointReturn['prepareSigninOAuth']>
+  >(() => prepareSigninOAuth(endpoint, authentication), [prepareSigninOAuth]);
 
   const handleSubmit = useCallback(
     async (requestValue: RequestValue) => {
-      if (!request) {
+      if (signinOAuth.error) {
         return;
       }
-      const requestPayloads = constructRequestPayloads(
-        request.operation,
-        requestValue
-      );
-      const requestInfo: RequestInfo = constructRequestInfo(
-        endpoint,
-        document,
-        request,
-        requestPayloads
-      );
-      try {
-        set(KEY.OAUTH_ENDPOINT_ID, endpoint.id);
-        location.href = requestInfo.toString();
-      } catch {
-        remove(KEY.OAUTH_ENDPOINT_ID);
+      const result = await signinOAuth.execute(requestValue);
+      if (result.error) {
+        // TODO: エラー表示。
+        return;
       }
     },
-    [endpoint, document, request]
+    [signinOAuth]
   );
 
   const renderHead = useCallback<NonNullable<RequestProps['renderHead']>>(
@@ -158,23 +101,18 @@ const OAuth: React.FC<{
     []
   );
 
-  if (!request) {
-    return (
-      <Error
-        on={COLOR_SYSTEM.SURFACE}
-        error={new BaseError('Request object missing.')}
-      />
-    );
+  if (signinOAuth.error) {
+    return <Error on={COLOR_SYSTEM.BACKGROUND} error={signinOAuth.error} />;
   }
 
   return (
     <Request
       on={COLOR_SYSTEM.SURFACE}
       className="h-full"
-      endpoint={endpoint}
-      document={document}
-      defaultValues={defaultValues}
-      request={request}
+      endpoint={signinOAuth.endpoint}
+      document={signinOAuth.document}
+      defaultValues={signinOAuth.defaultValues}
+      request={signinOAuth.request}
       onSubmit={handleSubmit}
       renderHead={renderHead}
     />
@@ -183,74 +121,29 @@ const OAuth: React.FC<{
 
 const Email: React.FC<{
   endpoint: Endpoint;
-  document: Document;
-  authConfig: AuthConfig;
-}> = ({ endpoint, document, authConfig }) => {
-  const { navigate } = useEndpoint();
-  // Request and Response error handling.
+  authentication: Authentication;
+}> = ({ endpoint, authentication }) => {
+  const { prepareSigninEmail, navigate } = useEndpoint();
+  const signinEmail = useMemo<
+    ReturnType<UseEndpointReturn['prepareSigninEmail']>
+  >(() => prepareSigninEmail(endpoint, authentication), [prepareSigninEmail]);
   const [error, setError] = useState<BaseError | null>(null);
   const errorModal = useModal();
 
-  const request = useMemo<RequestType | null>(
-    function () {
-      if (!document) {
-        return null;
-      }
-      const getRequestResult = getRequest(document, {
-        operationId: authConfig.operationId,
-      });
-      if (getRequestResult.isFailure()) {
-        return null;
-      }
-      return getRequestResult.value;
-    },
-    [document, authConfig]
-  );
-
   const handleSubmit = useCallback(
     async (requestValue: RequestValue) => {
-      if (!request) {
+      if (signinEmail.error) {
         return;
       }
-      const requestPayloads = constructRequestPayloads(
-        request.operation,
-        requestValue
-      );
-      const requestInfo: RequestInfo = constructRequestInfo(
-        endpoint,
-        document,
-        request,
-        requestPayloads
-      );
-      const requestInit: RequestInit = constructRequestInit(
-        request,
-        requestPayloads
-      );
-
-      const [response, responseError] = await promiseErrorHandler(
-        fetch(requestInfo, requestInit)
-      );
-      if (!!responseError) {
-        setError(new NetworkError(responseError.message));
-        errorModal.open();
-        return;
-      }
-      if (!response.ok) {
-        setError(getHTTPError(response.status as HTTPStatusCode));
+      const result = await signinEmail.execute(requestValue);
+      if (result.error) {
+        setError(result.error);
         errorModal.open();
         return;
       }
       navigate(endpoint);
     },
-    [endpoint, navigate, document, request, errorModal]
-  );
-
-  const defaultValues = useMemo<RequestValue>(
-    () => ({
-      parameters: authConfig.defaultParametersValue,
-      requestBody: authConfig.defaultRequestBodyValue,
-    }),
-    [authConfig]
+    [endpoint, navigate, signinEmail, errorModal]
   );
 
   const renderHead = useCallback<NonNullable<RequestProps['renderHead']>>(
@@ -262,23 +155,18 @@ const Email: React.FC<{
     []
   );
 
-  if (!request) {
-    return (
-      <Error
-        on={COLOR_SYSTEM.SURFACE}
-        error={new BaseError('Request object missing.')}
-      />
-    );
+  if (signinEmail.error) {
+    return <Error on={COLOR_SYSTEM.BACKGROUND} error={signinEmail.error} />;
   }
 
   return (
     <>
       <Request
         on={COLOR_SYSTEM.SURFACE}
-        endpoint={endpoint}
-        document={document}
-        defaultValues={defaultValues}
-        request={request}
+        endpoint={signinEmail.endpoint}
+        document={signinEmail.document}
+        defaultValues={signinEmail.defaultValues}
+        request={signinEmail.request}
         onSubmit={handleSubmit}
         className="h-full"
         renderHead={renderHead}
