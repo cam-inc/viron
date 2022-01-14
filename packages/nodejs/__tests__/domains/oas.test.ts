@@ -12,7 +12,7 @@ import {
   get,
   getPath,
   getResourceId,
-  loadOas,
+  getVironSpec,
   loadResolvedOas,
   VironOpenAPIObject,
 } from '../../src/domains/oas';
@@ -167,19 +167,6 @@ describe('domains/oas', () => {
     });
   });
 
-  describe('loadOas', () => {
-    it('Get openapi object', async () => {
-      const oasPath = path.resolve(__dirname, '../fixtures/test_oas.yaml');
-      const result = await loadOas(oasPath);
-      assert.strictEqual(result.openapi, '3.0.2');
-      assert.strictEqual(result.info.title, '@viron/lib test');
-      assert.strictEqual(
-        result.paths['/'].get.parameters[0].$ref,
-        '#/components/parameters/TestQueryParam'
-      );
-    });
-  });
-
   describe('loadResolvedOas', () => {
     it('Get $ref resolved openapi object', async () => {
       const oasPath = path.resolve(__dirname, '../fixtures/test_oas.yaml');
@@ -286,6 +273,13 @@ describe('domains/oas', () => {
     it('Return null when not found.', () => {
       const result = getResourceId('/users', API_METHOD.POST, oas);
       assert.strictEqual(result, null);
+    });
+  });
+
+  describe('getVironSpec', () => {
+    it('Get merged openapi object', async () => {
+      const result = await getVironSpec();
+      assert(Object.keys(result.paths).length >= 14);
     });
   });
 });
