@@ -12,10 +12,10 @@ import Layout, { Props as LayoutProps } from '~/layouts/index';
 import { useEndpointListItemGlobalStateValue } from '~/store';
 import { COLOR_SYSTEM } from '~/types';
 import { Document, Info } from '~/types/oas';
-import Appbar from './_/appBar/index';
-import Body, { Props as BodyProps } from './_body';
-import Navigation, { Props as NavigationProps } from './_navigation';
-import Subbody from './_subbody';
+import Appbar from './_/appBar';
+import Body, { Props as BodyProps } from './_/body';
+import Navigation, { Props as NavigationProps } from './_/navigation';
+import SubBody from './_/subBody';
 
 const splitter = ',';
 
@@ -106,14 +106,14 @@ const EndpointPage: React.FC<Props> = ({ params }) => {
   }, [location.search]);
 
   const handlePageSelect = useCallback<NavigationProps['onPageSelect']>(
-    function (pageId) {
+    (pageId) => {
       _navigate(pageId, pinnedContentIds);
     },
     [_navigate, pinnedContentIds]
   );
 
   const handleContentPin = useCallback<BodyProps['onPin']>(
-    function (contentId) {
+    (contentId) => {
       if (!selectedPageId) {
         return;
       }
@@ -123,7 +123,7 @@ const EndpointPage: React.FC<Props> = ({ params }) => {
   );
 
   const handleContentUnpin = useCallback<BodyProps['onUnpin']>(
-    function (contentId) {
+    (contentId) => {
       if (!selectedPageId) {
         return;
       }
@@ -158,7 +158,7 @@ const EndpointPage: React.FC<Props> = ({ params }) => {
   const renderNavigation = useCallback<
     NonNullable<LayoutProps['renderNavigation']>
   >(
-    function (args) {
+    (args) => {
       if (isPending || !endpoint || !document || error) {
         return null;
       }
@@ -219,20 +219,20 @@ const EndpointPage: React.FC<Props> = ({ params }) => {
   );
 
   const renderSubBody = useCallback<NonNullable<LayoutProps['renderSubBody']>>(
-    function (args) {
+    (args) => {
       if (isPending || !endpoint || !document || error) {
         return null;
       }
       const contents: Info['x-pages'][number]['contents'][number][] = [];
-      document.info['x-pages'].forEach(function (page) {
-        page.contents.forEach(function (_content) {
+      document.info['x-pages'].forEach((page) => {
+        page.contents.forEach((_content) => {
           if (pinnedContentIds.includes(_content.id)) {
             contents.push({ ..._content });
           }
         });
       });
       return (
-        <Subbody
+        <SubBody
           {...args}
           endpoint={endpoint}
           document={document}
