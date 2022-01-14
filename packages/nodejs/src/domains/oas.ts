@@ -1,4 +1,3 @@
-import fs from 'fs';
 import path from 'path';
 import {
   InfoObject,
@@ -10,9 +9,9 @@ import {
   SchemaObject,
 } from 'openapi3-ts';
 import jsonSchemaRefParser from '@apidevtools/json-schema-ref-parser';
-import { load } from 'js-yaml';
 import { match as matchPath } from 'path-to-regexp';
 import copy from 'fast-copy';
+import deepmerge from 'deepmerge';
 import { lint } from '@viron/linter';
 import {
   ApiMethod,
@@ -24,6 +23,8 @@ import {
   OAS_X_THEME,
   OAS_X_THUMBNAIL,
   Theme,
+  VironDomains,
+  VIRON_DOMAINS,
   XPageContentType,
 } from '../constants';
 import { getDebug } from '../logging';
@@ -126,15 +127,6 @@ export interface OasXAutocomplete {
   responseLabelKey: string;
   responseValueKey: string;
 }
-
-export type OasNames =
-  | 'adminaccounts'
-  | 'adminroles'
-  | 'adminusers'
-  | 'auditlogs'
-  | 'auth'
-  | 'authconfigs'
-  | 'oas';
 
 export { lint };
 
@@ -249,14 +241,8 @@ export const get = async (
 };
 
 // oasファイルのパスを取得
-export const getPath = (name: OasNames): string => {
+export const getPath = (name: VironDomains): string => {
   return path.resolve(__dirname, '..', 'openapi', `${name}.yaml`);
-};
-
-// oasをロード
-export const loadOas = async (path: string): Promise<VironOpenAPIObject> => {
-  const obj = load(await fs.promises.readFile(path, 'utf8'));
-  return obj as VironOpenAPIObject;
 };
 
 // oasをロードして$refを解決する
@@ -330,11 +316,11 @@ export const dereference = async (
 };
 
 // uri,methodに対応するopeartionを取得
-export const findOperation = async (
+export const findOperation = (
   uri: string,
   method: string,
   oas: VironOpenAPIObject
-): Promise<OperationObject | null> => {
+): VironOperationObject | null => {
   const { pathItem } = getPathItem(uri, oas);
   return pathItem?.[method.toLocaleLowerCase()] ?? null;
 };
@@ -470,4 +456,20 @@ export const getResourceId = (
 
   // ここまでヒットしなければresourceIdを特定できないのでnullを返す
   return null;
+};
+
+// 複数のoasをマージする
+export const merge = (
+  ...apiDefinitions: VironOpenAPIObject[]
+): VironOpenAPIObject => {
+  return deepmerge.all(apiDefinitions) as VironOpenAPIObject;
+};
+
+// @viron/libが提供している機能のoasを1つにして返す
+export const getVironSpec = async (): Promise<VironOpenAPIObject> => {
+  const names = Object.values(VIRON_DOMAINS);
+  const specs = await Promise.all(
+    names.map((name) => loadResolvedOas(getPath(name)))
+  );
+  return merge(...specs);
 };

@@ -230,7 +230,7 @@ export const hasPermission = async (
   const resourceId = getResourceId(requestUri, requestMethod, oas);
   if (!resourceId) {
     // リソースに紐づかないAPIはオペレーションがあれば通す
-    const operation = await findOperation(requestUri, requestMethod, oas);
+    const operation = findOperation(requestUri, requestMethod, oas);
     return !!operation;
   }
   return await hasPermissionByResourceId(
