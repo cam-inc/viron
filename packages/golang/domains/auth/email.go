@@ -36,5 +36,10 @@ func SigninEmail(ctx context.Context, email string, password string) (string, *e
 		return "", errors.SigninFailed
 	}
 
-	return Sign(user.ID), nil
+	token, err := Sign(user.ID)
+	if err != nil {
+		log.Error("SigninEmail sign failed %#v \n", err)
+		return "", errors.SigninFailed
+	}
+	return token, nil
 }

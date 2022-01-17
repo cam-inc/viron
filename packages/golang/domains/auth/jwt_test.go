@@ -19,12 +19,15 @@ func init() {
 
 func TestAuthJWTSignNormal(t *testing.T) {
 	userID := "test_1"
-	token := Sign(userID)
+	token, err := Sign(userID)
+	fmt.Println(err)
 	fmt.Println(token)
 	sepToken := strings.Split(token, " ")[1]
-	claim := Verify(sepToken)
+	claim, err := Verify(sepToken)
+	fmt.Println(err)
 	fmt.Printf("claim=%v\n", claim)
 	time.Sleep(10 * time.Second)
-	claim2 := Verify(sepToken)
+	claim2, err := Verify(sepToken)
+	fmt.Println(err)
 	fmt.Printf("claim2=%v\n", claim2)
 }
