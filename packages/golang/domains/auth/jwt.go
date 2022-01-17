@@ -54,7 +54,7 @@ func SetUp(secret string, provider string, expiration int) error {
 	return nil
 }
 
-func Sign(subject string) string {
+func Sign(subject string) (string, error) {
 	claim := map[string]interface{}{
 		"nbf": 0,
 		"sub": subject,
@@ -63,8 +63,12 @@ func Sign(subject string) string {
 	}
 	jwtauth.SetExpiryIn(claim, time.Duration(jwt.ExpirationSec)*time.Second)
 	jwtauth.SetIssuedNow(claim)
-	_, tokenStr, _ := jwt.jwtAuth.Encode(claim)
-	return fmt.Sprintf("%s %s", constant.AUTH_SCHEME, tokenStr)
+	_, tokenStr, err := jwt.jwtAuth.Encode(claim)
+
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s %s", constant.AUTH_SCHEME, tokenStr), nil
 }
 
 func Verify(token string) (*Claim, error) {
