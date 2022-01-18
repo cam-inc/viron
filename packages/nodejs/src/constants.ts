@@ -175,8 +175,17 @@ export const TABLE_SORT_ORDER = {
 export type TableSortOrder =
   typeof TABLE_SORT_ORDER[keyof typeof TABLE_SORT_ORDER];
 
-export const ADMIN_USER_ID_ME = 'me';
-
 export const CACHE_CONTROL = {
   NO_STORE: 'no-store',
 } as const;
+
+export const VIRON_DOMAINS = {
+  ADMINACCOUNTS: 'adminaccounts',
+  ADMINROLES: 'adminroles',
+  ADMINUSERS: 'adminusers',
+  AUDITLOGS: 'auditlogs',
+  AUTH: 'auth',
+  AUTHCONFIGS: 'authconfigs',
+  OAS: 'oas',
+} as const;
+export type VironDomains = typeof VIRON_DOMAINS[keyof typeof VIRON_DOMAINS];

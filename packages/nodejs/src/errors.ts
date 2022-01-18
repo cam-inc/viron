@@ -62,3 +62,7 @@ export const oasValidationFailure = (): VironError => {
 export const unableToDeleteRole = (): VironError => {
   return new VironError('Unable to Delete Role.', 400);
 };
+
+export const operationNotFound = (): VironError => {
+  return new VironError('Operation Not Found.', 404);
+};
