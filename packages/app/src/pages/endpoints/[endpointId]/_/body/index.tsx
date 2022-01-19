@@ -1,14 +1,14 @@
 import React from 'react';
 import { Props as LayoutProps } from '~/layouts';
 import { Endpoint } from '~/types';
-import { Document, Info } from '~/types/oas';
+import { Document, Page, ContentId } from '~/types/oas';
 import Content, { Props as ContentProps } from '../content';
 
 export type Props = Parameters<LayoutProps['renderBody']>[0] & {
   endpoint: Endpoint;
   document: Document;
-  page: Info['x-pages'][number];
-  pinnedContentIds: Info['x-pages'][number]['contents'][number]['id'][];
+  page: Page;
+  pinnedContentIds: ContentId[];
 } & Pick<ContentProps, 'onPin' | 'onUnpin'>;
 
 const Body: React.FC<Props> = ({

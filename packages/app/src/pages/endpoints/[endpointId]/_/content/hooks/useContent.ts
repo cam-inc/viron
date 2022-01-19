@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Endpoint } from '~/types';
-import { Document, Info } from '~/types/oas';
+import { Document, Content } from '~/types/oas';
 import useBase, { UseBaseReturn } from './useBase';
 import useSiblings, { UseSiblingsReturn } from './useSiblings';
 import useDescendants, { UseDescendantsReturn } from './useDescendants';
@@ -13,7 +13,7 @@ export type UseContentReturn = {
 const useContent = (
   endpoint: Endpoint,
   document: Document,
-  content: Info['x-pages'][number]['contents'][number]
+  content: Content
 ): UseContentReturn => {
   const base = useBase(endpoint, document, content);
   const siblings = useSiblings(endpoint, document, content);

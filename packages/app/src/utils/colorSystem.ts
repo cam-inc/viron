@@ -2,33 +2,33 @@ import { normal as normalBlend } from 'color-blend';
 import { CSSProperties } from 'react';
 import { BaseError } from '~/errors';
 import { RGB, Hue, HSL } from '~/types';
-import { X_Theme, X_THEME } from '~/types/oas';
+import { Theme, THEME } from '~/types/oas';
 
-export const THEME_HUE: Record<X_Theme, Hue> = {
-  [X_THEME.RED]: 0,
-  [X_THEME.ULTIMATE_ORANGE]: 15,
-  [X_THEME.ORANGE_JUICE]: 30,
-  [X_THEME.AMBER]: 45,
-  [X_THEME.YELLOW]: 60,
-  [X_THEME.LIMONCELLO]: 75,
-  [X_THEME.RADIUMM]: 90,
-  [X_THEME.HARLEQUIN]: 105,
-  [X_THEME.GREEN]: 120,
-  [X_THEME.LUCENT_LIME]: 135,
-  [X_THEME.GUPPIE_GREEN]: 150,
-  [X_THEME.MINTY_PARADISE]: 165,
-  [X_THEME.AQUA]: 180,
-  [X_THEME.CAPRI]: 195,
-  [X_THEME.BRESCIAN_BLUE]: 210,
-  [X_THEME.RARE_BLUE]: 225,
-  [X_THEME.BLUE]: 240,
-  [X_THEME.ELECTRIC_ULTRAMARINE]: 255,
-  [X_THEME.VIOLENT_VIOLET]: 270,
-  [X_THEME.ELECTRIC_PURPLE]: 285,
-  [X_THEME.MAGENDA]: 300,
-  [X_THEME.BRUTAL_PINK]: 315,
-  [X_THEME.NEON_ROSE]: 330,
-  [X_THEME.ELECTRIC_CRIMSON]: 345,
+export const THEME_HUE: Record<Theme, Hue> = {
+  [THEME.RED]: 0,
+  [THEME.ULTIMATE_ORANGE]: 15,
+  [THEME.ORANGE_JUICE]: 30,
+  [THEME.AMBER]: 45,
+  [THEME.YELLOW]: 60,
+  [THEME.LIMONCELLO]: 75,
+  [THEME.RADIUMM]: 90,
+  [THEME.HARLEQUIN]: 105,
+  [THEME.GREEN]: 120,
+  [THEME.LUCENT_LIME]: 135,
+  [THEME.GUPPIE_GREEN]: 150,
+  [THEME.MINTY_PARADISE]: 165,
+  [THEME.AQUA]: 180,
+  [THEME.CAPRI]: 195,
+  [THEME.BRESCIAN_BLUE]: 210,
+  [THEME.RARE_BLUE]: 225,
+  [THEME.BLUE]: 240,
+  [THEME.ELECTRIC_ULTRAMARINE]: 255,
+  [THEME.VIOLENT_VIOLET]: 270,
+  [THEME.ELECTRIC_PURPLE]: 285,
+  [THEME.MAGENDA]: 300,
+  [THEME.BRUTAL_PINK]: 315,
+  [THEME.NEON_ROSE]: 330,
+  [THEME.ELECTRIC_CRIMSON]: 345,
 } as const;
 export type ThemeHue = typeof THEME_HUE[keyof typeof THEME_HUE];
 
@@ -187,7 +187,7 @@ export type Tokens = {
   modes: Record<ModeName, Mode>;
 };
 
-export const getTokens = (theme: X_Theme): Tokens => {
+export const getTokens = (theme: Theme): Tokens => {
   const hue = THEME_HUE[theme];
   const keyColors = getKeyColors(hue);
   const additionalColors = getAdditionalColors(hue);
@@ -788,7 +788,7 @@ export const getTokens = (theme: X_Theme): Tokens => {
   };
 };
 
-export const getCustomProperties = (theme: X_Theme): CSSProperties => {
+export const getCustomProperties = (theme: Theme): CSSProperties => {
   const tokens = getTokens(theme);
   const ret: Record<string, string> = {};
   Object.values(MODE_NAME).forEach((modeName) => {

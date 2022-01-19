@@ -1,5 +1,6 @@
 import { AiOutlineSearch } from '@react-icons/all-files/ai/AiOutlineSearch';
 import React, { useCallback } from 'react';
+import TextButton, { Props as TextButtonProps } from '~/components/button/text';
 import Request from '~/components/request';
 import Drawer, { useDrawer } from '~/portals/drawer';
 import Popover, { usePopover } from '~/portals/popover';
@@ -7,14 +8,14 @@ import { COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document, RequestValue } from '~/types/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
 
-type Props = {
+export type Props = {
   endpoint: Endpoint;
   document: Document;
   base: UseBaseReturn;
 };
 const Search: React.FC<Props> = ({ endpoint, document, base }) => {
   const drawer = useDrawer();
-  const handleButtonClick = useCallback(() => {
+  const handleButtonClick = useCallback<TextButtonProps['onClick']>(() => {
     drawer.open();
   }, [drawer]);
 
@@ -41,9 +42,11 @@ const Search: React.FC<Props> = ({ endpoint, document, base }) => {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <button onClick={handleButtonClick}>
-          <AiOutlineSearch />
-        </button>
+        <TextButton
+          cs={COLOR_SYSTEM.PRIMARY}
+          Icon={AiOutlineSearch}
+          onClick={handleButtonClick}
+        />
       </div>
       <Drawer {...drawer.bind}>
         <Request

@@ -1,16 +1,30 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import _ from 'lodash';
-import { Info } from '~/types/oas';
+import { Content } from '~/types/oas';
 
 export type UseAutoRefreshReturn = {
   enabled: boolean;
   intervalSec: number;
 };
 const useAutoRefresh = (
-  content: Info['x-pages'][number]['contents'][number]
+  content: Content,
+  refresh: () => void
 ): UseAutoRefreshReturn => {
   const enabled = _.isFinite(content.autoRefreshSec);
   const intervalSec = content.autoRefreshSec || 0;
+
+  useEffect(() => {
+    let intervalId: ReturnType<typeof globalThis.setInterval>;
+    const cleanup = () => {
+      globalThis.clearInterval(intervalId);
+    };
+    if (enabled) {
+      intervalId = globalThis.setInterval(() => {
+        refresh();
+      }, intervalSec);
+    }
+    return cleanup;
+  }, [enabled, intervalSec, refresh]);
 
   const ret = useMemo<UseAutoRefreshReturn>(
     () => ({

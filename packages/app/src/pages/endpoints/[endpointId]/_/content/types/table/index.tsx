@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import Table, { Props as TableProps } from '~/components/table';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
-import { Document, Info, TableColumn, TABLE_SORT } from '~/types/oas';
+import { Document, Content, SORT } from '~/types/oas';
 import {
-  getTableColumns,
+  extractTableColumns,
   getTableRows,
   mergeTableSortRequestValue,
 } from '~/utils/oas';
@@ -14,12 +14,11 @@ import Descendant, { Props as DescendantProps } from '../../parts/descendant';
 type Props = {
   endpoint: Endpoint;
   document: Document;
-  content: Info['x-pages'][number]['contents'][number];
+  content: Content;
   base: UseBaseReturn;
   descendants: UseDescendantsReturn;
   onDescendantOperationSuccess: DescendantProps['onOperationSuccess'];
   onDescendantOperationFail: DescendantProps['onOperationFail'];
-  omittedColumns: TableColumn['key'][];
 };
 const ContentTable: React.FC<Props> = ({
   endpoint,
@@ -29,7 +28,6 @@ const ContentTable: React.FC<Props> = ({
   descendants,
   onDescendantOperationSuccess,
   onDescendantOperationFail,
-  omittedColumns,
 }) => {
   const [sorts, setSorts] = useState<
     Record<
@@ -38,20 +36,24 @@ const ContentTable: React.FC<Props> = ({
     >
   >({});
 
-  const columns = useMemo<TableProps['columns']>(
-    () =>
-      getTableColumns(document, content)
-        .map(function (column) {
-          return {
-            ...column,
-            sort: sorts[column.key] || TABLE_SORT.NONE,
-          };
-        })
-        .filter(function (column) {
-          return !omittedColumns.includes(column.key);
-        }),
-    [document, content, omittedColumns, sorts]
-  );
+  const columns = useMemo<TableProps['columns']>(() => {
+    const extractTableColumnsResult = extractTableColumns(document, content);
+    if (extractTableColumnsResult.isFailure()) {
+      return [];
+    }
+    const tableColumns = extractTableColumnsResult.value;
+    return tableColumns
+      .map((column) => ({
+        ...column,
+        sort: sorts[column.key] || SORT.NONE,
+      }))
+      .filter((column) => {
+        if (!base.filter.enabled) {
+          return false;
+        }
+        return !base.filter.listOmitted.includes(column.key);
+      });
+  }, [document, content, base, sorts]);
 
   const dataSource = useMemo<TableProps['dataSource']>(
     () => getTableRows(document, content, base.data),

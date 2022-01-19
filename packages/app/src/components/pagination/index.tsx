@@ -7,7 +7,7 @@ import ChevronDoubleRightIcon from '~/components/icon/chevronDoubleRight/outline
 import ChevronLeftIcon from '~/components/icon/chevronLeft/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 
-type Props = BaseProps & {
+export type Props = BaseProps & {
   current: number;
   max: number;
   onRequestChange: (num: number) => void;

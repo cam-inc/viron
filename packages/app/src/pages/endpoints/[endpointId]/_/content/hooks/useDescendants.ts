@@ -13,13 +13,13 @@ import {
 } from '~/types/oas';
 import { promiseErrorHandler } from '~/utils';
 import {
+  extractRequest,
+  extractParameters,
   cleanupRequestValue,
   constructRequestInfo,
   constructRequestInit,
   constructRequestPayloads,
   getContentBaseOperationResponseKeys,
-  getRequest,
-  getRequestParameterKeys,
 } from '~/utils/oas';
 
 export type UseDescendantsReturn = {
@@ -41,9 +41,7 @@ const useDescendants = function (
 ): UseDescendantsReturn {
   const operationIds = useMemo<OperationId[]>(() => {
     const _operationIds: OperationId[] = [];
-    const getBaseRequestResult = getRequest(document, {
-      operationId: content.operationId,
-    });
+    const getBaseRequestResult = extractRequest(document, content.operationId);
     if (getBaseRequestResult.isFailure()) {
       return _operationIds;
     }
@@ -84,9 +82,21 @@ const useDescendants = function (
         content
       );
       content.actions.forEach((action) => {
-        const actionOperationRequestKeys = getRequestParameterKeys(
+        const extractRequestResult = extractRequest(
           document,
           action.operationId
+        );
+        if (extractRequestResult.isFailure()) {
+          return;
+        }
+        const extractParametersResult = extractParameters(
+          extractRequestResult.value.operation
+        );
+        if (extractParametersResult.isFailure()) {
+          return;
+        }
+        const actionOperationRequestKeys = extractParametersResult.value.map(
+          (parameter) => parameter.name
         );
         if (
           _.intersection(
@@ -104,7 +114,7 @@ const useDescendants = function (
   const descendants = useMemo<UseDescendantsReturn>(() => {
     const _descendants: UseDescendantsReturn = [];
     operationIds.forEach((operationId) => {
-      const getRequestResult = getRequest(document, { operationId });
+      const getRequestResult = extractRequest(document, operationId);
       if (getRequestResult.isFailure()) {
         return;
       }

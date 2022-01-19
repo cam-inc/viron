@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import Error from '~/components/error';
 import Spinner from '~/components/spinner';
 import { ClassName, COLOR_SYSTEM, Endpoint } from '~/types';
-import { Document, Info, TableColumn } from '~/types/oas';
+import { Document, Content, CONTENT_TYPE } from '~/types/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
 import { UseDescendantsReturn } from '../../hooks/useDescendants';
 import NumberContent from '../../types/number/index';
@@ -11,10 +11,9 @@ import TableContent from '../../types/table/index';
 type Props = {
   endpoint: Endpoint;
   document: Document;
-  content: Info['x-pages'][number]['contents'][number];
+  content: Content;
   base: UseBaseReturn;
   descendants: UseDescendantsReturn;
-  omittedColumns: TableColumn['key'][];
   className?: ClassName;
 };
 const Body: React.FC<Props> = ({
@@ -23,7 +22,6 @@ const Body: React.FC<Props> = ({
   content,
   base,
   descendants,
-  omittedColumns,
   className = '',
 }) => {
   const handleDescendantOperationSuccess = useCallback(
@@ -48,11 +46,11 @@ const Body: React.FC<Props> = ({
       return <Error on={COLOR_SYSTEM.SURFACE} error={base.error} />;
     }
     switch (content.type) {
-      case 'number':
+      case CONTENT_TYPE.NUMBER:
         return (
           <NumberContent document={document} content={content} base={base} />
         );
-      case 'table':
+      case CONTENT_TYPE.TABLE:
         return (
           <TableContent
             endpoint={endpoint}
@@ -62,11 +60,8 @@ const Body: React.FC<Props> = ({
             descendants={descendants}
             onDescendantOperationSuccess={handleDescendantOperationSuccess}
             onDescendantOperationFail={handleDescendantOperationFail}
-            omittedColumns={omittedColumns}
           />
         );
-      default:
-        return <div>TODO: 未対応のtype</div>;
     }
   }, [
     document,

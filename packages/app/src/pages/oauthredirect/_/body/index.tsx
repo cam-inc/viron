@@ -102,7 +102,6 @@ const Body: React.FC<Props> = ({ className = '', search }) => {
 
   return (
     <div>
-      <p>{`https://localhost:8000/oauthredirect`}</p>
       <Request
         on={COLOR_SYSTEM.BACKGROUND}
         endpoint={signinOAuthCallback.endpoint}

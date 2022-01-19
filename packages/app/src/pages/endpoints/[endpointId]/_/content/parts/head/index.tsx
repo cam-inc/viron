@@ -1,11 +1,12 @@
-import { BiCaretDownSquare } from '@react-icons/all-files/bi/BiCaretDownSquare';
-import { BiCaretRightSquare } from '@react-icons/all-files/bi/BiCaretRightSquare';
 import React, { useCallback } from 'react';
-import { ClassName, Endpoint } from '~/types';
-import { Document, Info } from '~/types/oas';
+import TextButton, { Props as TextButtonProps } from '~/components/button/text';
+import ChevronDownIcon from '~/components/icon/chevronDown/outline';
+import ChevronRightIcon from '~/components/icon/chevronRight/outline';
+import { ClassName, COLOR_SYSTEM, Endpoint } from '~/types';
+import { Document, Content, ContentId } from '~/types/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
 import { UseSiblingsReturn } from '../../hooks/useSiblings';
-import Filter, { Props as FilterProps } from '../filter/index';
+import Filter from '../filter/index';
 import Refresh from '../refresh/index';
 import Pin from '../pin/index';
 import Search from '../search/index';
@@ -14,19 +15,15 @@ import Sibling from '../sibling/index';
 export type Props = {
   endpoint: Endpoint;
   document: Document;
-  content: Info['x-pages'][number]['contents'][number];
+  content: Content;
   base: UseBaseReturn;
   siblings: UseSiblingsReturn;
   isOpened: boolean;
   onOpen: () => void;
   onClose: () => void;
   isPinned: boolean;
-  onPin: (contentId: Info['x-pages'][number]['contents'][number]['id']) => void;
-  onUnpin: (
-    contentId: Info['x-pages'][number]['contents'][number]['id']
-  ) => void;
-  omittedColumns: FilterProps['omitted'];
-  onColumnsFilterChange: FilterProps['onChange'];
+  onPin: (contentId: ContentId) => void;
+  onUnpin: (contentId: ContentId) => void;
   className?: ClassName;
 };
 const Head: React.FC<Props> = ({
@@ -41,14 +38,11 @@ const Head: React.FC<Props> = ({
   isPinned,
   onPin,
   onUnpin,
-  omittedColumns,
-  onColumnsFilterChange,
   className = '',
 }) => {
   const handleSiblingOperationSuccess = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (data: any) => {
-      console.log(data);
       base.refresh();
     },
     [base]
@@ -59,7 +53,7 @@ const Head: React.FC<Props> = ({
     console.log(error);
   }, []);
 
-  const handleOpenerClick = useCallback(() => {
+  const handleOpenerClick = useCallback<TextButtonProps['onClick']>(() => {
     if (isOpened) {
       onClose();
     } else {
@@ -77,22 +71,22 @@ const Head: React.FC<Props> = ({
 
   return (
     <div className={className}>
-      <div className="flex items-center">
-        <div className="flex-none mr-2">
-          <button onClick={handleOpenerClick}>
-            {isOpened ? <BiCaretDownSquare /> : <BiCaretRightSquare />}
-          </button>
+      <div className="flex items-center gap-2">
+        <div className="flex-none">
+          <TextButton
+            cs={COLOR_SYSTEM.PRIMARY}
+            Icon={isOpened ? ChevronDownIcon : ChevronRightIcon}
+            onClick={handleOpenerClick}
+          />
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-thm-on-surface-high">
-            {content.title || content.id}
-          </div>
+          <div className="text-thm-on-surface-high">{content.title}</div>
         </div>
         {!!siblings.length && (
-          <div className="flex-none ml-2">
-            <div className="flex items-center">
+          <div className="flex-none">
+            <div className="flex items-center gap-2">
               {siblings.map((sibling, idx) => (
-                <div key={idx} className="mr-2 last:mr-0">
+                <div key={idx}>
                   <Sibling
                     endpoint={endpoint}
                     document={document}
@@ -105,16 +99,11 @@ const Head: React.FC<Props> = ({
             </div>
           </div>
         )}
-        <div className="flex-none ml-2">
+        <div className="flex-none">
           <div className="flex items-center gap-2">
-            {content.type === 'table' && (
+            {base.filter.enabled && (
               <div className="">
-                <Filter
-                  document={document}
-                  content={content}
-                  omitted={omittedColumns}
-                  onChange={onColumnsFilterChange}
-                />
+                <Filter document={document} content={content} base={base} />
               </div>
             )}
             <div className="">

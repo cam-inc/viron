@@ -16,6 +16,11 @@ export const ENVIRONMENTAL_VARIABLE = {
 } as const;
 export type EnvironmentalVariable =
   typeof ENVIRONMENTAL_VARIABLE[keyof typeof ENVIRONMENTAL_VARIABLE];
+export const isEnvironmentalVariable = (
+  str: string
+): str is EnvironmentalVariable => {
+  return (Object.values(ENVIRONMENTAL_VARIABLE) as string[]).includes(str);
+};
 
 export const OAUTH_REDIRECT_URI = (function () {
   if (isSSR) {

@@ -13,14 +13,14 @@ import {
 } from '~/types/oas';
 import { promiseErrorHandler } from '~/utils';
 import {
+  extractPathItem,
+  extractRequest,
+  extractParameters,
   cleanupRequestValue,
   constructRequestInfo,
   constructRequestInit,
   constructRequestPayloads,
   getContentBaseOperationResponseKeys,
-  getPathItem,
-  getRequest,
-  getRequestParameterKeys,
 } from '~/utils/oas';
 
 export type UseSiblingsReturn = {
@@ -41,14 +41,12 @@ const useSiblings = (
 ): UseSiblingsReturn => {
   const operationIds = useMemo<OperationId[]>(() => {
     const _operationIds: OperationId[] = [];
-    const getBaseRequestResult = getRequest(document, {
-      operationId: content.operationId,
-    });
+    const getBaseRequestResult = extractRequest(document, content.operationId);
     if (getBaseRequestResult.isFailure()) {
       return _operationIds;
     }
     const baseRequest = getBaseRequestResult.value;
-    const getBasePathItemResult = getPathItem(document, baseRequest.path);
+    const getBasePathItemResult = extractPathItem(document, baseRequest.path);
     if (getBasePathItemResult.isFailure()) {
       return _operationIds;
     }
@@ -85,9 +83,21 @@ const useSiblings = (
         content
       );
       content.actions.forEach((action) => {
-        const actionOperationRequestKeys = getRequestParameterKeys(
+        const extractRequestResult = extractRequest(
           document,
           action.operationId
+        );
+        if (extractRequestResult.isFailure()) {
+          return;
+        }
+        const extractParametersResult = extractParameters(
+          extractRequestResult.value.operation
+        );
+        if (extractParametersResult.isFailure()) {
+          return;
+        }
+        const actionOperationRequestKeys = extractParametersResult.value.map(
+          (parameter) => parameter.name
         );
         if (
           _.intersection(
@@ -105,7 +115,7 @@ const useSiblings = (
   const siblings = useMemo<UseSiblingsReturn>(() => {
     const _siblings: UseSiblingsReturn = [];
     operationIds.forEach((operationId) => {
-      const getRequestResult = getRequest(document, { operationId });
+      const getRequestResult = extractRequest(document, operationId);
       if (getRequestResult.isFailure()) {
         return;
       }

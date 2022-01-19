@@ -423,7 +423,7 @@ export const getValidateType = function (type: Schema['type']): Validate<any> {
       }
     }
     if (type === 'object') {
-      if (!_.isObject(data)) {
+      if (!_.isPlainObject(data)) {
         return `Should be type of object.`;
       }
     }

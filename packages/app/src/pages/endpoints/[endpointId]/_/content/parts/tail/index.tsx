@@ -1,35 +1,25 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { ClassName } from '~/types';
-import { Document, Info } from '~/types/oas';
+import { Document, Content } from '~/types/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
 import Pagination from '../pagination/index';
 
 type Props = {
   document: Document;
-  content: Info['x-pages'][number]['contents'][number];
+  content: Content;
   base: UseBaseReturn;
   className?: ClassName;
 };
-const Tail: React.FC<Props> = ({ document, content, base, className = '' }) => {
-  const paginationElm = useMemo<JSX.Element | null>(() => {
-    if (
-      !base.data ||
-      content.type !== 'table' ||
-      !content.pagination ||
-      !document.info['x-table']?.pager
-    ) {
-      return null;
-    }
-    return <Pagination document={document} base={base} />;
-  }, [document, base]);
-
-  if (!paginationElm) {
+const Tail: React.FC<Props> = ({ document, base, className = '' }) => {
+  if (!base.pagination.enabled) {
     return null;
   }
 
   return (
     <div className={className}>
-      <div className="flex items-center justify-center">{paginationElm}</div>
+      <div className="flex items-center justify-center">
+        <Pagination document={document} base={base} />
+      </div>
     </div>
   );
 };

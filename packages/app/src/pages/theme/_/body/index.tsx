@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Props as LayoutProps } from '~/layouts';
-import { X_Theme, X_THEME } from '~/types/oas';
+import { Theme, THEME } from '~/types/oas';
 import { getTokens, Tokens } from '~/utils/colorSystem';
 import Mode from './mode';
 import Preview from './preview';
@@ -10,7 +10,7 @@ import Tones from './tones';
 export type Props = Parameters<LayoutProps['renderBody']>[0];
 const Body: React.FC<Props> = ({ className = '' }) => {
   // Theme
-  const [theme, setTheme] = useState<X_Theme>(X_THEME.RED);
+  const [theme, setTheme] = useState<Theme>(THEME.RED);
   const handleThemeRequestChange = useCallback<
     ThemeSelectProps['onRequestChange']
   >((theme) => {

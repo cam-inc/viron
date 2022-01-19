@@ -1,5 +1,5 @@
 import { atom } from 'recoil';
-import { X_Theme, X_THEME } from '~/types/oas';
+import { Theme, THEME } from '~/types/oas';
 import { isBrowser } from '~/utils';
 
 const NAME = 'app';
@@ -24,9 +24,9 @@ export const screen = atom<Screen>({
   },
 });
 
-export const theme = atom<X_Theme>({
+export const theme = atom<Theme>({
   key: `${NAME}.${KEY.THEME}`,
-  default: X_THEME.RED,
+  default: THEME.RED,
   // TODO: 消す
   effects_UNSTABLE: [
     // Keep the stored data and the body element's attribute in sync for css styles to be applied.

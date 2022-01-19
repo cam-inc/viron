@@ -1,54 +1,40 @@
 import _ from 'lodash';
 import React, { useCallback } from 'react';
-import PaginationComponent from '~/components/pagination';
+import Pagination, { Props as PaginationProps } from '~/components/pagination';
 import { COLOR_SYSTEM } from '~/types';
 import { Document } from '~/types/oas';
-import { mergeTablePagerRequestValue } from '~/utils/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
 
 type Props = {
   document: Document;
   base: UseBaseReturn;
 };
-const Pagination: React.FC<Props> = ({ document, base }) => {
-  if (!base.data) {
-    throw new Error('TODO');
-  }
-  const pager = document.info['x-table']?.pager;
-  if (!pager) {
-    throw new Error('TODO');
-  }
-  if (typeof base.data[pager.responsePageKey] !== 'number') {
-    throw new Error('TODO');
-  }
-  if (typeof base.data[pager.responseMaxpageKey] !== 'number') {
-    throw new Error('TODO');
-  }
-
-  const current = base.data[pager.responsePageKey];
-  const max = base.data[pager.responseMaxpageKey];
-
-  const handlePaginationRequestChange = useCallback(
-    (page: number) => {
-      const requestValue = mergeTablePagerRequestValue(
-        document,
-        base.requestValue,
-        page
-      );
-      base.fetch(requestValue);
+const _Pagination: React.FC<Props> = ({ base }) => {
+  const handlePaginationRequestChange = useCallback<
+    PaginationProps['onRequestChange']
+  >(
+    (page) => {
+      if (!base.pagination.enabled) {
+        return null;
+      }
+      base.pagination.change(page);
     },
-    [document, base]
+    [base]
   );
+
+  if (!base.pagination.enabled) {
+    return null;
+  }
 
   return (
     <div>
-      <PaginationComponent
+      <Pagination
         on={COLOR_SYSTEM.SURFACE}
-        current={current}
-        max={max}
+        current={base.pagination.currentPage}
+        max={base.pagination.maxPage}
         onRequestChange={handlePaginationRequestChange}
       />
     </div>
   );
 };
-export default Pagination;
+export default _Pagination;

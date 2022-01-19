@@ -1,17 +1,17 @@
 import React from 'react';
 import Error from '~/components/error';
 import { COLOR_SYSTEM } from '~/types';
-import { Document, Info } from '~/types/oas';
-import { getNumber } from '~/utils/oas';
+import { Document, Content } from '~/types/oas';
+import { validateResponseDataOfTypeNumber } from '~/utils/oas/content';
 import { UseBaseReturn } from '../../hooks/useBase';
 
 type Props = {
   document: Document;
-  content: Info['x-pages'][number]['contents'][number];
+  content: Content;
   base: UseBaseReturn;
 };
-const ContentNumber: React.FC<Props> = ({ base }) => {
-  const result = getNumber(base.data);
+const ContentNumber: React.FC<Props> = ({ document, base }) => {
+  const result = validateResponseDataOfTypeNumber(document, base.data);
   if (result.isFailure()) {
     return <Error on={COLOR_SYSTEM.SURFACE} error={result.value} />;
   }

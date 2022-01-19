@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useAppThemeGlobalStateSet } from '~/store';
-import { Document, X_THEME } from '~/types/oas';
+import { Document, THEME } from '~/types/oas';
 
 export default (document: Document | null = null): void => {
   const setTheme = useAppThemeGlobalStateSet();
@@ -8,7 +8,7 @@ export default (document: Document | null = null): void => {
     if (document?.info['x-theme']) {
       setTheme(document.info['x-theme']);
     } else {
-      setTheme(X_THEME.RED);
+      setTheme(THEME.RED);
     }
   }, [document, setTheme]);
 };

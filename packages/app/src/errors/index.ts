@@ -1,5 +1,7 @@
 import { HTTPStatusCode, HTTP_STATUS } from '~/constants/index';
 
+export type Result<T, E extends BaseError> = Success<T, E> | Failure<T, E>;
+
 export class Success<T, E extends BaseError> {
   readonly value: T;
   readonly type = 'success';
@@ -27,8 +29,6 @@ export class Failure<T, E extends BaseError> {
     return true;
   }
 }
-
-export type Result<T, E extends BaseError> = Success<T, E> | Failure<T, E>;
 
 export class BaseError extends Error {
   code = '#base';

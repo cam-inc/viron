@@ -3,21 +3,18 @@ import React, { useCallback } from 'react';
 import { Props as BaseProps } from '~/components';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronUpIcon from '~/components/icon/chevronUp/outline';
-import { TableColumn, TableSort, TABLE_SORT } from '~/types/oas';
+import { TableColumn, Sort, SORT } from '~/types/oas';
 
 type Key = string;
-type Value = unknown;
+type Value = any;
 export type Data = Record<Key, Value>;
-type Column = TableColumn & {
-  sort: TableSort;
-};
 
 export type Props = BaseProps & {
   dataSource: Data[];
-  columns: Column[];
+  columns: TableColumn[];
   renderActions?: (data: Data) => JSX.Element;
   onRowClick?: (data: Data) => void;
-  onRequestSortChange?: (key: Column['key'], sort: Column['sort']) => void;
+  onRequestSortChange?: (key: TableColumn['key'], sort: Sort) => void;
 };
 const Table: React.FC<Props> = ({
   on,
@@ -35,16 +32,16 @@ const Table: React.FC<Props> = ({
       if (!column.isSortable) {
         return;
       }
-      let sort: Column['sort'];
+      let sort: Sort;
       switch (column.sort) {
-        case TABLE_SORT.ASC:
-          sort = TABLE_SORT.DESC;
+        case SORT.ASC:
+          sort = SORT.DESC;
           break;
-        case TABLE_SORT.DESC:
-          sort = TABLE_SORT.NONE;
+        case SORT.DESC:
+          sort = SORT.NONE;
           break;
-        case TABLE_SORT.NONE:
-          sort = TABLE_SORT.ASC;
+        case SORT.NONE:
+          sort = SORT.ASC;
           break;
       }
       onRequestSortChange?.(column.key, sort);
@@ -165,8 +162,8 @@ const Th: React.FC<ThProps> = ({ on, isSticky = false, children }) => {
 };
 
 type ThTitleProp = BaseProps & {
-  column: Column;
-  onClick?: (column: Column) => void;
+  column: TableColumn;
+  onClick?: (column: TableColumn) => void;
 };
 const ThTitle: React.FC<ThTitleProp> = ({ on, column, onClick }) => {
   const handleClick = useCallback(() => {
@@ -177,16 +174,16 @@ const ThTitle: React.FC<ThTitleProp> = ({ on, column, onClick }) => {
       <div className="flex-none mr-1">
         <div
           className={classnames({
-            [`text-thm-on-${on}`]: column.sort === TABLE_SORT.ASC,
-            [`text-thm-on-${on}-slight`]: column.sort !== TABLE_SORT.ASC,
+            [`text-thm-on-${on}`]: column.sort === SORT.ASC,
+            [`text-thm-on-${on}-slight`]: column.sort !== SORT.ASC,
           })}
         >
           <ChevronUpIcon className="w-em" />
         </div>
         <div
           className={classnames({
-            [`text-thm-on-${on}`]: column.sort === TABLE_SORT.DESC,
-            [`text-thm-on-${on}-slight`]: column.sort !== TABLE_SORT.DESC,
+            [`text-thm-on-${on}`]: column.sort === SORT.DESC,
+            [`text-thm-on-${on}-slight`]: column.sort !== SORT.DESC,
           })}
         >
           <ChevronDownIcon className="w-em" />
@@ -219,7 +216,7 @@ const Td: React.FC<BaseProps & { isSticky?: boolean }> = ({
   );
 };
 
-const Cell: React.FC<BaseProps & { column: Column; value: Value }> = ({
+const Cell: React.FC<BaseProps & { column: TableColumn; value: Value }> = ({
   on,
   column,
   value,

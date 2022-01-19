@@ -38,17 +38,23 @@ import {
   Authentication,
   URL,
 } from '~/types';
-import { Document, Request, RequestValue } from '~/types/oas';
+import {
+  Document,
+  Request,
+  RequestValue,
+  RequestParametersValue,
+  RequestRequestBodyValue,
+} from '~/types/oas';
 import { promiseErrorHandler } from '~/utils';
 import {
   lint,
   resolve,
-  getRequest,
+  extractRequest,
+  replaceWithEnvironmentalVariables,
+  cleanupRequestValue,
   constructRequestInfo,
   constructRequestInit,
   constructRequestPayloads,
-  cleanupRequestValue,
-  replaceEnvironmentalVariableOfDefaultRequestParametersValue,
 } from '~/utils/oas';
 
 export type UseEndpointReturn = {
@@ -290,13 +296,10 @@ export const useEndpoint = (): UseEndpointReturn => {
       }
       const authentication: Authentication =
         await authenticationResponse.json();
-      const { isValid, errors } = lint(authentication.oas);
-      if (!isValid) {
+      const lintResult = lint(authentication.oas);
+      if (lintResult.isFailure()) {
         return {
-          error: new OASError(
-            errors?.[0].message ||
-              'The OAS document is not of version we support.'
-          ),
+          error: lintResult.value,
         };
       }
       authentication.oas = resolve(authentication.oas);
@@ -312,13 +315,10 @@ export const useEndpoint = (): UseEndpointReturn => {
       let document: Document | null = null;
       if (response.ok) {
         const _document: unknown = await response.json();
-        const { isValid, errors } = lint(_document);
-        if (!isValid) {
+        const lintResult = lint(_document);
+        if (lintResult.isFailure()) {
           return {
-            error: new OASError(
-              errors?.[0].message ||
-                'The OAS document is not of version we support.'
-            ),
+            error: lintResult.value,
           };
         }
         document = resolve(_document as Record<string, unknown>);
@@ -373,9 +373,10 @@ export const useEndpoint = (): UseEndpointReturn => {
         error: new BaseError('AuthConfig for email not found.'),
       };
     }
-    const getRequestResult = getRequest(authentication.oas, {
-      operationId: authConfig.operationId,
-    });
+    const getRequestResult = extractRequest(
+      authentication.oas,
+      authConfig.operationId
+    );
     if (getRequestResult.isFailure()) {
       return {
         error: new OASError('Request object not found.'),
@@ -440,9 +441,10 @@ export const useEndpoint = (): UseEndpointReturn => {
         error: new BaseError('AuthConfig for OAuth not found.'),
       };
     }
-    const getRequestResult = getRequest(authentication.oas, {
-      operationId: authConfig.operationId,
-    });
+    const getRequestResult = extractRequest(
+      authentication.oas,
+      authConfig.operationId
+    );
     if (getRequestResult.isFailure()) {
       return {
         error: new OASError('Request object not found.'),
@@ -452,7 +454,7 @@ export const useEndpoint = (): UseEndpointReturn => {
     defaultValues = _.merge(
       {},
       {
-        parameters: replaceEnvironmentalVariableOfDefaultRequestParametersValue(
+        parameters: replaceWithEnvironmentalVariables<RequestParametersValue>(
           authConfig.defaultParametersValue || {},
           {
             [ENVIRONMENTAL_VARIABLE.OAUTH_REDIRECT_URI]: OAUTH_REDIRECT_URI,
@@ -511,9 +513,10 @@ export const useEndpoint = (): UseEndpointReturn => {
         error: new BaseError('AuthConfig for OAuth callback not found.'),
       };
     }
-    const getRequestResult = getRequest(authentication.oas, {
-      operationId: authConfig.operationId,
-    });
+    const getRequestResult = extractRequest(
+      authentication.oas,
+      authConfig.operationId
+    );
     if (getRequestResult.isFailure()) {
       return {
         error: new OASError('Request object not found.'),
@@ -524,7 +527,12 @@ export const useEndpoint = (): UseEndpointReturn => {
       {},
       {
         parameters: authConfig.defaultParametersValue,
-        requestBody: authConfig.defaultRequestBodyValue,
+        requestBody: replaceWithEnvironmentalVariables<RequestRequestBodyValue>(
+          authConfig.defaultRequestBodyValue || {},
+          {
+            [ENVIRONMENTAL_VARIABLE.OAUTH_REDIRECT_URI]: OAUTH_REDIRECT_URI,
+          }
+        ),
       },
       cleanupRequestValue(request, defaultValues)
     );
@@ -577,9 +585,10 @@ export const useEndpoint = (): UseEndpointReturn => {
           error: new BaseError('AuthConfig for signout not found.'),
         };
       }
-      const getRequestResult = getRequest(authentication.oas, {
-        operationId: authConfig.operationId,
-      });
+      const getRequestResult = extractRequest(
+        authentication.oas,
+        authConfig.operationId
+      );
       if (getRequestResult.isFailure()) {
         return {
           error: new OASError('Request object not found.'),
