@@ -8,7 +8,7 @@ import FilledButton, {
 } from '~/components/button/filled';
 import OutlineButton, {
   Props as OutlineButtonProps,
-} from '~/components/button/outline';
+} from '~/components/button/outline/on';
 import Head from '~/components/head';
 import Select from '~/components/select';
 import Textinput from '~/components/textinput';
@@ -124,7 +124,7 @@ const AddEndpoint: React.FC<Props> = ({ className = '', onAdd, onCancel }) => {
         </div>
         <div className="flex justify-end gap-2">
           <OutlineButton
-            cs={COLOR_SYSTEM.PRIMARY}
+            on={COLOR_SYSTEM.SURFACE}
             size={BUTTON_SIZE.BASE}
             label="Cancel"
             onClick={handleCancelClick}

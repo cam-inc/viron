@@ -4,6 +4,7 @@ import FilledButton, {
   Props as FilledButtonProps,
 } from '~/components/button/filled';
 import Error from '~/components/error/';
+import LoginIcon from '~/components/icon/login/outline';
 import Request, { Props as RequestProps } from '~/components/request';
 import { BaseError } from '~/errors';
 import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
@@ -42,6 +43,7 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
         {authConfigOAuth && (
           <FilledButton
             cs={COLOR_SYSTEM.PRIMARY}
+            Icon={LoginIcon}
             label="OAuth"
             onClick={handleOAuthClick}
           />
@@ -49,6 +51,7 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
         {authConfigEmail && (
           <FilledButton
             cs={COLOR_SYSTEM.PRIMARY}
+            Icon={LoginIcon}
             label="Email"
             onClick={handleEmailClick}
           />

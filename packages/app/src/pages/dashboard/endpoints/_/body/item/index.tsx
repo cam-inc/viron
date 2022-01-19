@@ -2,12 +2,16 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import FilledButton, {
   Props as FilledButtonProps,
 } from '~/components/button/filled';
-import TextButton, { Props as TextButtonProps } from '~/components/button/text';
+import TextButton, {
+  Props as TextButtonProps,
+} from '~/components/button/text/on';
 import Error from '~/components/error/';
 import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/outline';
 import InformationCircleIcon from '~/components/icon/informationCircle/outline';
 import QrcodeIcon from '~/components/icon/qrcode/outline';
+import TerminalIcon from '~/components/icon/terminal/outline';
 import TrashIcon from '~/components/icon/trash/outline';
+import Spinner from '~/components/spinner';
 import { BaseError } from '~/errors';
 import { useEndpoint } from '~/hooks/endpoint';
 import Modal, { useModal } from '~/portals/modal';
@@ -69,7 +73,7 @@ const Item: React.FC<Props> = ({ endpoint }) => {
       return <Error on={COLOR_SYSTEM.BACKGROUND} error={error} />;
     }
     if (isPending) {
-      return <div>pending...</div>;
+      return <Spinner className="w-4" on={COLOR_SYSTEM.BACKGROUND} />;
     }
     if (!authentication) {
       return null;
@@ -84,7 +88,11 @@ const Item: React.FC<Props> = ({ endpoint }) => {
     );
   }, [endpoint, error, isPending, document, authentication]);
 
-  return <div>{content}</div>;
+  return (
+    <div className="p-2 border-l-4 border-thm-secondary hover:bg-thm-on-background-faint">
+      {content}
+    </div>
+  );
 };
 export default Item;
 
@@ -147,7 +155,7 @@ const _Item: React.FC<{
         <div className="flex-none flex items-center gap-2">
           <div ref={menuPopover.targetRef}>
             <TextButton
-              cs={COLOR_SYSTEM.PRIMARY}
+              on={COLOR_SYSTEM.BACKGROUND}
               Icon={DotsCircleHorizontalIcon}
               label="Menu"
               onClick={handleMenuClick}
@@ -157,7 +165,7 @@ const _Item: React.FC<{
             <>
               <FilledButton
                 cs={COLOR_SYSTEM.PRIMARY}
-                Icon={DotsCircleHorizontalIcon}
+                Icon={TerminalIcon}
                 label="Enter"
                 onClick={handleEnterClick}
               />
@@ -176,24 +184,30 @@ const _Item: React.FC<{
       </div>
       {/* Menu */}
       <Popover {...menuPopover.bind}>
-        <TextButton
-          cs={COLOR_SYSTEM.PRIMARY}
-          Icon={InformationCircleIcon}
-          label="Information"
-          onClick={handleInfoClick}
-        />
-        <TextButton
-          cs={COLOR_SYSTEM.PRIMARY}
-          Icon={QrcodeIcon}
-          label="QR Code"
-          onClick={handleQrcodeClick}
-        />
-        <TextButton
-          cs={COLOR_SYSTEM.PRIMARY}
-          Icon={TrashIcon}
-          label="Remove"
-          onClick={handleRemoveClick}
-        />
+        <div>
+          <TextButton
+            on={COLOR_SYSTEM.SURFACE}
+            Icon={InformationCircleIcon}
+            label="Information"
+            onClick={handleInfoClick}
+          />
+        </div>
+        <div>
+          <TextButton
+            on={COLOR_SYSTEM.SURFACE}
+            Icon={QrcodeIcon}
+            label="QR Code"
+            onClick={handleQrcodeClick}
+          />
+        </div>
+        <div>
+          <TextButton
+            on={COLOR_SYSTEM.SURFACE}
+            Icon={TrashIcon}
+            label="Remove"
+            onClick={handleRemoveClick}
+          />
+        </div>
       </Popover>
       {/* Info */}
       <Modal {...infoModal.bind}>

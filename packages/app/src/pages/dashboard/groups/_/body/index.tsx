@@ -3,6 +3,7 @@ import FilledButton, {
   Props as FilledButtonProps,
 } from '~/components/button/filled';
 import Head from '~/components/head';
+import CollectionIcon from '~/components/icon/collection/outline';
 import PlusCircleIcon from '~/components/icon/plusCircle/outline';
 import { useEndpoint } from '~/hooks/endpoint';
 import { Props as LayoutProps } from '~/layouts/index';
@@ -35,7 +36,16 @@ const Body: React.FC<Props> = ({ className, style }) => {
           {/* Head */}
           <div>
             <div className="p-4">
-              <Head on={COLOR_SYSTEM.BACKGROUND} title="Dashboard" />
+              <Head
+                on={COLOR_SYSTEM.BACKGROUND}
+                title={
+                  <div className="flex items-center gap-2">
+                    <CollectionIcon className="w-em" />
+                    <div>Dashboard / Groups</div>
+                  </div>
+                }
+                description="This is your personal, private dashboard."
+              />
             </div>
             <div>
               <Tabs item={TABS_ITEM.GROUPS} />
@@ -43,7 +53,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
           </div>
           {/* Body */}
           <div className="">
-            <div className="p-4 flex justify-end">
+            <div className="p-4 flex justify-end border-b border-thm-on-background-slight">
               <FilledButton
                 cs={COLOR_SYSTEM.PRIMARY}
                 label="Add a Group"
@@ -51,11 +61,11 @@ const Body: React.FC<Props> = ({ className, style }) => {
                 onClick={handleAddClick}
               />
             </div>
-            <ul className="border-t border-b border-thm-on-background-faint">
+            <ul className="">
               {groupList.map((group) => (
                 <li
                   key={group.id}
-                  className="p-2 hover:bg-thm-on-background-faint"
+                  className="border-b border-dashed border-thm-on-background-faint pb-2 mb-2 last:border-none last:mb-0 last:pb-0"
                 >
                   <Item group={group} />
                 </li>

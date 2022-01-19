@@ -3,10 +3,13 @@ import React, { useCallback, useState } from 'react';
 import FilledButton, {
   Props as FilledButtonProps,
 } from '~/components/button/filled';
-import TextButton, { Props as TextButtonProps } from '~/components/button/text';
+import TextButton, {
+  Props as TextButtonProps,
+} from '~/components/button/text/on';
 import Head from '~/components/head';
-import ChevronDownIcon from '~/components/icon/chevronDown/outline';
-import ChevronRightIcon from '~/components/icon/chevronRight/outline';
+import CollectionOutlineIcon from '~/components/icon/collection/outline';
+import CollectionSolidIcon from '~/components/icon/collection/solid';
+import ColorSwatchIcon from '~/components/icon/colorSwatch/outline';
 import PlusCircleIcon from '~/components/icon/plusCircle/outline';
 import Modal, { useModal } from '~/portals/modal';
 import { useEndpoint } from '~/hooks/endpoint';
@@ -39,7 +42,16 @@ const Body: React.FC<Props> = ({ className, style }) => {
           {/* Head */}
           <div>
             <div className="p-4">
-              <Head on={COLOR_SYSTEM.BACKGROUND} title="Dashboard" />
+              <Head
+                on={COLOR_SYSTEM.BACKGROUND}
+                title={
+                  <div className="flex items-center gap-2">
+                    <ColorSwatchIcon className="w-em" />
+                    <div>Dashboard / Endpoints</div>
+                  </div>
+                }
+                description="This is your personal, private dashboard."
+              />
             </div>
             <div>
               <Tabs item={TABS_ITEM.ENDPOINTS} />
@@ -47,7 +59,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
           </div>
           {/* Body */}
           <div className="">
-            <div className="p-4 flex justify-end">
+            <div className="p-4 flex justify-end border-b border-thm-on-background-slight">
               <FilledButton
                 cs={COLOR_SYSTEM.PRIMARY}
                 label="Add an Endpoint"
@@ -56,20 +68,23 @@ const Body: React.FC<Props> = ({ className, style }) => {
               />
             </div>
             {listByGroup.length && (
-              <ul className="border-t border-b border-thm-on-background-faint">
+              <ul className="">
                 {listByGroup.map((item) => (
-                  <li key={item.group.id}>
+                  <li
+                    key={item.group.id}
+                    className="py-2 border-b border-thm-on-background-faint"
+                  >
                     <Group group={item.group} list={item.list} />
                   </li>
                 ))}
               </ul>
             )}
             {listUngrouped.length && (
-              <ul className="">
+              <ul className="mt-2">
                 {listUngrouped.map((item) => (
                   <li
                     key={item.id}
-                    className="p-2 hover:bg-thm-on-background-faint"
+                    className="border-b border-dashed border-thm-on-background-faint pb-2 mb-2 last:border-none last:mb-0 last:pb-0"
                   >
                     <Item endpoint={item} />
                   </li>
@@ -92,39 +107,47 @@ type GroupProps = {
   list: Endpoint[];
 };
 const Group: React.FC<GroupProps> = ({ group, list }) => {
-  const [isOpened, setIsOpened] = useState<boolean>(true);
+  const [isOpened, setIsOpened] = useState<boolean>(false);
   const handleToggleClick = useCallback<TextButtonProps['onClick']>(() => {
     setIsOpened((currVal) => !currVal);
   }, []);
 
   return (
-    <div>
+    <div className="">
       {/* Head */}
-      <div className="flex items-center gap-2">
-        <div className="flex-none">
-          <TextButton
-            cs={COLOR_SYSTEM.PRIMARY}
-            Icon={isOpened ? ChevronDownIcon : ChevronRightIcon}
-            onClick={handleToggleClick}
-          />
-        </div>
-        <div className="flex-1">
-          <div>{group.name}</div>
-        </div>
+      <div className="pl-2 flex items-center gap-2">
+        <TextButton
+          on={COLOR_SYSTEM.SURFACE}
+          label={group.name}
+          Icon={isOpened ? CollectionSolidIcon : CollectionOutlineIcon}
+          onClick={handleToggleClick}
+        />
+        {group.description && (
+          <div className="text-xxs text-thm-on-background-low">
+            {group.description}
+          </div>
+        )}
       </div>
       {/* Body */}
-      <div>
-        <ul
-          className={classnames({
-            hidden: !isOpened,
-          })}
-        >
-          {list.map((item) => (
-            <li key={item.id} className="p-2 hover:bg-thm-on-background-faint">
-              <Item endpoint={item} />
-            </li>
-          ))}
-        </ul>
+      <div
+        className={classnames('mt-2', {
+          hidden: !isOpened,
+        })}
+      >
+        {!!list.length ? (
+          <ul>
+            {list.map((item) => (
+              <li
+                key={item.id}
+                className="border-b border-dashed border-thm-on-background-faint pb-2 mb-2 last:border-none last:mb-0 last:pb-0"
+              >
+                <Item endpoint={item} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>TODO: Empty</p>
+        )}
       </div>
     </div>
   );

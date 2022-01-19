@@ -15,7 +15,7 @@ const _CommonMark: React.FC<Props> = ({ on, data, className = '' }) => {
 
   return (
     <div
-      className={classnames(`text-xxs text-thm-on-${on}`, className)}
+      className={classnames(`text-xs text-thm-on-${on}`, className)}
       dangerouslySetInnerHTML={parsedDescription}
     />
   );

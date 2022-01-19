@@ -1,6 +1,9 @@
 import classnames from 'classnames';
 import React, { useCallback } from 'react';
 import { Props as BaseProps } from '~/components';
+import TextButton, {
+  Props as TextButtonProps,
+} from '~/components/button/text/on';
 
 export type Props = BaseProps & {
   list: Omit<ItemProps, 'on' | 'className' | 'onClick'>[];
@@ -16,9 +19,14 @@ const Tabs: React.FC<Props> = ({ on, className = '', list, onChange }) => {
 
   return (
     <div className={className}>
-      <ul className={`flex border-b border-thm-on-${on}-slight`}>
+      <ul className={`flex border-y border-thm-on-${on}-slight`}>
         {list.map((item) => (
-          <li key={item.id}>
+          <li
+            key={item.id}
+            className={classnames(`p-2 border-thm-on-${on}-low`, {
+              'border-b-2': item.isActive,
+            })}
+          >
             <Item on={on} {...item} onClick={handleItemClick} />
           </li>
         ))}
@@ -34,31 +42,10 @@ type ItemProps = BaseProps & {
   isActive: boolean;
   onClick: (id: ItemProps['id']) => void;
 };
-export const Item: React.FC<ItemProps> = ({
-  on,
-  className = '',
-  id,
-  label,
-  isActive,
-  onClick,
-}) => {
-  const handleClick = useCallback(() => {
+export const Item: React.FC<ItemProps> = ({ on, id, label, onClick }) => {
+  const handleClick = useCallback<TextButtonProps['onClick']>(() => {
     onClick(id);
   }, [id, onClick]);
 
-  return (
-    <button
-      className={classnames(
-        `py-2 px-4 text-sm border-b-2`,
-        {
-          [`text-on-${on} border-transparent`]: !isActive,
-          [`text-on-primary border-primary font-bold`]: isActive,
-        },
-        className
-      )}
-      onClick={handleClick}
-    >
-      {label}
-    </button>
-  );
+  return <TextButton on={on} label={label} onClick={handleClick} />;
 };

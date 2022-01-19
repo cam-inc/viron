@@ -4,7 +4,9 @@ import { SIZE as BUTTON_SIZE } from '~/components/button';
 import FilledButton, {
   Props as FilledButtonProps,
 } from '~/components/button/filled';
+import Head from '~/components/head';
 import ArrowCircleDownIcon from '~/components/icon/arrowCircleDown/outline';
+import ColorSwatchIcon from '~/components/icon/colorSwatch/outline';
 import CheckCircleIcon from '~/components/icon/checkCircle/outline';
 import ExclamationIcon from '~/components/icon/exclamation/outline';
 import Spinner from '~/components/spinner';
@@ -19,9 +21,16 @@ export type Props = {
 const Targets: React.FC<Props> = ({ endpointList, endpointGroupList }) => {
   return (
     <div>
-      <p className="mb-4 text-sm text-thm-on-surface">
-        Click import button to add an endpoint into your dashboard.
-      </p>
+      <Head
+        on={COLOR_SYSTEM.BACKGROUND}
+        title={
+          <div className="flex items-center gap-2">
+            <ColorSwatchIcon className="w-em" />
+            <div>Import Endpoints</div>
+          </div>
+        }
+        description="Click import button to add an endpoint into your dashboard."
+      />
       <ul className="flex flex-col">
         {endpointList.map((endpoint, idx) => (
           <li

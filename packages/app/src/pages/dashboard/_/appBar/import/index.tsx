@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { SIZE as BUTTON_SIZE } from '~/components/button';
-import TextButton from '~/components/button/text';
+import FilledButton from '~/components/button/filled';
 import ArrowCircleDownIcon from '~/components/icon/arrowCircleDown/outline';
 import Error, { useError } from '~/components/error';
 import { useEndpoint } from '~/hooks/endpoint';
@@ -39,7 +39,7 @@ const Import: React.FC<Props> = ({ className = '' }) => {
 
   return (
     <>
-      <TextButton
+      <FilledButton
         className={className}
         cs={COLOR_SYSTEM.PRIMARY_CONTAINER}
         size={BUTTON_SIZE.SM}

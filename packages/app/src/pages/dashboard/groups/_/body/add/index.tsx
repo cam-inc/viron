@@ -5,7 +5,9 @@ import * as yup from 'yup';
 import FilledButton, {
   Props as FilledButtonProps,
 } from '~/components/button/filled';
-import TextButton, { Props as TextButtonProps } from '~/components/button/text';
+import OutlineButton, {
+  Props as OutlineButtonProps,
+} from '~/components/button/outline/on';
 import Head from '~/components/head';
 import Textinput from '~/components/textinput';
 import { useEndpoint } from '~/hooks/endpoint';
@@ -53,7 +55,7 @@ const Add: React.FC<Props> = ({ onAdd, onCancel }) => {
     [_handleSubmit, addGroup, setError, clearErrors, onAdd]
   );
 
-  const handleCancelClick = useCallback<TextButtonProps['onClick']>(() => {
+  const handleCancelClick = useCallback<OutlineButtonProps['onClick']>(() => {
     onCancel();
   }, [onCancel]);
   const handleAddClick = useCallback<FilledButtonProps['onClick']>(() => {
@@ -67,7 +69,7 @@ const Add: React.FC<Props> = ({ onAdd, onCancel }) => {
           <Head
             on={COLOR_SYSTEM.SURFACE}
             title="Create a Group"
-            description="Groups are xxx"
+            description="TODO: 新規グループを作成します。"
           />
         </div>
         <div className="space-y-4">
@@ -94,8 +96,8 @@ const Add: React.FC<Props> = ({ onAdd, onCancel }) => {
           />
         </div>
         <div className="flex justify-end gap-2">
-          <TextButton
-            cs={COLOR_SYSTEM.PRIMARY}
+          <OutlineButton
+            on={COLOR_SYSTEM.SURFACE}
             label="Cancel"
             onClick={handleCancelClick}
           />

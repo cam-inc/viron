@@ -1,15 +1,16 @@
 import React, { useCallback } from 'react';
 import OutlineButton, {
   Props as OutlineButtonProps,
-} from '~/components/button/outline';
+} from '~/components/button/outline/on';
 import FilledButton, {
   Props as FilledButtonProps,
 } from '~/components/button/filled';
-import TextButton, { Props as TextButtonProps } from '~/components/button/text';
+import TextButton, {
+  Props as TextButtonProps,
+} from '~/components/button/text/on';
 import Head from '~/components/head';
 import ArrowDownIcon from '~/components/icon/arrowCircleDown/outline';
 import ArrowUpIcon from '~/components/icon/arrowCircleUp/outline';
-import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import PencilIcon from '~/components/icon/pencil/outline';
 import TrashIcon from '~/components/icon/trash/outline';
 import { useEndpoint } from '~/hooks/endpoint';
@@ -54,7 +55,7 @@ const Item: React.FC<Props> = ({ group }) => {
 
   return (
     <>
-      <div className="flex items-center gap-2 border-l-2 border-thm-on-background-low pl-4">
+      <div className="flex items-center gap-2 p-2 border-l-4 border-thm-secondary hover:bg-thm-on-background-faint">
         <div className="flex-1">
           <div className="text-base font-bold">{group.name}</div>
           <div className="flex items-center gap-2">
@@ -68,25 +69,25 @@ const Item: React.FC<Props> = ({ group }) => {
         </div>
         <div className="flex-none flex items-center gap-2">
           <TextButton
-            cs={COLOR_SYSTEM.PRIMARY}
+            on={COLOR_SYSTEM.BACKGROUND}
             label="Move Up"
             Icon={ArrowUpIcon}
             onClick={handleUpClick}
           />
           <TextButton
-            cs={COLOR_SYSTEM.PRIMARY}
+            on={COLOR_SYSTEM.BACKGROUND}
             label="Move Down"
             Icon={ArrowDownIcon}
             onClick={handleDownClick}
           />
           <OutlineButton
-            cs={COLOR_SYSTEM.PRIMARY}
+            on={COLOR_SYSTEM.BACKGROUND}
             label="Edit"
             Icon={PencilIcon}
             onClick={handleEditClick}
           />
           <OutlineButton
-            cs={COLOR_SYSTEM.PRIMARY}
+            on={COLOR_SYSTEM.BACKGROUND}
             label="Remove"
             Icon={TrashIcon}
             onClick={handleRemoveClick}
@@ -112,7 +113,7 @@ const RemoveConfirmation: React.FC<RemoveConfirmationProps> = ({
   onRequestCancel,
   onRequestRemove,
 }) => {
-  const handleCancelClick = useCallback<TextButtonProps['onClick']>(() => {
+  const handleCancelClick = useCallback<OutlineButtonProps['onClick']>(() => {
     onRequestCancel();
   }, [onRequestCancel]);
 
@@ -122,10 +123,14 @@ const RemoveConfirmation: React.FC<RemoveConfirmationProps> = ({
 
   return (
     <div className="space-y-8">
-      <Head on={COLOR_SYSTEM.SURFACE} title="Remove a Group" />
+      <Head
+        on={COLOR_SYSTEM.SURFACE}
+        title="Remove a Group"
+        description="TODO: 本当にグループを削除しますか？取り消しできません。"
+      />
       <div className="flex justify-end gap-2">
-        <TextButton
-          cs={COLOR_SYSTEM.PRIMARY}
+        <OutlineButton
+          on={COLOR_SYSTEM.SURFACE}
           label="Cancel"
           onClick={handleCancelClick}
         />

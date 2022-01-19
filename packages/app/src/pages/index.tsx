@@ -2,6 +2,7 @@ import { navigate, PageProps } from 'gatsby';
 import React, { useCallback } from 'react';
 import { SIZE as BUTTON_SIZE } from '~/components/button';
 import FilledButton from '~/components/button/filled';
+import FilledOnButton from '~/components/button/filled/on';
 import BookOpenIcon from '~/components/icon/bookOpen/outline';
 import ColorSwatchIcon from '~/components/icon/colorSwatch/outline';
 import UserGroupIcon from '~/components/icon/userGroup/outline';
@@ -39,7 +40,10 @@ const HomePage: React.FC<Props> = () => {
             <div className="flex-1 p-4 flex items-center justify-center min-w-0 bg-thm-background text-thm-on-background">
               <div className="flex-initial flex flex-col items-center">
                 <div className="w-24 mb-4">
-                  <Logo left="text-thm-primary" right="text-thm-secondary" />
+                  <Logo
+                    left="text-thm-on-background-high"
+                    right="text-thm-on-background"
+                  />
                 </div>
                 <div className="text-xl font-bold mb-2 text-thm-on-background-high">
                   Give OAS, Get GUI.
@@ -57,8 +61,8 @@ const HomePage: React.FC<Props> = () => {
                 Welcome to Viron{' '}
                 <Logo
                   className="inline w-em"
-                  left="text-thm-primary"
-                  right="text-thm-secondary"
+                  left="text-thm-on-surface-high"
+                  right="text-thm-on-surface"
                 />{' '}
                 !
               </div>
@@ -74,20 +78,20 @@ const HomePage: React.FC<Props> = () => {
                 to administrate your services. To learn more about Viron{' '}
                 <Logo
                   className="inline w-em"
-                  left="text-thm-primary"
-                  right="text-thm-secondary"
+                  left="text-thm-on-surface-high"
+                  right="text-thm-on-surface"
                 />
                 , read{' '}
-                <FilledButton
-                  cs={COLOR_SYSTEM.PRIMARY}
+                <FilledOnButton
+                  on={COLOR_SYSTEM.SURFACE}
                   size={BUTTON_SIZE.SM}
                   label="Documentation"
                   Icon={BookOpenIcon}
                   onClick={handleDocumentationButtonClick}
                 />
                 . Your{' '}
-                <FilledButton
-                  cs={COLOR_SYSTEM.PRIMARY}
+                <FilledOnButton
+                  on={COLOR_SYSTEM.SURFACE}
                   size={BUTTON_SIZE.SM}
                   label="Contribution"
                   Icon={UserGroupIcon}
