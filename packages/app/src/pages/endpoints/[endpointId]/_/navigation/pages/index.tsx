@@ -1,10 +1,18 @@
-import { BiChevronDown } from '@react-icons/all-files/bi/BiChevronDown';
-import { BiChevronRight } from '@react-icons/all-files/bi/BiChevronRight';
-import { BiFolder } from '@react-icons/all-files/bi/BiFolder';
-import { BiFolderOpen } from '@react-icons/all-files/bi/BiFolderOpen';
 import classnames from 'classnames';
-import React, { useMemo, useState } from 'react';
-import { Info } from '~/types/oas';
+import React, { useCallback, useMemo, useState } from 'react';
+import { SIZE as BUTTON_SIZE } from '~/components/button';
+import FilledButton, {
+  Props as FilledButtonProps,
+} from '~/components/button/filled';
+import TextOnButton, {
+  Props as TextOnButtonProps,
+} from '~/components/button/text/on';
+import ChevronDownIcon from '~/components/icon/chevronDown/outline';
+import ChevronRightIcon from '~/components/icon/chevronRight/outline';
+import FolderIcon from '~/components/icon/folder/outline';
+import FolderOpenIcon from '~/components/icon/folderOpen/outline';
+import { COLOR_SYSTEM } from '~/types';
+import { Page, PageId } from '~/types/oas';
 
 type Partial = {
   group: string;
@@ -12,9 +20,9 @@ type Partial = {
 };
 
 export type Props = {
-  pages: Info['x-pages'];
-  selectedPageId: Info['x-pages'][number]['id'];
-  onSelect: (pageId: Info['x-pages'][number]['id']) => void;
+  pages: Page[];
+  selectedPageId: PageId;
+  onSelect: (pageId: PageId) => void;
 };
 const _Pages: React.FC<Props> = ({ pages, selectedPageId, onSelect }) => {
   // Convert data structure like below so we can easily construct the jsx.
@@ -36,45 +44,42 @@ const _Pages: React.FC<Props> = ({ pages, selectedPageId, onSelect }) => {
   //    'settings'
   //  ]
   //}
-  const tree = useMemo<Partial>(
-    function () {
-      type Tree = {
-        [key: string]: Partial;
-      };
-      const tree: Tree = {};
-      pages.forEach(function (page) {
-        let group: string;
-        if (!page.group) {
-          group = 'root';
+  const tree = useMemo<Partial>(() => {
+    type Tree = {
+      [key: string]: Partial;
+    };
+    const tree: Tree = {};
+    pages.forEach((page) => {
+      let group: string;
+      if (!page.group) {
+        group = 'root';
+      } else {
+        group = `root/${page.group}`;
+      }
+      // Make an array of all groups from root. e.g. ['root', 'root/Management', 'root/Management/Analytics']
+      const levels: string[] = [];
+      group.split('/').forEach((s, idx) => {
+        if (idx === 0) {
+          levels.push(s);
         } else {
-          group = `root/${page.group}`;
+          levels.push(`${levels[idx - 1]}/${s}`);
         }
-        // Make an array of all groups from root. e.g. ['root', 'root/Management', 'root/Management/Analytics']
-        const levels: string[] = [];
-        group.split('/').forEach(function (s, idx) {
-          if (idx === 0) {
-            levels.push(s);
-          } else {
-            levels.push(`${levels[idx - 1]}/${s}`);
-          }
-        });
-        levels.forEach(function (level, idx) {
-          if (!tree[level]) {
-            const ref = (tree[level] = {
-              group: level.split('/')[idx],
-              children: [],
-            });
-            if (idx !== 0) {
-              tree[levels[idx - 1]].children.push(ref);
-            }
-          }
-        });
-        tree[group].children.push(page.id);
       });
-      return tree['root'];
-    },
-    [pages]
-  );
+      levels.forEach((level, idx) => {
+        if (!tree[level]) {
+          const ref = (tree[level] = {
+            group: level.split('/')[idx],
+            children: [],
+          });
+          if (idx !== 0) {
+            tree[levels[idx - 1]].children.push(ref);
+          }
+        }
+      });
+      tree[group].children.push(page.id);
+    });
+    return tree['root'];
+  }, [pages]);
 
   return (
     <GroupOrPage
@@ -89,22 +94,22 @@ const _Pages: React.FC<Props> = ({ pages, selectedPageId, onSelect }) => {
 export default _Pages;
 
 const GroupOrPage: React.FC<{
-  pages: Info['x-pages'];
+  pages: Page[];
   depth: number;
   list: Partial['children'];
-  selectedPageId: Info['x-pages'][number]['id'];
-  onSelect: (pageId: Info['x-pages'][number]['id']) => void;
+  selectedPageId: PageId;
+  onSelect: (pageId: PageId) => void;
 }> = ({ pages, depth, list, selectedPageId, onSelect }) => {
   return (
     <ul>
-      {list.map(function (item, idx) {
+      {list.map((item, idx) => {
         let content: JSX.Element;
         if (typeof item === 'string') {
+          const page = pages.find((p) => p.id === item) as Page;
           content = (
-            <Page
-              pages={pages}
+            <_Page
+              page={page}
               depth={depth}
-              pageId={item}
               isSelected={item === selectedPageId}
               onSelect={onSelect}
             />
@@ -120,42 +125,44 @@ const GroupOrPage: React.FC<{
             />
           );
         }
-        return <li key={idx}>{content}</li>;
+        return (
+          <li key={idx} className="mt-1">
+            {content}
+          </li>
+        );
       })}
     </ul>
   );
 };
 
 const Group: React.FC<{
-  pages: Info['x-pages'];
+  pages: Page[];
   depth: number;
   partial: Partial;
-  selectedPageId: Info['x-pages'][number]['id'];
-  onSelect: (pageId: Info['x-pages'][number]['id']) => void;
+  selectedPageId: PageId;
+  onSelect: (pageId: PageId) => void;
 }> = ({ pages, depth, partial, selectedPageId, onSelect }) => {
   const [isOpened, setIsOpened] = useState<boolean>(true);
-  const handleClick = function () {
-    setIsOpened(!isOpened);
-  };
+  const handleClick = useCallback<TextOnButtonProps['onClick']>(() => {
+    setIsOpened((currVal) => !currVal);
+  }, []);
   return (
     <div>
-      <button
-        className="w-full text-left flex items-center gap-2 py-2 pr-2 text-xs text-on-surface hover:text-on-surface-high hover:bg-on-surface-faint focus:outline-none focus:ring-2 focus:ring-inset focus:ring-on-surface-high focus:text-on-surface-high focus:bg-on-surface-faint active:text-on-surface-high active:bg-on-surface-faint"
-        style={{
-          paddingLeft: `${depth * 8}px`,
-        }}
-        onClick={handleClick}
-      >
-        <div className="flex-0 flex items-center">
-          {isOpened ? <BiFolderOpen /> : <BiFolder />}
-        </div>
-        <div className="flex-1 min-w-0">{partial.group}</div>
-        <div className="flex-0 flex items-center">
-          {isOpened ? <BiChevronDown /> : <BiChevronRight />}
-        </div>
-      </button>
+      <div className="">
+        <TextOnButton
+          pl={`${depth * 8}px`}
+          className="block w-full"
+          on={COLOR_SYSTEM.SURFACE}
+          size={BUTTON_SIZE.XS}
+          rounded={false}
+          Icon={isOpened ? FolderOpenIcon : FolderIcon}
+          IconRight={isOpened ? ChevronDownIcon : ChevronRightIcon}
+          label={partial.group}
+          onClick={handleClick}
+        />
+      </div>
       <div
-        className={classnames({
+        className={classnames('mt-1', {
           hidden: !isOpened,
         })}
       >
@@ -171,36 +178,45 @@ const Group: React.FC<{
   );
 };
 
-const Page: React.FC<{
-  pages: Info['x-pages'];
+const _Page: React.FC<{
+  page: Page;
   depth: number;
-  pageId: Info['x-pages'][number]['id'];
   isSelected: boolean;
-  onSelect: (pageId: Info['x-pages'][number]['id']) => void;
-}> = ({ pages, depth, pageId, isSelected, onSelect }) => {
-  const handleClick = function () {
-    onSelect(pageId);
-  };
-  const page = pages.find(function (page) {
-    return page.id === pageId;
-  });
+  onSelect: (pageId: PageId) => void;
+}> = ({ page, depth, isSelected, onSelect }) => {
+  const handleClick = useCallback<
+    TextOnButtonProps['onClick'] | FilledButtonProps['onClick']
+  >(() => {
+    onSelect(page.id);
+  }, [page, onSelect]);
+
   return (
-    <button
-      className={classnames(
-        'block w-full text-left py-1 pr-2 text-xs focus:outline-none focus:ring-2 focus:ring-inset',
-        {
-          'text-on-surface hover:text-on-surface-high hover:bg-on-surface-faint focus:ring-on-surface-high focus:text-on-surface-high focus:bg-on-surface-faint active:text-on-surface-high active:bg-on-surface-faint':
-            !isSelected,
-          'font-bold text-on-primary bg-primary border-r-[4px] border-on-primary hover:bg-primary-variant hover:text-on-primary-variant hover:border-on-primary-variant focus:ring-primary-high active:bg-primary-variant active:text-on-primary-variant active:border-on-primary-variant':
-            isSelected,
-        }
-      )}
-      style={{
-        paddingLeft: `${depth * 8}px`,
-      }}
-      onClick={handleClick}
+    <div
+      className={classnames('border-thm-on-primary', {
+        'border-r-4': isSelected,
+      })}
     >
-      {page?.title || pageId}
-    </button>
+      {isSelected ? (
+        <FilledButton
+          pl={`${depth * 8}px`}
+          className="block w-full"
+          cs={COLOR_SYSTEM.PRIMARY}
+          size={BUTTON_SIZE.XS}
+          rounded={false}
+          label={page.title}
+          onClick={handleClick}
+        />
+      ) : (
+        <TextOnButton
+          pl={`${depth * 8}px`}
+          className="block w-full"
+          on={COLOR_SYSTEM.SURFACE}
+          size={BUTTON_SIZE.XS}
+          rounded={false}
+          label={page.title}
+          onClick={handleClick}
+        />
+      )}
+    </div>
   );
 };

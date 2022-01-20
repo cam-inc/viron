@@ -1,8 +1,14 @@
 import React, { useCallback, useMemo } from 'react';
 import Breadcrumb, { Props as BreadcrumbProps } from '~/components/breadcrumb';
-import TextButton, { Props as TextButtonProps } from '~/components/button/text';
+import { SIZE as BUTTON_SIZE } from '~/components/button';
+import FilledButton, {
+  Props as FilledButtonProps,
+} from '~/components/button/filled';
+import TextOnButton, {
+  Props as TextOnButtonProps,
+} from '~/components/button/text/on';
 import CommonMark from '~/components/commonMark';
-import ChevronRightIcon from '~/components/icon/chevronRight/outline';
+import MenuAlt1Icon from '~/components/icon/menuAlt1/outline';
 import ExternalLinkIcon from '~/components/icon/externalLink/outline';
 import ServerIcon from '~/components/icon/server/outline';
 import TagIcon from '~/components/icon/tag/outline';
@@ -12,12 +18,12 @@ import { Props as LayoutProps } from '~/layouts';
 import Popover, { usePopover } from '~/portals/popover';
 import { useAppScreenGlobalStateValue } from '~/store';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
-import { Document, Info } from '~/types/oas';
+import { Document, Page, Content } from '~/types/oas';
 
 type Props = Parameters<NonNullable<LayoutProps['renderAppBar']>>[0] & {
   endpoint: Endpoint;
   document: Document;
-  page: Info['x-pages'][number];
+  page: Page;
 };
 const Appbar: React.FC<Props> = ({
   className,
@@ -31,7 +37,7 @@ const Appbar: React.FC<Props> = ({
   const { lg } = screen;
 
   // Navigation Opener.
-  const handleNavButtonClick = useCallback(() => {
+  const handleNavButtonClick = useCallback<TextOnButtonProps['onClick']>(() => {
     openNavigation();
   }, [openNavigation]);
 
@@ -56,8 +62,8 @@ const Appbar: React.FC<Props> = ({
       />
     );
   }, [endpoint, document]);
-  const endpointPopover = usePopover<HTMLButtonElement>();
-  const handleEndpointClick = useCallback(() => {
+  const endpointPopover = usePopover<HTMLDivElement>();
+  const handleEndpointClick = useCallback<TextOnButtonProps['onClick']>(() => {
     endpointPopover.open();
   }, [endpointPopover]);
 
@@ -68,19 +74,17 @@ const Appbar: React.FC<Props> = ({
     }
     return page.group.split('/');
   }, [page.group]);
-  const pagePopover = usePopover<HTMLButtonElement>();
-  const handlePageClick = useCallback(() => {
+  const pagePopover = usePopover<HTMLDivElement>();
+  const handlePageClick = useCallback<TextOnButtonProps['onClick']>(() => {
     pagePopover.open();
   }, [pagePopover]);
 
   // Contents Info
   const contentsPopover = usePopover<HTMLDivElement>();
-  const handleContentsClick = useCallback(() => {
+  const handleContentsClick = useCallback<FilledButtonProps['onClick']>(() => {
     contentsPopover.open();
   }, [contentsPopover]);
-  const handleContentClick = useCallback<
-    TextButtonProps<Info['x-pages'][number]['contents'][number]>['onClick']
-  >(
+  const handleContentClick = useCallback<TextOnButtonProps<Content>['onClick']>(
     (content) => {
       contentsPopover.close();
       const contentId = content.id;
@@ -101,57 +105,65 @@ const Appbar: React.FC<Props> = ({
         <div className="flex gap-2 items-center h-full px-4">
           {!lg && (
             <div className="flex-none">
-              <button className={className} onClick={handleNavButtonClick}>
-                sidebar
-              </button>
+              <TextOnButton
+                on={COLOR_SYSTEM.PRIMARY}
+                size={BUTTON_SIZE.XL}
+                Icon={MenuAlt1Icon}
+                onClick={handleNavButtonClick}
+              />
             </div>
           )}
           <div className="flex-none">
-            <button
-              className="flex gap-2 p-2 items-center text-left rounded hover:bg-thm-on-primary-faint focus:outline-none focus:ring-2 focus:ring-inset focus:ring-thm-on-primary focus:bg-thm-on-primary-faint active:bg-thm-on-primary-faint"
-              ref={endpointPopover.targetRef}
-              onClick={handleEndpointClick}
-            >
-              <div className="w-10 h-10 bg-cover bg-thm-background bg-center rounded overflow-hidden border-2 border-thm-on-primary-faint">
-                {thumbnail}
-              </div>
-              <div className="">
-                <div className="text-xs font-bold text-thm-on-primary">
-                  {endpoint.id}
+            <div ref={endpointPopover.targetRef}>
+              <TextOnButton
+                on={COLOR_SYSTEM.PRIMARY}
+                onClick={handleEndpointClick}
+              >
+                <div className="flex gap-2 items-center">
+                  <div className="w-10 h-10 bg-cover bg-thm-background bg-center rounded overflow-hidden border-2 border-thm-on-primary-faint">
+                    {thumbnail}
+                  </div>
+                  <div className="">
+                    <div className="text-xs font-bold text-thm-on-primary">
+                      {endpoint.id}
+                    </div>
+                    <div className="text-sm font-bold text-thm-on-primary-high">
+                      {document.info.title}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-sm font-bold text-thm-on-primary-high">
-                  {document.info.title}
+              </TextOnButton>
+            </div>
+          </div>
+          <div className="flex-none">
+            <div className="border-r border-thm-on-primary-slight h-4" />
+          </div>
+          <div className="flex-none">
+            <div ref={pagePopover.targetRef}>
+              <TextOnButton on={COLOR_SYSTEM.PRIMARY} onClick={handlePageClick}>
+                <div className="flex gap-1">
+                  {!!breadcrumbList.length && (
+                    <Breadcrumb
+                      className="text-xxs"
+                      on={COLOR_SYSTEM.PRIMARY}
+                      list={breadcrumbList}
+                    />
+                  )}
+                  <div className="text-xs text-thm-on-primary">
+                    {page.title}
+                  </div>
                 </div>
-              </div>
-            </button>
+              </TextOnButton>
+            </div>
           </div>
-          <div className="flex-none">
-            <ChevronRightIcon className="text-thm-on-primary-slight w-em" />
-          </div>
-          <div className="flex-none">
-            <button
-              className="flex gap-1 p-2 rounded hover:bg-thm-on-primary-faint focus:outline-none focus:ring-2 focus:ring-inset focus:ring-thm-on-primary focus:bg-thm-on-primary-faint active:bg-thm-on-primary-faint"
-              ref={pagePopover.targetRef}
-              onClick={handlePageClick}
-            >
-              {!!breadcrumbList.length && (
-                <Breadcrumb
-                  className="text-xxs"
-                  on={COLOR_SYSTEM.PRIMARY}
-                  list={breadcrumbList}
-                />
-              )}
-              <div className="text-xs text-thm-on-primary">{page.title}</div>
-            </button>
-          </div>
-          <div className="flex-none">
-            <ChevronRightIcon className="text-thm-on-primary-slight w-em" />
-          </div>
+          <div className="flex-1" />
           <div className="flex-none">
             <div ref={contentsPopover.targetRef}>
-              <button className={className} onClick={handleContentsClick}>
-                contents
-              </button>
+              <FilledButton
+                cs={COLOR_SYSTEM.PRIMARY_CONTAINER}
+                label="Jump"
+                onClick={handleContentsClick}
+              />
             </div>
           </div>
         </div>
@@ -261,18 +273,16 @@ const Appbar: React.FC<Props> = ({
       </Popover>
       {/* Contents Popover */}
       <Popover {...contentsPopover.bind}>
-        {page.contents.map(function (content) {
-          return (
-            <React.Fragment key={content.id}>
-              <TextButton<Info['x-pages'][number]['contents'][number]>
-                cs={COLOR_SYSTEM.PRIMARY}
-                label={content.title || content.id}
-                data={content}
-                onClick={handleContentClick}
-              />
-            </React.Fragment>
-          );
-        })}
+        {page.contents.map((content) => (
+          <div key={content.id}>
+            <TextOnButton<Content>
+              on={COLOR_SYSTEM.SURFACE}
+              label={content.title || content.id}
+              data={content}
+              onClick={handleContentClick}
+            />
+          </div>
+        ))}
       </Popover>
     </>
   );

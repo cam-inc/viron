@@ -1,3 +1,5 @@
+import { CSSProperties } from 'react';
+
 // Common props for all button components.
 export type Props<T = null> = Pick<
   React.ButtonHTMLAttributes<string>,
@@ -5,6 +7,8 @@ export type Props<T = null> = Pick<
 > & {
   size?: Size;
   data?: T;
+  rounded?: boolean;
+  pl?: CSSProperties['paddingLeft'];
   onClick: (data: T) => void;
 };
 
