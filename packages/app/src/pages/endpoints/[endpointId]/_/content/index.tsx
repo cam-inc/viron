@@ -40,7 +40,7 @@ const _Content: React.FC<Props> = ({
   return (
     <div
       id={content.id}
-      className="bg-thm-surface text-thm-on-surface border border-thm-on-surface-faint"
+      className="bg-thm-surface text-thm-on-surface border border-thm-on-surface-faint rounded"
     >
       <Head
         className="p-2"

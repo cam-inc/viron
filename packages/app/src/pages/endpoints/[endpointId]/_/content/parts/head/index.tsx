@@ -1,5 +1,8 @@
 import React, { useCallback } from 'react';
-import TextButton, { Props as TextButtonProps } from '~/components/button/text';
+import { SIZE as BUTTON_SIZE } from '~/components/button';
+import TextOnButton, {
+  Props as TextOnButtonProps,
+} from '~/components/button/text/on';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import { ClassName, COLOR_SYSTEM, Endpoint } from '~/types';
@@ -53,7 +56,7 @@ const Head: React.FC<Props> = ({
     console.log(error);
   }, []);
 
-  const handleOpenerClick = useCallback<TextButtonProps['onClick']>(() => {
+  const handleOpenerClick = useCallback<TextOnButtonProps['onClick']>(() => {
     if (isOpened) {
       onClose();
     } else {
@@ -73,15 +76,15 @@ const Head: React.FC<Props> = ({
     <div className={className}>
       <div className="flex items-center gap-2">
         <div className="flex-none">
-          <TextButton
-            cs={COLOR_SYSTEM.PRIMARY}
+          <TextOnButton
+            on={COLOR_SYSTEM.SURFACE}
+            size={BUTTON_SIZE.BASE}
             Icon={isOpened ? ChevronDownIcon : ChevronRightIcon}
+            label={content.title}
             onClick={handleOpenerClick}
           />
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="text-thm-on-surface-high">{content.title}</div>
-        </div>
+        <div className="flex-1 min-w-0" />
         {!!siblings.length && (
           <div className="flex-none">
             <div className="flex items-center gap-2">

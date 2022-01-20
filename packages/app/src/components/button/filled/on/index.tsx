@@ -5,7 +5,7 @@ import { Props as BaseButtonProps, SIZE } from '~/components/button';
 
 export type Props<T = null> = BaseProps &
   BaseButtonProps<T> & {
-    label: string;
+    label?: string;
     Icon?: React.FC<React.ComponentProps<'svg'>>;
     IconRight?: React.FC<React.ComponentProps<'svg'>>;
   };
@@ -78,7 +78,7 @@ const FilledButton = function <T = null>({
               <Icon className="w-[1.2em]" />
             </div>
           )}
-          <div className="flex-1 text-left truncate">{label}</div>
+          {label && <div className="flex-1 text-left truncate">{label}</div>}
           {IconRight && (
             <div className="flex-none">
               <IconRight className="w-[1.2em]" />

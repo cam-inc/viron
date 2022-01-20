@@ -1,6 +1,8 @@
-import { AiOutlineSearch } from '@react-icons/all-files/ai/AiOutlineSearch';
 import React, { useCallback } from 'react';
-import TextButton, { Props as TextButtonProps } from '~/components/button/text';
+import TextOnButton, {
+  Props as TextOnButtonProps,
+} from '~/components/button/text/on';
+import SearchIcon from '~/components/icon/search/outline';
 import Request from '~/components/request';
 import Drawer, { useDrawer } from '~/portals/drawer';
 import Popover, { usePopover } from '~/portals/popover';
@@ -15,7 +17,7 @@ export type Props = {
 };
 const Search: React.FC<Props> = ({ endpoint, document, base }) => {
   const drawer = useDrawer();
-  const handleButtonClick = useCallback<TextButtonProps['onClick']>(() => {
+  const handleButtonClick = useCallback<TextOnButtonProps['onClick']>(() => {
     drawer.open();
   }, [drawer]);
 
@@ -42,9 +44,9 @@ const Search: React.FC<Props> = ({ endpoint, document, base }) => {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <TextButton
-          cs={COLOR_SYSTEM.PRIMARY}
-          Icon={AiOutlineSearch}
+        <TextOnButton
+          on={COLOR_SYSTEM.SURFACE}
+          Icon={SearchIcon}
           onClick={handleButtonClick}
         />
       </div>

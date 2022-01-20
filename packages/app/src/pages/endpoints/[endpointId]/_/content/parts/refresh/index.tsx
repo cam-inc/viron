@@ -1,6 +1,8 @@
-import { AiOutlineReload } from '@react-icons/all-files/ai/AiOutlineReload';
 import React, { useCallback } from 'react';
-import TextButton, { Props as TextButtonProps } from '~/components/button/text';
+import TextOnButton, {
+  Props as TextOnButtonProps,
+} from '~/components/button/text/on';
+import RefreshIcon from '~/components/icon/refresh/outline';
 import Popover, { usePopover } from '~/portals/popover';
 import { COLOR_SYSTEM } from '~/types';
 import { UseBaseReturn } from '../../hooks/useBase';
@@ -9,7 +11,7 @@ export type Props = {
   base: UseBaseReturn;
 };
 const Refresh: React.FC<Props> = ({ base }) => {
-  const handleButtonClick = useCallback<TextButtonProps['onClick']>(() => {
+  const handleButtonClick = useCallback<TextOnButtonProps['onClick']>(() => {
     base.refresh();
   }, [base]);
 
@@ -28,9 +30,9 @@ const Refresh: React.FC<Props> = ({ base }) => {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <TextButton
-          cs={COLOR_SYSTEM.PRIMARY}
-          Icon={AiOutlineReload}
+        <TextOnButton
+          on={COLOR_SYSTEM.SURFACE}
+          Icon={RefreshIcon}
           onClick={handleButtonClick}
         />
       </div>

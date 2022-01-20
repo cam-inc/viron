@@ -1,8 +1,15 @@
-import { AiFillFilter } from '@react-icons/all-files/ai/AiFillFilter';
-import { AiOutlineFilter } from '@react-icons/all-files/ai/AiOutlineFilter';
-import classnames from 'classnames';
 import React, { useCallback } from 'react';
-import TextButton, { Props as TextButtonProps } from '~/components/button/text';
+import FilledButton, {
+  Props as FilledButtonProps,
+} from '~/components/button/filled';
+import TextOnButton, {
+  Props as TextOnButtonProps,
+} from '~/components/button/text/on';
+import Head from '~/components/head';
+import BulbOutlineIcon from '~/components/icon/bulb/outline';
+import BulbSolidIcon from '~/components/icon/bulb/solid';
+import FilterOutlineIcon from '~/components/icon/filter/outline';
+import FilterSolidIcon from '~/components/icon/filter/solid';
 import Drawer, { useDrawer } from '~/portals/drawer';
 import Popover, { usePopover } from '~/portals/popover';
 import { COLOR_SYSTEM } from '~/types';
@@ -24,16 +31,17 @@ const Filter: React.FC<Props> = ({ base }) => {
   }, [popover]);
 
   const drawer = useDrawer();
-  const handleButtonClick = useCallback<TextButtonProps['onClick']>(() => {
+  const handleButtonClick = useCallback<
+    TextOnButtonProps['onClick'] | FilledButtonProps['onClick']
+  >(() => {
     drawer.open();
   }, [drawer]);
 
-  const handleItemClick = useCallback(
-    (e: React.MouseEvent<HTMLElement>) => {
+  const handleItemClick = useCallback<TextOnButtonProps<string>['onClick']>(
+    (key) => {
       if (!base.filter.enabled) {
         return;
       }
-      const key = e.currentTarget.dataset.key as string;
       base.filter.toggle(key);
     },
     [base]
@@ -54,46 +62,56 @@ const Filter: React.FC<Props> = ({ base }) => {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <TextButton
-          cs={COLOR_SYSTEM.PRIMARY}
-          Icon={base.filter.filtered ? AiFillFilter : AiOutlineFilter}
-          onClick={handleButtonClick}
-        />
+        {base.filter.filtered ? (
+          <FilledButton
+            cs={COLOR_SYSTEM.PRIMARY}
+            Icon={FilterSolidIcon}
+            onClick={handleButtonClick}
+          />
+        ) : (
+          <TextOnButton
+            on={COLOR_SYSTEM.SURFACE}
+            Icon={FilterOutlineIcon}
+            onClick={handleButtonClick}
+          />
+        )}
       </div>
       <Drawer {...drawer.bind}>
         <div className="h-full flex flex-col text-thm-on-surface">
           {/* Head */}
           <div className="flex-none p-2 border-b-2 border-thm-on-surface-faint">
-            <div>Filter</div>
+            <Head
+              on={COLOR_SYSTEM.SURFACE}
+              title="Filter"
+              description="TODO: select items."
+            />
           </div>
           {/* Body */}
           <div className="flex-1 min-h-0 flex flex-col">
             <div className="px-2 pb-2 flex-1 min-h-0 overflow-y-scroll overscroll-y-contain">
-              <div className="flex flex-col">
+              <ul className="space-y-2">
                 {base.filter.list.map((item) => (
-                  <button
-                    key={item.key}
-                    data-key={item.key}
-                    className={classnames(
-                      'py-2 flex items-center gap-2 border-b border-thm-on-surface-faint',
-                      {
-                        'text-thm-on-surface': item.isActive,
-                        'text-thm-on-surface-slight': !item.isActive,
-                      }
-                    )}
-                    onClick={handleItemClick}
-                  >
-                    <div>{item.name}</div>
-                  </button>
+                  <li key={item.key}>
+                    <TextOnButton<string>
+                      className="block w-full"
+                      on={COLOR_SYSTEM.SURFACE}
+                      data={item.key}
+                      label={item.name}
+                      Icon={item.isActive ? BulbSolidIcon : BulbOutlineIcon}
+                      onClick={handleItemClick}
+                    />
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           </div>
           {/* Tail */}
           <div className="flex-none p-2 border-t-2 border-thm-on-surface-faint">
-            <button className="w-full" onClick={handleApplyClick}>
-              apply
-            </button>
+            <FilledButton
+              cs={COLOR_SYSTEM.PRIMARY}
+              label="Apply"
+              onClick={handleApplyClick}
+            />
           </div>
         </div>
       </Drawer>

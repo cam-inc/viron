@@ -70,6 +70,7 @@ const OutlineButton = function <T = null>({
               'text-base': size === SIZE.BASE,
               'text-xl': size === SIZE.XL,
               'text-2xl': size === SIZE['2XL'],
+              rounded: rounded,
             }
           )}
         >
