@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/cam-inc/viron/packages/golang/logging"
@@ -19,7 +20,7 @@ import (
 type (
 	JWT struct {
 		Secret        string
-		Provider      func() string
+		Provider      func(r *http.Request) (string ,[]string, error)
 		ExpirationSec int
 		jwtAuth       *jwtauth.JWTAuth
 	}
@@ -43,7 +44,7 @@ var (
 	log logging.Logger
 )
 
-func SetUp(secret string, provider func() string, expiration int) error {
+func SetUp(secret string, provider func(r *http.Request) (string ,[]string, error), expiration int) error {
 	jwt = &JWT{
 		Secret:        secret,
 		Provider:      provider,
@@ -54,12 +55,16 @@ func SetUp(secret string, provider func() string, expiration int) error {
 	return nil
 }
 
-func Sign(subject string) (string, error) {
+func Sign(r *http.Request, subject string) (string, error) {
+	iss, aud, err := jwt.Provider(r)
+	if err != nil {
+		return "", err
+	}
 	claim := map[string]interface{}{
 		"nbf": 0,
 		"sub": subject,
-		"iss": jwt.Provider(),
-		"aud": []string{jwt.Provider()},
+		"iss": iss,
+		"aud": aud,
 	}
 	jwtauth.SetExpiryIn(claim, time.Duration(jwt.ExpirationSec)*time.Second)
 	jwtauth.SetIssuedNow(claim)

@@ -167,7 +167,7 @@ func (a *authObj) Oauth2GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ctx := r.Context()
-	token, tokenErr := auth.SigninGoogleOAuth2(oauth2GoogleCollback.Code, oauth2GoogleCollback.RedirectUri, ctx)
+	token, tokenErr := auth.SigninGoogleOAuth2(oauth2GoogleCollback.Code, oauth2GoogleCollback.RedirectUri, r)
 	if tokenErr != nil {
 		a.log.Errorf("tokenErr %v", tokenErr)
 		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
