@@ -1,38 +1,29 @@
-import { BiServer } from '@react-icons/all-files/bi/BiServer';
 import classnames from 'classnames';
 import React, { useCallback } from 'react';
-import CommonMark from '$components/commonMark';
-import Popover, { usePopover } from '$components/popover';
-import { On } from '$constants/index';
-import { ClassName } from '$types/index';
-import { Server } from '$types/oas';
+import { Props as BaseProps } from '~/components';
+import CommonMark from '~/components/commonMark';
+import ServerIcon from '~/components/icon/server/outline';
+import Popover, { usePopover } from '~/portals/popover';
+import { Server } from '~/types/oas';
 
-type Props = {
-  on: On;
+type Props = BaseProps & {
   server: Server;
-  className?: ClassName;
 };
 const _Server: React.FC<Props> = ({ on, server, className = '' }) => {
   const popover = usePopover<HTMLDivElement>();
-  const handleMouseEnter = useCallback(
-    function () {
-      popover.open();
-    },
-    [popover]
-  );
-  const handleMouseLeave = useCallback(
-    function () {
-      popover.close();
-    },
-    [popover]
-  );
+  const handleMouseEnter = useCallback(() => {
+    popover.open();
+  }, [popover]);
+  const handleMouseLeave = useCallback(() => {
+    popover.close();
+  }, [popover]);
 
   return (
     <>
       <div
         className={classnames(
           'p-1 text-xs rounded border',
-          `text-on-${on}-low border-on-${on}-low`,
+          `text-thm-on-${on}-low border-thm-on-${on}-low`,
           className
         )}
         ref={popover.targetRef}
@@ -40,7 +31,7 @@ const _Server: React.FC<Props> = ({ on, server, className = '' }) => {
         onMouseLeave={handleMouseLeave}
       >
         <div className="flex items-center gap-1">
-          <BiServer />
+          <ServerIcon className="w-em" />
           <div>{server.url}</div>
         </div>
       </div>

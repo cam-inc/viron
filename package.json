@@ -61,5 +61,9 @@
     "node": ">=15.13.0",
     "npm": ">=7.9.0"
   },
-  "private": true
+  "private": true,
+  "volta": {
+    "node": "15.14.0",
+    "npm": "7.9.0"
+  }
 }

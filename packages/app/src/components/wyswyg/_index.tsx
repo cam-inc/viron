@@ -1,12 +1,9 @@
 import EditorJS, { EditorConfig, OutputData } from '@editorjs/editorjs';
 import classnames from 'classnames';
 import React, { useEffect, useMemo, useState } from 'react';
-import { On } from '$constants/index';
-import { ClassName } from '$types/index';
+import { Props as BaseProps } from '~/components';
 
-export type Props = {
-  on: On;
-  className?: ClassName;
+export type Props = BaseProps & {
   initialData?: OutputData;
   readOnly?: boolean;
   onChange: NonNullable<EditorConfig['onChange']>;
@@ -20,11 +17,9 @@ const Wyswyg: React.FC<Props> = ({
 }) => {
   const [editor, setEditor] = useState<EditorJS | null>(null);
 
-  const holder = useMemo<string>(function () {
-    return `editor-${Date.now().toString()}`;
-  }, []);
+  const holder = useMemo<string>(() => `editor-${Date.now().toString()}`, []);
 
-  useEffect(function () {
+  useEffect(() => {
     const editor = new EditorJS({
       holder,
       data: initialData,
@@ -32,10 +27,10 @@ const Wyswyg: React.FC<Props> = ({
       onChange,
     });
     editor.isReady
-      .then(function () {
+      .then(() => {
         console.log('editor is ready to work.');
       })
-      .catch(function (error) {
+      .catch((error) => {
         // TODO: エラー処理
         console.error(error);
       });
@@ -43,24 +38,21 @@ const Wyswyg: React.FC<Props> = ({
   }, []);
 
   // Dynamically change some Editor.js properties.
-  useEffect(
-    function () {
-      if (!editor) {
-        return;
-      }
-      editor.isReady.then(function () {
-        // Force update the onChange callback even though Editor.js doesn't expose the property configuration as public one.
-        // @ts-ignore
-        editor.configuration.onChange = onChange;
-      });
-    },
-    [editor, onChange]
-  );
+  useEffect(() => {
+    if (!editor) {
+      return;
+    }
+    editor.isReady.then(() => {
+      // Force update the onChange callback even though Editor.js doesn't expose the property configuration as public one.
+      // @ts-ignore
+      editor.configuration.onChange = onChange;
+    });
+  }, [editor, onChange]);
 
   return (
     <div
       id={holder}
-      className={classnames('border-2', `border-on-${on}`, className)}
+      className={classnames(`border-2 border-thm-on-${on}`, className)}
     />
   );
 };

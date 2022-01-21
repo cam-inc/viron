@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { RequestPayloadParameter, Style } from '$types/oas';
+import { RequestPayloadParameter, Style } from '~/types/oas';
 
 type Variable = RequestPayloadParameter['value'];
 
@@ -49,7 +49,7 @@ export const serializeMatrix = function (
   if (_.isBoolean(variable)) {
     return `;${name}=${variable.toString()}`;
   }
-  if (_.isObject(variable)) {
+  if (_.isPlainObject(variable)) {
     if (_.isEmpty(variable)) {
       return `;${name}`;
     }
@@ -107,7 +107,7 @@ export const serializeLabel = function (
   if (_.isBoolean(variable)) {
     return `.${variable.toString()}`;
   }
-  if (_.isObject(variable)) {
+  if (_.isPlainObject(variable)) {
     if (_.isEmpty(variable)) {
       return `.`;
     }
@@ -150,7 +150,7 @@ export const serializeForm = function (
   if (_.isBoolean(variable)) {
     return `${name}=${variable.toString()}`;
   }
-  if (_.isObject(variable)) {
+  if (_.isPlainObject(variable)) {
     if (_.isEmpty(variable)) {
       return `${name}=`;
     }
@@ -171,14 +171,19 @@ export const serializeForm = function (
     if (_.isEmpty(variable)) {
       return `${name}=`;
     }
+    // TODO: JSON.stringifyすべきかいなか。
     if (explode) {
-      return variable
-        .map((value) => `${name}=${JSON.stringify(value)}`)
-        .join('&');
+      return (
+        variable
+          //.map((value) => `${name}=${JSON.stringify(value)}`)
+          .map((value) => `${name}=${value}`)
+          .join('&')
+      );
     } else {
       return (
         `${name}=` +
-        variable.map((value) => `${JSON.stringify(value)}`).join(',')
+        //variable.map((value) => `${JSON.stringify(value)}`).join(',')
+        variable.map((value) => `${value}`).join(',')
       );
     }
   }
@@ -202,7 +207,7 @@ export const serializeSimple = function (
   if (_.isBoolean(variable)) {
     return variable.toString();
   }
-  if (_.isObject(variable)) {
+  if (_.isPlainObject(variable)) {
     if (_.isEmpty(variable)) {
       throw new Error('TODO');
     }
@@ -229,7 +234,7 @@ export const serializeSpaceDelimited = function (variable: Variable): string {
   if (_.isString(variable) || _.isNumber(variable) || _.isBoolean(variable)) {
     throw new Error('TODO');
   }
-  if (_.isObject(variable)) {
+  if (_.isPlainObject(variable)) {
     if (_.isEmpty(variable)) {
       throw new Error('TODO');
     }
@@ -250,7 +255,7 @@ export const serializePipeDelimited = function (variable: Variable): string {
   if (_.isString(variable) || _.isNumber(variable) || _.isBoolean(variable)) {
     throw new Error('TODO');
   }
-  if (_.isObject(variable)) {
+  if (_.isPlainObject(variable)) {
     if (_.isEmpty(variable)) {
       throw new Error('TODO');
     }
@@ -274,7 +279,7 @@ export const serializeDeepObject = function (
   if (_.isString(variable) || _.isNumber(variable) || _.isBoolean(variable)) {
     throw new Error('TODO');
   }
-  if (_.isObject(variable)) {
+  if (_.isPlainObject(variable)) {
     if (_.isEmpty(variable)) {
       throw new Error('TODO');
     }

@@ -1,8 +1,6 @@
-import {
-  HTTPStatusCode,
-  HTTP_STATUS,
-  HTTP_STATUS_CODE,
-} from '$constants/index';
+import { HTTPStatusCode, HTTP_STATUS } from '~/constants/index';
+
+export type Result<T, E extends BaseError> = Success<T, E> | Failure<T, E>;
 
 export class Success<T, E extends BaseError> {
   readonly value: T;
@@ -32,63 +30,99 @@ export class Failure<T, E extends BaseError> {
   }
 }
 
-export type Result<T, E extends BaseError> = Success<T, E> | Failure<T, E>;
-
 export class BaseError extends Error {
   code = '#base';
   name = 'Base Error';
-  message = 'An error has occured.';
 }
 
 export class NetworkError extends BaseError {
   code = '#network';
   name = 'Network Error';
-  message = "Couldn't establish a connection.";
+  type = 'network';
 }
 
-export class HTTPError extends BaseError {
+export class HTTPError extends NetworkError {
   code = '#http';
   name = 'HTTP Error';
-  message = 'A HTTP-related error has occured.';
 }
 
 export class HTTP400Error extends HTTPError {
-  code = '#http-400';
-  name = HTTP_STATUS[HTTP_STATUS_CODE.BAD_REQUEST].name;
-  message = HTTP_STATUS[HTTP_STATUS_CODE.BAD_REQUEST].message;
+  code = `#http-${HTTP_STATUS.BAD_REQUEST.code}`;
+  name = HTTP_STATUS.BAD_REQUEST.name;
 }
 
 export class HTTP401Error extends HTTPError {
-  message = 'TODO';
+  code = `#http-${HTTP_STATUS.UNAUTHORIZED.code}`;
+  name = HTTP_STATUS.UNAUTHORIZED.name;
 }
 
 export class HTTP403Error extends HTTPError {
-  message = 'TODO';
+  code = `#http-${HTTP_STATUS.FORBIDDEN.code}`;
+  name = HTTP_STATUS.FORBIDDEN.name;
+}
+
+export class HTTP404Error extends HTTPError {
+  code = `#http-${HTTP_STATUS.NOT_FOUND.code}`;
+  name = HTTP_STATUS.NOT_FOUND.name;
 }
 
 export class HTTPUnexpectedError extends HTTPError {
-  message = 'TODO';
+  code = `#http-unexpected`;
+  name = 'HTTP Unexpected Error';
 }
 
 export class FileReaderError extends BaseError {
   code = '#fileReader';
   name = 'File Reader Error';
-  message = "Counln't read a file properly.";
+}
+
+export class EndpointError extends BaseError {
+  code = '#endpoint';
+  name = 'Endpoint Error';
+}
+
+export class EndpointDuplicatedError extends EndpointError {
+  code = '#endpointDuplicated';
+  name = 'Endpoint Duplicated Error';
+}
+
+export class EndpointExportError extends EndpointError {
+  code = '#endpointExport';
+  name = 'Endpoint Export Error';
+}
+
+export class EndpointGroupError extends BaseError {
+  code = '#endpointGroup';
+  name = 'Endpoint Group Error';
+}
+
+export class EndpointGroupDuplicatedError extends EndpointGroupError {
+  code = '#endpointGroupDuplicated';
+  name = 'Endpoint Group Duplicated Error';
 }
 
 export class OASError extends BaseError {
   code = '#oas';
   name = 'OAS Error';
-  message = 'Incorrect OAS document.';
 }
 
-export const getHTTPError = function (statusCode: HTTPStatusCode): BaseError {
+export class UnexpectedError extends BaseError {
+  code = '#unexpected';
+  name = 'Unexpected Error';
+}
+
+export class UnhandledError extends BaseError {
+  code = '#unhandled';
+  name = 'Unhandled Error';
+}
+
+export const getHTTPError = (statusCode: HTTPStatusCode): BaseError => {
   switch (statusCode) {
-    case HTTP_STATUS_CODE.BAD_REQUEST:
+    case HTTP_STATUS.BAD_REQUEST.code:
       return new HTTP400Error();
-    case HTTP_STATUS_CODE.UNAUTHORIZED:
+    case HTTP_STATUS.UNAUTHORIZED.code:
       return new HTTP401Error();
-    case HTTP_STATUS_CODE.FORBIDDEN:
+    case HTTP_STATUS.FORBIDDEN.code:
       return new HTTP403Error();
     default:
       return new HTTPError();

@@ -1,11 +1,8 @@
 import classnames from 'classnames';
 import React from 'react';
-import { On } from '$constants/index';
-import { ClassName } from '$types/index';
+import { Props as BaseProps } from '~/components';
 
-export type Props = {
-  on: On;
-  className?: ClassName;
+export type Props = BaseProps & {
   renderHead?: () => JSX.Element | null;
   renderBody?: () => JSX.Element | null;
   renderTail?: () => JSX.Element | null;
@@ -25,8 +22,7 @@ const Navigation: React.FC<Props> = ({
         {/* body */}
         <div
           className={classnames(
-            'flex-1 min-h-0 overflow-y-scroll overscroll-y-contain',
-            `border-on-${on}-faint`,
+            `flex-1 min-h-0 overflow-y-scroll overscroll-y-contain border-thm-on-${on}-slight`,
             {
               'border-t-2 border-b-2': renderBody,
             }
