@@ -77,6 +77,10 @@ const _Request: React.FC<Props> = ({
     // Do nothing.
   }, []);
 
+  const handleDebugClick = useCallback<FilledButtonProps['onClick']>(() => {
+    console.log(formState, getValues());
+  }, [formState, getValues]);
+
   return (
     <div className={classnames('text-xxs', className)}>
       <form className="h-full flex flex-col" onSubmit={_handleSubmit}>
@@ -197,6 +201,12 @@ const _Request: React.FC<Props> = ({
             size={BUTTON_SIZE.BASE}
             label="Submit"
             onClick={handleSubmitClick}
+          />
+          <FilledButton
+            cs={COLOR_SYSTEM.SECONDARY}
+            size={BUTTON_SIZE.BASE}
+            label="Debug"
+            onClick={handleDebugClick}
           />
         </div>
       </form>

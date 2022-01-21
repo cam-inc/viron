@@ -252,7 +252,7 @@ const Cell: React.FC<BaseProps & { column: TableColumn; value: Value }> = ({
       </div>
       <div className="whitespace-nowrap">
         <div className={classnames(`text-sm text-thm-on-${on}`)}>
-          {/*formattedValue(column, value)*/ value as string}
+          {/*formattedValue(column, value)*/ JSON.stringify(value)}
         </div>
       </div>
     </>

@@ -5,6 +5,7 @@ import { Endpoint } from '~/types';
 import { Document, Schema } from '~/types/oas';
 import { useActive, UseEliminateReturn } from './hooks/index';
 import Container, { Props as ContainerProps } from './parts/container';
+import OneOf from './parts/oneOf';
 import SchemaOfTypeArray from './types/array';
 import SchemaOfTypeBoolean from './types/boolean';
 import SchemaOfTypeInteger from './types/integer';
@@ -12,26 +13,25 @@ import SchemaOfTypeNumber from './types/number';
 import SchemaOfTypeString from './types/string';
 import SchemaOfTypeObject from './types/object';
 
-export type Props = BaseProps &
-  Pick<ContainerProps, 'renderHeadItem'> & {
-    endpoint: Endpoint;
-    document: Document;
-    name: string;
-    schema: Schema;
-    register: UseFormReturn['register'];
-    unregister: UseFormReturn['unregister'];
-    control: UseFormReturn['control'];
-    watch: UseFormReturn['watch'];
-    formState: UseFormReturn['formState'];
-    getValues: UseFormReturn['getValues'];
-    setValue: UseFormReturn['setValue'];
-    setError: UseFormReturn['setError'];
-    clearErrors: UseFormReturn['clearErrors'];
-    required: boolean;
-    isDeepActive: boolean;
-    activeRef: UseEliminateReturn['ref'];
-  };
-const _Schema: React.FC<Props> = ({
+export type Props = BaseProps & {
+  endpoint: Endpoint;
+  document: Document;
+  name: string;
+  schema: Schema;
+  register: UseFormReturn['register'];
+  unregister: UseFormReturn['unregister'];
+  control: UseFormReturn['control'];
+  watch: UseFormReturn['watch'];
+  formState: UseFormReturn['formState'];
+  getValues: UseFormReturn['getValues'];
+  setValue: UseFormReturn['setValue'];
+  setError: UseFormReturn['setError'];
+  clearErrors: UseFormReturn['clearErrors'];
+  required: boolean;
+  isDeepActive: boolean;
+  activeRef: UseEliminateReturn['ref'];
+};
+const _Schema: React.FC<Props & Pick<ContainerProps, 'renderHeadItem'>> = ({
   on,
   renderHeadItem,
   endpoint,
@@ -52,6 +52,9 @@ const _Schema: React.FC<Props> = ({
   activeRef,
 }) => {
   const Component = useMemo<React.FC<Props>>(() => {
+    if (schema.oneOf) {
+      return OneOf;
+    }
     switch (schema.type) {
       case 'string':
         return SchemaOfTypeString;

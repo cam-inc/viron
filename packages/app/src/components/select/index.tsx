@@ -3,7 +3,7 @@ import React from 'react';
 import { Props as BaseProps } from '~/components';
 import { ClassName } from '~/types';
 
-type Props<T = unknown> = BaseProps & {
+export type Props<T = unknown> = BaseProps & {
   list: T[];
   Select: React.FC<{ className: ClassName }>;
   Option: React.FC<{ className: ClassName; data: T }>;

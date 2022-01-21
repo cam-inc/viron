@@ -143,18 +143,18 @@ export const useNameForError = function ({
   schema: Schema;
   name: string;
 }): string {
-  return useMemo<string>(
-    function () {
-      if (schema.type === 'array') {
-        return `${name}_array`;
-      }
-      if (schema.type === 'object') {
-        return `${name}_object`;
-      }
-      return name;
-    },
-    [schema, name]
-  );
+  return useMemo<string>(() => {
+    if (schema.oneOf) {
+      return `${name}_oneOf`;
+    }
+    if (schema.type === 'array') {
+      return `${name}_array`;
+    }
+    if (schema.type === 'object') {
+      return `${name}_object`;
+    }
+    return name;
+  }, [schema, name]);
 };
 
 export type UseAutocompleteReturn<T> = {
