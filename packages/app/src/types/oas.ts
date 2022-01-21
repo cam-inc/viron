@@ -394,6 +394,7 @@ export type Schema = {
   allOf?: Schema[];
   // Inline or referenced schema MUST be of a Schema Object and not a standard JSON Schema.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-5.24
+  // TODO: 仕様では、ただ一つのschemaのみにvalidか否かをチェックすべきだが、vironではoneofからどのschemaを使うか選ばせるために使用している。
   oneOf?: Schema[];
   // Inline or referenced schema MUST be of a Schema Object and not a standard JSON Schema.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-5.23
