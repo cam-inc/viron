@@ -73,6 +73,6 @@ components:
         - operationId
 
     VironAuthConfigOas:
-      description: aaa
+      description: listで返されるopeation群が定義されたoas
       type: object
       properties: {}

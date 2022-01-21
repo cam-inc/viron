@@ -46,5 +46,6 @@ export const listVironAuthconfigs = async (
     authConfigDefinitions,
     context.req._context.apiDefinition
   );
+
   context.res.json(result);
 };
