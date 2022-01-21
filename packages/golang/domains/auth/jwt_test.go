@@ -17,6 +17,10 @@ func init() {
 	SetUp(secret, provider, 1)
 }
 
+func getProvider() string {
+	return provider
+}
+
 func TestAuthJWTSignNormal(t *testing.T) {
 	userID := "test_1"
 	token, err := Sign(userID)
