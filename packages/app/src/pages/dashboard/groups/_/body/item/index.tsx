@@ -1,10 +1,13 @@
 import React, { useCallback } from 'react';
-import OutlineButton, {
-  Props as OutlineButtonProps,
+import OutlineOnButton, {
+  Props as OutlineOnButtonProps,
 } from '~/components/button/outline/on';
 import FilledButton, {
   Props as FilledButtonProps,
 } from '~/components/button/filled';
+import FilledOnButton, {
+  Props as FilledOnButtonProps,
+} from '~/components/button/filled/on';
 import TextButton, {
   Props as TextButtonProps,
 } from '~/components/button/text/on';
@@ -32,11 +35,11 @@ const Item: React.FC<Props> = ({ group }) => {
     descendGroup(group.id);
   }, [group, descendGroup]);
 
-  const handleEditClick = useCallback<OutlineButtonProps['onClick']>(() => {
+  const handleEditClick = useCallback<FilledOnButtonProps['onClick']>(() => {
     // TODO
   }, []);
 
-  const handleRemoveClick = useCallback<OutlineButtonProps['onClick']>(() => {
+  const handleRemoveClick = useCallback<FilledOnButtonProps['onClick']>(() => {
     removeConfirmationModal.open();
   }, [removeConfirmationModal]);
 
@@ -55,7 +58,7 @@ const Item: React.FC<Props> = ({ group }) => {
 
   return (
     <>
-      <div className="flex items-center gap-2 p-2 border-l-4 border-thm-secondary hover:bg-thm-on-background-faint">
+      <div className="flex items-center gap-2 p-2 border-l-8 border-thm-primary hover:bg-thm-on-background-faint">
         <div className="flex-1">
           <div className="text-base font-bold">{group.name}</div>
           <div className="flex items-center gap-2">
@@ -80,13 +83,13 @@ const Item: React.FC<Props> = ({ group }) => {
             Icon={ArrowDownIcon}
             onClick={handleDownClick}
           />
-          <OutlineButton
+          <FilledOnButton
             on={COLOR_SYSTEM.BACKGROUND}
             label="Edit"
             Icon={PencilIcon}
             onClick={handleEditClick}
           />
-          <OutlineButton
+          <FilledOnButton
             on={COLOR_SYSTEM.BACKGROUND}
             label="Remove"
             Icon={TrashIcon}
@@ -113,7 +116,7 @@ const RemoveConfirmation: React.FC<RemoveConfirmationProps> = ({
   onRequestCancel,
   onRequestRemove,
 }) => {
-  const handleCancelClick = useCallback<OutlineButtonProps['onClick']>(() => {
+  const handleCancelClick = useCallback<OutlineOnButtonProps['onClick']>(() => {
     onRequestCancel();
   }, [onRequestCancel]);
 
@@ -129,7 +132,7 @@ const RemoveConfirmation: React.FC<RemoveConfirmationProps> = ({
         description="TODO: 本当にグループを削除しますか？取り消しできません。"
       />
       <div className="flex justify-end gap-2">
-        <OutlineButton
+        <OutlineOnButton
           on={COLOR_SYSTEM.SURFACE}
           label="Cancel"
           onClick={handleCancelClick}

@@ -1,9 +1,9 @@
 import classnames from 'classnames';
 import React, { useCallback } from 'react';
 import { Props as BaseProps } from '~/components';
-import TextButton, {
-  Props as TextButtonProps,
-} from '~/components/button/text/on';
+import FilledOnButton, {
+  Props as FilledOnButtonProps,
+} from '~/components/button/filled/on';
 
 export type Props = BaseProps & {
   list: Omit<ItemProps, 'on' | 'className' | 'onClick'>[];
@@ -43,9 +43,9 @@ type ItemProps = BaseProps & {
   onClick: (id: ItemProps['id']) => void;
 };
 export const Item: React.FC<ItemProps> = ({ on, id, label, onClick }) => {
-  const handleClick = useCallback<TextButtonProps['onClick']>(() => {
+  const handleClick = useCallback<FilledOnButtonProps['onClick']>(() => {
     onClick(id);
   }, [id, onClick]);
 
-  return <TextButton on={on} label={label} onClick={handleClick} />;
+  return <FilledOnButton on={on} label={label} onClick={handleClick} />;
 };

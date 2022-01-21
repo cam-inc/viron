@@ -83,17 +83,17 @@ export type UseEliminateReturn = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   execute: (data: { [key in string]: any }) => void;
 };
-export const useEliminate = function (): UseEliminateReturn {
+export const useEliminate = (): UseEliminateReturn => {
   const ref = useRef<{ [key in string]: boolean }>({});
   const execute = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function (data: { [key in string]: any }) {
+    (data: { [key in string]: any }) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const f = function (prefix: string, data: any) {
+      const f = (prefix: string, data: any) => {
         if (_.isPlainObject(data)) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           data = data as { [key in string]: any };
-          _.forEach(data, function (value, key) {
+          _.forEach(data, (value, key) => {
             const deepKey = !!prefix ? `${prefix}.${key}` : key;
             if (ref.current[deepKey]) {
               f(deepKey, value);

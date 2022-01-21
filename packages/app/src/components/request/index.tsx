@@ -2,12 +2,19 @@ import classnames from 'classnames';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Props as BaseProps } from '~/components';
+import { SIZE as BUTTON_SIZE } from '~/components/button';
+import FilledButton, {
+  Props as FilledButtonProps,
+} from '~/components/button/filled';
+import TextOnButton, {
+  Props as TextOnButtonProps,
+} from '~/components/button/text/on';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import Operation from '~/components/operation';
 import Schema from '~/components/schema';
-import { useEliminate } from '~/components/schema/hooks/index';
-import { Endpoint } from '~/types/index';
+import { useEliminate } from '~/components/schema/hooks';
+import { COLOR_SYSTEM, Endpoint } from '~/types/index';
 import {
   Document,
   Request,
@@ -50,73 +57,55 @@ const _Request: React.FC<Props> = ({
   });
   const { ref, execute } = useEliminate();
   const _handleSubmit = useMemo(
-    function () {
-      return handleSubmit(function (data) {
+    () =>
+      handleSubmit((data) => {
         execute(data);
         onSubmit(data as RequestValue);
-      });
-    },
+      }),
     [handleSubmit, onSubmit, execute]
   );
 
   // Common head open status.
   const [isCommonHeadOpened, setIsCommonHeadOpened] = useState<boolean>(true);
-  const handleCommonHeadOpenerClick = useCallback(
-    function (e: React.MouseEvent<HTMLButtonElement>) {
-      e.preventDefault();
-      setIsCommonHeadOpened(!isCommonHeadOpened);
-    },
-    [isCommonHeadOpened]
-  );
+  const handleCommonHeadOpenerClick = useCallback<
+    TextOnButtonProps['onClick']
+  >(() => {
+    setIsCommonHeadOpened((currVal) => !currVal);
+  }, []);
+
+  const handleSubmitClick = useCallback<FilledButtonProps['onClick']>(() => {
+    // Do nothing.
+  }, []);
 
   return (
     <div className={classnames('text-xxs', className)}>
       <form className="h-full flex flex-col" onSubmit={_handleSubmit}>
         {/* Custom Head */}
         {renderHead && (
-          <div
-            className={classnames(
-              'flex-none p-2 border-b-2',
-              `border-thm-on-${on}-faint`
-            )}
-          >
+          <div className={`flex-none p-2 border-b-2 border-thm-on-${on}-faint`}>
             {renderHead()}
           </div>
         )}
         {/* Common Head */}
         <div
-          className={classnames(
-            'flex-none flex gap-2 border-b-2',
-            `text-thm-on-${on} border-thm-on-${on}-faint`
-          )}
+          className={`flex-none flex gap-2 border-b-2 p-2 text-thm-on-${on} border-thm-on-${on}-faint`}
         >
-          <div className={classnames('flex-none p-2', `bg-on-thm-${on}-faint`)}>
+          <div className={`flex-none bg-on-thm-${on}-faint`}>
             <div className="flex items-center h-[22px]">
-              <button
-                type="button"
-                className="text-sm"
+              <TextOnButton
+                on={on}
+                Icon={isCommonHeadOpened ? ChevronDownIcon : ChevronRightIcon}
                 onClick={handleCommonHeadOpenerClick}
-              >
-                {isCommonHeadOpened ? (
-                  <ChevronDownIcon className="w-em" />
-                ) : (
-                  <ChevronRightIcon className="w-em" />
-                )}
-              </button>
+              />
             </div>
           </div>
-          <div className="flex-1 p-2">
+          <div className="flex-1">
             <div className="flex items-center gap-2 text-sm">
               <div>{request.method.toUpperCase()}</div>
               <div>{request.path}</div>
             </div>
             {isCommonHeadOpened && (
-              <div
-                className={classnames(
-                  'pt-2 mt-2 border-t',
-                  `border-thm-on-${on}-faint`
-                )}
-              >
+              <div className={`pt-2 mt-2 border-t border-thm-on-${on}-faint`}>
                 <Operation
                   on={on}
                   document={document}
@@ -200,14 +189,15 @@ const _Request: React.FC<Props> = ({
         </div>
         {/* Tail */}
         <div
-          className={classnames(
-            'flex-none p-2 border-t-2',
-            `border-thm-on-${on}-faint`
-          )}
+          className={`flex-none p-2 border-t-2 border-thm-on-${on}-faint flex justify-start gap-2`}
         >
-          <button className="w-full" type="submit">
-            submit
-          </button>
+          <FilledButton
+            type="submit"
+            cs={COLOR_SYSTEM.PRIMARY}
+            size={BUTTON_SIZE.BASE}
+            label="Submit"
+            onClick={handleSubmitClick}
+          />
         </div>
       </form>
     </div>

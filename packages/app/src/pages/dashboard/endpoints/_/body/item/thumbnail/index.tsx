@@ -13,7 +13,7 @@ const Thumbnail: React.FC<Props> = ({ endpoint, document }) => {
       return (
         <div className="h-full p-2 flex items-center">
           <Logo
-            left="text-thm-on-background-medium"
+            left="text-thm-on-background"
             right="text-thm-on-background-low"
           />
         </div>

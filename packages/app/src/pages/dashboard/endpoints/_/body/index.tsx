@@ -67,7 +67,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
                 onClick={handleAddClick}
               />
             </div>
-            {listByGroup.length && (
+            {!!listByGroup.length && (
               <ul className="">
                 {listByGroup.map((item) => (
                   <li
@@ -79,7 +79,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
                 ))}
               </ul>
             )}
-            {listUngrouped.length && (
+            {!!listUngrouped.length && (
               <ul className="mt-2">
                 {listUngrouped.map((item) => (
                   <li
@@ -107,18 +107,21 @@ type GroupProps = {
   list: Endpoint[];
 };
 const Group: React.FC<GroupProps> = ({ group, list }) => {
-  const [isOpened, setIsOpened] = useState<boolean>(false);
+  const [isOpened, setIsOpened] = useState<boolean>(!!list.length);
   const handleToggleClick = useCallback<TextButtonProps['onClick']>(() => {
+    if (!list.length) {
+      return;
+    }
     setIsOpened((currVal) => !currVal);
-  }, []);
+  }, [list]);
 
   return (
-    <div className="">
+    <div className="border-l-4 border-thm-primary">
       {/* Head */}
-      <div className="pl-2 flex items-center gap-2">
+      <div className="pl-2 flex items-center gap-2 border-l-4 border-thm-primary">
         <TextButton
           on={COLOR_SYSTEM.SURFACE}
-          label={group.name}
+          label={`${group.name}(${list.length})`}
           Icon={isOpened ? CollectionSolidIcon : CollectionOutlineIcon}
           onClick={handleToggleClick}
         />
@@ -134,20 +137,16 @@ const Group: React.FC<GroupProps> = ({ group, list }) => {
           hidden: !isOpened,
         })}
       >
-        {!!list.length ? (
-          <ul>
-            {list.map((item) => (
-              <li
-                key={item.id}
-                className="border-b border-dashed border-thm-on-background-faint pb-2 mb-2 last:border-none last:mb-0 last:pb-0"
-              >
-                <Item endpoint={item} />
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>TODO: Empty</p>
-        )}
+        <ul>
+          {list.map((item) => (
+            <li
+              key={item.id}
+              className="border-b border-dashed border-thm-on-background-faint pb-2 mb-2 last:border-none last:mb-0 last:pb-0"
+            >
+              <Item endpoint={item} />
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

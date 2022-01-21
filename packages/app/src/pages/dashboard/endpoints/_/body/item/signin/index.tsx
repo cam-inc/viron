@@ -5,7 +5,7 @@ import FilledButton, {
 } from '~/components/button/filled';
 import Error from '~/components/error/';
 import LoginIcon from '~/components/icon/login/outline';
-import Request, { Props as RequestProps } from '~/components/request';
+import Request from '~/components/request';
 import { BaseError } from '~/errors';
 import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
 import Drawer, { useDrawer } from '~/portals/drawer';
@@ -95,15 +95,6 @@ const OAuth: React.FC<{
     [signinOAuth]
   );
 
-  const renderHead = useCallback<NonNullable<RequestProps['renderHead']>>(
-    () => (
-      <div className="flex items-center text-thm-on-surface">
-        <div className="text-xs">OAuth</div>
-      </div>
-    ),
-    []
-  );
-
   if (signinOAuth.error) {
     return <Error on={COLOR_SYSTEM.BACKGROUND} error={signinOAuth.error} />;
   }
@@ -117,7 +108,6 @@ const OAuth: React.FC<{
       defaultValues={signinOAuth.defaultValues}
       request={signinOAuth.request}
       onSubmit={handleSubmit}
-      renderHead={renderHead}
     />
   );
 };
@@ -149,15 +139,6 @@ const Email: React.FC<{
     [endpoint, navigate, signinEmail, errorModal]
   );
 
-  const renderHead = useCallback<NonNullable<RequestProps['renderHead']>>(
-    () => (
-      <div className="flex items-center text-thm-on-surface">
-        <div className="text-xs">Email</div>
-      </div>
-    ),
-    []
-  );
-
   if (signinEmail.error) {
     return <Error on={COLOR_SYSTEM.BACKGROUND} error={signinEmail.error} />;
   }
@@ -172,7 +153,6 @@ const Email: React.FC<{
         request={signinEmail.request}
         onSubmit={handleSubmit}
         className="h-full"
-        renderHead={renderHead}
       />
       <Modal {...errorModal.bind}>
         {error && <Error on={COLOR_SYSTEM.SURFACE} error={error} />}

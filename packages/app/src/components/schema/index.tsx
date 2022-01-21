@@ -4,7 +4,7 @@ import { Props as BaseProps } from '~/components';
 import { Endpoint } from '~/types';
 import { Document, Schema } from '~/types/oas';
 import { useActive, UseEliminateReturn } from './hooks/index';
-import Container from './parts/container';
+import Container, { Props as ContainerProps } from './parts/container';
 import SchemaOfTypeArray from './types/array';
 import SchemaOfTypeBoolean from './types/boolean';
 import SchemaOfTypeInteger from './types/integer';
@@ -12,26 +12,28 @@ import SchemaOfTypeNumber from './types/number';
 import SchemaOfTypeString from './types/string';
 import SchemaOfTypeObject from './types/object';
 
-export type Props = BaseProps & {
-  endpoint: Endpoint;
-  document: Document;
-  name: string;
-  schema: Schema;
-  register: UseFormReturn['register'];
-  unregister: UseFormReturn['unregister'];
-  control: UseFormReturn['control'];
-  watch: UseFormReturn['watch'];
-  formState: UseFormReturn['formState'];
-  getValues: UseFormReturn['getValues'];
-  setValue: UseFormReturn['setValue'];
-  setError: UseFormReturn['setError'];
-  clearErrors: UseFormReturn['clearErrors'];
-  required: boolean;
-  isDeepActive: boolean;
-  activeRef: UseEliminateReturn['ref'];
-};
+export type Props = BaseProps &
+  Pick<ContainerProps, 'renderHeadItem'> & {
+    endpoint: Endpoint;
+    document: Document;
+    name: string;
+    schema: Schema;
+    register: UseFormReturn['register'];
+    unregister: UseFormReturn['unregister'];
+    control: UseFormReturn['control'];
+    watch: UseFormReturn['watch'];
+    formState: UseFormReturn['formState'];
+    getValues: UseFormReturn['getValues'];
+    setValue: UseFormReturn['setValue'];
+    setError: UseFormReturn['setError'];
+    clearErrors: UseFormReturn['clearErrors'];
+    required: boolean;
+    isDeepActive: boolean;
+    activeRef: UseEliminateReturn['ref'];
+  };
 const _Schema: React.FC<Props> = ({
   on,
+  renderHeadItem,
   endpoint,
   document,
   name,
@@ -87,6 +89,7 @@ const _Schema: React.FC<Props> = ({
       inactivate={inactivate}
       switchActive={switchActive}
       required={required}
+      renderHeadItem={renderHeadItem}
     >
       <Component
         endpoint={endpoint}

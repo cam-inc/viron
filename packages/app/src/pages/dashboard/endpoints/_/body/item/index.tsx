@@ -88,11 +88,7 @@ const Item: React.FC<Props> = ({ endpoint }) => {
     );
   }, [endpoint, error, isPending, document, authentication]);
 
-  return (
-    <div className="p-2 border-l-4 border-thm-secondary hover:bg-thm-on-background-faint">
-      {content}
-    </div>
-  );
+  return <div className="p-2 hover:bg-thm-on-background-faint">{content}</div>;
 };
 export default Item;
 
@@ -142,11 +138,11 @@ const _Item: React.FC<{
           <Thumbnail endpoint={endpoint} document={document || undefined} />
         </div>
         <div className="flex-1">
-          <div className="text-thm-on-background-low text-xs">
+          <div className="text-thm-on-background-low text-xxs">
             {endpoint.id}
           </div>
           <div className="text-thm-on-background text-sm font-bold">
-            {document?.info.title || '---'}
+            {document?.info.title || authentication.oas.info.title || '---'}
           </div>
           <div className="text-thm-on-background-low text-xxs">
             {endpoint.url}

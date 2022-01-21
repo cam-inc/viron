@@ -11,8 +11,7 @@ const Info: React.FC<Props> = ({ on, schema, className = '' }) => {
   return (
     <div
       className={classnames(
-        'p-1 text-xxs',
-        `bg-thm-on-${on}-faint text-thm-on-${on}`,
+        `p-1 text-xxs bg-thm-on-${on}-faint text-thm-on-${on}`,
         className
       )}
     >

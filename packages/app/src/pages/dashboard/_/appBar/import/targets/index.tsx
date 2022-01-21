@@ -75,7 +75,7 @@ const Target: React.FC<{
   }, [isPending, isDone, connect, addEndpoint, endpoint]);
 
   return (
-    <div className="flex items-center gap-4 border-l-4 border-thm-on-surface-slight pl-4">
+    <div className="flex items-center gap-4 border-l-4 border-thm-primary pl-4">
       <div className="flex-1 flex flex-col gap-1">
         <div className="text-sm text-thm-on-surface">{endpoint.id}</div>
         <div className="text-xs text-thm-on-surface-low">{endpoint.url}</div>
