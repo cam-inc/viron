@@ -19,7 +19,7 @@ import (
 type (
 	JWT struct {
 		Secret        string
-		Provider      string
+		Provider      func() string
 		ExpirationSec int
 		jwtAuth       *jwtauth.JWTAuth
 	}
@@ -43,7 +43,7 @@ var (
 	log logging.Logger
 )
 
-func SetUp(secret string, provider string, expiration int) error {
+func SetUp(secret string, provider func() string, expiration int) error {
 	jwt = &JWT{
 		Secret:        secret,
 		Provider:      provider,
@@ -58,8 +58,8 @@ func Sign(subject string) (string, error) {
 	claim := map[string]interface{}{
 		"nbf": 0,
 		"sub": subject,
-		"iss": jwt.Provider,
-		"aud": []string{jwt.Provider},
+		"iss": jwt.Provider(),
+		"aud": []string{jwt.Provider()},
 	}
 	jwtauth.SetExpiryIn(claim, time.Duration(jwt.ExpirationSec)*time.Second)
 	jwtauth.SetIssuedNow(claim)
