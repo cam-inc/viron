@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"context"
+	"net/http"
 	"strings"
 	"time"
 
@@ -43,7 +43,7 @@ func GetGoogleOAuth2AuthorizationUrl(redirectUrl string, state string) (string, 
 	return url, nil
 }
 
-func SigninGoogleOAuth2(code string, redirectUrl string, ctx context.Context) (string, *errors.VironError) {
+func SigninGoogleOAuth2(code string, redirectUrl string, r *http.Request) (string, *errors.VironError) {
 	cfn := getGoogleOAuth2Config(redirectUrl, googleOAuth2Config)
 	oauth2Token, err := cfn.Exchange(oauth2.NoContext, code)
 	if err != nil {
@@ -51,6 +51,7 @@ func SigninGoogleOAuth2(code string, redirectUrl string, ctx context.Context) (s
 		return "", errors.SigninFailed
 	}
 
+	ctx := r.Context()
 	oauth2Service, err := oauthv2.New(cfn.Client(ctx, oauth2Token))
 	if err != nil {
 		log.Errorf("oauthv2.New failed -> %v", err)
