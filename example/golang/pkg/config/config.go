@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 
@@ -56,9 +57,9 @@ type (
 		AllowOrigins []string `yaml:"allowOrigins"`
 	}
 	JWT struct {
-		Secret        string `yaml:"secret"`
-		Provider      string `yaml:"provider"`
-		ExpirationSec int    `yaml:"expirationSec"`
+		Secret        string                                          `yaml:"secret"`
+		Provider      func(r *http.Request) (string, []string, error) `yaml:"provider"`
+		ExpirationSec int                                             `yaml:"expirationSec"`
 	}
 	Auth struct {
 		JWT          *JWT
@@ -94,12 +95,15 @@ func New() *Config {
 	if os.Getenv(pkgConstant.ENV_STORE_MODE) == string(StoreModeMySQL) {
 		mode = StoreModeMySQL
 	}
+	provider := func(r *http.Request) (string, []string, error) {
+		return "viron_example", []string{"viron_example"}, nil
+	}
 	// TODO: yaml -> statik で環境別設定
 	return &Config{
 		Auth: &Auth{
 			JWT: &JWT{
 				Secret:        "xxxxxxxxxxxxxxxxxxxx",
-				Provider:      "viron_example",
+				Provider:      provider,
 				ExpirationSec: 24 * 60 * 60,
 			},
 			GoogleOAuth2: &pkgConfig.GoogleOAuth2{

@@ -117,6 +117,27 @@ func InjectAPIDefinition(apiDef *openapi3.T) func(http.HandlerFunc) http.Handler
 	}
 }
 
+func InjectAPIACL(apiDef *openapi3.T) func(http.HandlerFunc) http.HandlerFunc {
+	return func(handlerFunc http.HandlerFunc) http.HandlerFunc {
+		fn := func(w http.ResponseWriter, r *http.Request) {
+			fmt.Println("InjectAPIACL")
+			ctx := r.Context()
+			ctxUser := ctx.Value(constant.CTX_KEY_ADMINUSER)
+			user, exists := ctxUser.(*domains.AdminUser)
+			if !exists {
+				helpers.SendError(w, http.StatusInternalServerError, fmt.Errorf("adminuser notfound"))
+				return
+			}
+			if !domains.ACLAllow(r.Method, r.RequestURI, user.RoleIDs, apiDef) {
+				helpers.SendError(w, http.StatusForbidden, fmt.Errorf("adminuser not permission"))
+				return
+			}
+			handlerFunc.ServeHTTP(w, r.WithContext(ctx))
+		}
+		return fn
+	}
+}
+
 func InjectConfig(cfg *config.Config) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
