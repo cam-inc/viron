@@ -91,7 +91,7 @@ func (a *authObj) SigninEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := auth.SigninEmail(ctx, string(signinEmail.Email), signinEmail.Password)
+	token, err := auth.SigninEmail(r, string(signinEmail.Email), signinEmail.Password)
 	if err != nil {
 		a.log.Errorf("%v", err)
 		helpers.SendError(w, err.StatusCode(), err)
