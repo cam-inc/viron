@@ -1,6 +1,6 @@
 import { FindOptions, Sequelize, WhereOptions } from 'sequelize';
 import { domainsAuth } from '../../domains';
-import { RevokedTokenModelCtor } from '../../infrastructures/mysql/models/revokedtokens';
+import { RevokedTokenModelStatic } from '../../infrastructures/mysql/models/revokedtokens';
 import { repositoryContainer } from '..';
 import {
   getMysqlFindOptions,
@@ -10,9 +10,9 @@ import {
   normalizeMysqlFilterQuery,
 } from '../../helpers';
 
-const getModel = (): RevokedTokenModelCtor => {
+const getModel = (): RevokedTokenModelStatic => {
   const conn = repositoryContainer.conn as Sequelize;
-  return conn.models.revokedtokens as RevokedTokenModelCtor;
+  return conn.models.revokedtokens as RevokedTokenModelStatic;
 };
 
 export const findOneById = async (

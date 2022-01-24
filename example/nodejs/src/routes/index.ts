@@ -6,6 +6,7 @@ import { routeArticles } from './articles';
 import { routeAuditlogs } from './auditlogs';
 import { routeAuth } from './auth';
 import { routeAuthconfigs } from './authconfigs';
+import { routeItems } from './items';
 import { routeMedias } from './medias';
 import { routeOas } from './oas';
 import { routePing } from './ping';
@@ -20,6 +21,7 @@ const routes: Route[] = [
   routePurchases,
   routeResources,
   routeArticles,
+  routeItems,
   routeMedias,
   routeAdminAccounts,
   routeAdminRoles,

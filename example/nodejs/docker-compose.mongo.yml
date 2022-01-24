@@ -1,4 +1,3 @@
-
 version: '3.8'
 
 services:
@@ -33,3 +32,4 @@ services:
       default:
         aliases:
           - viron.example.nodejs
+    command: mongod --auth --bind_ip_all --profile=2 --slowms=1

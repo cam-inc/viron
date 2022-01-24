@@ -2,8 +2,8 @@ import {
   Model,
   Sequelize,
   DataTypes,
-  ModelCtor,
   ModelAttributes,
+  ModelStatic,
 } from 'sequelize';
 import { Purchase, PurchaseCreateAttributes } from '../../../domains/purchase';
 
@@ -44,16 +44,18 @@ const schemaDefinition: ModelAttributes<PurchaseModel, Purchase> = {
 
 export class PurchaseModel extends Model<Purchase, PurchaseCreateAttributes> {
   id!: number;
-  name!: string;
-  nickName!: string;
+  userId!: string;
+  itemId!: string;
+  amount!: number;
+  unitPrice!: number;
   // timestamps!
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
 
-export type PurchaseModelCtor = ModelCtor<PurchaseModel>;
+export type PurchaseModelStatic = ModelStatic<PurchaseModel>;
 
-export const createModel = (s: Sequelize): PurchaseModelCtor => {
+export const createModel = (s: Sequelize): PurchaseModelStatic => {
   return s.define(name, schemaDefinition, {
     timestamps: true,
     deletedAt: false,

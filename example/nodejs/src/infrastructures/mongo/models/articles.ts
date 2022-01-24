@@ -1,5 +1,9 @@
-import { Document, Model, Schema, SchemaDefinition } from 'mongoose';
+import { mongo } from '@viron/lib';
 import { Article } from '../../../domains/article';
+type Document = mongo.mongoose.Document;
+type Model<T> = mongo.mongoose.Model<T>;
+type SchemaDefinition = mongo.mongoose.SchemaDefinition;
+const Schema = mongo.mongoose.Schema;
 
 export const name = 'articles';
 
@@ -10,34 +14,46 @@ const bodyItemSchema: SchemaDefinition = {
   textArea: {
     type: Schema.Types.String,
   },
-  headingTextArea: new Schema({
-    level: {
-      type: Schema.Types.String,
+  headingTextArea: new Schema(
+    {
+      level: {
+        type: Schema.Types.String,
+      },
+      text: {
+        type: Schema.Types.String,
+      },
     },
-    text: {
-      type: Schema.Types.String,
+    { _id: false }
+  ),
+  textButtonArea: new Schema(
+    {
+      text: {
+        type: Schema.Types.String,
+      },
+      link: {
+        type: Schema.Types.String,
+      },
     },
-  }),
-  textButtonArea: new Schema({
-    text: {
-      type: Schema.Types.String,
+    { _id: false }
+  ),
+  relatedArticleArea: new Schema(
+    {
+      relatedArticles: [
+        new Schema(
+          {
+            text: {
+              type: Schema.Types.String,
+            },
+            link: {
+              type: Schema.Types.String,
+            },
+          },
+          { _id: false }
+        ),
+      ],
     },
-    link: {
-      type: Schema.Types.String,
-    },
-  }),
-  relatedArticleArea: new Schema({
-    relatedArticles: [
-      new Schema({
-        text: {
-          type: Schema.Types.String,
-        },
-        link: {
-          type: Schema.Types.String,
-        },
-      }),
-    ],
-  }),
+    { _id: false }
+  ),
 };
 
 const schemaDefinition: SchemaDefinition = {
@@ -46,7 +62,7 @@ const schemaDefinition: SchemaDefinition = {
     required: true,
   },
   body: {
-    type: [new Schema(bodyItemSchema)],
+    type: [new Schema(bodyItemSchema, { _id: false })],
     required: true,
   },
   createdAt: {

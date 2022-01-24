@@ -1,5 +1,9 @@
-import { Document, Model, Schema, SchemaDefinition } from 'mongoose';
+import { mongo } from '@viron/lib';
 import { Media } from '../../../domains/media';
+type Document = mongo.mongoose.Document;
+type Model<T> = mongo.mongoose.Model<T>;
+type SchemaDefinition = mongo.mongoose.SchemaDefinition;
+const Schema = mongo.mongoose.Schema;
 
 export const name = 'medias';
 

@@ -2,8 +2,8 @@ import {
   Model,
   Sequelize,
   DataTypes,
-  ModelCtor,
   ModelAttributes,
+  ModelStatic,
 } from 'sequelize';
 import {
   AdminUser,
@@ -18,6 +18,9 @@ const schemaDefinition: ModelAttributes<AdminUserModel, AdminUser> = {
     allowNull: false,
     primaryKey: true,
     autoIncrement: true,
+    get() {
+      return `${this.getDataValue('id')}`;
+    },
   },
   email: {
     type: DataTypes.STRING,
@@ -79,15 +82,13 @@ export class AdminUserModel extends Model<
   public readonly updatedAt!: Date;
 }
 
-export type AdminUserModelCtor = ModelCtor<AdminUserModel>;
+export type AdminUserModelStatic = ModelStatic<AdminUserModel>;
 
-export const createModel = (s: Sequelize): ModelCtor<AdminUserModel> => {
-  const Model = s.define<AdminUserModel>(name, schemaDefinition, {
+export const createModel = (s: Sequelize): ModelStatic<AdminUserModel> => {
+  return s.define<AdminUserModel>(name, schemaDefinition, {
     timestamps: true,
     deletedAt: false,
     charset: 'utf8',
     indexes: [{ unique: true, fields: ['email'] }],
   });
-
-  return Model;
 };

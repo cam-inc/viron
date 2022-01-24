@@ -2,8 +2,8 @@ import {
   Model,
   Sequelize,
   DataTypes,
-  ModelCtor,
   ModelAttributes,
+  ModelStatic,
 } from 'sequelize';
 import {
   RevokedToken,
@@ -18,6 +18,9 @@ const schemaDefinition: ModelAttributes<RevokedTokenModel, RevokedToken> = {
     allowNull: false,
     primaryKey: true,
     autoIncrement: true,
+    get() {
+      return `${this.getDataValue('id')}`;
+    },
   },
   token: {
     type: DataTypes.STRING(1024),
@@ -47,9 +50,9 @@ export class RevokedTokenModel extends Model<
   public readonly updatedAt!: Date;
 }
 
-export type RevokedTokenModelCtor = ModelCtor<RevokedTokenModel>;
+export type RevokedTokenModelStatic = ModelStatic<RevokedTokenModel>;
 
-export const createModel = (s: Sequelize): ModelCtor<RevokedTokenModel> => {
+export const createModel = (s: Sequelize): ModelStatic<RevokedTokenModel> => {
   return s.define(name, schemaDefinition, {
     timestamps: true,
     deletedAt: false,
