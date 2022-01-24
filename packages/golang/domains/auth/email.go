@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"context"
+	"net/http"
 
 	"github.com/cam-inc/viron/packages/golang/helpers"
 
@@ -12,7 +12,8 @@ import (
 )
 
 // SigninEmail Emailアドレスでサインイン
-func SigninEmail(ctx context.Context, email string, password string) (string, *errors.VironError) {
+func SigninEmail(r *http.Request, email string, password string) (string, *errors.VironError) {
+	ctx := r.Context()
 	user := domains.FindByEmail(ctx, email)
 	log.Debugf("user(%s)", email)
 	if user == nil {
@@ -36,7 +37,7 @@ func SigninEmail(ctx context.Context, email string, password string) (string, *e
 		return "", errors.SigninFailed
 	}
 
-	token, err := Sign(user.ID)
+	token, err := Sign(r, user.ID)
 	if err != nil {
 		log.Error("SigninEmail sign failed %#v \n", err)
 		return "", errors.SigninFailed
