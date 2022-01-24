@@ -1,4 +1,5 @@
-import { sign, verify } from 'jsonwebtoken';
+import http from 'http';
+import { JwtPayload, sign, verify } from 'jsonwebtoken';
 import {
   AUTH_SCHEME,
   DEFAULT_JWT_EXPIRATION_SEC,
@@ -10,9 +11,14 @@ import { isSignedout } from './signout';
 
 const debug = getDebug('domains:auth:jwt');
 
+export type ProviderFunction = (req?: http.IncomingMessage) => {
+  issuer: string;
+  audience: string[];
+};
+
 export interface JwtConfig {
   secret: string;
-  provider: string;
+  provider: string | ProviderFunction;
   expirationSec?: number;
 }
 
@@ -29,7 +35,7 @@ const regExpAuthScheme = new RegExp(`^${AUTH_SCHEME}$`, 'i');
 
 class Jwt {
   secret!: string;
-  provider!: string;
+  provider!: string | ProviderFunction;
   expirationSec!: number;
 
   constructor(config: JwtConfig) {
@@ -38,17 +44,31 @@ class Jwt {
     this.expirationSec = config.expirationSec ?? DEFAULT_JWT_EXPIRATION_SEC;
   }
 
+  private getIssuerAndAudience(req?: http.IncomingMessage): {
+    issuer: string;
+    audience: string[];
+  } {
+    if (typeof this.provider === 'string') {
+      return {
+        issuer: this.provider,
+        audience: [this.provider],
+      };
+    }
+    return this.provider(req);
+  }
+
   // 署名
-  sign(subject: string): string {
+  sign(subject: string, req?: http.IncomingMessage): string {
     const now = Math.floor(Date.now() / 1000);
+    const { issuer, audience } = this.getIssuerAndAudience(req);
     const token = sign(
       {
         exp: now + this.expirationSec, // 有効期限
         iat: now, // 発行した日時
         nbf: 0, // 有効になる日時
         sub: subject, // ユーザー識別子
-        iss: this.provider, // 発行者
-        aud: this.provider, // 利用者
+        iss: issuer, // 発行者
+        aud: audience, // 利用者
       },
       this.secret,
       {
@@ -59,22 +79,26 @@ class Jwt {
   }
 
   // 検証
-  async verify(token: string): Promise<JwtClaims | null> {
+  async verify(
+    token: string,
+    req?: http.IncomingMessage
+  ): Promise<JwtClaims | null> {
     const [scheme, credentials, ...unexpects] = token.split(' ');
     if (unexpects?.length || !regExpAuthScheme.test(scheme)) {
       return null;
     }
+    const { issuer, audience } = this.getIssuerAndAudience(req);
     return await new Promise((resolve): void => {
       verify(
         credentials,
         this.secret,
         {
           algorithms: [JWT_HASH_ALGORITHM],
-          audience: this.provider,
-          issuer: this.provider,
+          audience,
+          issuer,
+          complete: false,
         },
-        // eslint-disable-next-line @typescript-eslint/ban-types
-        (err: Error | null, decoded: object | undefined): void => {
+        (err: Error | null, decoded?: JwtPayload): void => {
           if (err) {
             debug(err);
             return resolve(null);
@@ -90,24 +114,28 @@ class Jwt {
 let jwt: Jwt | undefined;
 
 // 初期化
-export const initJwt = (config: JwtConfig): Jwt => {
-  if (!jwt) {
+export const initJwt = (config: JwtConfig, force = false): Jwt => {
+  if (!jwt || force) {
     jwt = new Jwt(config);
   }
   return jwt;
 };
 
 // JWT生成
-export const signJwt = (subject: string): string => {
+export const signJwt = (
+  subject: string,
+  req?: http.IncomingMessage
+): string => {
   if (!jwt) {
     throw jwtUninitialized();
   }
-  return jwt.sign(subject);
+  return jwt.sign(subject, req);
 };
 
 // JWT検証
 export const verifyJwt = async (
-  token?: string | null
+  token?: string | null,
+  req?: http.IncomingMessage
 ): Promise<JwtClaims | null> => {
   if (!jwt) {
     throw jwtUninitialized();
@@ -119,5 +147,5 @@ export const verifyJwt = async (
     debug('Already signed out. token: %s', token);
     return null;
   }
-  return await jwt.verify(token);
+  return await jwt.verify(token, req);
 };
