@@ -109,7 +109,7 @@ func SigninGoogleOAuth2(code string, redirectUrl string, r *http.Request) (strin
 		return "", errors.SigninFailed
 	}
 
-	token, err := Sign(user.ID)
+	token, err := Sign(r, user.ID)
 	if err != nil {
 		log.Error("SigninGoogleOAuth2 sign failed %#v \n", err)
 		return "", errors.SigninFailed

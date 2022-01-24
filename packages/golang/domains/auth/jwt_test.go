@@ -11,6 +11,7 @@ import (
 const (
 	secret   = "xxxxxx"
 	provider = "test"
+	clientID = "testClientId"
 )
 
 func init() {
@@ -19,7 +20,7 @@ func init() {
 }
 
 func getProvider(r *http.Request) (string, []string, error) {
-	return provider, []string{provider}, nil
+	return provider, []string{clientID}, nil
 }
 
 func TestAuthJWTSignNormal(t *testing.T) {
@@ -30,11 +31,11 @@ func TestAuthJWTSignNormal(t *testing.T) {
 	fmt.Println(err)
 	fmt.Println(token)
 	sepToken := strings.Split(token, " ")[1]
-	claim, err := Verify(sepToken)
+	claim, err := Verify(r, sepToken)
 	fmt.Println(err)
 	fmt.Printf("claim=%v\n", claim)
 	time.Sleep(10 * time.Second)
-	claim2, err := Verify(sepToken)
+	claim2, err := Verify(r, sepToken)
 	fmt.Println(err)
 	fmt.Printf("claim2=%v\n", claim2)
 }
