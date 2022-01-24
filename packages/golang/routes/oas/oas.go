@@ -42,7 +42,7 @@ func (o *oas) GetOas(w http.ResponseWriter, r *http.Request) {
 		helpers.SendError(w, e.StatusCode(), e)
 		return
 	}
-
+	w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
 	helpers.Send(w, http.StatusOK, clone)
 }
 
