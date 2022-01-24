@@ -155,12 +155,12 @@ func New() http.Handler {
 		BaseRouter: routeRoot,
 		Middlewares: []oas.MiddlewareFunc{
 			InjectAPIDefinition(definition),
-			InjectAPIACL(definition),
 			JWTAuthHandlerFunc(),
 			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
 				AuthenticationFunc: AuthenticationFunc,
 			}),
 			JWTSecurityHandlerFunc(cfg.Auth),
+			InjectAPIACL(definition),
 		},
 	})
 
@@ -169,12 +169,12 @@ func New() http.Handler {
 		BaseRouter: routeRoot,
 		Middlewares: []adminusers.MiddlewareFunc{
 			InjectAPIDefinition(definition),
-			InjectAPIACL(definition),
 			JWTSecurityHandlerFunc(cfg.Auth),
 			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
 				AuthenticationFunc: AuthenticationFunc,
 			}),
 			JWTSecurityHandlerFunc(cfg.Auth),
+			InjectAPIACL(definition),
 		},
 	})
 
@@ -183,12 +183,12 @@ func New() http.Handler {
 		BaseRouter: routeRoot,
 		Middlewares: []adminaccounts.MiddlewareFunc{
 			InjectAPIDefinition(definition),
-			InjectAPIACL(definition),
 			JWTSecurityHandlerFunc(cfg.Auth),
 			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
 				AuthenticationFunc: AuthenticationFunc,
 			}),
 			JWTSecurityHandlerFunc(cfg.Auth),
+			InjectAPIACL(definition),
 		},
 	})
 
@@ -197,12 +197,12 @@ func New() http.Handler {
 		BaseRouter: routeRoot,
 		Middlewares: []adminroles.MiddlewareFunc{
 			InjectAPIDefinition(definition),
-			InjectAPIACL(definition),
 			JWTSecurityHandlerFunc(cfg.Auth),
 			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
 				AuthenticationFunc: AuthenticationFunc,
 			}),
 			JWTSecurityHandlerFunc(cfg.Auth),
+			InjectAPIACL(definition),
 		},
 	})
 
@@ -226,8 +226,8 @@ func New() http.Handler {
 		BaseRouter: routeRoot,
 		Middlewares: []auditlogs.MiddlewareFunc{
 			InjectAPIDefinition(definition),
-			InjectAPIACL(definition),
 			JWTSecurityHandlerFunc(cfg.Auth),
+			InjectAPIACL(definition),
 		},
 	})
 

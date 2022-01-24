@@ -204,7 +204,7 @@ func JWTAuthHandlerFunc() func(http.HandlerFunc) http.HandlerFunc {
 				return
 			}
 			fmt.Println("DEBUG1")
-			claim, err := auth.Verify(token)
+			claim, err := auth.Verify(r, token)
 			if err != nil {
 				fmt.Println(err)
 				handlerFunc.ServeHTTP(w, r.WithContext(ctx))
@@ -240,7 +240,7 @@ func JWTSecurityHandlerFunc(cfg *config.Auth) func(http.HandlerFunc) http.Handle
 				http.Error(w, errors.UnAuthorized.Error(), errors.UnAuthorized.StatusCode())
 				return
 			}
-			claim, err := auth.Verify(token)
+			claim, err := auth.Verify(r, token)
 			if err != nil {
 				fmt.Println(err)
 				w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
@@ -305,7 +305,7 @@ func InjectAuditLog(next http.Handler) http.Handler {
 			}
 
 			if token, err := helpers.GetCookieToken(r); err == nil {
-				if claim, err := auth.Verify(token); err == nil && claim != nil {
+				if claim, err := auth.Verify(r, token); err == nil && claim != nil {
 					userID = claim.Sub
 				}
 			}
