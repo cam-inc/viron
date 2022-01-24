@@ -20,7 +20,7 @@ import (
 type (
 	JWT struct {
 		Secret        string
-		Provider      func(r *http.Request) (string ,[]string, error)
+		Provider      func(r *http.Request) (string, []string, error)
 		ExpirationSec int
 		jwtAuth       *jwtauth.JWTAuth
 	}
@@ -44,7 +44,7 @@ var (
 	log logging.Logger
 )
 
-func SetUp(secret string, provider func(r *http.Request) (string ,[]string, error), expiration int) error {
+func SetUp(secret string, provider func(r *http.Request) (string, []string, error), expiration int) error {
 	jwt = &JWT{
 		Secret:        secret,
 		Provider:      provider,
@@ -76,7 +76,7 @@ func Sign(r *http.Request, subject string) (string, error) {
 	return fmt.Sprintf("%s %s", constant.AUTH_SCHEME, tokenStr), nil
 }
 
-func Verify(token string) (*Claim, error) {
+func Verify(r *http.Request, token string) (*Claim, error) {
 
 	if jwt == nil {
 		return nil, errors.JwtUninitialized
@@ -91,6 +91,17 @@ func Verify(token string) (*Claim, error) {
 		return nil, err
 	}
 
+	iss, aud, err := jwt.Provider(r)
+	if err != nil {
+		return nil, err
+	}
+	if iss != jwtToken.Issuer() {
+		return nil, fmt.Errorf("iss miss match verify iss[%s] jwt iss[%s]", iss, jwtToken.Issuer())
+	}
+	if !checkAudience(aud, jwtToken.Audience()) {
+		return nil, fmt.Errorf("aud miss match verify aud[%s] jwt aud[%s]", aud, jwtToken.Audience())
+	}
+
 	claim := &Claim{
 		Exp: int(jwtToken.Expiration().Unix()),
 		Iat: int(jwtToken.IssuedAt().Unix()),
@@ -101,4 +112,20 @@ func Verify(token string) (*Claim, error) {
 	}
 
 	return claim, nil
+}
+
+func checkAudience(providerAudience []string, jwtAudience []string) bool {
+	// 発行者と依頼者が未設定はtrue
+	if len(providerAudience) == 0 && len(jwtAudience) == 0 {
+		return true
+	}
+	// jwt audience が provider audienceに含まれていればtrue
+	for _, ja := range jwtAudience {
+		for _, pa := range providerAudience {
+			if ja == pa {
+				return true
+			}
+		}
+	}
+	return false
 }
