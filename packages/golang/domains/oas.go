@@ -94,6 +94,37 @@ func GetOas(apiDef *openapi3.T, roleIDs []string) *openapi3.T {
 	return clone
 }
 
+// ACLAllow ロールに沿ったAPIアクセス許可チェック
+func ACLAllow(method, uri string, roleIDs []string, apiDef *openapi3.T) bool {
+
+	log := logging.GetDefaultLogger()
+
+	operationID := findOperationID(uri, method, apiDef)
+	if operationID == "" {
+		log.Debugf("not operationID uri[%+v] method[%+v] roleIDs[%+v] apiDef[%+v]", uri, method, roleIDs, apiDef)
+		return false
+	}
+	resourceID := findResourceID(operationID, apiDef)
+	if resourceID == "" {
+		log.Debugf("not resourceID uri[%+v] method[%+v] roleIDs[%+v] apiDef[%+v]", uri, method, roleIDs, apiDef)
+		return false
+	}
+	pathMethod := findPathMethodByOperationID(operationID, apiDef)
+	if pathMethod == nil {
+		log.Debugf("not pathMethod uri[%+v] method[%+v] roleIDs[%+v] apiDef[%+v]", uri, method, roleIDs, apiDef)
+		return false
+	}
+
+	for _, roleID := range roleIDs {
+		if hasPermissionByResourceID(roleID, resourceID, method2Permissions(pathMethod.method)) {
+			return true
+		}
+	}
+
+	log.Debugf("not permission uri[%+v] method[%+v] roleIDs[%+v] apiDef[%+v]", uri, method, roleIDs, apiDef)
+	return false
+}
+
 // getPathItem uriにヒットするとpathとpathItemをoasから取得する
 func getPathItem(uri string, apiDef *openapi3.T) *openapi3.PathItem {
 	for path, pathItem := range apiDef.Paths {
