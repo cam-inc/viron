@@ -4,9 +4,9 @@ title: Theme
 
 # Theme
 
-This function allows you to switch UI color taste between 24 preset patterns. With this function, you will be confident about which one you are editing by separating documents by color depending on, for example, environmental values: local, development, production, etc.
+This function allows you to switch UI color taste out of 24 preset patterns. With this, you will be confident about which OAS document you are editing by colorizing OAS documents depending on, for example, environmental values: local, development, or production.
 
-Switching between themes is as easy as writing just a single line of code in a document like shown in the code snippet below:
+Switching themes is as easy as writing just a single line of code in an OAS document like shown in the code below:
 
 
 ```json {4}
@@ -20,9 +20,9 @@ Switching between themes is as easy as writing just a single line of code in a d
 
 ## Light and Dark Modes
 
-Each theme contains two modes: **light** and **dark**. Viron automatically detects which to use by referring to the [prefers-color-scheme CSS media feature](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme) and adjusts colors on the screen to match it. For example, if you choose to use the theme of **red**, your screen will be light-reddish with light mode on and dark-reddish with dark mode on; thus, there are 48 patterns offered in total, 24 multiplied by 2.
+Each theme consists of two modes: **light** and **dark**. Viron automatically detects which one to apply by referring to the [prefers-color-scheme CSS media feature](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme) and adjusts colors on the screen to match it. So, for example, if you choose to use a theme of red, your screen will be light-reddish when the light mode is on and dark-reddish when the dark.
 
-Check [this section](./theme#color-system) to see how all the colors in a theme are selected.
+Visit [here](https://viron.plus/theme/) to see how all the colors in a theme look.
 
 ## List of All the Themes
 
@@ -33,28 +33,6 @@ Here is a list of all the 24 themes with their name and hue value.
 :::note
 We thank [Color Namer](https://colornamer.robertcooper.me/) for providing us with cool names!
 :::
-
-## Color System
-
-Viron selects colors for each theme by leveraging [Google Material Design 3 color system](https://m3.material.io/styles/color/overview), using the theme specified in a document as the only single key value for dynamic color detection.
-
-The **primary color** is for prominent UI elements to accentuate and emphasize; Logo, AppBar, or submit buttons, for example. Values of the primary color HSL are a pre-defined hue, a saturation of 75%, and a lightness of 50%.
-- `Primary` is a color used to paint background areas of UI elements.
-- `On-Primary` is a color applied to any content that sits on Primary-colored content.
-- `Primary-Container` is for UI elements that have less emphasis than Primary.
-- `On-Primary-Container` works same as Primary but for Primary-container-colored contents.
-
-The **secondary color** is for less prominent UI elements than Primary. Values of the secondary color HSL are a pre-defined hue, a saturation of 25%, and a lightness of 50%.
-- `Secondary` is a color used to paint background areas of UI elements.
-- `On-Secondary` is a color applied to any content that sits on Secondary-colored content.
-- `Secondary-Container` is for UI elements that have less emphasis than Secondary.
-- `On-Secondary-Container` works same as Secondary but for Secondary-container-colored contents.
-
-The **tertiary color** is for less prominent UI elements than Secondary. Values of the tertiary color HSL are a 180-degree-rotated pre-defined hue, a saturation of 50%, and a lightness of 50%.
-- `Tertiary` is a color used to paint background areas of UI elements.
-- `On-Tertiary` is a color applied to any content that sits on Tertiary-colored content.
-- `Tertiary-Container` is for UI elements that have less emphasis than Tertiary.
-- `On-Tertiary-Container` works same as Tertiary but for Tertiary-container-colored contents.
 
 export const ColorChipTable = () => {
   const list = [
