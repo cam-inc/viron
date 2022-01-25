@@ -90,6 +90,5 @@ export async function register(app: Express, routes: Route[]): Promise<void> {
     apiDefinition = domainsOas.merge(apiDefinition, apiDoc);
   });
   apiDefinition = await domainsOas.dereference(apiDefinition);
-
-  logger.debug('register routes finish. apiDefinition: %o', apiDefinition);
+  logger.debug('Routes registration is completed.');
 }
