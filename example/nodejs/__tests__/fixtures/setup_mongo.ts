@@ -7,9 +7,9 @@ let mongod: MongoMemoryServer;
 
 export async function setupMongo(): Promise<void> {
   // 接続先をmemory-serverに向ける
-  mongod = new MongoMemoryServer();
+  mongod = await MongoMemoryServer.create();
   const config = ctx.config.store.main as MongoConfig;
-  config.openUri = await mongod.getUri();
+  config.openUri = mongod.getUri();
   // 認証不要のため消す
   delete config.connectOptions.user;
   delete config.connectOptions.pass;

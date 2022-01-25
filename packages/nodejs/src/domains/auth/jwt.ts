@@ -98,7 +98,7 @@ class Jwt {
           issuer,
           complete: false,
         },
-        (err: Error | null, decoded?: JwtPayload): void => {
+        (err: Error | null, decoded?: JwtPayload | string): void => {
           if (err) {
             debug(err);
             return resolve(null);
