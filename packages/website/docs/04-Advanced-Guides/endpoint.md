@@ -24,4 +24,39 @@ For Viron to be able to connect to an endpoint, below are requirements your serv
 
 ## How to Customize Appearance on the Dashboard
 
-TODO
+Viron displays endpoints on a screen reading helpful information in an OAS document:
+- the [OAS-defined Info Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#infoObject)
+- the Viron-extended information, such as `x-thumbnail`, `x-tags`, and `x-theme`
+
+Below is a complete example of a fully-decorated endpoint:
+
+```json
+{
+  "openapi": "3.0.2",
+  // OAS-defined Info Object
+  "info": {
+    "title": "Awesome service X - Production",
+    "version": "1.2.3",
+    // A URL to a page for terms of service.
+    "termsOfService": "https://sample.com/path/to/termsOfService",
+    // see: https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#contactObject
+    "contact": {
+      "name": "API Support",
+      // one of url and email is required.
+      "url": "https://sample.com/path/to/contact",
+      "email": "contact@sample.com"
+    },
+    // @see: https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#licenseObject
+    "license": {
+      "name": "License",
+      "url": "https://sample.com/path/to/license",
+    },
+    // Used as a URL to the endpoint icon.
+    "x-thumbnail": "https://sample.com/path/to/thumbnail.png",
+    // Theme of the endpoint.
+    "x-theme": "blue",
+    // An array of string values.
+    "x-tags": ["production", "QA"]
+  }
+}
+```
