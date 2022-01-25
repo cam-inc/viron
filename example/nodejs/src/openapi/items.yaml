@@ -1,0 +1,258 @@
+openapi: 3.0.2
+info:
+  version: 0.0.1
+  title: '@viron/example-nodejs items'
+  description: items api specifications
+  x-pages:
+    - id: item
+      group: 管理画面/マスター
+      title: アイテム
+      description: |
+        # アイテムの管理
+        アイテムの **作成・更新・削除** を行います。
+      contents:
+        - title: アイテム情報
+          type: table
+          operationId: listItems
+          pagination: true
+          resourceId: item
+
+tags:
+  - name: item
+
+paths:
+  /items:
+    get:
+      operationId: listItems
+      tags:
+        - item
+      summary: list items
+      description: アイテム一覧
+      parameters:
+        - $ref: './components.yaml#/components/parameters/PagerSizeQueryParam'
+        - $ref: './components.yaml#/components/parameters/PagerPageQueryParam'
+        - $ref: './components.yaml#/components/parameters/SortQueryParam'
+        - $ref: '#/components/parameters/ItemIdQueryParam'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemListWithPager'
+      security:
+        - jwt: []
+
+    post:
+      operationId: createItem
+      tags:
+        - item
+      summary: create item
+      description: アイテム作成
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemCreatePayload'
+      responses:
+        201:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+      security:
+        - jwt: []
+
+  /items/{itemId}:
+    put:
+      operationId: updateItem
+      tags:
+        - item
+      summary: update item
+      description: アイテム更新
+      parameters:
+        - $ref: '#/components/parameters/ItemIdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItemUpdatePayload'
+      responses:
+        204:
+          description: OK
+      security:
+        - jwt: []
+
+    delete:
+      operationId: removeItem
+      tags:
+        - item
+      summary: remove item
+      description: アイテム削除
+      parameters:
+        - $ref: '#/components/parameters/ItemIdPathParam'
+      responses:
+        204:
+          description: OK
+      security:
+        - jwt: []
+
+components:
+  parameters:
+    ItemIdPathParam:
+      name: itemId
+      in: path
+      schema:
+        type: string
+      required: true
+
+    ItemIdQueryParam:
+      name: itemId
+      in: query
+      schema:
+        type: string
+      required: false
+
+  schemas:
+    ItemListWithPager:
+      allOf:
+        - $ref: './components.yaml#/components/schemas/Pager'
+        - type: object
+          properties:
+            list:
+              $ref: '#/components/schemas/ItemList'
+          required:
+            - list
+
+    ItemList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Item'
+
+    Item:
+      type: object
+      properties:
+        id:
+          description: ID
+          type: string
+        name:
+          description: アイテム名
+          type: string
+        description:
+          description: アイテム説明
+          type: string
+        sellingPrice:
+          description: 販売価格
+          type: integer
+        imageUrl:
+          description: 画像URL
+          type: string
+          format: uri
+        detail:
+          $ref: '#/components/schemas/ItemDetail'
+      required:
+        - id
+        - name
+        - description
+        - sellingPrice
+        - imageUrl
+        - detail
+
+    ItemDetail:
+      oneOf:
+        - $ref: '#/components/schemas/RealGoods'
+        - $ref: '#/components/schemas/DigitalContents'
+
+    RealGoods:
+      title: グッズ
+      type: object
+      properties:
+        type:
+          description: アイテム種別
+          type: string
+          enum:
+            - realGoods
+        productCode:
+          description: 製品コード
+          type: string
+        manufacturer:
+          description: 製造元
+          type: string
+        manufacturingCost:
+          description: 製造原価
+          type: integer
+      required:
+        - type
+        - productCode
+        - manufacturer
+        - manufacturingCost
+
+    DigitalContents:
+      title: デジコン
+      type: object
+      properties:
+        type:
+          description: アイテム種別
+          type: string
+          enum:
+            - digitalContents
+        downloadUrl:
+          description: ダウンロードURL
+          type: string
+          format: uri
+      required:
+        - type
+        - downloadUrl
+
+    ItemCreatePayload:
+      type: object
+      properties:
+        name:
+          description: アイテム名
+          type: string
+        description:
+          description: アイテム説明
+          type: string
+        sellingPrice:
+          description: 販売価格
+          type: integer
+        imageUrl:
+          description: 画像URL
+          type: string
+          format: uri
+        detail:
+          $ref: '#/components/schemas/ItemDetail'
+      required:
+        - name
+        - description
+        - sellingPrice
+        - imageUrl
+        - detail
+
+    ItemUpdatePayload:
+      type: object
+      properties:
+        name:
+          description: アイテム名
+          type: string
+        description:
+          description: アイテム説明
+          type: string
+        sellingPrice:
+          description: 販売価格
+          type: integer
+        imageUrl:
+          description: 画像URL
+          type: string
+          format: uri
+        detail:
+          $ref: '#/components/schemas/ItemDetail'
+      required:
+        - name
+        - description
+        - sellingPrice
+        - imageUrl
+        - detail

@@ -12,10 +12,10 @@ import {
   UserCreateAttributes,
   UserUpdateAttributes,
 } from '../../domains/user';
-import { UserModelCtor } from '../../infrastructures/mysql/models/users';
+import { UserModelStatic } from '../../infrastructures/mysql/models/users';
 
-const getModel = (): UserModelCtor =>
-  ctx.stores.main.models.users as UserModelCtor;
+const getModel = (): UserModelStatic =>
+  ctx.stores.main.models.users as UserModelStatic;
 
 export const findOneById = async (id: string): Promise<User | null> => {
   const model = getModel();

@@ -12,10 +12,10 @@ import {
   PurchaseCreateAttributes,
   PurchaseUpdateAttributes,
 } from '../../domains/purchase';
-import { PurchaseModelCtor } from '../../infrastructures/mysql/models/purchases';
+import { PurchaseModelStatic } from '../../infrastructures/mysql/models/purchases';
 
-const getModel = (): PurchaseModelCtor =>
-  ctx.stores.main.models.purchases as PurchaseModelCtor;
+const getModel = (): PurchaseModelStatic =>
+  ctx.stores.main.models.purchases as PurchaseModelStatic;
 
 export const findOneById = async (id: string): Promise<Purchase | null> => {
   const model = getModel();

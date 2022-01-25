@@ -2,8 +2,8 @@ import {
   Model,
   Sequelize,
   DataTypes,
-  ModelCtor,
   ModelAttributes,
+  ModelStatic,
 } from 'sequelize';
 import { Media, MediaCreateAttributes } from '../../../domains/media';
 
@@ -48,9 +48,9 @@ export class MediaModel extends Model<Media, MediaCreateAttributes> {
   public readonly updatedAt!: Date;
 }
 
-export type MediaModelCtor = ModelCtor<MediaModel>;
+export type MediaModelStatic = ModelStatic<MediaModel>;
 
-export const createModel = (s: Sequelize): MediaModelCtor => {
+export const createModel = (s: Sequelize): MediaModelStatic => {
   return s.define(name, schemaDefinition, {
     timestamps: true,
     deletedAt: false,

@@ -1,5 +1,5 @@
 import { FindOptions, Op, Sequelize, WhereOptions } from 'sequelize';
-import { AdminUserModelCtor } from '../../infrastructures/mysql/models/adminusers';
+import { AdminUserModelStatic } from '../../infrastructures/mysql/models/adminusers';
 import { domainsAdminUser } from '../../domains';
 import {
   getMysqlFindOptions,
@@ -14,9 +14,9 @@ type WhereOptionsWithUserIds = WhereOptions<domainsAdminUser.AdminUser> & {
   userIds?: string[];
 };
 
-const getModel = (): AdminUserModelCtor => {
+const getModel = (): AdminUserModelStatic => {
   const conn = repositoryContainer.conn as Sequelize;
-  return conn.models.adminusers as AdminUserModelCtor;
+  return conn.models.adminusers as AdminUserModelStatic;
 };
 
 const convertConditions = (

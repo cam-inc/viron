@@ -22,95 +22,11 @@ info:
                 resourceName: users
                 format: csv
           resourceId: user
-        - title: ユーザー情報2
-          type: table
-          operationId: listUsers2
-          pagination: true
-          resourceId: user
 
 tags:
   - name: user
 
 paths:
-  /user:
-    get:
-      operationId: listUsers2
-      tags:
-        - user
-      summary: list users
-      description: ユーザー一覧
-      parameters:
-        - $ref: './components.yaml#/components/parameters/PagerSizeQueryParam'
-        - $ref: './components.yaml#/components/parameters/PagerPageQueryParam'
-        - $ref: './components.yaml#/components/parameters/SortQueryParam'
-        - $ref: '#/components/parameters/UserIdQueryParam'
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserListWithPager'
-      security:
-        - jwt: []
-
-    post:
-      operationId: createUser2
-      tags:
-        - user
-      summary: create user
-      description: ユーザー作成
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserCreatePayload'
-      responses:
-        201:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-      security:
-        - jwt: []
-
-  /user/{userId}:
-    put:
-      operationId: updateUser2
-      tags:
-        - user
-      summary: update user
-      description: ユーザー更新
-      parameters:
-        - $ref: '#/components/parameters/UserIdPathParam'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserUpdatePayload'
-      responses:
-        204:
-          description: OK
-      security:
-        - jwt: []
-
-    delete:
-      operationId: removeUser2
-      tags:
-        - user
-      summary: remove user
-      description: ユーザー削除
-      parameters:
-        - $ref: '#/components/parameters/UserIdPathParam'
-      responses:
-        204:
-          description: OK
-      security:
-        - jwt: []
-
   /users:
     get:
       operationId: listUsers
