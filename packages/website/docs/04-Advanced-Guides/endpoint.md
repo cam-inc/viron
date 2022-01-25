@@ -21,3 +21,7 @@ For Viron to be able to connect to an endpoint, below are requirements your serv
 - The server should use HTTPS protocol for secure communication over a computer network.
 - The server should be accessible publically. However, if it being accessible is not your option, visit [here](./self-hosting) to learn how to make it private.
 - If the endpoint is private, it should provide Viron with ways to authenticate. [Here](./authentication) is the documentation for how to do so.
+
+## How to Customize Appearance on the Dashboard
+
+TODO
