@@ -1,24 +1,16 @@
 ---
-title: Auto refresh
+title: Auto-Refresh
 ---
 
-自動更新機能について。
+This function enables a content to re-fetch periodically with an interval of seconds you have specified. One possible use case would be to display the latest number of DAU.
 
 ```json
+// Content Object
 {
-  openapi: '3.0.2',
-  info: {
-    'x-pages': [
-      {
-        id: string;
-        contents: [
-          {
-            operationId: OpeartionId;
-            autoRefreshSec: number; // ここに自動更新機能のインターバル秒数を！
-          }
-        ]
-      }
-    ]
-  },
+  "title": "DAU",
+  "type": "number",
+  "operationId": "fetchDau",
+  // Specify here
+  "autoRefreshSec": 60
 }
 ```
