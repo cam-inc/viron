@@ -21,7 +21,7 @@ const useAutoRefresh = (
     if (enabled) {
       intervalId = globalThis.setInterval(() => {
         refresh();
-      }, intervalSec);
+      }, intervalSec * 1000);
     }
     return cleanup;
   }, [enabled, intervalSec, refresh]);
