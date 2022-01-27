@@ -150,7 +150,6 @@ components:
             - read
             - write
             - all
-            - delete
             - deny
       required:
         - resourceId

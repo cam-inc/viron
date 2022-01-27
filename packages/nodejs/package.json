@@ -1,6 +1,6 @@
 {
   "name": "@viron/lib",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "scripts": {
     "build": "npm run clean && tsc --project tsconfig.json && cp -fr src/openapi dist/",
     "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
@@ -71,5 +71,6 @@
       "prettier --write --loglevel warn",
       "eslint"
     ]
-  }
+  },
+  "license": "MIT"
 }
