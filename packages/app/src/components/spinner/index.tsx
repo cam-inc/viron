@@ -1,12 +1,8 @@
 import classnames from 'classnames';
 import React from 'react';
-import { On } from '$constants/index';
-import { ClassName } from '$types/index';
+import { Props as BaseProps } from '~/components';
 
-export type Props = {
-  on: On;
-  className?: ClassName;
-};
+export type Props = BaseProps;
 const Spinner: React.FC<Props> = ({ on, className = '' }) => {
   const ballClassNames = classnames(
     'absolute w-[40%] h-[40%] transform animate-pulse'
@@ -25,7 +21,10 @@ const Spinner: React.FC<Props> = ({ on, className = '' }) => {
             )}
           >
             <div
-              className={classnames(ballInnerClassNames, `bg-on-${on}-high`)}
+              className={classnames(
+                ballInnerClassNames,
+                `bg-thm-on-${on}-high`
+              )}
             />
           </div>
           <div
@@ -35,7 +34,7 @@ const Spinner: React.FC<Props> = ({ on, className = '' }) => {
             )}
           >
             <div
-              className={classnames(ballInnerClassNames, `bg-on-${on}-medium`)}
+              className={classnames(ballInnerClassNames, `bg-thm-on-${on}`)}
             />
           </div>
           <div
@@ -45,7 +44,7 @@ const Spinner: React.FC<Props> = ({ on, className = '' }) => {
             )}
           >
             <div
-              className={classnames(ballInnerClassNames, `bg-on-${on}-low`)}
+              className={classnames(ballInnerClassNames, `bg-thm-on-${on}-low`)}
             />
           </div>
           <div
@@ -55,7 +54,10 @@ const Spinner: React.FC<Props> = ({ on, className = '' }) => {
             )}
           >
             <div
-              className={classnames(ballInnerClassNames, `bg-on-${on}-faint`)}
+              className={classnames(
+                ballInnerClassNames,
+                `bg-thm-on-${on}-faint`
+              )}
             />
           </div>
         </div>

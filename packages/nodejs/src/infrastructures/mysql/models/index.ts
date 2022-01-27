@@ -4,9 +4,9 @@ import * as adminUsers from './adminusers';
 import * as revokedTokens from './revokedtokens';
 
 export interface MysqlModels {
-  [adminUsers.name]: adminUsers.AdminUserModelCtor;
-  [auditLogs.name]: auditLogs.AuditLogModelCtor;
-  [revokedTokens.name]: revokedTokens.RevokedTokenModelCtor;
+  [adminUsers.name]: adminUsers.AdminUserModelStatic;
+  [auditLogs.name]: auditLogs.AuditLogModelStatic;
+  [revokedTokens.name]: revokedTokens.RevokedTokenModelStatic;
 }
 
 export const getModels = (s: Sequelize): MysqlModels => {

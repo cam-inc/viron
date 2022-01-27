@@ -1,33 +1,34 @@
-import { BiCaretDownSquare } from '@react-icons/all-files/bi/BiCaretDownSquare';
-import { BiCaretRightSquare } from '@react-icons/all-files/bi/BiCaretRightSquare';
 import classnames from 'classnames';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import Button, {
-  SIZE as BUTTON_SIZE,
-  VARIANT as BUTTON_VARIANT,
-} from '$components/button';
-import Operation from '$components/operation';
-import Schema from '$components/schema';
-import { useEliminate } from '$components/schema/hooks/index';
-import { On, ON } from '$constants/index';
-import { ClassName, Endpoint } from '$types/index';
+import { Props as BaseProps } from '~/components';
+import { SIZE as BUTTON_SIZE } from '~/components/button';
+import FilledButton, {
+  Props as FilledButtonProps,
+} from '~/components/button/filled';
+import TextOnButton, {
+  Props as TextOnButtonProps,
+} from '~/components/button/text/on';
+import ChevronDownIcon from '~/components/icon/chevronDown/outline';
+import ChevronRightIcon from '~/components/icon/chevronRight/outline';
+import Operation from '~/components/operation';
+import Schema from '~/components/schema';
+import { useEliminate } from '~/components/schema/hooks';
+import { COLOR_SYSTEM, Endpoint } from '~/types/index';
 import {
   Document,
   Request,
   RequestValue,
   Schema as SchemaType,
-} from '$types/oas';
-import { pickContentType } from '$utils/oas';
+} from '~/types/oas';
+import { pickContentType } from '~/utils/oas';
 
-export type Props = {
-  on: On;
+export type Props = BaseProps & {
   endpoint: Endpoint;
   document: Document;
   request: Request;
   defaultValues?: RequestValue;
   onSubmit: (requestValue: RequestValue) => void;
-  className?: ClassName;
   renderHead?: () => JSX.Element | null;
 };
 const _Request: React.FC<Props> = ({
@@ -56,73 +57,59 @@ const _Request: React.FC<Props> = ({
   });
   const { ref, execute } = useEliminate();
   const _handleSubmit = useMemo(
-    function () {
-      return handleSubmit(function (data) {
+    () =>
+      handleSubmit((data) => {
         execute(data);
         onSubmit(data as RequestValue);
-      });
-    },
+      }),
     [handleSubmit, onSubmit, execute]
   );
 
   // Common head open status.
   const [isCommonHeadOpened, setIsCommonHeadOpened] = useState<boolean>(true);
-  const handleCommonHeadOpenerClick = useCallback(
-    function (e: React.MouseEvent<HTMLButtonElement>) {
-      e.preventDefault();
-      setIsCommonHeadOpened(!isCommonHeadOpened);
-    },
-    [isCommonHeadOpened]
-  );
+  const handleCommonHeadOpenerClick = useCallback<
+    TextOnButtonProps['onClick']
+  >(() => {
+    setIsCommonHeadOpened((currVal) => !currVal);
+  }, []);
+
+  const handleSubmitClick = useCallback<FilledButtonProps['onClick']>(() => {
+    // Do nothing.
+  }, []);
+
+  const handleDebugClick = useCallback<FilledButtonProps['onClick']>(() => {
+    console.log(formState, getValues());
+  }, [formState, getValues]);
 
   return (
     <div className={classnames('text-xxs', className)}>
       <form className="h-full flex flex-col" onSubmit={_handleSubmit}>
         {/* Custom Head */}
         {renderHead && (
-          <div
-            className={classnames(
-              'flex-none p-2 border-b-2',
-              `border-on-${on}-faint`
-            )}
-          >
+          <div className={`flex-none p-2 border-b-2 border-thm-on-${on}-faint`}>
             {renderHead()}
           </div>
         )}
         {/* Common Head */}
         <div
-          className={classnames(
-            'flex-none flex gap-2 border-b-2',
-            `text-on-${on} border-on-${on}-faint`
-          )}
+          className={`flex-none flex gap-2 border-b-2 p-2 text-thm-on-${on} border-thm-on-${on}-faint`}
         >
-          <div className={classnames('flex-none p-2', `bg-on-${on}-faint`)}>
+          <div className={`flex-none bg-on-thm-${on}-faint`}>
             <div className="flex items-center h-[22px]">
-              <button
-                type="button"
-                className="text-sm"
+              <TextOnButton
+                on={on}
+                Icon={isCommonHeadOpened ? ChevronDownIcon : ChevronRightIcon}
                 onClick={handleCommonHeadOpenerClick}
-              >
-                {isCommonHeadOpened ? (
-                  <BiCaretDownSquare />
-                ) : (
-                  <BiCaretRightSquare />
-                )}
-              </button>
+              />
             </div>
           </div>
-          <div className="flex-1 p-2">
+          <div className="flex-1">
             <div className="flex items-center gap-2 text-sm">
               <div>{request.method.toUpperCase()}</div>
               <div>{request.path}</div>
             </div>
             {isCommonHeadOpened && (
-              <div
-                className={classnames(
-                  'pt-2 mt-2 border-t',
-                  `border-on-${on}-faint`
-                )}
-              >
+              <div className={`pt-2 mt-2 border-t border-thm-on-${on}-faint`}>
                 <Operation
                   on={on}
                   document={document}
@@ -206,18 +193,20 @@ const _Request: React.FC<Props> = ({
         </div>
         {/* Tail */}
         <div
-          className={classnames(
-            'flex-none p-2 border-t-2',
-            `border-on-${on}-faint`
-          )}
+          className={`flex-none p-2 border-t-2 border-thm-on-${on}-faint flex justify-start gap-2`}
         >
-          <Button
-            className="w-full"
-            on={ON.SURFACE}
-            variant={BUTTON_VARIANT.PAPER}
-            size={BUTTON_SIZE.LG}
+          <FilledButton
             type="submit"
-            label="submit"
+            cs={COLOR_SYSTEM.PRIMARY}
+            size={BUTTON_SIZE.BASE}
+            label="Submit"
+            onClick={handleSubmitClick}
+          />
+          <FilledButton
+            cs={COLOR_SYSTEM.SECONDARY}
+            size={BUTTON_SIZE.BASE}
+            label="Debug"
+            onClick={handleDebugClick}
           />
         </div>
       </form>

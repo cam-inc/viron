@@ -1,17 +1,16 @@
 import classnames from 'classnames';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { FieldError } from 'react-hook-form';
-import { On } from '$constants/index';
-import { ClassName } from '$types/index';
+import { Props as BaseProps } from '~/components/';
+import { ClassName } from '~/types';
 
 type Bind = {
   type: React.InputHTMLAttributes<HTMLInputElement>['type'];
+  id: string;
   className: ClassName;
   list?: string;
 };
-type Props = {
-  on: On;
-  className?: ClassName;
+type Props = BaseProps & {
   type?: React.InputHTMLAttributes<HTMLInputElement>['type'];
   label?: string;
   description?: string;
@@ -32,19 +31,22 @@ const Textinput: React.FC<Props> = ({
   autocompleteId,
   render,
 }) => {
+  const id = useMemo<string>(() => `text-input-${Math.random()}`, []);
   const bind: Bind = {
     type,
-    className: classnames(
-      'block w-full p-1 border rounded focus:outline-none focus:ring-2',
-      `border-on-${on}-faint bg-${on} text-on-${on} focus:bg-on-${on}-faint focus:text-on-${on}  focus:ring-on-${on}`
-    ),
+    id,
+    className: `block w-full p-1 border rounded border-thm-on-${on}-low bg-thm-${on} text-thm-on-${on} hover:bg-thm-on-${on}-faint focus:outline-none focus:ring-2 focus:ring-thm-on-${on} focus:bg-thm-on-${on}-faint focus:ring-thm-on-${on}`,
   };
   if (autocompleteId) {
     bind.list = autocompleteId;
   }
   return (
-    <div className={classnames(`text-on-${on}`, className)}>
-      {!!label && <div className="text-xs font-bold">{label}</div>}
+    <div className={classnames(`text-thm-on-${on}`, className)}>
+      {label && (
+        <label htmlFor={id} className="text-xs font-bold">
+          {label}
+        </label>
+      )}
       {!!description && <p>{description}</p>}
       {!!error && <p className="text-xxs">{error.message}</p>}
       {render(bind)}

@@ -47,6 +47,8 @@
     "example-nodejs:docker-compose:up:mysql": "docker-compose -f ./docker-compose.example-nodejs.mysql.yml up --build --force-recreate"
   },
   "devDependencies": {
+    "@commitlint/cli": "^16.1.0",
+    "@commitlint/config-conventional": "^16.0.0",
     "husky": "^5.0.6",
     "pinst": "^2.1.1"
   },
@@ -61,5 +63,9 @@
     "node": ">=15.13.0",
     "npm": ">=7.9.0"
   },
-  "private": true
+  "private": true,
+  "volta": {
+    "node": "15.14.0",
+    "npm": "7.9.0"
+  }
 }

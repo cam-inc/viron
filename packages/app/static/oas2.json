@@ -1,0 +1,303 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "version": "0.0.1",
+    "title": "バイナリー情報",
+    "description": "flexible binary api specifications",
+    "x-pages": [
+      {
+        "id": "flexiblebinary",
+        "group": "CamplatSecure/テナント/データ",
+        "title": "バイナリー",
+        "description": "# バイナリーの管理\nバイナリーの **作成・更新・削除** を行います。\n",
+        "contents": [
+          {
+            "title": "バイナリー",
+            "type": "table",
+            "operationId": "listFlexibleBinary",
+            "pagination": true,
+            "resourceId": "flexiblebinary",
+            "defaultParametersValue": {
+              "tenantId": "default"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "tags": [
+    {
+      "name": "flexiblebinary"
+    }
+  ],
+  "paths": {
+    "/types/table": {
+      "get": {
+        "operationId": "listFlexibleBinary",
+        "tags": [
+          "flexiblebinary"
+        ],
+        "summary": "list flexiblebinary",
+        "description": "バイナリー一覧",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SchemaIdQueryParam"
+          },
+          {
+            "$ref": "./components.yaml#/components/parameters/PagerSizeQueryParam"
+          },
+          {
+            "$ref": "./components.yaml#/components/parameters/PagerPageQueryParam"
+          },
+          {
+            "$ref": "./components.yaml#/components/parameters/SortQueryParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "userId": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "page": {
+                      "type": "number"
+                    },
+                    "maxpage": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "createFlexibleBinary",
+        "tags": [
+          "flexiblebinary"
+        ],
+        "summary": "create flexiblebinary",
+        "description": "バイナリー登録",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/FlexibleBinaryCreatePayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ]
+      }
+    },
+    "/flexiblebinary/{identifier}/schemas/{schemaId}/binaries/{binaryId}": {
+      "delete": {
+        "operationId": "removeFlexibleBinary",
+        "tags": [
+          "flexiblebinary"
+        ],
+        "summary": "remove flexiblebinary",
+        "description": "バイナリー削除",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdentifierPathParam"
+          },
+          {
+            "$ref": "#/components/parameters/SchemaIdPathParam"
+          },
+          {
+            "$ref": "#/components/parameters/BinaryIdPathParam"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "jwt": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "SchemaIdQueryParam": {
+        "name": "schemaId",
+        "in": "query",
+        "schema": {
+          "type": "string"
+        },
+        "required": false
+      },
+      "IdentifierPathParam": {
+        "name": "identifier",
+        "in": "path",
+        "schema": {
+          "type": "string"
+        },
+        "required": true
+      },
+      "SchemaIdPathParam": {
+        "name": "schemaId",
+        "in": "path",
+        "schema": {
+          "type": "string"
+        },
+        "required": true
+      },
+      "BinaryIdPathParam": {
+        "name": "binaryId",
+        "in": "path",
+        "schema": {
+          "type": "string"
+        },
+        "required": true
+      }
+    },
+    "schemas": {
+      "FlexibleBinaryListWithPager": {
+        "allOf": [
+          {
+            "$ref": "./components.yaml#/components/schemas/Pager"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "list": {
+                "$ref": "#/components/schemas/FlexibleBinaryList"
+              }
+            },
+            "required": [
+              "list"
+            ]
+          }
+        ]
+      },
+      "FlexibleBinaryList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/FlexibleBinary"
+        }
+      },
+      "FlexibleBinary": {
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "description": "identifier",
+            "type": "string"
+          },
+          "schemaId": {
+            "description": "schema id",
+            "type": "string"
+          },
+          "binaries": {
+            "$ref": "#/components/schemas/Binaries"
+          }
+        },
+        "required": [
+          "identifier",
+          "schemaId",
+          "binaries"
+        ]
+      },
+      "Binaries": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Binary"
+        }
+      },
+      "Binary": {
+        "type": "object",
+        "description": "バイナリー情報",
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/BinaryMeta"
+          },
+          "binaryId": {
+            "type": "string",
+            "example": "menkyo_omote",
+            "description": "バイナリ登録時にしてされたbinaryId"
+          }
+        },
+        "required": [
+          "binaryId"
+        ]
+      },
+      "BinaryMeta": {
+        "type": "string",
+        "description": "- バイナリーのメタ情報",
+        "example": "免許証表"
+      },
+      "FlexibleBinaryCreatePayload": {
+        "description": "バイナリー登録するときのマルチパートフォーム情報",
+        "type": "object",
+        "properties": {
+          "identifier": {
+            "description": "識別子",
+            "type": "string",
+            "example": "ABCDEFG1234567"
+          },
+          "schemaId": {
+            "description": "スキーマID",
+            "type": "string",
+            "example": "dcb2b288-8fa3-4f80-8abc-829ab4aaa744-0"
+          },
+          "binaryId": {
+            "description": "バイナリーID",
+            "type": "string",
+            "example": "menkyoomote"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/BinaryMeta"
+          },
+          "fileName": {
+            "description": "ファイル名",
+            "type": "string",
+            "example": "example.png"
+          },
+          "file": {
+            "description": "ファイル",
+            "type": "string",
+            "format": "binary"
+          }
+        },
+        "required": [
+          "fileName",
+          "file"
+        ]
+      }
+    }
+  }
+}

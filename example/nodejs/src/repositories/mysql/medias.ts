@@ -8,10 +8,10 @@ import {
 } from '@viron/lib';
 import { ctx } from '../../context';
 import { Media, MediaCreateAttributes } from '../../domains/media';
-import { MediaModelCtor } from '../../infrastructures/mysql/models/medias';
+import { MediaModelStatic } from '../../infrastructures/mysql/models/medias';
 
-const getModel = (): MediaModelCtor =>
-  ctx.stores.main.models.medias as MediaModelCtor;
+const getModel = (): MediaModelStatic =>
+  ctx.stores.main.models.medias as MediaModelStatic;
 
 export const findOneById = async (id: string): Promise<Media | null> => {
   const model = getModel();

@@ -1,19 +1,19 @@
 import _ from 'lodash';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FieldError, UseFormReturn } from 'react-hook-form';
-import { ENVIRONMENTAL_VARIABLE } from '$constants/index';
-import { Endpoint } from '$types/index';
-import { Document, Schema } from '$types/oas';
-import { promiseErrorHandler } from '$utils/index';
+import { ENVIRONMENTAL_VARIABLE } from '~/constants';
+import { Endpoint } from '~/types';
+import { Document, Schema, RequestParametersValue } from '~/types/oas';
+import { promiseErrorHandler } from '~/utils';
 import {
+  extractXAutocomplete,
+  extractRequest,
+  replaceWithEnvironmentalVariables,
+  cleanupRequestValue,
   constructRequestInfo,
   constructRequestInit,
   constructRequestPayloads,
-  cleanupRequestValue,
-  getAutocompleteSetting,
-  getRequest,
-  replaceEnvironmentalVariableOfDefaultRequestParametersValue,
-} from '$utils/oas';
+} from '~/utils/oas';
 
 export type UseActiveReturn = {
   isActive: boolean;
@@ -83,17 +83,17 @@ export type UseEliminateReturn = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   execute: (data: { [key in string]: any }) => void;
 };
-export const useEliminate = function (): UseEliminateReturn {
+export const useEliminate = (): UseEliminateReturn => {
   const ref = useRef<{ [key in string]: boolean }>({});
   const execute = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function (data: { [key in string]: any }) {
+    (data: { [key in string]: any }) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const f = function (prefix: string, data: any) {
-        if (_.isObject(data)) {
+      const f = (prefix: string, data: any) => {
+        if (_.isPlainObject(data)) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           data = data as { [key in string]: any };
-          _.forEach(data, function (value, key) {
+          _.forEach(data, (value, key) => {
             const deepKey = !!prefix ? `${prefix}.${key}` : key;
             if (ref.current[deepKey]) {
               f(deepKey, value);
@@ -143,18 +143,18 @@ export const useNameForError = function ({
   schema: Schema;
   name: string;
 }): string {
-  return useMemo<string>(
-    function () {
-      if (schema.type === 'array') {
-        return `${name}_array`;
-      }
-      if (schema.type === 'object') {
-        return `${name}_object`;
-      }
-      return name;
-    },
-    [schema, name]
-  );
+  return useMemo<string>(() => {
+    if (schema.oneOf) {
+      return `${name}_oneOf`;
+    }
+    if (schema.type === 'array') {
+      return `${name}_array`;
+    }
+    if (schema.type === 'object') {
+      return `${name}_object`;
+    }
+    return name;
+  }, [schema, name]);
 };
 
 export type UseAutocompleteReturn<T> = {
@@ -185,31 +185,29 @@ export const useAutocomplete = function <T>(
         setIsEnabled(false);
         return;
       }
-      const getAutocompleteSettingResult = getAutocompleteSetting(
-        document.info
-      );
+      const getAutocompleteSettingResult = extractXAutocomplete(document.info);
       if (getAutocompleteSettingResult.isFailure()) {
         setIsEnabled(false);
         return;
       }
       const autocompleteSetting = getAutocompleteSettingResult.value;
       setIsEnabled(true);
-      const getRequestResult = getRequest(document, {
-        operationId: autocomplete.operationId,
-      });
+      const getRequestResult = extractRequest(
+        document,
+        autocomplete.operationId
+      );
       if (getRequestResult.isFailure()) {
         // TODO: エラー処理。
         return;
       }
       const request = getRequestResult.value;
       const requestValue = cleanupRequestValue(request, {
-        parameters:
-          replaceEnvironmentalVariableOfDefaultRequestParametersValue<T>(
-            autocomplete.defaultParametersValue,
-            {
-              [ENVIRONMENTAL_VARIABLE.AUTOCOMPLETE_VALUE]: payload,
-            }
-          ),
+        parameters: replaceWithEnvironmentalVariables<
+          RequestParametersValue,
+          T
+        >(autocomplete.defaultParametersValue, {
+          [ENVIRONMENTAL_VARIABLE.AUTOCOMPLETE_VALUE]: payload,
+        }),
         requestBody: autocomplete.defaultRequestBodyValue,
       });
       const f = async function () {
@@ -289,9 +287,10 @@ export const useDynamicEnum = function <T>(
         return;
       }
       setIsEnabled(true);
-      const getRequestResult = getRequest(document, {
-        operationId: dynamicEnum.operationId,
-      });
+      const getRequestResult = extractRequest(
+        document,
+        dynamicEnum.operationId
+      );
       if (getRequestResult.isFailure()) {
         // TODO: エラー処理。
         return;

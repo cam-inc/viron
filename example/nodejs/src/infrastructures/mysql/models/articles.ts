@@ -2,8 +2,8 @@ import {
   Model,
   Sequelize,
   DataTypes,
-  ModelCtor,
   ModelAttributes,
+  ModelStatic,
 } from 'sequelize';
 import { Article, ArticleCreateAttributes } from '../../../domains/article';
 
@@ -43,9 +43,9 @@ export class ArticleModel extends Model<Article, ArticleCreateAttributes> {
   public readonly updatedAt!: Date;
 }
 
-export type ArticleModelCtor = ModelCtor<ArticleModel>;
+export type ArticleModelStatic = ModelStatic<ArticleModel>;
 
-export const createModel = (s: Sequelize): ArticleModelCtor => {
+export const createModel = (s: Sequelize): ArticleModelStatic => {
   return s.define(name, schemaDefinition, {
     timestamps: true,
     deletedAt: false,

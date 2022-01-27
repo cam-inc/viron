@@ -2,8 +2,8 @@ import {
   Model,
   Sequelize,
   DataTypes,
-  ModelCtor,
   ModelAttributes,
+  ModelStatic,
 } from 'sequelize';
 import { AuditLog, AuditLogCreateAttributes } from '../../../domains/auditlog';
 
@@ -15,6 +15,9 @@ const schemaDefinition: ModelAttributes<AuditLogModel, AuditLog> = {
     allowNull: false,
     primaryKey: true,
     autoIncrement: true,
+    get() {
+      return `${this.getDataValue('id')}`;
+    },
   },
   requestMethod: {
     type: DataTypes.STRING,
@@ -57,9 +60,9 @@ export class AuditLogModel extends Model<AuditLog, AuditLogCreateAttributes> {
   public readonly updatedAt!: Date;
 }
 
-export type AuditLogModelCtor = ModelCtor<AuditLogModel>;
+export type AuditLogModelStatic = ModelStatic<AuditLogModel>;
 
-export const createModel = (s: Sequelize): ModelCtor<AuditLogModel> => {
+export const createModel = (s: Sequelize): ModelStatic<AuditLogModel> => {
   return s.define(name, schemaDefinition, {
     timestamps: true,
     deletedAt: false,

@@ -1,7 +1,7 @@
 module.exports = {
   extends: [
     'eslint:recommended',
-    'cam-recommended/backend',
+    'cam-recommended/presets/backend-typescript',
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',

@@ -1,12 +1,8 @@
 import { Link as GatsbyLink, GatsbyLinkProps } from 'gatsby';
 import React from 'react';
-import { On } from '$constants/index';
-import { ClassName } from '$types/index';
+import { Props as BaseProps } from '~/components';
 
-type Props = {
-  on: On;
-  className?: ClassName;
-} & Pick<GatsbyLinkProps<Record<string, string>>, 'to'>;
+type Props = BaseProps & Pick<GatsbyLinkProps<Record<string, string>>, 'to'>;
 const Link: React.FC<Props> = ({ className = '', to, children }) => {
   const isInternal = /^\/(?!\/)/.test(to);
   if (isInternal) {

@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import FileReader, { Props as FileReaderProps } from '$components/fileReader';
+import FileReader, { Props as FileReaderProps } from '~/components/fileReader';
 
 export type Props = {
   onChange: (binaryString: string | null) => void;

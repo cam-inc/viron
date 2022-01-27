@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { RegisterOptions, Validate } from 'react-hook-form';
-import { Schema } from '$types/oas';
-import { email } from '$utils/v8n';
+import { Schema } from '~/types/oas';
+import { email } from '~/utils/v8n';
 
 export const getRegisterOptions = function ({
   required,
@@ -423,7 +423,7 @@ export const getValidateType = function (type: Schema['type']): Validate<any> {
       }
     }
     if (type === 'object') {
-      if (!_.isObject(data)) {
+      if (!_.isPlainObject(data)) {
         return `Should be type of object.`;
       }
     }

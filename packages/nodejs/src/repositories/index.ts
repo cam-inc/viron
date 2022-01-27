@@ -125,15 +125,15 @@ export class RepositoryContainer {
             mongooseConfig.autoIndex ?? mongoConfig?.connectOptions?.autoIndex,
           user: options.user ?? options.credentials?.username,
           pass: options.password ?? options.credentials?.password,
-          useNewUrlParser: true,
-          useCreateIndex: true,
           authSource: options.authSource ?? options.credentials?.source,
-          useFindAndModify: false,
-          useUnifiedTopology: true,
           ssl: options.ssl ?? mongoConfig?.connectOptions?.ssl,
           sslValidate:
             options.sslValidate ?? mongoConfig?.connectOptions?.sslValidate,
           sslCA: options.sslCA ?? mongoConfig?.connectOptions?.sslCA,
+          useCreateIndex: true,
+          useFindAndModify: false,
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
         };
         debug(
           'Init casbin-mongoose-adapter. url: %s, options: %O',

@@ -1,10 +1,10 @@
 import React, { Suspense } from 'react';
-import { isSSR } from '$utils/index';
+import { isSSR } from '~/utils';
 import WyswygBase, { Props as WyswygProps } from './_index';
 
-const WyswygLazy = React.lazy<typeof WyswygBase>(function () {
-  return import('$components/wyswyg/_index');
-});
+const WyswygLazy = React.lazy<typeof WyswygBase>(
+  () => import('~/components/wyswyg/_index')
+);
 
 const Spinner: React.FC = () => {
   return <p>TODO: spinning...</p>;

@@ -1,4 +1,4 @@
-import { EMail, URL } from '$types/index';
+import { EMail, URL } from '~/types';
 
 // [extendable] Root document object.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#openapi-object
@@ -32,47 +32,60 @@ export type Info = {
   // [extended] Be used on endpoint UI cards.
   'x-thumbnail'?: URL;
   // [extended] Color theme for the endpoint page. Default to 'red'.
-  'x-theme'?: X_Theme;
+  'x-theme'?: Theme;
   // [extended] Be used on endpoint UI cards.
   'x-tags'?: string[];
   // [extended] Be used on endpoints page.
-  'x-pages': {
-    // Should be a unique string value. Be used as a part of the URL.
-    id: string;
-    // Be displayed on screen.
-    title: string;
-    // Be displayed on screen.
-    description?: string | CommonMark;
-    // Use slashed string to create levels more than two. e.g. 'Dashboard/Analytics/DAU'.
-    group?: string;
-    //  What to be displayed on the page.
-    contents: {
-      // Will be assigned on client side.
-      id: string;
-      title: string;
-      // TODO: 全部リストアップすること。
-      type: 'number' | 'table' | 'custom';
-      // Specify the operation id of target method that is required to fetch data for the content.
-      operationId: OperationId;
-      defaultParametersValue?: RequestParametersValue;
-      defaultRequestBodyValue?: RequestRequestBodyValue;
-      pagination?: boolean;
-      autoRefreshSec?: number;
-      actions?: {
-        operationId: OperationId;
-        defaultParametersValue?: RequestParametersValue;
-        defaultRequestBodyValue?: RequestRequestBodyValue;
-      }[];
-    }[];
-  }[];
+  'x-pages': Page[];
+  // [extended] Common setting for page contents that are type of numner.
+  'x-number'?: X_Number;
   // [extended] Common setting for page contents that are type of table.
   'x-table'?: X_Table;
   // [extended] Common setting for autocomplete function.
   'x-autocomplete'?: X_Autocomplete;
 };
 
+export type PageId = string;
+export type Page = {
+  // Should be a unique string value. Be used as a part of the URL.
+  id: PageId;
+  // Be displayed on screen.
+  title: string;
+  // Be displayed on screen.
+  description?: string | CommonMark;
+  // Use slashed string to create levels more than two. e.g. 'Dashboard/Analytics/DAU'.
+  group?: string;
+  //  What to be displayed on the page.
+  contents: Content[];
+};
+
+export const CONTENT_TYPE = {
+  NUMBER: 'number',
+  TABLE: 'table',
+} as const;
+export type ContentId = string;
+export type ContentType = typeof CONTENT_TYPE[keyof typeof CONTENT_TYPE];
+export type Content = {
+  // Will be assigned on client side.
+  id: ContentId;
+  title: string;
+  type: ContentType;
+  // Specify the operation id of target method that is required to fetch data for the content.
+  operationId: OperationId;
+  defaultParametersValue?: RequestParametersValue;
+  defaultRequestBodyValue?: RequestRequestBodyValue;
+  pagination?: boolean;
+  // TODO: ドキュメントに書くこと
+  autoRefreshSec?: number;
+  actions?: {
+    operationId: OperationId;
+    defaultParametersValue?: RequestParametersValue;
+    defaultRequestBodyValue?: RequestRequestBodyValue;
+  }[];
+};
+
 // [extended] All theme names.
-export const X_THEME = {
+export const THEME = {
   RED: 'red',
   ULTIMATE_ORANGE: 'ultimate orange',
   ORANGE_JUICE: 'orange juice',
@@ -98,7 +111,12 @@ export const X_THEME = {
   NEON_ROSE: 'neon rose',
   ELECTRIC_CRIMSON: 'electric crimson',
 } as const;
-export type X_Theme = typeof X_THEME[keyof typeof X_THEME];
+export type Theme = typeof THEME[keyof typeof THEME];
+
+// [extended] Common setting for page contents that are type of table.
+export type X_Number = {
+  responseKey: string;
+};
 
 // [extended] Common setting for page contents that are type of table.
 export type X_Table = {
@@ -108,17 +126,18 @@ export type X_Table = {
     requestKey: string;
   };
 };
-export const TABLE_SORT = {
+export const SORT = {
   ASC: 'asc',
   DESC: 'desc',
   NONE: 'none',
 } as const;
-export type TableSort = typeof TABLE_SORT[keyof typeof TABLE_SORT];
+export type Sort = typeof SORT[keyof typeof SORT];
 export type TableColumn = {
   schema: Schema;
   name: string;
   key: string;
   isSortable: boolean;
+  sort: Sort;
 };
 export type Pager = {
   // Which request parameter to use when fetching.
@@ -129,7 +148,7 @@ export type Pager = {
   responsePageKey: string;
 };
 // e.g. '${keyA}:asc,${keyB}:desc,${keyC}:desc'
-export type Sort = string;
+//export type Sort = string;
 
 // [extended] Common setting for autocomplete function.
 export type X_Autocomplete = {
@@ -167,12 +186,12 @@ export type License = {
   url?: URL;
 };
 
+// @see: https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#path-templating
+// key must begin with a slash.
+export type PathTemplate = string;
 // [extendable] Holds the relative paths to the individual endpoints and their operations.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#paths-object
-export type Paths = {
-  // key must begin with a slash.
-  [key: string]: PathItem;
-};
+export type Paths = Record<PathTemplate, PathItem>;
 
 // [extendable] Describes the operations available on a single path
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#path-item-object
@@ -205,8 +224,7 @@ export type Method = typeof METHOD[keyof typeof METHOD];
 
 // This is not a part of OAS.
 export type Request = {
-  // key must begin with a slash.
-  path: string;
+  path: PathTemplate;
   method: Method;
   operation: Operation;
 };
@@ -376,6 +394,7 @@ export type Schema = {
   allOf?: Schema[];
   // Inline or referenced schema MUST be of a Schema Object and not a standard JSON Schema.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-5.24
+  // TODO: 仕様では、ただ一つのschemaのみにvalidか否かをチェックすべきだが、vironではoneofからどのschemaを使うか選ばせるために使用している。
   oneOf?: Schema[];
   // Inline or referenced schema MUST be of a Schema Object and not a standard JSON Schema.
   // @see: https://tools.ietf.org/html/draft-wright-json-schema-validation-00#section-5.23
@@ -491,7 +510,7 @@ export type Responses = {
 };
 
 // A map containing descriptions of potential response payloads. The key is a media type or media type range and the value describes it. For responses that match multiple keys, only the most specific key is applicable. e.g. text/plain overrides text/*
-export type Content = {
+export type MediaTypes = {
   [key: string]: MediaType;
 };
 
@@ -503,7 +522,7 @@ export type Response = {
     [key: string]: Header;
   };
   // A map containing descriptions of potential response payloads.
-  content?: Content;
+  content?: MediaTypes;
   links?: {
     [key: string]: Link;
   };
@@ -541,7 +560,7 @@ export type Parameter = {
   | {
       schema?: never;
       // A map containing the representations for the parameter. The key is the media type and the value describes it. The map MUST only contain one entry.
-      content: Content;
+      content: MediaTypes;
     }
 );
 
@@ -568,7 +587,7 @@ export type Example = {
 // [Extendable] Describes a single request body.
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md#request-body-object
 export type RequestBody = {
-  content: Content;
+  content: MediaTypes;
   description?: string | CommonMark;
   required?: boolean;
 };

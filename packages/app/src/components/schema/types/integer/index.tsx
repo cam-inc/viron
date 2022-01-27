@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import React, { useMemo } from 'react';
-import Numberinput from '$components/numberinput';
-import Select from '$components/select';
-import { getRegisterOptions } from '$utils/oas/v8n';
+import Numberinput from '~/components/numberinput';
+import Select from '~/components/select';
+import { getRegisterOptions } from '~/utils/oas/v8n';
 import { useDynamicEnum } from '../../hooks';
 import { Props } from '../../index';
 
@@ -16,15 +16,12 @@ const SchemaOfTypeInteger: React.FC<Props> = ({
   schema,
   isDeepActive,
 }) => {
-  const registerOptions = useMemo<ReturnType<typeof getRegisterOptions>>(
-    function () {
-      if (!isDeepActive) {
-        return {};
-      }
-      return getRegisterOptions({ required, schema });
-    },
-    [required, schema, isDeepActive]
-  );
+  const registerOptions = useMemo<ReturnType<typeof getRegisterOptions>>(() => {
+    if (!isDeepActive) {
+      return {};
+    }
+    return getRegisterOptions({ required, schema });
+  }, [required, schema, isDeepActive]);
 
   // Dynamic Enum
   const { isEnabled: isDynamicEnumEnabled, list: dynamicEnumList } =

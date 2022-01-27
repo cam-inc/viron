@@ -10,7 +10,7 @@ export interface MysqlStore {
   instance: Sequelize;
 }
 
-export const preflight = async (config: MysqlConfig): Promise<MysqlStore> => {
+export const init = async (config: MysqlConfig): Promise<MysqlStore> => {
   const s = await mysql.createConnection(config.connectOptions);
 
   const ms = models(s);

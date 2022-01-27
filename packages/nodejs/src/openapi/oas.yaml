@@ -13,6 +13,9 @@ info:
       responsePageKey: currentPage # 現在のページ番号を返すキー
     sort:
       requestKey: sort # ソートを指定するクエリパラメータ
+  # type=numberの仕様定義
+  x-number:
+    responseKey: value
   # オートコンプリートの仕様定義
   x-autocomplete:
     responseLabelKey: label

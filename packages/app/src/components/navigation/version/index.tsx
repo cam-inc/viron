@@ -1,16 +1,11 @@
-import classnames from 'classnames';
 import React from 'react';
-import { On } from '$constants/index';
+import { Props as BaseProps } from '~/components';
 import pkg from '../../../../package.json';
 
-type Props = {
-  on: On;
-};
+type Props = BaseProps;
 const Version: React.FC<Props> = ({ on }) => {
   return (
-    <div className={classnames('text-xxs', `text-on-${on}`)}>
-      ver. {pkg.version}
-    </div>
+    <div className={`text-xxs text-thm-on-${on}-low`}>ver. {pkg.version}</div>
   );
 };
 export default Version;

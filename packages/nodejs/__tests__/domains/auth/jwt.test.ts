@@ -28,7 +28,7 @@ describe('domains/auth/jwt', () => {
 
   describe('signJwt', () => {
     beforeEach(() => {
-      initJwt(config);
+      initJwt(config, true);
     });
 
     it('Get a jwt.', async () => {
@@ -45,7 +45,7 @@ describe('domains/auth/jwt', () => {
 
   describe('verifyJwt', () => {
     beforeEach(() => {
-      initJwt(config);
+      initJwt(config, true);
     });
 
     it('Get verified claims.', async () => {
@@ -78,6 +78,35 @@ describe('domains/auth/jwt', () => {
 
       const result = await verifyJwt(token);
       assert.strictEqual(result, null);
+    });
+  });
+
+  describe('custom provider', () => {
+    beforeAll(() => {
+      initJwt(
+        {
+          secret: 'test',
+          provider: () => {
+            return { issuer: 'custom-issuer', audience: ['custom-audience'] };
+          },
+          expirationSec: 60,
+        },
+        true
+      );
+    });
+    it('Return custom issuer and audiences.', async () => {
+      const subject = 'test';
+      const token = signJwt(subject);
+
+      sandbox
+        .stub(domainsAuthSignout, 'isSignedout')
+        .withArgs(token)
+        .resolves(false);
+
+      const result = await verifyJwt(token);
+      assert(result);
+      assert.strictEqual(result.iss, 'custom-issuer');
+      assert.strictEqual(result.aud[0], 'custom-audience');
     });
   });
 });
