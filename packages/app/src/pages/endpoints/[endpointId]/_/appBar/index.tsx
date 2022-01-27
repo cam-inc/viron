@@ -152,7 +152,6 @@ const Appbar: React.FC<Props> = ({
                   <div className="text-xs text-thm-on-primary">
                     {page.title}
                   </div>
-                  2{' '}
                 </div>
               </TextOnButton>
             </div>
