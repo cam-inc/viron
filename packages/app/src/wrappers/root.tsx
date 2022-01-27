@@ -5,10 +5,10 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { HelmetProvider } from 'react-helmet-async';
-import resolveConfig from 'tailwindcss/resolveConfig';
-import { TailwindConfig } from 'tailwindcss/tailwind-config';
+//import resolveConfig from 'tailwindcss/resolveConfig';
+//import { TailwindConfig } from 'tailwindcss/tailwind-config';
 // @ts-ignore
-import tailwindConfig from '../../tailwind.config';
+//import tailwindConfig from '../../tailwind.config';
 import Error, { useError } from '~/components/error';
 import ErrorBoundary from '~/components/errorBoundary';
 import Spinner from '~/components/spinner';
@@ -153,9 +153,11 @@ const useRoot = function (): UseRootReturn {
         };
       });
     };
-    const config = resolveConfig(tailwindConfig as TailwindConfig);
+    //const config = resolveConfig(tailwindConfig as TailwindConfig);
     const mediaQueryList = window.matchMedia(
-      `(min-width: ${config.theme.screens?.lg})`
+      // TODO:
+      //`(min-width: ${config.theme.screens?.lg})`
+      `(min-width: 640px)`
     );
     set(mediaQueryList.matches);
 
