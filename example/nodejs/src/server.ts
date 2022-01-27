@@ -6,7 +6,7 @@ import { getCertificate } from './helpers/ssl';
 logger.info(`Set mode. mode=${ctx.mode}`);
 
 const main = async (): Promise<void> => {
-  await ctx.preflight();
+  await ctx.init();
   const app = await createApplication();
   const server = https.createServer(await getCertificate(), app);
 

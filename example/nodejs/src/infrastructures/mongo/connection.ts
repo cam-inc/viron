@@ -12,7 +12,7 @@ export interface MongoStore {
   instance: mongo.mongoose.Connection;
 }
 
-export const preflight = async (config: MongoConfig): Promise<MongoStore> => {
+export const init = async (config: MongoConfig): Promise<MongoStore> => {
   mongo.mongoose.set('debug', true);
   const c = await mongo.createConnection(config.openUri, config.connectOptions);
   return {
