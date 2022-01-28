@@ -4,6 +4,7 @@ import { parse } from 'query-string';
 import React, { useCallback, useEffect, useState } from 'react';
 import Error from '~/components/error';
 import Request from '~/components/request';
+import Spinner from '~/components/spinner';
 import { BaseError } from '~/errors';
 import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
 import { Props as LayoutProps } from '~/layouts';
@@ -86,17 +87,25 @@ const Body: React.FC<Props> = ({ className = '', search }) => {
   );
 
   if (isPending) {
-    return <div className={classnames('p-2', className)}>TODO: pending...</div>;
+    return (
+      <div className={classnames('p-4', className)}>
+        <Spinner className="w-8" on={COLOR_SYSTEM.BACKGROUND} />
+      </div>
+    );
   }
   if (error) {
-    return <Error on={COLOR_SYSTEM.BACKGROUND} error={error} />;
+    <div className={classnames('p-4', className)}>
+      return <Error on={COLOR_SYSTEM.BACKGROUND} error={error} />;
+    </div>;
   }
   if (!signinOAuthCallback) {
     return null;
   }
   if (signinOAuthCallback.error) {
     return (
-      <Error on={COLOR_SYSTEM.BACKGROUND} error={signinOAuthCallback.error} />
+      <div className={classnames('p-4', className)}>
+        <Error on={COLOR_SYSTEM.BACKGROUND} error={signinOAuthCallback.error} />
+      </div>
     );
   }
 
