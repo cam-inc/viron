@@ -1,6 +1,5 @@
 import { atom } from 'recoil';
 import { Theme, THEME } from '~/types/oas';
-import { isBrowser } from '~/utils';
 
 const NAME = 'app';
 const KEY = {
@@ -26,22 +25,5 @@ export const screen = atom<Screen>({
 
 export const theme = atom<Theme>({
   key: `${NAME}.${KEY.THEME}`,
-  default: THEME.RED,
-  // TODO: 消す
-  effects_UNSTABLE: [
-    // Keep the stored data and the body element's attribute in sync for css styles to be applied.
-    ({ onSet }) => {
-      onSet((newValue) => {
-        if (!isBrowser) {
-          return;
-        }
-        const bodyElm = document.querySelector('body');
-        if (!bodyElm) {
-          return;
-        }
-        // TODO: 消す
-        bodyElm.dataset.theme = newValue;
-      });
-    },
-  ],
+  default: THEME.BLUE,
 });
