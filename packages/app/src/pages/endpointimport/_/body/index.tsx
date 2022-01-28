@@ -5,6 +5,7 @@ import FilledButton, {
   Props as FilledButtonProps,
 } from '~/components/button/filled';
 import Error from '~/components/error';
+import Spinner from '~/components/spinner';
 import { BaseError } from '~/errors/index';
 import { useEndpoint } from '~/hooks/endpoint';
 import { Props as LayoutProps } from '~/layouts';
@@ -60,14 +61,17 @@ const Body: React.FC<Props> = ({ style, className = '', search }) => {
   if (isPending) {
     return (
       <div style={style} className={className}>
-        <div className="p-2">TODO: pending...</div>
+        <div className="p-4">
+          <Spinner className="w-8" on={COLOR_SYSTEM.BACKGROUND} />
+        </div>
       </div>
     );
   }
+
   if (error) {
     return (
       <div style={style} className={className}>
-        <div className="p-2">
+        <div className="p-4">
           <Error on={COLOR_SYSTEM.BACKGROUND} error={error} />;
         </div>
       </div>
@@ -76,13 +80,16 @@ const Body: React.FC<Props> = ({ style, className = '', search }) => {
 
   return (
     <div style={style} className={className}>
-      <div className="p-2">
-        <div>TODO: import完了</div>
-        <FilledButton
-          cs={COLOR_SYSTEM.PRIMARY}
-          label="Back to Dashboard"
-          onClick={handleButtonClick}
-        />
+      <div className="p-4">
+        <div>
+          Have completed importing an endpoint successfully.{' '}
+          <FilledButton
+            cs={COLOR_SYSTEM.PRIMARY}
+            label="Go back to the dashboard"
+            onClick={handleButtonClick}
+          />{' '}
+          to continue.
+        </div>
       </div>
     </div>
   );
