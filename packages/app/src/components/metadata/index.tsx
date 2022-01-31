@@ -116,7 +116,7 @@ const Metadata: React.FC<Props> = ({
     // application name
     ret.applicationName = siteMetadata.title;
     // generator
-    ret.generator = 'TODO:prdとかdevとかセルフホストじゃないとか';
+    ret.generator = 'Gatsby';
     // theme color
     // TODO: いい感じに色を変更する。
     ret.themeColor = '#ffffff';
