@@ -2,116 +2,44 @@
 title: URL
 ---
 
-**注意** ドキュメントに含めるべきではない情報も含まれています。どの情報をどこに載せるべきか、改めて精査すること。
+## Environments
 
-## URLの種類
+There are two environments: **production** and **development**. The difference is that `production` is for everyone who uses Viron, while `development` is for only maintainers and contributors. You need permission to access to be in the development environment.
 
-mainブランチとsnapshotブランチ
-以下の2つのタイプのURL
-- latest: 最新バージョンのvironを使うため
-- snapshot: 特定バージョンのvironを使うため
+## URL Types
 
-| type | S3 Bucket | Bucket内ディレクトリ | URL |
-| ---- | ---- | ---- | ---- |
-| latest | s3://app.viron.plus | 無し | https://viron.plus/ |
-| snapshot | s3://snapshot-app.viron.plus | semver名 | https://snapshot.viron.plus/{semver}/ |
+Each environment has these four types of URLs:
 
-## dev
-developブランチとdevelop-snapshotブランチ
-| type | S3 Bucket | Bucket内ディレクトリ | URL |
-| ---- | ---- | ---- | ---- |
-| latest | s3://development-app.viron.work | 無し | https://viron.work/ |
-| snapshot | s3://development-snapshot-app.viron.work | semver名 | https://snapshot.viron.work/{semver}/ |
+- **Latest**: for the latest version of Viron.
+- **Snapshot**: for fixed versions of Viron.
+- **Website**: for documentation and blog site.
+- **API**: for demo.
 
-dev用のendpoint url: https://demo.viron.work/
+Use the `Latest` type to access the newest version of Viron. If you want to stick to a particular version, use `Snapshot` type.
 
-## S3 Buckets
+| env| type | S3 Bucket | Directory in the bucket | URL |
+| ---- | ---- | ---- | ---- | ---- |
+| production | latest | s3://app.viron.plus | - | https://viron.plus/ |
+| production | snapshot | s3://snapshot-app.viron.plus | semver名 | https://snapshot.viron.plus/{semver}/ |
+| production | website | s3://discovery.viron.plus | - | https://snapshot.viron.plus/{semver}/ |
+| production | api | - | - | https://demo.viron.plus/ |
+| development | latest | s3://development-app.viron.work | - | https://viron.work/ |
+| development | snapshot | s3://development-snapshot-app.viron.work | semver名 | https://snapshot.viron.work/{semver}/ |
+| development | website | s3://development-discovery.viron.work | - | https://snapshot.viron.plus/{semver}/ |
+| development | api | - | - | https://demo.viron.work/ |
 
-latest用
-```
-s3://app.viron.plus/
-  - Gatsby Build生成物
-```
+## Deployment Flow
 
-snapshot用
-```
-s3://snapshot-app.viron.plus/
-  - 1.0.0
-    - Gatsby Build生成物
-  - 2.0.0
-    - Gatsby Build生成物
-```
+There are two primary branches in the GitHub repository: **main** and **development**.
+The `main` branch is for the production environment and the development branch for the development environment, and each branch triggers `AWS CodePipeline tasks` as described below.
 
+For URL types of `Latest` and `Snapshot`,
 
-## ユーザがどのURLを使うべきか
+1. When pushed to the target branch,
+2. AWS CodePipeline executes `npm run build --workspace=@viron/app` to generate static files
+3. and deploys the output to the S3 bucket. (for the URL type of `Latest`)
+4. It also runs `'npm run build:prefix --workspace=@viron/app` to generate and deploy. (for the URL type of `Snapshot`)
 
-常に最新のVironを使いたい -> https://viron.plus/
-v1.0.0のVironを使いたい -> https://snapshot.viron.plus/1.0.0/
-v2.0.0のVironを使いたい -> https://snapshot.viron.plus/2.0.0/
+For URL type of `Website`, AWS CodePipeline executes `npm run build --workspace=@viron/website` and deploys the output files to the target S3 bucket.
 
-## CF
-https://viron.plus/ -> s3://app.viron.plus
-https://snapshot.viron.plus/{semver}/ -> s3://snapshot-app.viron.plus/{semver}
-
-
-## S3 Bucketに静的ファイルがdeployされるまでの流れ
-
-(通常時とpatch時の違いは、latest用build/deployを行うか否かだけ。)
-
-### 通常リリース時
-
-1. `main`ブランチにpush
-2. `1`をtriggerに、AWS CodePipelineが動く。
-3. `npm run build --workspace=@viron/app`が実行される。
-4. `3`の生成物が`s3://app.viron.plus`バケット配下にdeployされる。(latest用)
-5. `npm run build:prefix --workspace=@viron/app`が実行される。
-6. `5`の生成物が`s3://snapshot-app.viron.plus`バケット配下の特定ディレクトリ(package.jsonのversion値と一緒)配下にdeployされる。(snapshot用)
-
-## patchリリース時
-
-1. 修正対象のversionのreleaseタグからブランチを作成する。
-2. 修正する
-3. `snapshot`ブランチにpush
-4. `3`をtriggerに、AWS CodePipelineが動く。
-5. `npm run build:prefix --workspace=@viron/app`が実行される。
-6. `5`の生成物が`s3://snapshot-app.viron.plus`バケット配下の特定ディレクトリ(package.jsonのversion値と一緒)配下にdeployされる。(snapshot用)
-
-## タグ
-リリース毎(package.jsonのversion)のタグが存在する。
-
-## バグ修正の流れ
-
-### 「最新版のVironでxxxがバグってる」
-
-修正してpatchバージョンを上げて、上記「通常リリース時」を行う。
-
-latest用
-```
-s3://app.viron.plus/
-  - 修正済みGatsby Build生成物 // ここも変わるよ。
-```
-
-snapshot用
-```
-s3://snapshot-app.viron.plus/
-  - 1.2.3
-    - バグってるGatsby Build生成物
-  - 1.2.4 // このディレクトリを足すってことね。
-    - 修正済みGatsby Build生成物
-```
-
-### 「特定versionのVironでxxxがバグってる」
-
-対象バーションのタグを元に修正して、上記「patchリリース時」を行う。
-最新patch値のURLを使うように促す。
-
-snapshot用
-```
-s3://snapshot-app.viron.plus/
-  - 1.2.3
-    - バグってるGatsby Build生成物
-  - 1.2.4 // このディレクトリを足すってことね。
-    - 修正済みGatsby Build生成物
-  - 2.3.4
-    - 最新のGatsby Build生成物
-```
+Branches whose name prefixed with `snapshot-main-` or `snapshot-develop-` act the same as `main` and `development` branches above but only the `Snapshot-related tasks`.

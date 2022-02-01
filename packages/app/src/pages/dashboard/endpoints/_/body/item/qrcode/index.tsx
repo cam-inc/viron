@@ -1,7 +1,11 @@
 import qrcode from 'qrcode';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import FilledButton, {
+  Props as FilledButtonProps,
+} from '~/components/button/filled';
 import Error from '~/components/error';
 import Head from '~/components/head';
+import ClipboardCopyIcon from '~/components/icon/clipboardCopy/outline';
 import QrcodeIcon from '~/components/icon/qrcode/outline';
 import { BaseError } from '~/errors';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
@@ -31,13 +35,17 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
     setData(data);
   }, [endpoint]);
 
+  const handleCopyClick = useCallback<FilledButtonProps['onClick']>(() => {
+    globalThis.navigator.clipboard.writeText(data);
+  }, [data]);
+
   if (error) {
     return <Error on={COLOR_SYSTEM.SURFACE} error={error} />;
   }
 
   return (
-    <div>
-      <div>
+    <div className="text-thm-on-surface">
+      <div className="pb-4 mb-4 border-b border-thm-on-surface-slight">
         <Head
           on={COLOR_SYSTEM.SURFACE}
           title={
@@ -46,11 +54,26 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
               <div>QR Code</div>
             </div>
           }
-          description="TODO:"
+          description="Share an endpoint with the QR code."
         />
       </div>
       <div className="flex justify-center">
         <canvas ref={canvasRef} />
+      </div>
+      <div className="mt-4 pt-4 flex flex-col items-end gap-2 border-t border-dotted border-thm-on-surface-slight">
+        <div className="">
+          Or, you can{' '}
+          <FilledButton
+            cs={COLOR_SYSTEM.PRIMARY}
+            Icon={ClipboardCopyIcon}
+            label="Copy"
+            onClick={handleCopyClick}
+          />{' '}
+          the URL.
+        </div>
+        <div className="text-thm-on-surface-low text-xxs text-right max-w-[380px] break-all">
+          {data}
+        </div>
       </div>
     </div>
   );

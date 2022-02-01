@@ -129,7 +129,7 @@ const RemoveConfirmation: React.FC<RemoveConfirmationProps> = ({
       <Head
         on={COLOR_SYSTEM.SURFACE}
         title="Remove a Group"
-        description="TODO: 本当にグループを削除しますか？取り消しできません。"
+        description="Really want to remove it? The endpoints in the group will remain ungrouped."
       />
       <div className="flex justify-end gap-2">
         <OutlineOnButton
