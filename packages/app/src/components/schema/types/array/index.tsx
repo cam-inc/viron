@@ -35,7 +35,7 @@ const SchemaOfTypeArray: React.FC<Props> = ({
   isDeepActive,
   activeRef,
 }) => {
-  const data: any[] | undefined = watch(name, []);
+  const data: any[] | undefined = getValues(name);
   const nameForError = useNameForError({ schema, name });
   useEffect(() => {
     if (!isDeepActive) {
