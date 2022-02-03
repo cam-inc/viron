@@ -9,8 +9,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/cam-inc/viron/example/golang/pkg/constant"
-	pkgConstant "github.com/cam-inc/viron/packages/golang/constant"
 	pkgConfig "github.com/cam-inc/viron/packages/golang/config"
+	pkgConstant "github.com/cam-inc/viron/packages/golang/constant"
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -114,7 +114,7 @@ func New() *Config {
 			},
 		},
 		Cors: &Cors{
-			AllowOrigins: []string{"https://localhost:8000"},
+			AllowOrigins: []string{"https://localhost:8000", "https://viron.plus", "https://viron.work"},
 		},
 		StoreMode: mode,
 		StoreMySQL: &MySQL{
