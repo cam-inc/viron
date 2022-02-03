@@ -41,7 +41,7 @@ type (
 		Contents    []*Content `json:"contents"`
 	}
 
-	XPages []XPage
+	XPages []*XPage
 )
 
 // GetOas ロールに沿ったoasを返す
