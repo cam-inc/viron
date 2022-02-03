@@ -8,7 +8,6 @@ import (
 
 	"github.com/cam-inc/viron/packages/golang/constant"
 	"github.com/cam-inc/viron/packages/golang/helpers"
-	"github.com/getkin/kin-openapi/jsoninfo"
 	"github.com/getkin/kin-openapi/openapi3"
 	pathToRegexp "github.com/soongo/path-to-regexp"
 )
@@ -33,13 +32,16 @@ type (
 		ContentType string    `json:"type"`
 		Actions     []*Action `json:"actions"`
 	}
-	XPages struct {
-		ID          string     `json:"ID"`
+
+	XPage struct {
+		ID          string     `json:"id"`
 		Title       string     `json:"title"`
 		Group       string     `json:"group"`
 		Description string     `json:"description"`
 		Contents    []*Content `json:"contents"`
 	}
+
+	XPages []XPage
 )
 
 // GetOas ロールに沿ったoasを返す
@@ -159,19 +161,14 @@ func listContentsByOas(apiDef *openapi3.T) []*Content {
 		return contents
 	}
 
-	prop := &openapi3.ExtensionProps{
-		Extensions: map[string]interface{}{
-			constant.OAS_X_PAGES: apiDef.Info.ExtensionProps.Extensions[constant.OAS_X_PAGES],
-		},
-	}
-	xPages := &XPages{
-		Contents: []*Content{},
-	}
-	if err := prop.EncodeWith(jsoninfo.NewObjectEncoder(), xPages); err != nil {
-		return contents
-	}
-	for _, c := range xPages.Contents {
-		contents = append(contents, c)
+	XPages := &XPages{}
+	encodedXPages, _ := json.Marshal(apiDef.Info.ExtensionProps.Extensions[constant.OAS_X_PAGES])
+	json.Unmarshal(encodedXPages, XPages)
+
+	for _, xPage := range *XPages {
+		for _, v := range xPage.Contents {
+			contents = append(contents,v)
+		}
 	}
 	return contents
 }
