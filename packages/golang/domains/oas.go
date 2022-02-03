@@ -161,13 +161,17 @@ func listContentsByOas(apiDef *openapi3.T) []*Content {
 		return contents
 	}
 
-	XPages := &XPages{}
-	encodedXPages, _ := json.Marshal(apiDef.Info.ExtensionProps.Extensions[constant.OAS_X_PAGES])
-	json.Unmarshal(encodedXPages, XPages)
+	xPages := &XPages{}
+	encodedXPages, err := json.Marshal(apiDef.Info.ExtensionProps.Extensions[constant.OAS_X_PAGES])
+	if err != nil {
+		log.Errorf("x-pages json.marshal failed. err:%v\n", err)
+		return contents
+	}
+	json.Unmarshal(encodedXPages, xPages)
 
-	for _, xPage := range *XPages {
+	for _, xPage := range *xPages {
 		for _, v := range xPage.Contents {
-			contents = append(contents,v)
+			contents = append(contents, v)
 		}
 	}
 	return contents
