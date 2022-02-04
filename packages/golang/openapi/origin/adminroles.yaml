@@ -13,6 +13,11 @@ info:
           resourceId: vironAdminRole
           type: table
           pagination: true
+          actions:
+            - listVironAdminRoles
+            - createVironAdminRole
+            - updateVironAdminRole
+            - removeVironAdminRole
 
 tags:
   - name: vironAdminRoles

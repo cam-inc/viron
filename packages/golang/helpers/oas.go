@@ -23,6 +23,7 @@ type (
 		ContentType string   `json:"type"`
 		Pagination  bool     `json:"pagination"`
 		Sort        []string `json:"sort,omitempty"`
+		Actions     []string `json:"actions,omitempty"`
 	}
 	XPage struct {
 		ID          string      `json:"id"`

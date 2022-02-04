@@ -17,6 +17,12 @@ info:
           pagination: true
           operationId: listVironAdminUsers
           resourceId: vironAdminUser
+          actions:
+            - listVironAdminUsers
+            - createVironAdminUser
+            - updateVironAdminUser
+            - removeVironAdminUser
+
 
 tags:
   - name: vironAdminUsers

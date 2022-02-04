@@ -23,6 +23,8 @@ info:
             - userId
             - statusCode
             - createdAt
+          actions:
+            - listVironAuditlogs
 
 tags:
   - name: vironAuditLog

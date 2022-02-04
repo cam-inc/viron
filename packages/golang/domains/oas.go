@@ -2,6 +2,7 @@ package domains
 
 import (
 	"encoding/json"
+	"net/url"
 	"strings"
 
 	"github.com/cam-inc/viron/packages/golang/logging"
@@ -20,17 +21,13 @@ type (
 
 	operationIDPathMethodMap map[string]*pathMethod
 
-	Action struct {
-		OperationID string `json:"operationId"`
-	}
-
 	Content struct {
-		OperationID string    `json:"operationId"`
-		Query       []string  `json:"query,omitempty"`
-		Sort        []string  `json:"sort,omitempty"`
-		ResourceID  string    `json:"resourceId"`
-		ContentType string    `json:"type"`
-		Actions     []*Action `json:"actions"`
+		OperationID string   `json:"operationId"`
+		Query       []string `json:"query,omitempty"`
+		Sort        []string `json:"sort,omitempty"`
+		ResourceID  string   `json:"resourceId"`
+		ContentType string   `json:"type"`
+		Actions     []string `json:"actions"`
 	}
 
 	XPage struct {
@@ -98,15 +95,21 @@ func GetOas(apiDef *openapi3.T, roleIDs []string) *openapi3.T {
 
 // ACLAllow ロールに沿ったAPIアクセス許可チェック
 func ACLAllow(method, uri string, roleIDs []string, apiDef *openapi3.T) bool {
+	u, err := url.Parse(uri)
+	if err != nil {
+		log.Errorf("url parse err. err: %v\n", err)
+		return false
+	}
+	path := u.Path
 
 	log := logging.GetDefaultLogger()
 
-	operationID := findOperationID(uri, method, apiDef)
+	operationID := findOperationID(path, method, apiDef)
 	if operationID == "" {
 		log.Debugf("not operationID uri[%+v] method[%+v] roleIDs[%+v] apiDef[%+v]", uri, method, roleIDs, apiDef)
 		return false
 	}
-	resourceID := findResourceID(operationID, apiDef)
+	resourceID := findResourceIDByActions(path, method, apiDef)
 	if resourceID == "" {
 		log.Debugf("not resourceID uri[%+v] method[%+v] roleIDs[%+v] apiDef[%+v]", uri, method, roleIDs, apiDef)
 		return false
@@ -223,8 +226,8 @@ func findResourceIDByActions(uri, method string, apiDef *openapi3.T) string {
 			continue
 		}
 		for _, a := range c.Actions {
-			pm := findPathMethodByOperationID(a.OperationID, apiDef)
-			if pm.method == method {
+			pm := findPathMethodByOperationID(a, apiDef)
+			if strings.EqualFold(pm.method, method) {
 				match, err := pathToRegexp.Match(pm.path, nil)
 				if err != nil {
 					continue

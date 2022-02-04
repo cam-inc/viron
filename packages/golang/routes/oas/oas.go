@@ -2,18 +2,14 @@ package oas
 
 import (
 	"fmt"
-	"net/http"
-
+	"github.com/cam-inc/viron/packages/golang/constant"
+	"github.com/cam-inc/viron/packages/golang/domains"
 	"github.com/cam-inc/viron/packages/golang/errors"
-
 	"github.com/cam-inc/viron/packages/golang/linter"
 	"github.com/cam-inc/viron/packages/golang/logging"
+	"net/http"
 
 	"github.com/cam-inc/viron/packages/golang/helpers"
-
-	"github.com/cam-inc/viron/packages/golang/domains"
-
-	"github.com/cam-inc/viron/packages/golang/constant"
 
 	"github.com/getkin/kin-openapi/openapi3"
 )
