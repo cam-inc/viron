@@ -306,7 +306,7 @@ export const useEndpoint = (): UseEndpointReturn => {
       }
       authentication.oas = resolve(authentication.oas);
       // TODO: validate more severely.
-      if (!authentication.list?.length) {
+      if (!authentication.list) {
         return {
           error: new EndpointError(
             `GET ${authenticationPath} returns data not properly formatted.`

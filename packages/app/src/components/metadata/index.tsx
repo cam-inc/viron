@@ -187,7 +187,7 @@ const Metadata: React.FC<Props> = ({
         sizes="180x180"
         href="/apple-touch-icon.png"
       />
-      <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+      <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       <link
         rel="icon"
         type="image/png"
