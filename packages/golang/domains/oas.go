@@ -2,6 +2,8 @@ package domains
 
 import (
 	"encoding/json"
+	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/cam-inc/viron/packages/golang/logging"
@@ -182,17 +184,6 @@ func listContentsByOas(apiDef *openapi3.T) []*Content {
 	return contents
 }
 
-//// findResourceID x-pagesからoperationIdを取得
-//func findResourceID(operationID string, apiDef *openapi3.T) string {
-//	contents := listContentsByOas(apiDef)
-//	for _, c := range contents {
-//		if c.OperationID == operationID {
-//			return c.ResourceID
-//		}
-//	}
-//	return ""
-//}
-
 func genOperationIDPathMethodMap(apiDef *openapi3.T) operationIDPathMethodMap {
 	oMap := operationIDPathMethodMap{}
 	for path, pathItem := range apiDef.Paths {
@@ -243,116 +234,61 @@ func findResourceIDByActions(uri, method string, apiDef *openapi3.T) string {
 	return ""
 }
 
-//func getResourceID(uri, method string, apiDef *openapi3.T) string {
-//	operationID := findOperationID(uri, method, apiDef)
-//	if operationID == "" {
-//		return ""
-//	}
-//	// x-pages内から特定できるかもしれないので探す
-//	resourceID := findResourceID(operationID, apiDef)
-//	if resourceID != "" {
-//		return resourceID
-//	}
-//
-//	parentUri := uri
-//	parentLastIndex := strings.LastIndex(parentUri, "/")
-//	for {
-//		parentUri := parentUri[0:parentLastIndex]
-//		for _, method := range constant.API_METHODS {
-//			oid := findOperationID(parentUri, method, apiDef)
-//			if oid == "" {
-//				continue
-//			}
-//			rid := findResourceID(oid, apiDef)
-//			if rid != "" {
-//				return rid
-//			}
-//		}
-//		parentLastIndex = strings.LastIndex(parentUri, "/")
-//		if parentLastIndex == 0 {
-//			break
-//		}
-//	}
-//
-//	// uriとmethodがどこかのactionsに定義されているかもしれないので探す
-//	if actionResourceID := findResourceIDByActions(uri, method, apiDef); actionResourceID != "" {
-//		return actionResourceID
-//	}
-//
-//	return ""
-//
-//}
-
-// basePathに関連するpath内のoperationIDを探す
-func findOperationIDsByPath(basePath string, apiDef *openapi3.T) []string {
-	var operationIDs []string
-	for path, pathItem := range apiDef.Paths {
-		// 前方一致するかチェック
-		// ex) (path = "/users/{userId}", basePath = "/users"+"/") => true
-		// ex) (path = "/users", basePath = "/users"+"/") => false
-		if strings.HasPrefix(path, basePath+"/") {
-			if pathItem.Put != nil {
-				operationIDs = append(operationIDs, pathItem.Put.OperationID)
-			}
-			if pathItem.Delete != nil {
-				operationIDs = append(operationIDs, pathItem.Delete.OperationID)
-			}
-			// download等の特殊ケースも想定
-			// ex) path = /users/{userId}/download, method = get
-			if pathItem.Get != nil {
-				operationIDs = append(operationIDs, pathItem.Get.OperationID)
-			}
-			if pathItem.Post != nil {
-				operationIDs = append(operationIDs, pathItem.Post.OperationID)
-			}
-		}
-	}
-	return operationIDs
-}
-
-// permissionに対応するoperationIDを探す
-func findOperationIDsByOperationID(operationID string, apiDef *openapi3.T) []string {
-	var operationIDs []string
-	for path, pathItem := range apiDef.Paths {
-		// getの場合
-		if pathItem.Get != nil {
-			// permissionのoperationIDと一致する場合
-			if pathItem.Get.OperationID == operationID {
-				if pathItem.Post != nil {
-					operationIDs = append(operationIDs, pathItem.Post.OperationID)
-				}
-				// ヒットしたpathを元にput,deleteのoperationIdを探す
-				ids := findOperationIDsByPath(path, apiDef)
-				if len(ids) != 0 {
-					operationIDs = append(operationIDs, ids...)
-				}
-			}
-		}
-	}
-	return operationIDs
-}
-
 func genPermissions(apiDef *openapi3.T) []*Permission {
 	var permissions []*Permission
+	// x-pagesのcontentsをpermissionの基準にする
 	contents := listContentsByOas(apiDef)
 
-	// 基準となるresourceIDとoperationIDをpermissionsにまとめる
+	// 全てのcontentの関連するresourceIDとoperationIDのセットをapiDefから収集する
 	for _, content := range contents {
+		// 基準となるoperationIDに関連するoperationIDの配列を取得
+		operationIDs := findPermissionOperationIDs(content.OperationID, apiDef)
+		// actionsのoperationIDも同じresourceIDとする
+		for _, action := range content.Actions {
+			operationIDs = append(operationIDs, action.OperationID)
+		}
+
 		permissions = append(permissions, &Permission{
 			ResourceID:   content.ResourceID,
-			OperationIDs: []string{content.OperationID},
+			OperationIDs: operationIDs,
 		})
 	}
 
-	// permissionsを基準に、足りないoperationIDを探す
-	for _, permission := range permissions {
-		operationIDs := findOperationIDsByOperationID(permission.OperationIDs[0], apiDef)
-		if len(operationIDs) != 0 {
-			permission.OperationIDs = append(permission.OperationIDs, operationIDs...)
+	return permissions
+}
+
+// findPermissionOperationIDs 指定のoperationIDに関連するoperationIDの配列を返す
+func findPermissionOperationIDs(operationID string, apiDef *openapi3.T) []string {
+	for path, pathItem := range apiDef.Paths {
+		operations := pathItem.Operations()
+		for _, operation := range operations {
+			// 指定のoperationIDを探す
+			if operation.OperationID == operationID {
+				return findPermissionOperationIDsByPath(path, apiDef)
+			}
 		}
 	}
+	return []string{} // ない場合は空で返す
+}
 
-	return permissions
+// findPermissionOperationIDsByPath basePathに関連するoperationIDを返す
+func findPermissionOperationIDsByPath(basePath string, apiDef *openapi3.T) []string {
+	var operationIDs []string
+	for path, pathItem := range apiDef.Paths {
+		// 対象のpathかどうかをチェック
+		// ex)
+		// 対象のpath "/users
+		// 対象のpath "/users/{xxx}"
+		// 非対象のpath "/users/purchases/{xxx}"
+		// 非対象のpath "/users/{xxx}/purchases/{xxx}"
+		if path == basePath || (strings.Count(path, "/") == 2 && regexp.MustCompile(fmt.Sprintf(`^%s/{.+}$`, basePath)).MatchString(path)) {
+			operations := pathItem.Operations()
+			for _, operation := range operations {
+				operationIDs = append(operationIDs, operation.OperationID)
+			}
+		}
+	}
+	return operationIDs
 }
 
 // PermissionsからresourceIDを取得
