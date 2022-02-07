@@ -42,6 +42,11 @@ type (
 	}
 
 	XPages []*XPage
+
+	Permission struct {
+		ResourceID   string
+		OperationIDs []string
+	}
 )
 
 // GetOas ロールに沿ったoasを返す
@@ -177,16 +182,16 @@ func listContentsByOas(apiDef *openapi3.T) []*Content {
 	return contents
 }
 
-// findResourceID x-pagesからoperationIdを取得
-func findResourceID(operationID string, apiDef *openapi3.T) string {
-	contents := listContentsByOas(apiDef)
-	for _, c := range contents {
-		if c.OperationID == operationID {
-			return c.ResourceID
-		}
-	}
-	return ""
-}
+//// findResourceID x-pagesからoperationIdを取得
+//func findResourceID(operationID string, apiDef *openapi3.T) string {
+//	contents := listContentsByOas(apiDef)
+//	for _, c := range contents {
+//		if c.OperationID == operationID {
+//			return c.ResourceID
+//		}
+//	}
+//	return ""
+//}
 
 func genOperationIDPathMethodMap(apiDef *openapi3.T) operationIDPathMethodMap {
 	oMap := operationIDPathMethodMap{}
@@ -238,40 +243,136 @@ func findResourceIDByActions(uri, method string, apiDef *openapi3.T) string {
 	return ""
 }
 
-func getResourceID(uri, method string, apiDef *openapi3.T) string {
-	operationID := findOperationID(uri, method, apiDef)
-	if operationID == "" {
-		return ""
-	}
-	resourceID := findResourceID(operationID, apiDef)
-	if resourceID != "" {
-		return resourceID
-	}
+//func getResourceID(uri, method string, apiDef *openapi3.T) string {
+//	operationID := findOperationID(uri, method, apiDef)
+//	if operationID == "" {
+//		return ""
+//	}
+//	// x-pages内から特定できるかもしれないので探す
+//	resourceID := findResourceID(operationID, apiDef)
+//	if resourceID != "" {
+//		return resourceID
+//	}
+//
+//	parentUri := uri
+//	parentLastIndex := strings.LastIndex(parentUri, "/")
+//	for {
+//		parentUri := parentUri[0:parentLastIndex]
+//		for _, method := range constant.API_METHODS {
+//			oid := findOperationID(parentUri, method, apiDef)
+//			if oid == "" {
+//				continue
+//			}
+//			rid := findResourceID(oid, apiDef)
+//			if rid != "" {
+//				return rid
+//			}
+//		}
+//		parentLastIndex = strings.LastIndex(parentUri, "/")
+//		if parentLastIndex == 0 {
+//			break
+//		}
+//	}
+//
+//	// uriとmethodがどこかのactionsに定義されているかもしれないので探す
+//	if actionResourceID := findResourceIDByActions(uri, method, apiDef); actionResourceID != "" {
+//		return actionResourceID
+//	}
+//
+//	return ""
+//
+//}
 
-	parentUri := uri
-	parentLastIndex := strings.LastIndex(parentUri, "/")
-	for {
-		parentUri := parentUri[0:parentLastIndex]
-		for _, method := range constant.API_METHODS {
-			oid := findOperationID(parentUri, method, apiDef)
-			if oid == "" {
-				continue
+// basePathに関連するpath内のoperationIDを探す
+func findOperationIDsByPath(basePath string, apiDef *openapi3.T) []string {
+	var operationIDs []string
+	for path, pathItem := range apiDef.Paths {
+		// 前方一致するかチェック
+		// ex) (path = "/users/{userId}", basePath = "/users"+"/") => true
+		// ex) (path = "/users", basePath = "/users"+"/") => false
+		if strings.HasPrefix(path, basePath+"/") {
+			if pathItem.Put != nil {
+				operationIDs = append(operationIDs, pathItem.Put.OperationID)
 			}
-			rid := findResourceID(oid, apiDef)
-			if rid != "" {
-				return rid
+			if pathItem.Delete != nil {
+				operationIDs = append(operationIDs, pathItem.Delete.OperationID)
+			}
+			// download等の特殊ケースも想定
+			// ex) path = /users/{userId}/download, method = get
+			if pathItem.Get != nil {
+				operationIDs = append(operationIDs, pathItem.Get.OperationID)
+			}
+			if pathItem.Post != nil {
+				operationIDs = append(operationIDs, pathItem.Post.OperationID)
 			}
 		}
-		parentLastIndex = strings.LastIndex(parentUri, "/")
-		if parentLastIndex == 0 {
-			break
+	}
+	return operationIDs
+}
+
+// permissionに対応するoperationIDを探す
+func findOperationIDsByOperationID(operationID string, apiDef *openapi3.T) []string {
+	var operationIDs []string
+	for path, pathItem := range apiDef.Paths {
+		// getの場合
+		if pathItem.Get != nil {
+			// permissionのoperationIDと一致する場合
+			if pathItem.Get.OperationID == operationID {
+				if pathItem.Post != nil {
+					operationIDs = append(operationIDs, pathItem.Post.OperationID)
+				}
+				// ヒットしたpathを元にput,deleteのoperationIdを探す
+				ids := findOperationIDsByPath(path, apiDef)
+				if len(ids) != 0 {
+					operationIDs = append(operationIDs, ids...)
+				}
+			}
+		}
+	}
+	return operationIDs
+}
+
+func genPermissions(apiDef *openapi3.T) []*Permission {
+	var permissions []*Permission
+	contents := listContentsByOas(apiDef)
+
+	// 基準となるresourceIDとoperationIDをpermissionsにまとめる
+	for _, content := range contents {
+		permissions = append(permissions, &Permission{
+			ResourceID:   content.ResourceID,
+			OperationIDs: []string{content.OperationID},
+		})
+	}
+
+	// permissionsを基準に、足りないoperationIDを探す
+	for _, permission := range permissions {
+		operationIDs := findOperationIDsByOperationID(permission.OperationIDs[0], apiDef)
+		if len(operationIDs) != 0 {
+			permission.OperationIDs = append(permission.OperationIDs, operationIDs...)
 		}
 	}
 
-	if actionResourceID := findResourceIDByActions(uri, method, apiDef); actionResourceID != "" {
-		return actionResourceID
+	return permissions
+}
+
+// PermissionsからresourceIDを取得
+func findResourceID(operationID string, apiDef *openapi3.T) string {
+	permissions := genPermissions(apiDef)
+
+	for _, permission := range permissions {
+		if contains(permission.OperationIDs, operationID) {
+			return permission.ResourceID
+		}
 	}
 
 	return ""
+}
 
+func contains(a []string, s string) bool {
+	for _, v := range a {
+		if s == v {
+			return true
+		}
+	}
+	return false
 }
