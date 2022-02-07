@@ -2,6 +2,8 @@ package domains
 
 import (
 	"encoding/json"
+	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/cam-inc/viron/packages/golang/logging"
@@ -9,7 +11,6 @@ import (
 	"github.com/cam-inc/viron/packages/golang/constant"
 	"github.com/cam-inc/viron/packages/golang/helpers"
 	"github.com/getkin/kin-openapi/openapi3"
-	pathToRegexp "github.com/soongo/path-to-regexp"
 )
 
 type (
@@ -42,6 +43,11 @@ type (
 	}
 
 	XPages []*XPage
+
+	Permission struct {
+		ResourceID   string
+		OperationIDs []string
+	}
 )
 
 // GetOas ロールに沿ったoasを返す
@@ -101,7 +107,7 @@ func ACLAllow(method, uri string, roleIDs []string, apiDef *openapi3.T) bool {
 
 	log := logging.GetDefaultLogger()
 
-	operationID := findOperationID(uri, method, apiDef)
+	operationID := findOperationIDByPathMethod(method, uri, apiDef)
 	if operationID == "" {
 		log.Debugf("not operationID uri[%+v] method[%+v] roleIDs[%+v] apiDef[%+v]", uri, method, roleIDs, apiDef)
 		return false
@@ -127,33 +133,6 @@ func ACLAllow(method, uri string, roleIDs []string, apiDef *openapi3.T) bool {
 	return false
 }
 
-// getPathItem uriにヒットするとpathとpathItemをoasから取得する
-func getPathItem(uri string, apiDef *openapi3.T) *openapi3.PathItem {
-	for path, pathItem := range apiDef.Paths {
-		match, err := pathToRegexp.Match(path, nil)
-		if err != nil {
-			continue
-		}
-		if result, err := match(uri); result != nil && err == nil {
-			return pathItem
-		}
-	}
-	return nil
-}
-
-// findOperationID uri,methodに対応するopeartionIdを取得
-func findOperationID(uri, method string, apiDef *openapi3.T) string {
-	pathItem := getPathItem(uri, apiDef)
-	if pathItem == nil {
-		return ""
-	}
-	operation := pathItem.GetOperation(helpers.MethodNameUpper(method))
-	if operation == nil {
-		return ""
-	}
-	return operation.OperationID
-}
-
 // listContentByOas oasのx-pages内のcontentsを一覧取得
 func listContentsByOas(apiDef *openapi3.T) []*Content {
 	contents := []*Content{}
@@ -167,7 +146,11 @@ func listContentsByOas(apiDef *openapi3.T) []*Content {
 		log.Errorf("x-pages json.marshal failed. err:%v\n", err)
 		return contents
 	}
-	json.Unmarshal(encodedXPages, xPages)
+	err = json.Unmarshal(encodedXPages, xPages)
+	if err != nil {
+		log.Errorf("json.Unmarshal failed. err:%v\n", err)
+		return contents
+	}
 
 	for _, xPage := range *xPages {
 		for _, v := range xPage.Contents {
@@ -175,17 +158,6 @@ func listContentsByOas(apiDef *openapi3.T) []*Content {
 		}
 	}
 	return contents
-}
-
-// findResourceID x-pagesからoperationIdを取得
-func findResourceID(operationID string, apiDef *openapi3.T) string {
-	contents := listContentsByOas(apiDef)
-	for _, c := range contents {
-		if c.OperationID == operationID {
-			return c.ResourceID
-		}
-	}
-	return ""
 }
 
 func genOperationIDPathMethodMap(apiDef *openapi3.T) operationIDPathMethodMap {
@@ -215,63 +187,84 @@ func findPathMethodByOperationID(operationID string, apiDef *openapi3.T) *pathMe
 	return pm
 }
 
-// findResourceIDByActions uri,methodをactionsに持つcontentのresourceIdを取得
-func findResourceIDByActions(uri, method string, apiDef *openapi3.T) string {
-	contents := listContentsByOas(apiDef)
-	for _, c := range contents {
-		if len(c.Actions) == 0 {
+// findOperationIDByPathMethod pathとmethodからoperationIDを取得
+func findOperationIDByPathMethod(method, path string, apiDef *openapi3.T) string {
+	oMap := genOperationIDPathMethodMap(apiDef)
+	for operationID, pathMethod := range oMap {
+		// rootは除外
+		if pathMethod.path == "/" {
 			continue
 		}
-		for _, a := range c.Actions {
-			pm := findPathMethodByOperationID(a.OperationID, apiDef)
-			if pm.method == method {
-				match, err := pathToRegexp.Match(pm.path, nil)
-				if err != nil {
-					continue
-				}
-				if result, err := match(uri); result != nil && err == nil {
-					return c.ResourceID
-				}
-			}
+
+		// /users/{userId} を /users/+ に正規表現パターンにする
+		rep := regexp.MustCompile(`{.+}`)
+		pattern := rep.ReplaceAllString(pathMethod.path, "+")
+		matcher := regexp.MustCompile(pattern)
+
+		// メソッド名が同じ かつ パスと正規表現でマッチする かつ "/"の数が同じ
+		if strings.EqualFold(pathMethod.method, method) && matcher.MatchString(path) && (strings.Count(path, "/") == strings.Count(pathMethod.path, "/")) {
+			return operationID
 		}
 	}
 	return ""
 }
 
-func getResourceID(uri, method string, apiDef *openapi3.T) string {
-	operationID := findOperationID(uri, method, apiDef)
-	if operationID == "" {
-		return ""
-	}
-	resourceID := findResourceID(operationID, apiDef)
-	if resourceID != "" {
-		return resourceID
+// genPermissions resourceIDをキーにして、operationIDのlistを返す
+func genPermissions(apiDef *openapi3.T) []*Permission {
+	var permissions []*Permission
+	// x-pagesのcontentsをpermissionの基準にする
+	contents := listContentsByOas(apiDef)
+
+	// 全てのcontentの関連するresourceIDとoperationIDのセットをapiDefから収集する
+	for _, content := range contents {
+		// 基準となるoperationIDに関連するoperationIDの配列を取得
+		operationIDs := findPermissionOperationIDs(content.OperationID, apiDef)
+		// actionsのoperationIDも同じresourceIDとする
+		for _, action := range content.Actions {
+			operationIDs = append(operationIDs, action.OperationID)
+		}
+
+		permissions = append(permissions, &Permission{
+			ResourceID:   content.ResourceID,
+			OperationIDs: operationIDs,
+		})
 	}
 
-	parentUri := uri
-	parentLastIndex := strings.LastIndex(parentUri, "/")
-	for {
-		parentUri := parentUri[0:parentLastIndex]
-		for _, method := range constant.API_METHODS {
-			oid := findOperationID(parentUri, method, apiDef)
-			if oid == "" {
-				continue
+	return permissions
+}
+
+// findPermissionOperationIDs 指定のoperationIDに関連するoperationIDの配列を返す
+func findPermissionOperationIDs(operationID string, apiDef *openapi3.T) []string {
+	pathMethod := findPathMethodByOperationID(operationID, apiDef)
+
+	var operationIDs []string
+	for path, pathItem := range apiDef.Paths {
+		// 対象のpathかどうかをチェック
+		// ex)
+		// 対象のpath "/users
+		// 対象のpath "/users/{xxx}"
+		// 非対象のpath "/users/purchases/{xxx}"
+		// 非対象のpath "/users/{xxx}/purchases/{xxx}"
+		if path == pathMethod.path || (strings.Count(path, "/") == 2 && regexp.MustCompile(fmt.Sprintf(`^%s/{.+}$`, pathMethod.path)).MatchString(path)) {
+			operations := pathItem.Operations()
+			for _, operation := range operations {
+				operationIDs = append(operationIDs, operation.OperationID)
 			}
-			rid := findResourceID(oid, apiDef)
-			if rid != "" {
-				return rid
-			}
-		}
-		parentLastIndex = strings.LastIndex(parentUri, "/")
-		if parentLastIndex == 0 {
-			break
 		}
 	}
+	return operationIDs
+}
 
-	if actionResourceID := findResourceIDByActions(uri, method, apiDef); actionResourceID != "" {
-		return actionResourceID
+// PermissionsからresourceIDを取得
+func findResourceID(operationID string, apiDef *openapi3.T) string {
+	permissions := genPermissions(apiDef)
+
+	for _, permission := range permissions {
+		operationIDs := helpers.StringSlice(permission.OperationIDs)
+		if operationIDs.Contains(operationID) {
+			return permission.ResourceID
+		}
 	}
 
 	return ""
-
 }
