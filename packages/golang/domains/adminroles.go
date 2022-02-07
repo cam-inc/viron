@@ -298,15 +298,6 @@ func hasPermissionByResourceID(id, resourceID string, permissions []string) bool
 	return false
 }
 
-// hasPermission ユーザーがリソースを操作する権限を持っているかチェック
-func hasPermission(userID, requestURI, requestMethod string, apiDef *openapi3.T) bool {
-	resourceID := getResourceID(requestURI, requestMethod, apiDef)
-	if resourceID == "" {
-		return true
-	}
-	return hasPermissionByResourceID(userID, resourceID, method2Permissions(requestMethod))
-}
-
 // ListResourcesByOas resource一覧
 func ListResourcesByOas(apiDef *openapi3.T) []string {
 
