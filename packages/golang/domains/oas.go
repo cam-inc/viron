@@ -234,6 +234,7 @@ func findResourceIDByActions(uri, method string, apiDef *openapi3.T) string {
 	return ""
 }
 
+// genPermissions resourceIDをキーにして、operationIDのlistを返す
 func genPermissions(apiDef *openapi3.T) []*Permission {
 	var permissions []*Permission
 	// x-pagesのcontentsをpermissionの基準にする
@@ -242,7 +243,7 @@ func genPermissions(apiDef *openapi3.T) []*Permission {
 	// 全てのcontentの関連するresourceIDとoperationIDのセットをapiDefから収集する
 	for _, content := range contents {
 		// 基準となるoperationIDに関連するoperationIDの配列を取得
-		operationIDs := findPermissionOperationIDs(content.OperationID, apiDef)
+		operationIDs := findPermissionOperationIDsByPath(content.OperationID, apiDef)
 		// actionsのoperationIDも同じresourceIDとする
 		for _, action := range content.Actions {
 			operationIDs = append(operationIDs, action.OperationID)
@@ -257,22 +258,10 @@ func genPermissions(apiDef *openapi3.T) []*Permission {
 	return permissions
 }
 
-// findPermissionOperationIDs 指定のoperationIDに関連するoperationIDの配列を返す
-func findPermissionOperationIDs(operationID string, apiDef *openapi3.T) []string {
-	for path, pathItem := range apiDef.Paths {
-		operations := pathItem.Operations()
-		for _, operation := range operations {
-			// 指定のoperationIDを探す
-			if operation.OperationID == operationID {
-				return findPermissionOperationIDsByPath(path, apiDef)
-			}
-		}
-	}
-	return []string{} // ない場合は空で返す
-}
+// findPermissionOperationIDsByPath 指定のoperationIDに関連するoperationIDの配列を返す
+func findPermissionOperationIDsByPath(operationID string, apiDef *openapi3.T) []string {
+	pathMethod := findPathMethodByOperationID(operationID, apiDef)
 
-// findPermissionOperationIDsByPath basePathに関連するoperationIDを返す
-func findPermissionOperationIDsByPath(basePath string, apiDef *openapi3.T) []string {
 	var operationIDs []string
 	for path, pathItem := range apiDef.Paths {
 		// 対象のpathかどうかをチェック
@@ -281,7 +270,7 @@ func findPermissionOperationIDsByPath(basePath string, apiDef *openapi3.T) []str
 		// 対象のpath "/users/{xxx}"
 		// 非対象のpath "/users/purchases/{xxx}"
 		// 非対象のpath "/users/{xxx}/purchases/{xxx}"
-		if path == basePath || (strings.Count(path, "/") == 2 && regexp.MustCompile(fmt.Sprintf(`^%s/{.+}$`, basePath)).MatchString(path)) {
+		if path == pathMethod.path || (strings.Count(path, "/") == 2 && regexp.MustCompile(fmt.Sprintf(`^%s/{.+}$`, pathMethod.path)).MatchString(path)) {
 			operations := pathItem.Operations()
 			for _, operation := range operations {
 				operationIDs = append(operationIDs, operation.OperationID)
@@ -296,19 +285,11 @@ func findResourceID(operationID string, apiDef *openapi3.T) string {
 	permissions := genPermissions(apiDef)
 
 	for _, permission := range permissions {
-		if contains(permission.OperationIDs, operationID) {
+		operationIDs := helpers.StringSlice(permission.OperationIDs...)
+		if operationIDs.Contains(operationID) {
 			return permission.ResourceID
 		}
 	}
 
 	return ""
-}
-
-func contains(a []string, s string) bool {
-	for _, v := range a {
-		if s == v {
-			return true
-		}
-	}
-	return false
 }
