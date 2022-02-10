@@ -2,7 +2,7 @@ If you have updated the OpenAPI definition, please update the server code using 
 
 ### Simple steps
 
-Install [oapi-codegen](https://github.com/deepmap/oapi-codegen)
+Install [oapi-codegen](https://github.com/deepmap/oapi-codegen).
 ```
 $ go get github.com/deepmap/oapi-codegen/cmd/oapi-codegen
 ```
