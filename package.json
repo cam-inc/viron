@@ -1,7 +1,5 @@
 {
   "version": "2.0.0",
-  "description": "Design-based Management Console.",
-  "main": "TODO",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cam-inc/viron.git"

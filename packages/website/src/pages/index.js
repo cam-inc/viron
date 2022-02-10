@@ -15,16 +15,16 @@ function Home() {
   return (
     <Layout
       title={`${siteConfig.title}`}
-      description={`${description}`}>
-      <header className={clsx('hero hero--primary', styles.heroBanner)}>
-        <div className="container">
-          <h1 className="hero__title">{siteConfig.title}</h1>
+    description={`${description}`}>
+
+      <header className={styles.header}>
+      <div>
+      <h1 className="hero__title">{siteConfig.title}</h1>
       <p className="hero__subtitle">{translate({
         id: 'cmn.tagline',
         message: 'Magic to turn OAS into GUI.'
       })}</p>
-          <div className={styles.buttons}>
-          <Link
+      <Link
               className={clsx(
                 'button button--outline button--secondary button--lg',
                 styles.getStarted,
@@ -34,14 +34,17 @@ function Home() {
         message: 'Get Started'
       })}
             </Link>
-          </div>
-        </div>
+      </div>
+      <div>
+      <img src={useBaseUrl('img/viron_kv.png')}/>
+      </div>
       </header>
+
       <main>
         <section className={styles.features}>
-          <div className="container">
-            <div className="row">
-              <div className={clsx('col col--4', styles.feature)}>
+
+    <div className={styles.feature}>
+      <div className={styles.feature__body}>
                 <h3>{translate({
                   id: 'cmn.features.01.title',
                   message: 'Frontend-NoCode'
@@ -50,8 +53,13 @@ function Home() {
                  id: 'cmn.features.01.body',
                  message: 'No need to write any frontend-matter codes.'
                 })}</p>
-              </div>
-              <div className={clsx('col col--4', styles.feature)}>
+      </div>
+      <div className={styles.feature__sub}><img src={useBaseUrl('img/feature_nocode.png')} /></div>
+      </div>
+
+
+      <div className={styles.feature}>
+      <div className={styles.feature__body}>
                 <h3>{translate({
                   id: 'cmn.features.02.title',
                   message: 'Open-Source Software'
@@ -60,8 +68,12 @@ function Home() {
                  id: 'cmn.features.02.body',
                  message: 'Viron is an open-source software, which grants anyone to edit, study, distribute and contribute to it for free.'
                 })}</p>
-              </div>
-              <div className={clsx('col col--4', styles.feature)}>
+      </div>
+      <div className={styles.feature__sub}><img src={useBaseUrl('img/feature_oss.png')} /></div>
+      </div>
+
+      <div className={styles.feature}>
+      <div className={styles.feature__body}>
                 <h3>{translate({
                   id: 'cmn.features.03.title',
                   message: 'Fine-Tuned User Interface'
@@ -70,8 +82,12 @@ function Home() {
                  id: 'cmn.features.03.body',
                  message: 'Viron works on all modern browsers and offers responsive UI. It also supports light and dark modes with 24+ color themes.'
                 })}</p>
-              </div>
-              <div className={clsx('col col--4', styles.feature)}>
+      </div>
+      <div className={styles.feature__sub}><img src={useBaseUrl('img/feature_ui.png')} /></div>
+      </div>
+
+    <div className={styles.feature}>
+      <div className={styles.feature__body}>
                 <h3>{translate({
                   id: 'cmn.features.04.title',
                   message: 'OpenAPI Specification-driven'
@@ -80,9 +96,10 @@ function Home() {
                  id: 'cmn.features.04.body',
                  message: 'What a OAS can describe is what Viron can display on a screen. Viron grows as OAS does.'
                 })}</p>
-              </div>
-            </div>
-          </div>
+      </div>
+      <div className={styles.feature__sub}><img src={useBaseUrl('img/feature_oas.png')} /></div>
+      </div>
+
         </section>
       </main>
     </Layout>

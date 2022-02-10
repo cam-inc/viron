@@ -8,7 +8,6 @@ export default (document: Document | null = null): void => {
     if (document?.info['x-theme']) {
       setTheme(document.info['x-theme']);
     } else {
-      //setTheme(THEME.RED);
       setTheme(THEME.BLUE);
     }
   }, [document, setTheme]);

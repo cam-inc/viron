@@ -69,7 +69,7 @@ const Add: React.FC<Props> = ({ onAdd, onCancel }) => {
           <Head
             on={COLOR_SYSTEM.SURFACE}
             title="Create a Group"
-            description="TODO: 新規グループを作成します。"
+            description="Manage endpoints in groups."
           />
         </div>
         <div className="space-y-4">

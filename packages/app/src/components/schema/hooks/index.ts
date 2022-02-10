@@ -223,7 +223,7 @@ export const useAutocomplete = function <T>(
         );
         const requestInit = constructRequestInit(request, requestPayloads);
         const [response, responseError] = await promiseErrorHandler<Response>(
-          window.fetch(requestInfo, requestInit)
+          globalThis.fetch(requestInfo, requestInit)
         );
         if (responseError) {
           // TODO: エラー処理
@@ -313,7 +313,7 @@ export const useDynamicEnum = function <T>(
         );
         const requestInit = constructRequestInit(request, requestPayloads);
         const [response, responseError] = await promiseErrorHandler<Response>(
-          window.fetch(requestInfo, requestInit)
+          globalThis.fetch(requestInfo, requestInit)
         );
         if (responseError) {
           // TODO: エラー処理

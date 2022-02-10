@@ -22,15 +22,17 @@ const ExternalDocs: React.FC<Props> = ({ on, data, className = '' }) => {
   return (
     <>
       <div
-        className={classnames('text-xxs', `text-thm-on-${on}`, className)}
+        className={classnames(className)}
         ref={popover.targetRef}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <Link on={on} to={data.url}>
-          <div className="flex items-center gap-1">
-            <div>external docs</div>
+        <Link className="group focus-outline-none" on={on} to={data.url}>
+          <div
+            className={`flex gap-1 items-center text-xs text-thm-on-${on} group-hover:underline group-active:text-thm-on-${on}-low group-focus:ring-2 group-focus:ring-thm-on-${on}`}
+          >
             <DocumentTextIcon className="w-em" />
+            <div>External Docs</div>
           </div>
         </Link>
       </div>

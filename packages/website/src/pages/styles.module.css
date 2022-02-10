@@ -26,12 +26,32 @@
 
 .features {
   display: flex;
-  align-items: center;
-  padding: 2rem 0;
-  width: 100%;
+  flex-direction: column;
+  gap: 36px;
+  padding: 16px;
+  max-width: 860px;
+  margin: 0 auto;
 }
 
-.featureImage {
-  height: 200px;
-  width: 200px;
+.feature {
+  display: flex;
+  gap: 16px;
+}
+
+.feature__body {
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+.feature__sub {
+  flex-shrink: 0;
+}
+
+
+.header {
+  padding: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }

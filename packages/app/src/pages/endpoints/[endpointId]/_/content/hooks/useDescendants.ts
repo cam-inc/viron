@@ -160,6 +160,31 @@ const useDescendants = function (
               error: getHTTPError(response.status as HTTPStatusCode),
             };
           }
+
+          const contentDisposition = response.headers.get(
+            'content-disposition'
+          );
+          if (contentDisposition && requestInit.method === 'get') {
+            await response.blob().then((blob) => {
+              const blobURL = globalThis.URL.createObjectURL(blob);
+              const elm = globalThis.document.createElement('a');
+              elm.download =
+                contentDisposition
+                  .split('filename=')[1]
+                  .split(';')[0]
+                  .replace(/['"]/g, '') || 'download';
+              elm.href = blobURL;
+              elm.style.display = 'none';
+              globalThis.document.body.appendChild(elm);
+              elm.click();
+              // clean up.
+              globalThis.document.body.removeChild(elm);
+              globalThis.URL.revokeObjectURL(blobURL);
+            });
+            return {
+              data: null,
+            };
+          }
           const data = await response.json();
           return {
             data,

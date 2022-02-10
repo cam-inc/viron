@@ -211,8 +211,9 @@ export const useEndpoint = (): UseEndpointReturn => {
 
   const connect = useCallback<UseEndpointReturn['connect']>(async (url) => {
     const [response, responseError] = await promiseErrorHandler(
-      fetch(url, {
+      globalThis.fetch(url, {
         mode: 'cors',
+        credentials: 'include',
       })
     );
     // Could not establish a network connection to the endpoint.
@@ -247,7 +248,7 @@ export const useEndpoint = (): UseEndpointReturn => {
     async (endpoint) => {
       // Ping to see whether the authorization cookie is valid.
       const [response, responseError] = await promiseErrorHandler(
-        fetch(endpoint.url, {
+        globalThis.fetch(endpoint.url, {
           mode: 'cors',
           credentials: 'include',
         })
@@ -282,10 +283,11 @@ export const useEndpoint = (): UseEndpointReturn => {
       }
       const [authenticationResponse, authenticationResponseError] =
         await promiseErrorHandler(
-          fetch(
+          globalThis.fetch(
             `${new globalThis.URL(endpoint.url).origin}${authenticationPath}`,
             {
               mode: 'cors',
+              credentials: 'include',
             }
           )
         );
@@ -304,7 +306,7 @@ export const useEndpoint = (): UseEndpointReturn => {
       }
       authentication.oas = resolve(authentication.oas);
       // TODO: validate more severely.
-      if (!authentication.list?.length) {
+      if (!authentication.list) {
         return {
           error: new EndpointError(
             `GET ${authenticationPath} returns data not properly formatted.`
@@ -404,7 +406,7 @@ export const useEndpoint = (): UseEndpointReturn => {
       );
       const requestInit = constructRequestInit(request, requestPayloads);
       const [response, responseError] = await promiseErrorHandler(
-        fetch(requestInfo, requestInit)
+        globalThis.fetch(requestInfo, requestInit)
       );
       if (!!responseError) {
         return {
@@ -549,7 +551,7 @@ export const useEndpoint = (): UseEndpointReturn => {
       );
       const requestInit = constructRequestInit(request, requestPayloads);
       const [response, responseError] = await promiseErrorHandler(
-        fetch(requestInfo, requestInit)
+        globalThis.fetch(requestInfo, requestInit)
       );
       if (!!responseError) {
         return {
@@ -616,7 +618,7 @@ export const useEndpoint = (): UseEndpointReturn => {
         );
         const requestInit = constructRequestInit(request, requestPayloads);
         const [response, responseError] = await promiseErrorHandler(
-          fetch(requestInfo, requestInit)
+          globalThis.fetch(requestInfo, requestInit)
         );
         if (!!responseError) {
           return {
