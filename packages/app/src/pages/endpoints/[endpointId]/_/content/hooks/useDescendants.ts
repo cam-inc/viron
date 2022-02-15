@@ -48,11 +48,13 @@ const useDescendants = function (
     const baseRequest = getBaseRequestResult.value;
 
     // Add operations under the rule of [1] described above.
-    const pathItems = _.filter(
-      document.paths,
-      (_, path) =>
-        path !== baseRequest.path && path.indexOf(baseRequest.path) === 0
-    );
+    const pathItems = _.filter(document.paths, (_, path) => {
+      if (path === baseRequest.path) {
+        return false;
+      }
+      // The slash at the end is necessary for cases like: "/abc", "/abc/def", "/abcdef"
+      return path.indexOf(`${baseRequest.path}/`) === 0;
+    });
     _.each(pathItems, (pathItem) => {
       // TODO: method一覧の扱い改善。
       (
