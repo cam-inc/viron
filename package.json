@@ -45,6 +45,7 @@
     "example-nodejs:docker-compose:up:mysql": "docker-compose -f ./docker-compose.example-nodejs.mysql.yml up --build --force-recreate"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.20.0",
     "@commitlint/cli": "^16.1.0",
     "@commitlint/config-conventional": "^16.0.0",
     "husky": "^5.0.6",
