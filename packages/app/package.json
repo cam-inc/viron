@@ -1,11 +1,15 @@
 {
   "name": "@viron/app",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "engines": {
     "node": ">=15.13.0",
     "npm": ">=7.9.0"
   },
-  "browserslist": [">5%", "last 2 versions", "not dead"],
+  "browserslist": [
+    ">5%",
+    "last 2 versions",
+    "not dead"
+  ],
   "scripts": {
     "pre-commit": "run-s lint:staged test:static test:unit",
     "pre-push": "npm run ci:local",
