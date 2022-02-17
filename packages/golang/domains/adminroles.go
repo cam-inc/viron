@@ -317,7 +317,7 @@ func ListResourcesByOas(apiDef *openapi3.T) []string {
 }
 
 // ListByOas 管理ロール一覧
-func ListByOas(apiDef *openapi3.T) *AdminRolesWithPager {
+func ListByOas(apiDef *openapi3.T, page, size int) *AdminRolesWithPager {
 
 	policies := listPolicies("")
 	log.Debugf("policies=%+v", policies)
@@ -325,10 +325,12 @@ func ListByOas(apiDef *openapi3.T) *AdminRolesWithPager {
 	resources := ListResourcesByOas(apiDef)
 	log.Debugf("resources=%+v", resources)
 
+	var keys []string
 	policyMap := map[string]map[string]string{}
 	for _, policy := range policies {
 		if _, exists := policyMap[policy[0]]; !exists {
 			policyMap[policy[0]] = map[string]string{}
+			keys = append(keys, policy[0])
 		}
 		if len(policy) != 3 || len(policy[2]) == 0 {
 			policyMap[policy[0]][policy[1]] = constant.PERMISSION_DENY
@@ -340,13 +342,14 @@ func ListByOas(apiDef *openapi3.T) *AdminRolesWithPager {
 	log.Debugf("policyMap=%+v", policyMap)
 
 	result := []*AdminRole{}
-	for roleID, _ := range policyMap {
+
+	for _, key := range keys {
 		role := &AdminRole{
-			ID:          roleID,
+			ID:          key,
 			Permissions: []*AdminRolePermission{},
 		}
 		for _, resourceID := range resources {
-			permission, exists := policyMap[roleID][resourceID]
+			permission, exists := policyMap[key][resourceID]
 			if !exists {
 				permission = constant.PERMISSION_DENY
 			}
@@ -359,11 +362,23 @@ func ListByOas(apiDef *openapi3.T) *AdminRolesWithPager {
 		result = append(result, role)
 	}
 
-	//helpers.Paging(result, len(result), constant.DEFAULT_PAGER_PAGE)
-	pager := &AdminRolesWithPager{
-		List: result,
+	start := (page - 1) * size
+	end := page * size
+
+	l := len(result)
+
+	if start > l {
+		start = 0
 	}
-	pager.Pager = Pagging(len(result), len(result), constant.DEFAULT_PAGER_PAGE)
+
+	if end > l {
+		end = l
+	}
+
+	pager := &AdminRolesWithPager{
+		List: result[start:end],
+	}
+	pager.Pager = Pagging(len(result), size, page)
 	return pager
 
 }

@@ -76,15 +76,28 @@ func toVironAdminRolePermissionDomain(permissions []VironAdminRolePermission) []
 	return d
 }
 
+func (params ListVironAdminRolesParams) page() int {
+	if params.Page == nil {
+		return constant.DEFAULT_PAGER_PAGE
+	}
+	return params.Page.Page()
+}
+func (params ListVironAdminRolesParams) size() int {
+	if params.Size == nil {
+		return constant.DEFAULT_PAGER_SIZE
+	}
+	return params.Size.Size()
+}
+
 // ListVironAdminRoles 管理ロール一覧
-func (a *adminroleImpl) ListVironAdminRoles(w http.ResponseWriter, r *http.Request) {
+func (a *adminroleImpl) ListVironAdminRoles(w http.ResponseWriter, r *http.Request, params ListVironAdminRolesParams) {
 	ctxApiDef := r.Context().Value(constant.CTX_KEY_API_DEFINITION)
 	apiDef, exists := ctxApiDef.(*openapi3.T)
 	if !exists {
 		helpers.SendError(w, http.StatusInternalServerError, fmt.Errorf(`{"code":%d,"message":"notfound api-definition in ctx"}`, http.StatusInternalServerError))
 		return
 	}
-	result := domains.ListByOas(apiDef)
+	result := domains.ListByOas(apiDef, params.page(), params.size())
 	if result == nil {
 		helpers.SendError(w, http.StatusInternalServerError, fmt.Errorf(`{"code":%d,"message":"notfound roles"}`, http.StatusInternalServerError))
 		return
