@@ -365,20 +365,20 @@ func ListByOas(apiDef *openapi3.T, page, size int) *AdminRolesWithPager {
 	start := (page - 1) * size
 	end := page * size
 
-	l := len(result)
+	cnt := len(result)
 
-	if start > l {
+	if start > cnt {
 		start = 0
 	}
 
-	if end > l {
-		end = l
+	if end > cnt {
+		end = cnt
 	}
 
 	pager := &AdminRolesWithPager{
 		List: result[start:end],
 	}
-	pager.Pager = Pagging(len(result), size, page)
+	pager.Pager = Pagging(cnt, size, page)
 	return pager
 
 }
