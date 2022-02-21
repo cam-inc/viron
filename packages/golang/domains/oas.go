@@ -243,9 +243,9 @@ func findPermissionOperationIDs(operationID string, apiDef *openapi3.T) []string
 		// ex)
 		// 対象のpath "/users
 		// 対象のpath "/users/{xxx}"
-		// 非対象のpath "/users/purchases/{xxx}"
-		// 非対象のpath "/users/{xxx}/purchases/{xxx}"
-		if path == pathMethod.path || (strings.Count(path, "/") == 2 && regexp.MustCompile(fmt.Sprintf(`^%s/{.+}$`, pathMethod.path)).MatchString(path)) {
+		// 対象のpath "/users/purchases/{xxx}"
+		// 対象のpath "/users/{xxx}/purchases/{yyy}"
+		if path == pathMethod.path || regexp.MustCompile(fmt.Sprintf(`^%s/.+$`, pathMethod.path)).MatchString(path) {
 			operations := pathItem.Operations()
 			for _, operation := range operations {
 				operationIDs = append(operationIDs, operation.OperationID)
