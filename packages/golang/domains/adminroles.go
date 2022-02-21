@@ -288,6 +288,7 @@ func hasPermissionByResourceID(id, resourceID string, permissions []string) bool
 
 	log.Debug("hasPermissionByResourceID called")
 	for _, permission := range permissions {
+		casbinInstance.LoadPolicy()
 		if ok, err := casbinInstance.Enforce(id, resourceID, permission); err != nil {
 			log.Debugf("Enforce %+v", err)
 		} else if ok {
