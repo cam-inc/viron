@@ -11,12 +11,15 @@
       "email": "TODO@viron.app"
     },
     "license": {
-      "name": "TODO",
+      "name": "MIT",
       "url": "https://TODO.viron.app/"
     },
     "x-thumbnail": "https://st0.fensi.plus/ui/common/favicon/owner/favicon-96x96.png",
     "x-theme": "ultimate orange",
     "x-tags": ["tagA", "tagB", "tagC"],
+    "x-number": {
+      "responseKey": "value"
+    },
     "x-table": {
       "responseListKey": "list",
       "pager": {
@@ -110,6 +113,17 @@
                 "operationId": "get:/actions/csv/{userId}"
               }
             ]
+          }
+        ]
+      },
+      {
+        "id": "fileUploads",
+        "title": "File Uploads全般",
+        "contents": [
+          {
+            "title": "File Upload",
+            "type": "number",
+            "operationId": "get:/fileUploads/number"
           }
         ]
       },
@@ -431,6 +445,61 @@
         }
       }
     },
+    "/fileUploads/number": {
+      "get": {
+        "operationId": "get:/fileUploads/number",
+        "responses": {
+          "200": {
+            "description": "description",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "post:fileUploads",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/Empty"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "BASE64": {
+                    "type": "string",
+                    "format": "base64"
+                  },
+                  "BINARY": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": ["BINARY"]
+              },
+              "encoding": {
+                "id": {
+                },
+                "BASE64": {
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/actions/csv": {
       "get": {
         "operationId": "get:/actions/csv",
@@ -575,6 +644,18 @@
                       "type": "string"
                     },
                     "uniqueItems": true
+                  },
+                  "ANY_OF": {
+                    "type": "array",
+                    "anyOf": [
+
+                    ]
+                  },
+                  "ONE_OF": {
+                    "type": "array",
+                    "oneOf": [
+
+                    ]
                   },
                   "MAX_PROPERTIES": {
                     "type": "object",

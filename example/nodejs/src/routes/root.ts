@@ -1,6 +1,9 @@
-import { RouteContext } from '../application';
+import * as controllers from '../controllers/root';
+import { oasPath } from '../domains/oas';
+import { Route } from '../router';
 
-// root
-export const getRoot = async (context: RouteContext): Promise<void> => {
-  context.res.set('Location', '/oas').status(301).end();
+export const routeRoot: Route = {
+  name: 'root',
+  oasPath: oasPath('root'),
+  controllers,
 };

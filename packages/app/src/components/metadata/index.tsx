@@ -116,7 +116,7 @@ const Metadata: React.FC<Props> = ({
     // application name
     ret.applicationName = siteMetadata.title;
     // generator
-    ret.generator = 'TODO:prdとかdevとかセルフホストじゃないとか';
+    ret.generator = 'Gatsby';
     // theme color
     // TODO: いい感じに色を変更する。
     ret.themeColor = '#ffffff';
@@ -187,7 +187,7 @@ const Metadata: React.FC<Props> = ({
         sizes="180x180"
         href="/apple-touch-icon.png"
       />
-      <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+      <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
       <link
         rel="icon"
         type="image/png"

@@ -14,11 +14,7 @@ export const get = (): Config => {
       autoIndex: true,
       user: process.env.MONGODB_USER_NAME,
       pass: process.env.MONGODB_USER_PASSWORD,
-      useNewUrlParser: true,
-      useCreateIndex: true,
       authSource: 'admin',
-      useFindAndModify: false,
-      useUnifiedTopology: true,
       ssl: true,
       sslValidate: false,
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -30,6 +26,7 @@ export const get = (): Config => {
   const ret: Config = {
     store: {
       main: mongo,
+      vironLib: mongo,
     },
     cors: {
       allowOrigins: ['https://viron.plus', 'https://snapshot.viron.plus'],
@@ -46,6 +43,15 @@ export const get = (): Config => {
         clientSecret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET ?? '',
         additionalScopes: [],
         userHostedDomains: ['gmail.com', 'cam-inc.co.jp', 'cyberagent.co.jp'],
+      },
+    },
+    aws: {
+      s3: {
+        accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID ?? '',
+        secretAccessKey: process.env.AWS_S3_SECRET_KEY ?? '',
+        region: 'ap-northeast-1',
+        bucketName: 'production-media.viron.plus',
+        mediaDomain: 'media.viron.plus',
       },
     },
     oas: {

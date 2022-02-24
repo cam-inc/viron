@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { RequestPayloadParameter, Style } from '$types/oas';
+import { RequestPayloadParameter, Style } from '~/types/oas';
 
 type Variable = RequestPayloadParameter['value'];
 
@@ -12,99 +12,182 @@ export const serialize = function (
   explode = false
 ): string {
   switch (style) {
-    /*
-  case 'matrix':
-    return serializeMatrix(variable, explode);
-  case 'label':
-    return serializeLabel(variable, explode);
-    */
+    case 'matrix':
+      return serializeMatrix(name, variable, explode);
+    case 'label':
+      return serializeLabel(variable, explode);
     case 'form':
       return serializeForm(name, variable, explode);
     case 'simple':
       return serializeSimple(variable, explode);
-    /*
-  case 'spaceDelimited':
-    return serializeSpaceDelimited(variable, explode);
-  case 'pipeDelimited':
-    return serializePipeDelimited(variable, explode);
-  case 'deepObject':
-    return serializeDeepObject(variable, explode);
-    */
+    case 'spaceDelimited':
+      return serializeSpaceDelimited(variable);
+    case 'pipeDelimited':
+      return serializePipeDelimited(variable);
+    case 'deepObject':
+      return serializeDeepObject(name, variable);
     default:
       break;
   }
   return variable as string;
 };
-/*
+
 export const serializeMatrix = function (
+  name: string,
   variable: Variable,
   explode: boolean
 ): string {
-  // TODO
-  return variable;
+  if (_.isString(variable)) {
+    if (_.isEmpty(variable)) {
+      return `;${name}`;
+    }
+    return `;${name}=${variable}`;
+  }
+  if (_.isNumber(variable)) {
+    return `;${name}=${variable.toString()}`;
+  }
+  if (_.isBoolean(variable)) {
+    return `;${name}=${variable.toString()}`;
+  }
+  if (_.isPlainObject(variable)) {
+    if (_.isEmpty(variable)) {
+      return `;${name}`;
+    }
+    if (explode) {
+      return (
+        ';' +
+        Object.entries(variable)
+          .map(([key, value]) => `${key}=${JSON.stringify(value)}`)
+          .join(';')
+      );
+    } else {
+      return (
+        `;${name}=` +
+        Object.entries(variable)
+          .map(([key, value]) => `${key},${JSON.stringify(value)}`)
+          .join(',')
+      );
+    }
+  }
+  if (_.isArray(variable)) {
+    if (_.isEmpty(variable)) {
+      return `;${name}`;
+    }
+    if (explode) {
+      return (
+        ';' +
+        variable.map((value) => `${name}=${JSON.stringify(value)}`).join(';')
+      );
+    } else {
+      return (
+        `;${name}=` +
+        variable.map((value) => `${JSON.stringify(value)}`).join(',')
+      );
+    }
+  }
+  throw new Error('TODO');
 };
 
 export const serializeLabel = function (
   variable: Variable,
   explode: boolean
 ): string {
-  // TODO
-  return variable;
+  if (_.isString(variable)) {
+    if (_.isEmpty(variable)) {
+      return '.';
+    }
+    return `.${variable}`;
+  }
+  if (_.isNumber(variable)) {
+    if (_.isEmpty(variable)) {
+      return '.';
+    }
+    return `.${variable.toString()}`;
+  }
+  if (_.isBoolean(variable)) {
+    return `.${variable.toString()}`;
+  }
+  if (_.isPlainObject(variable)) {
+    if (_.isEmpty(variable)) {
+      return `.`;
+    }
+    if (explode) {
+      return (
+        '.' +
+        Object.entries(variable)
+          .map(([key, value]) => `${key}=${JSON.stringify(value)}`)
+          .join('.')
+      );
+    } else {
+      return (
+        '.' +
+        Object.entries(variable)
+          .map(([key, value]) => `${key}.${JSON.stringify(value)}`)
+          .join('.')
+      );
+    }
+  }
+  if (_.isArray(variable)) {
+    if (_.isEmpty(variable)) {
+      return `.`;
+    }
+    return '.' + variable.map((value) => `${JSON.stringify(value)}`).join('.');
+  }
+  throw new Error('TODO');
 };
-*/
 
 export const serializeForm = function (
   name: string,
   variable: Variable,
   explode: boolean
 ): string {
-  if (_.isNumber(variable)) {
-    return `${name}=${variable.toString()}`;
-  }
   if (_.isString(variable)) {
     return `${name}=${variable}`;
   }
-  if (_.isArray(variable)) {
+  if (_.isNumber(variable)) {
+    return `${name}=${variable.toString()}`;
+  }
+  if (_.isBoolean(variable)) {
+    return `${name}=${variable.toString()}`;
+  }
+  if (_.isPlainObject(variable)) {
+    if (_.isEmpty(variable)) {
+      return `${name}=`;
+    }
     if (explode) {
-      return variable
-        .map((v) => {
-          if (_.isNumber(v)) {
-            return v.toString();
-          }
-          return `${name}=${v}`;
-        })
+      return Object.entries(variable)
+        .map(([key, value]) => `${key}=${JSON.stringify(value)}`)
         .join('&');
     } else {
-      return `${name}=${variable
-        .map((v) => {
-          if (_.isNumber(v)) {
-            return v.toString();
-          }
-          return v;
-        })
-        .join(',')}`;
+      return (
+        `${name}=` +
+        Object.entries(variable)
+          .map(([key, value]) => `${key},${JSON.stringify(value)}`)
+          .join(',')
+      );
     }
   }
-  if (_.isObject(variable)) {
+  if (_.isArray(variable)) {
+    if (_.isEmpty(variable)) {
+      return `${name}=`;
+    }
+    // TODO: JSON.stringifyすべきかいなか。
     if (explode) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return _.map(variable, function (val: any, key) {
-        if (_.isNumber(val)) {
-          val = val.toString();
-        }
-        return `${key}=${val}`;
-      }).join('&');
+      return (
+        variable
+          //.map((value) => `${name}=${JSON.stringify(value)}`)
+          .map((value) => `${name}=${value}`)
+          .join('&')
+      );
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return `${name}=${_.map(variable, function (val: any, key) {
-        if (_.isNumber(val)) {
-          val = val.toString();
-        }
-        return `${key},${val}`;
-      }).join(',')}`;
+      return (
+        `${name}=` +
+        //variable.map((value) => `${JSON.stringify(value)}`).join(',')
+        variable.map((value) => `${value}`).join(',')
+      );
     }
   }
-  return variable;
+  throw new Error('TODO');
 };
 
 // @see: https://tools.ietf.org/html/rfc6570#section-3.2.2
@@ -112,59 +195,100 @@ export const serializeSimple = function (
   variable: Variable,
   explode: boolean
 ): string {
+  if (_.isString(variable)) {
+    if (_.isEmpty(variable)) {
+      throw new Error('TODO');
+    }
+    return variable;
+  }
   if (_.isNumber(variable)) {
     return variable.toString();
   }
-  if (_.isString(variable)) {
-    return variable;
+  if (_.isBoolean(variable)) {
+    return variable.toString();
+  }
+  if (_.isPlainObject(variable)) {
+    if (_.isEmpty(variable)) {
+      throw new Error('TODO');
+    }
+    if (explode) {
+      return Object.entries(variable)
+        .map(([key, value]) => `${key}=${JSON.stringify(value)}`)
+        .join(',');
+    } else {
+      return Object.entries(variable)
+        .map(([key, value]) => `${key},${JSON.stringify(value)}`)
+        .join(',');
+    }
   }
   if (_.isArray(variable)) {
-    return variable
-      .map((v) => {
-        if (_.isNumber(v)) {
-          return v.toString();
-        }
-        return v;
-      })
-      .join(',');
+    if (_.isEmpty(variable)) {
+      throw new Error('TODO');
+    }
+    return variable.map((value) => `${JSON.stringify(value)}`).join(',');
   }
-  if (_.isObject(variable)) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return _.map(variable, function (val: any, key) {
-      if (_.isNumber(val)) {
-        val = val.toString();
-      }
-      if (explode) {
-        return `${key}=${val}`;
-      } else {
-        return `${key},${val}`;
-      }
-    }).join(',');
-  }
-  return variable;
-};
-/*
-export const serializeSpaceDelimited = function (
-  variable: Variable,
-  explode: boolean
-): string {
-  // TODO
-  return variable;
+  throw new Error('TODO');
 };
 
-export const serializePipeDelimited = function (
-  variable: Variable,
-  explode: boolean
-): string {
-  // TODO
-  return variable;
+export const serializeSpaceDelimited = function (variable: Variable): string {
+  if (_.isString(variable) || _.isNumber(variable) || _.isBoolean(variable)) {
+    throw new Error('TODO');
+  }
+  if (_.isPlainObject(variable)) {
+    if (_.isEmpty(variable)) {
+      throw new Error('TODO');
+    }
+    return Object.entries(variable)
+      .map(([key, value]) => `${key}%20${JSON.stringify(value)}`)
+      .join('%20');
+  }
+  if (_.isArray(variable)) {
+    if (_.isEmpty(variable)) {
+      throw new Error('TODO');
+    }
+    return variable.map((value) => `${JSON.stringify(value)}`).join('%20');
+  }
+  throw new Error('TODO');
+};
+
+export const serializePipeDelimited = function (variable: Variable): string {
+  if (_.isString(variable) || _.isNumber(variable) || _.isBoolean(variable)) {
+    throw new Error('TODO');
+  }
+  if (_.isPlainObject(variable)) {
+    if (_.isEmpty(variable)) {
+      throw new Error('TODO');
+    }
+    return Object.entries(variable)
+      .map(([key, value]) => `${key}|${JSON.stringify(value)}`)
+      .join('|');
+  }
+  if (_.isArray(variable)) {
+    if (_.isEmpty(variable)) {
+      throw new Error('TODO');
+    }
+    return variable.map((value) => `${JSON.stringify(value)}`).join('|');
+  }
+  throw new Error('TODO');
 };
 
 export const serializeDeepObject = function (
-  variable: Variable,
-  explode: boolean
+  name: string,
+  variable: Variable
 ): string {
-  // TODO
-  return variable;
+  if (_.isString(variable) || _.isNumber(variable) || _.isBoolean(variable)) {
+    throw new Error('TODO');
+  }
+  if (_.isPlainObject(variable)) {
+    if (_.isEmpty(variable)) {
+      throw new Error('TODO');
+    }
+    return Object.entries(variable)
+      .map(([key, value]) => `${name}[${key}]=${JSON.stringify(value)}`)
+      .join('&');
+  }
+  if (_.isArray(variable)) {
+    throw new Error('TODO');
+  }
+  throw new Error('TODO');
 };
-*/

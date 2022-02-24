@@ -1,3 +1,6 @@
+require('dotenv').config({
+  path: `.env.${process.env.NODE_ENV}`,
+});
 const package = require('./package.json');
 
 // @see: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/
@@ -6,13 +9,19 @@ module.exports = {
   siteMetadata: {
     // TODO: 増やす
     title: 'Viron',
-    description: 'TODO: description',
-    author: 'TODO',
-    authorURL: 'TODO: readmeのauthorかpackage.jsonのauthorへのurlを使うこと。',
-    helpURL: 'TODO: vironのドキュメントページへのURL。',
-    licenseURL:
-      'TODO: readmeのlicenseかpackage.jsonのlicenseへのurlを使うこと。',
-    keywords: ['TODO'],
+    description: 'OAS-driven Frontend-NoCode Administration Console',
+    author: 'CAM, Inc.',
+    authorURL: 'https://github.com/cam-inc/viron#authors',
+    helpURL: 'https://discovery.viron.plus/docs/introduction',
+    licenseURL: 'https://github.com/cam-inc/viron/blob/develop/LICENSE',
+    keywords: [
+      'OpenAPI Specification',
+      'OAS',
+      'administration',
+      'admin',
+      'Frontend-NoCode',
+      'OSS',
+    ],
     creator: 'CAM, Inc.',
     publisher: 'CAM, Inc.',
   },
@@ -31,20 +40,7 @@ module.exports = {
       options: {
         // Edit the paths option in the tsconfig.json file as well.
         alias: {
-          $src: 'src',
-          $components: 'src/components',
-          $constants: 'src/constants',
-          $errors: 'src/errors',
-          $hooks: 'src/hooks',
-          $i18n: 'src/i18n',
-          $layouts: 'src/layouts',
-          $oas: 'src/oas',
-          $storage: 'src/storage',
-          $store: 'src/store',
-          $styles: 'src/styles',
-          $types: 'src/types',
-          $utils: 'src/utils',
-          $wrappers: 'src/wrappers',
+          '~': './src',
         },
       },
     },
@@ -62,5 +58,12 @@ module.exports = {
   // @see: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/#flags
   flags: {
     FAST_DEV: true,
+  },
+  // @see: https://www.gatsbyjs.com/docs/api-proxy/#advanced-proxying
+  developMiddleware: (app) => {
+    app.use((req, res, next) => {
+      res.set('x-viron-authtypes-path', '/authentication');
+      next();
+    });
   },
 };

@@ -26,6 +26,16 @@ components:
       type: string
       format: date-time
 
+  responses:
+    VironXEnumResponse:
+      description: x-enumに指定されたオペレーションのレスポンス定義
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: string
+
   parameters:
     VironIdPathParam:
       name: id

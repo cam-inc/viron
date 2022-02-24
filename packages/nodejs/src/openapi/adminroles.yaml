@@ -101,11 +101,7 @@ paths:
       description: リソースID一覧(enum用)
       responses:
         200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/VironResourceIdList'
+          $ref: './components.yaml#/components/responses/VironXEnumResponse'
       security:
         - jwt: []
 
@@ -147,12 +143,13 @@ components:
         resourceId:
           type: string
           x-enum:
-            operationId: listVironAdminRoleIds
+            operationId: listVironResourceIds
         permission:
           type: string
           enum:
             - read
             - write
+            - all
             - deny
       required:
         - resourceId
@@ -183,8 +180,3 @@ components:
             $ref: '#/components/schemas/VironAdminRolePermission'
       required:
         - permissions
-
-    VironResourceIdList:
-      type: array
-      items:
-        type: string

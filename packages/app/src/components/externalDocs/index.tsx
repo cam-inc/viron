@@ -1,50 +1,38 @@
-import { BiLinkExternal } from '@react-icons/all-files/bi/BiLinkExternal';
 import classnames from 'classnames';
 import React, { useCallback } from 'react';
-import CommonMark from '$components/commonMark';
-import Link from '$components/link';
-import Popover, { usePopover } from '$components/popover';
-import { ON, On } from '$constants/index';
-import { ClassName } from '$types/index';
-import { ExternalDocumentation } from '$types/oas';
+import { Props as BaseProps } from '~/components';
+import CommonMark from '~/components/commonMark';
+import DocumentTextIcon from '~/components/icon/documentText/outline';
+import Link from '~/components/link';
+import Popover, { usePopover } from '~/portals/popover';
+import { ExternalDocumentation } from '~/types/oas';
 
-type Props = {
-  on: On;
+type Props = BaseProps & {
   data: ExternalDocumentation;
-  className?: ClassName;
 };
 const ExternalDocs: React.FC<Props> = ({ on, data, className = '' }) => {
   const popover = usePopover<HTMLDivElement>();
-  const handleMouseEnter = useCallback(
-    function () {
-      popover.open();
-    },
-    [popover]
-  );
-  const handleMouseLeave = useCallback(
-    function () {
-      popover.close();
-    },
-    [popover]
-  );
+  const handleMouseEnter = useCallback(() => {
+    popover.open();
+  }, [popover]);
+  const handleMouseLeave = useCallback(() => {
+    popover.close();
+  }, [popover]);
 
   return (
     <>
       <div
-        className={classnames('text-xxs', className, {
-          'text-on-background': on === ON.BACKGROUND,
-          'text-on-surface': on === ON.SURFACE,
-          'text-on-primary': on === ON.PRIMARY,
-          'text-on-complementary': on === ON.COMPLEMENTARY,
-        })}
+        className={classnames(className)}
         ref={popover.targetRef}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <Link on={on} to={data.url}>
-          <div className="flex items-center gap-1">
-            <div>external docs</div>
-            <BiLinkExternal />
+        <Link className="group focus-outline-none" on={on} to={data.url}>
+          <div
+            className={`flex gap-1 items-center text-xs text-thm-on-${on} group-hover:underline group-active:text-thm-on-${on}-low group-focus:ring-2 group-focus:ring-thm-on-${on}`}
+          >
+            <DocumentTextIcon className="w-em" />
+            <div>External Docs</div>
           </div>
         </Link>
       </div>

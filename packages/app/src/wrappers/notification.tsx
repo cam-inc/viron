@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import React from 'react';
-import { ClassName } from '$types/index';
+import { ClassName } from '~/types';
 
 export const ID = 'wrapper-notification';
 

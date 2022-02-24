@@ -8,7 +8,7 @@ import {
   list,
   maskRequestBody,
 } from '../../src/domains/auditlog';
-import { VironOpenAPIObject } from '../../src/domains/oas';
+import { dereference, VironOpenAPIObject } from '../../src/domains/oas';
 import { Repository, repositoryContainer } from '../../src/repositories';
 
 describe('domains/auditlog', () => {
@@ -135,7 +135,8 @@ describe('domains/auditlog', () => {
         },
       };
 
-      const result = await maskRequestBody('/users', 'post', oas, {
+      const _oas = await dereference(oas);
+      const result = await maskRequestBody('/users', 'post', _oas, {
         name: 'test',
         password: 'xxxxxxxxxxxxxxxxxxxxxxxxxx',
       });
@@ -222,7 +223,8 @@ describe('domains/auditlog', () => {
         },
       };
 
-      const result = await maskRequestBody('/users', 'post', oas, {
+      const _oas = await dereference(oas);
+      const result = await maskRequestBody('/users', 'post', _oas, {
         name: 'test',
         password: 'xxxxxxxxxxxxxxxxxxxxxxxxxx',
         users: [

@@ -162,5 +162,38 @@
   "theme.docs.sidebar.navAriaLabel": {
     "message": "Sidebar navigation",
     "description": "The ARIA label for documentation menu"
+  },
+  "Get Started": {
+    "message": "始める"
+  },
+  "Magic to turn OAS into GUI.": {
+    "message": "Magic to turn OAS into GUI."
+  },
+  "cmn.tagline": {
+    "message": "Magic to turn OAS into GUI."
+  },
+  "cmn.features.01.title": {
+    "message": "Frontend-NoCode"
+  },
+  "cmn.features.01.body": {
+    "message": "No need to write any frontend-matter codes."
+  },
+  "cmn.features.02.title": {
+    "message": "Open-Source Software"
+  },
+  "cmn.features.02.body": {
+    "message": "Viron is an open-source software, which grants anyone to edit, study, distribute and contribute to it for free."
+  },
+  "cmn.features.03.title": {
+    "message": "Fine-Tuned User Interface"
+  },
+  "cmn.features.03.body": {
+    "message": "Viron works on all modern browsers and offers responsive UI. It also supports light and dark modes with 24+ color themes."
+  },
+  "cmn.features.04.title": {
+    "message": "OpenAPI Specification-driven"
+  },
+  "cmn.features.04.body": {
+    "message": "What a OAS can describe is what Viron can display on a screen. Viron grows as OAS does."
   }
 }

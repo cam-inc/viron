@@ -1,6 +1,6 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'react', 'react-hooks'],
+  plugins: ['@typescript-eslint', 'react', 'react-hooks', 'import'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
@@ -17,7 +17,10 @@ module.exports = {
     'no-empty-pattern': 'off',
     'no-extra-boolean-cast': 'off',
     'linebreak-style': ['error', 'unix'],
-    'react/jsx-no-bind': ['error', { ignoreRefs: true, allowFunctions: true }],
+    'react/jsx-no-bind': [
+      'error',
+      { ignoreRefs: true, allowFunctions: true, allowArrowFunctions: true },
+    ],
     'react/jsx-no-duplicate-props': 'error',
     'react/self-closing-comp': 'error',
     'react/prefer-es6-class': 'error',
@@ -34,6 +37,28 @@ module.exports = {
     ],
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
+    'import/order': [
+      'warn',
+      {
+        alphabetize: { order: 'asc', caseInsensitive: false },
+        groups: [
+          'builtin',
+          'external',
+          'internal',
+          'parent',
+          'sibling',
+          'index',
+        ],
+        pathGroups: [
+          {
+            pattern: '[$|~]/**',
+            group: 'internal',
+          },
+        ],
+        'newlines-between': 'never',
+        warnOnUnassignedImports: true,
+      },
+    ],
   },
   settings: {
     react: {

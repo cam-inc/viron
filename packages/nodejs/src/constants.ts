@@ -2,6 +2,7 @@ export const API_METHOD = {
   GET: 'get',
   POST: 'post',
   PUT: 'put',
+  PATCH: 'patch',
   DELETE: 'delete',
 } as const;
 export type ApiMethod = typeof API_METHOD[keyof typeof API_METHOD];
@@ -65,6 +66,7 @@ export const ACCESS_CONTROL_ALLOW_METHODS = [
   'GET',
   'PUT',
   'POST',
+  'PATCH',
   'DELETE',
   'HEAD',
   'OPTIONS',
@@ -87,6 +89,7 @@ export const SIGNOUT_PATH = '/signout';
 export const PERMISSION = {
   READ: 'read',
   WRITE: 'write',
+  ALL: 'all',
   DENY: 'deny',
 } as const;
 export type Permission = typeof PERMISSION[keyof typeof PERMISSION];
@@ -165,9 +168,24 @@ export type XPageContentType =
   typeof X_PAGE_CONTENT_TYPE[keyof typeof X_PAGE_CONTENT_TYPE];
 
 export const TABLE_SORT_DELIMITER = ':';
-
-export const ADMIN_USER_ID_ME = 'me';
+export const TABLE_SORT_ORDER = {
+  ASC: 'asc',
+  DESC: 'desc',
+} as const;
+export type TableSortOrder =
+  typeof TABLE_SORT_ORDER[keyof typeof TABLE_SORT_ORDER];
 
 export const CACHE_CONTROL = {
   NO_STORE: 'no-store',
 } as const;
+
+export const VIRON_DOMAINS = {
+  ADMINACCOUNTS: 'adminaccounts',
+  ADMINROLES: 'adminroles',
+  ADMINUSERS: 'adminusers',
+  AUDITLOGS: 'auditlogs',
+  AUTH: 'auth',
+  AUTHCONFIGS: 'authconfigs',
+  OAS: 'oas',
+} as const;
+export type VironDomains = typeof VIRON_DOMAINS[keyof typeof VIRON_DOMAINS];

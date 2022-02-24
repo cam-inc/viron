@@ -1,4 +1,3 @@
-// jest.config.ts
 import type { Config } from '@jest/types';
 
 const config: Config.InitialOptions = {
@@ -10,7 +9,7 @@ const config: Config.InitialOptions = {
   },
   globals: {
     'ts-jest': {
-      tsconfig: 'tsconfig.json',
+      tsconfig: 'tsconfig.test.json',
     },
   },
   testPathIgnorePatterns: [
@@ -31,6 +30,7 @@ const config: Config.InitialOptions = {
     './__tests__/fixtures/setup_env.ts',
     './__tests__/fixtures/setup_context.ts',
   ],
+  globalTeardown: './__tests__/fixtures/teardown.ts',
 };
 
 export default config;

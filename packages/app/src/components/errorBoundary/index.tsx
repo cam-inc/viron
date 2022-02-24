@@ -1,7 +1,7 @@
 import React from 'react';
-import Error from '$components/error';
-import { On } from '$constants/index';
-import { BaseError } from '$errors/index';
+import { Props as BaseProps } from '~/components';
+import Error from '~/components/error';
+import { BaseError } from '~/errors/index';
 
 type FallbackProps = {
   error: BaseError;
@@ -9,27 +9,28 @@ type FallbackProps = {
 };
 
 type Props = React.PropsWithRef<
-  React.PropsWithChildren<{
-    on: On;
-    fallback?: React.ReactElement<
-      unknown,
-      string | React.FunctionComponent | typeof React.Component
-    >;
-    fallbackRender?: (
-      props: FallbackProps
-    ) => React.ReactElement<
-      unknown,
-      string | React.FunctionComponent | typeof React.Component
-    >;
-    FallbackComponent?: React.ComponentType<FallbackProps>;
-    resetKeys?: Array<unknown>;
-    onError?: (error: BaseError, errorInfo: React.ErrorInfo) => void;
-    onReset?: (...args: Array<unknown>) => void;
-    onResetKeysChange?: (
-      prevResetKeys: Array<unknown> | undefined,
-      resetKeys: Array<unknown> | undefined
-    ) => void;
-  }>
+  React.PropsWithChildren<
+    BaseProps<'on'> & {
+      fallback?: React.ReactElement<
+        unknown,
+        string | React.FunctionComponent | typeof React.Component
+      >;
+      fallbackRender?: (
+        props: FallbackProps
+      ) => React.ReactElement<
+        unknown,
+        string | React.FunctionComponent | typeof React.Component
+      >;
+      FallbackComponent?: React.ComponentType<FallbackProps>;
+      resetKeys?: Array<unknown>;
+      onError?: (error: BaseError, errorInfo: React.ErrorInfo) => void;
+      onReset?: (...args: Array<unknown>) => void;
+      onResetKeysChange?: (
+        prevResetKeys: Array<unknown> | undefined,
+        resetKeys: Array<unknown> | undefined
+      ) => void;
+    }
+  >
 >;
 type State = {
   error: BaseError | null;

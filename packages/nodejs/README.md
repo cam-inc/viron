@@ -50,8 +50,10 @@ When the server fails to validate the JWT and returns Unauthorized(HTTP status 4
 
 For the management of admin user roles, we use `casbin` RBAC model.
 Assign resources to roles and allow them to actions.
-Only three actions are allowed: `READ, WRITE, and DENY`.
-These correspond to HTTP request methods. POST, PUT, and DELETE methods can only action on resources for which WRITE is allowed. GET method can action on resources for READ or WRITE actions are allowed.
+Only three actions are allowed: `READ, WRITE, ALL, and DENY`.
+These correspond to HTTP request methods.
+POST, PUT methods can only action on resources for which WRITE is allowed.
+GET method can action on resources for READ or WRITE actions are allowed.
 Of course, DENY does not allow any requests.
 
 You can specify the resource in your specifications `.info['x-pages'][].contents[].resourceId`.
@@ -94,7 +96,7 @@ By writing `x-skip-auditlog: true` in the `Operation` of your specifications, `i
 
 `domainsOas` provides functions for loading specifications and various other functions using your specifications.
 
-The `get()` method is an important function to get a specification that  optimized by a role.
+The `get()` method is an important function to get a specification that optimized by a role.
 The API registered with the viron endpoint should return the entire specifications.
 In this library, each function is provided as a different yaml file, but we expect them to be merged on your server.
 `get()` method is a function that removes inaccessible pages from the merged specification `.info['x-page']` and returns a user-optimized specification.

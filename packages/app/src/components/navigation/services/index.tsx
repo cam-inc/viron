@@ -1,41 +1,40 @@
-import { AiFillGithub } from '@react-icons/all-files/ai/AiFillGithub';
-import { AiFillTwitterCircle } from '@react-icons/all-files/ai/AiFillTwitterCircle';
-import classnames from 'classnames';
 import React from 'react';
-import Link from '$components/link';
-import { On, ON, URL } from '$constants/index';
+import { Props as BaseProps } from '~/components';
+import GithubIcon from '~/components/icon/github/solid';
+import TwitterIcon from '~/components/icon/twitter/solid';
+import Link from '~/components/link';
+import { URL } from '~/constants';
+import { Pathname, URL as _URL } from '~/types';
 
-type Props = {
-  on: On;
-};
+const links: {
+  to: Pathname | _URL;
+  icon: JSX.Element;
+}[] = [
+  {
+    to: URL.GITHUB,
+    icon: <GithubIcon className="w-em" />,
+  },
+  {
+    to: URL.TWITTER,
+    icon: <TwitterIcon className="w=em" />,
+  },
+];
+
+type Props = BaseProps;
 const Services: React.FC<Props> = ({ on }) => {
-  const _className = classnames('focus:outline-none focus:ring-2', {
-    'text-on-background hover:text-on-background-high focus:ring-on-background focus:text-on-background-high active:text-on-background-high':
-      on === ON.BACKGROUND,
-    'text-on-surface hover:text-on-surface-high focus:ring-on-surface focus:text-on-surface-high active:text-on-surface-high':
-      on === ON.SURFACE,
-    'text-on-primary hover:text-on-primary-high focus:ring-on-primary focus:text-on-primary-high active:text-on-primary-high':
-      on === ON.PRIMARY,
-    'text-on-complementary hover:text-on-complementary-high focus:ring-on-complementary focus:text-on-complementary-high active:text-on-complementary-high':
-      on === ON.COMPLEMENTARY,
-  });
-
   return (
-    <ul className="flex justify-center text-2xl">
-      <li className="mr-2 last:mr-0">
-        <Link on={on} to={URL.GITHUB} className="block">
-          <div className={_className}>
-            <AiFillGithub />
-          </div>
-        </Link>
-      </li>
-      <li className="mr-2 last:mr-0">
-        <Link on={on} to={URL.TWITTER} className="block">
-          <div className={_className}>
-            <AiFillTwitterCircle />
-          </div>
-        </Link>
-      </li>
+    <ul className="flex justify-center gap-2 text-2xl">
+      {links.map((item) => (
+        <li key={item.to}>
+          <Link className="block group focus:outline-none" on={on} to={item.to}>
+            <div
+              className={`text-2xl text-thm-on-${on} group-hover:text-thm-on-${on}-low group-active:text-thm-on-${on}-slight group-focus:ring-2 group-focus:ring-thm-on-${on}`}
+            >
+              {item.icon}
+            </div>
+          </Link>
+        </li>
+      ))}
     </ul>
   );
 };

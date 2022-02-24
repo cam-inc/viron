@@ -1,6 +1,9 @@
-import { RouteContext } from '../application';
+import * as controllers from '../controllers/ping';
+import { oasPath } from '../domains/oas';
+import { Route } from '../router';
 
-// Ping
-export const getPing = async (context: RouteContext): Promise<void> => {
-  context.res.setBody('pong');
+export const routePing: Route = {
+  name: 'ping',
+  oasPath: oasPath('ping'),
+  controllers,
 };

@@ -6,16 +6,8 @@ import {
   OAS_X_AUTHCONFIG_DEFAULT_REQUESTBODY,
   OAS_X_PAGES,
 } from '../constants';
-import { oasUndefined } from '../errors';
-import { getDebug } from '../logging';
-import {
-  VironOpenAPIObject,
-  VironOperationObject,
-  VironPathItemObject,
-  VironPathsObject,
-} from './oas';
-
-const debug = getDebug('domains:authconfig');
+import { operationNotFound } from '../errors';
+import { findOperation, VironOpenAPIObject, VironPathsObject } from './oas';
 
 export interface AuthConfig {
   provider: AuthConfigProvider;
@@ -43,24 +35,6 @@ export interface AuthConfigDefinition {
 
 export type AuthConfigDefinitions = AuthConfigDefinition[];
 
-const getOperation = (
-  method: ApiMethod,
-  path: string,
-  oas: VironOpenAPIObject
-): VironOperationObject => {
-  const pathItem = oas.paths[path];
-  if (!pathItem) {
-    debug('oas undefined path: %s', path);
-    throw oasUndefined();
-  }
-  const operationObject = (pathItem as VironPathItemObject)[method];
-  if (!operationObject || !operationObject.operationId) {
-    debug('oas undefined path: %s, method: %s', path, method);
-    throw oasUndefined();
-  }
-  return operationObject as VironOperationObject;
-};
-
 const genAuthConfig = (
   provider: AuthConfigProvider,
   type: AuthConfigType,
@@ -68,7 +42,10 @@ const genAuthConfig = (
   path: string,
   oas: VironOpenAPIObject
 ): AuthConfig => {
-  const operationObject = getOperation(method, path, oas);
+  const operationObject = findOperation(path, method, oas);
+  if (!operationObject) {
+    throw operationNotFound();
+  }
   return {
     provider,
     type,
@@ -89,7 +66,11 @@ export const genAuthConfigs = (
       const { provider, type, method, path } = def;
       ret.list.push(genAuthConfig(provider, type, method, path, oas));
       ret.paths[path] = ret.paths[path] ?? {};
-      ret.paths[path][method] = getOperation(method, path, oas);
+      const operation = findOperation(path, method, oas);
+      if (!operation) {
+        throw operationNotFound();
+      }
+      ret.paths[path][method] = operation;
       return ret;
     },
     {

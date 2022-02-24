@@ -4,8 +4,12 @@
 
 ## Development
 
-Run the example API server in the Quick Start section [here](../../example/nodejs/README.md).
-Then run `npm run develop --workspace=@viron/app` in order to access [https://localhost:8000/](https://localhost:8000/).
+1. Follow the section [here](../../README.md#setup) to setup.
+2. Build packages on list below by executing `npm run build --workspace=[package name]`.
+  - @viron/linter
+  - @viron/lib
+3. Run the sample API server in the Quick Start section [here](../../example/nodejs/README.md#quick-start).
+4. Run `npm run develop --workspace=@viron/app` in order to access [https://localhost:8000/](https://localhost:8000/).
 
 ### Basic Commands
 
@@ -49,6 +53,15 @@ As we use Gatsby of version 2, we need to do some tricks to architect a UI tree.
 - Layout(s): This is equivalent to each element in the `layouts` directory. This stays inside a page element, so this will be mounted and unmouted as well like page elements.
 - ModalWrapper: A parent component of every modal component.
 - Splash: This is a component that is similar to native app's splash UI.
+
+### Environment Variables
+
+We conform with the [Gatsby's direction](https://www.gatsbyjs.com/docs/how-to/local-development/environment-variables/).
+
+### TypeScript
+
+Gatsby supports TypeScript out of the box but does NOT run type checking during build; refer to the [plugin's explanation](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-plugin-typescript) for detail. We adopt the hybrid approach described [here](https://www.typescriptlang.org/docs/handbook/babel-with-typescript.html#babel-for-transpiling-tsc-for-types) to manually execute type checking.
+
 
 ### State Management
 
