@@ -44,7 +44,7 @@ func ListAccountByID(ctx context.Context, userID string) *AdminAccountsWithPager
 			},
 		},
 	}
-	pager.Pager = Pagging(1, 1, 1)
+	pager.Pager = Paging(1, 1, 1)
 	return pager
 }
 

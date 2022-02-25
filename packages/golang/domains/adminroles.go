@@ -341,8 +341,7 @@ func ListByOas(apiDef *openapi3.T, page, size int) *AdminRolesWithPager {
 
 	log.Debugf("policyMap=%+v", policyMap)
 
-	result := []*AdminRole{}
-
+	var result []*AdminRole
 	for _, key := range keys {
 		role := &AdminRole{
 			ID:          key,
@@ -362,25 +361,21 @@ func ListByOas(apiDef *openapi3.T, page, size int) *AdminRolesWithPager {
 		result = append(result, role)
 	}
 
-	start := (page - 1) * size
-	end := page * size
+	res := &AdminRolesWithPager{}
 
-	cnt := len(result)
+	res.Pager = Paging(len(result), size, page)
 
-	if start > cnt {
-		start = 0
+	if res.Start != nil && res.End != nil {
+		res.List = result[*res.Start:*res.End]
+	} else if res.Start == nil && res.End != nil {
+		res.List = result[:*res.End]
+	} else if res.Start != nil && res.End == nil {
+		res.List = result[*res.Start:]
+	} else {
+		res.List = []*AdminRole{}
 	}
 
-	if end > cnt {
-		end = cnt
-	}
-
-	pager := &AdminRolesWithPager{
-		List: result[start:end],
-	}
-	pager.Pager = Pagging(cnt, size, page)
-	return pager
-
+	return res
 }
 
 // CreateViewerRole viewerロールを作成
