@@ -1,0 +1,88 @@
+---
+title: Theme
+---
+
+# Theme
+
+This function allows you to switch UI color taste out of 24 preset patterns. With this, you will be confident about which OAS document you are editing by colorizing OAS documents depending on, for example, environmental values: local, development, or production.
+
+Switching themes is as easy as writing just a single line of code in an OAS document like shown in the code below:
+
+
+```json {4}
+{
+  openapi: "3.0.2",
+  info: {
+    "x-theme": "red" // Specify a theme name here.
+  }
+}
+```
+
+## Light and Dark Modes
+
+Each theme consists of two modes: **light** and **dark**. Viron automatically detects which one to apply by referring to the [prefers-color-scheme CSS media feature](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme) and adjusts colors on the screen to match it. So, for example, if you choose to use a theme of red, your screen will be light-reddish when the light mode is on and dark-reddish when the dark.
+
+Visit [here](https://viron.plus/theme/) to see how all the colors in a theme look.
+
+## List of All the Themes
+
+Here is a list of all the 24 themes with their name and hue value.
+
+<ColorChipTable />
+
+:::note
+We thank [Color Namer](https://colornamer.robertcooper.me/) for providing us with cool names!
+:::
+
+export const ColorChipTable = () => {
+  const list = [
+    ['red', 0],
+    ['ultimate orange', 15],
+    ['orange juice', 30],
+    ['amber', 45],
+    ['yellow', 60],
+    ['limoncello', 75],
+    ['radium', 90],
+    ['harlequin', 105],
+    ['green', 120],
+    ['lucent time', 135],
+    ['guppie green', 150],
+    ['minty paradise', 165],
+    ['aqua', 180],
+    ['capri', 195],
+    ['brescian blue', 210],
+    ['rare blue', 225],
+    ['blue', 240],
+    ['electric ultramarine', 255],
+    ['violent violent', 270],
+    ['electric purple', 285],
+    ['magenta', 300],
+    ['brutal pink', 315],
+    ['neon rose', 330],
+    ['electric crimson', 345],
+  ];
+  return (
+    <ul style={{
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: '8px',
+      padding: '0',
+      listStyle: 'none',
+    }}>
+      {list.map(item => (
+        <li style={{
+          flex: '1 1 200px',
+          margin: '0',
+        }}>
+          <div style={{
+            padding: '8px',
+            color: '#333',
+            textAlign: 'center',
+            fontWeight: 'bold',
+            backgroundColor: `hsl(${item[1]} 100% 50%)`
+          }}>{item[0]}</div>
+        </li>
+      ))}
+    </ul>
+  );
+};

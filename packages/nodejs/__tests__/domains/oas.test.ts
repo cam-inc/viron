@@ -12,7 +12,7 @@ import {
   get,
   getPath,
   getResourceId,
-  loadOas,
+  getVironSpec,
   loadResolvedOas,
   VironOpenAPIObject,
 } from '../../src/domains/oas';
@@ -42,21 +42,6 @@ describe('domains/oas', () => {
     });
 
     it('Get an oas that filtered by roleIds', async () => {
-      sandbox
-        .stub(domainsAdminrole, 'hasPermissionByResourceId')
-        .withArgs(
-          'editor',
-          'user',
-          sinon.match([PERMISSION.READ, PERMISSION.WRITE])
-        )
-        .resolves(false)
-        .withArgs(
-          'editor',
-          'blog',
-          sinon.match([PERMISSION.READ, PERMISSION.WRITE])
-        )
-        .resolves(true);
-
       const roleIds = ['editor'];
       const pageUsers = {
         id: 'users',
@@ -136,11 +121,35 @@ describe('domains/oas', () => {
         },
       };
 
+      sandbox
+        .stub(domainsAdminrole, 'hasPermissionByResourceId')
+        .withArgs(
+          'editor',
+          'user',
+          sinon.match([PERMISSION.READ, PERMISSION.WRITE, PERMISSION.ALL])
+        )
+        .resolves(false)
+        .withArgs(
+          'editor',
+          'blog',
+          sinon.match([PERMISSION.READ, PERMISSION.WRITE, PERMISSION.ALL])
+        )
+        .resolves(true);
+      sandbox
+        .stub(domainsAdminrole, 'hasPermission')
+        .withArgs('editor', '/users', 'get', oas)
+        .resolves(false)
+        .withArgs('editor', '/blogs', 'get', oas)
+        .resolves(true);
+
       const expects = Object.assign(copy(oas), {
         info: {
           title: 'test',
           version: '0.0.1',
           'x-pages': [pageBlogs],
+        },
+        paths: {
+          '/blogs': pathItemBlogs,
         },
       });
       const result = await get(oas, {}, roleIds);
@@ -154,19 +163,6 @@ describe('domains/oas', () => {
       assert.strictEqual(
         result,
         path.resolve(__dirname, '../../src/openapi/oas.yaml')
-      );
-    });
-  });
-
-  describe('loadOas', () => {
-    it('Get openapi object', async () => {
-      const oasPath = path.resolve(__dirname, '../fixtures/test_oas.yaml');
-      const result = await loadOas(oasPath);
-      assert.strictEqual(result.openapi, '3.0.2');
-      assert.strictEqual(result.info.title, '@viron/lib test');
-      assert.strictEqual(
-        result.paths['/'].get.parameters[0].$ref,
-        '#/components/parameters/TestQueryParam'
       );
     });
   });
@@ -277,6 +273,13 @@ describe('domains/oas', () => {
     it('Return null when not found.', () => {
       const result = getResourceId('/users', API_METHOD.POST, oas);
       assert.strictEqual(result, null);
+    });
+  });
+
+  describe('getVironSpec', () => {
+    it('Get merged openapi object', async () => {
+      const result = await getVironSpec();
+      assert(Object.keys(result.paths).length >= 14);
     });
   });
 });

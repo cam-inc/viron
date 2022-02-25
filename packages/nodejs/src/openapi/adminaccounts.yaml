@@ -16,6 +16,7 @@ info:
         - title: アカウント設定
           type: table
           operationId: listVironAdminAccounts
+          pagination: false
           resourceId: vironAdminAccount
 
 tags:

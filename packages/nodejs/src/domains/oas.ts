@@ -1,4 +1,3 @@
-import fs from 'fs';
 import path from 'path';
 import {
   InfoObject,
@@ -10,9 +9,9 @@ import {
   SchemaObject,
 } from 'openapi3-ts';
 import jsonSchemaRefParser from '@apidevtools/json-schema-ref-parser';
-import { load } from 'js-yaml';
-import { Match, match as matchPath } from 'path-to-regexp';
+import { match as matchPath } from 'path-to-regexp';
 import copy from 'fast-copy';
+import deepmerge from 'deepmerge';
 import { lint } from '@viron/linter';
 import {
   ApiMethod,
@@ -24,13 +23,17 @@ import {
   OAS_X_THEME,
   OAS_X_THUMBNAIL,
   Theme,
+  VironDomains,
+  VIRON_DOMAINS,
   XPageContentType,
 } from '../constants';
 import { getDebug } from '../logging';
 import { oasValidationFailure } from '../errors';
 import {
   createViewer,
+  hasPermission,
   hasPermissionByResourceId,
+  isApiMethod,
   method2Permissions,
 } from './adminrole';
 
@@ -83,7 +86,7 @@ export interface OasXPageContent {
   type: XPageContentType;
   operationId: string;
   defaultParametersValue?: OasCustomParameters;
-  defaultRequestBodyValues?: OasCustomRequestBody;
+  defaultRequestBodyValue?: OasCustomRequestBody;
   pagination?: boolean;
   autoRefreshSec?: number;
   actions?: OasXPageContentActions;
@@ -124,15 +127,6 @@ export interface OasXAutocomplete {
   responseLabelKey: string;
   responseValueKey: string;
 }
-
-export type OasNames =
-  | 'adminaccounts'
-  | 'adminroles'
-  | 'adminusers'
-  | 'auditlogs'
-  | 'auth'
-  | 'authconfigs'
-  | 'oas';
 
 export { lint };
 
@@ -180,31 +174,75 @@ export const get = async (
     return page.contents.length ? page : null;
   };
 
+  // 権限のないOperationをフィルタする
+  const filterOperation = async (
+    path: string,
+    method: ApiMethod
+  ): Promise<OperationObject | null> => {
+    const pathItem: PathItemObject = clonedApiDefinition.paths[path];
+    const operation = pathItem[method];
+    if (!operation?.operationId) {
+      return operation ?? null;
+    }
+    const tasks = roleIds.map((roleId) =>
+      hasPermission(roleId, path, method, oas)
+    );
+    for await (const hasPermission of tasks) {
+      if (hasPermission) {
+        return operation;
+      }
+    }
+    return null;
+  };
+
+  // pathItemを書き換える
+  const rewritePathItem = async (path: string): Promise<PathsObject | null> => {
+    const pathItem: PathItemObject = clonedApiDefinition.paths[path];
+    const newPathItems = await Promise.all(
+      Object.keys(pathItem).map(async (method: string) => {
+        if (!isApiMethod(method)) {
+          return null;
+        }
+        const operation = await filterOperation(path, method);
+        if (operation) {
+          return { [method]: operation };
+        }
+        return null;
+      })
+    );
+    const newPathItem = Object.assign({}, ...newPathItems);
+    if (Object.keys(newPathItem).length <= 0) {
+      return null;
+    }
+    return { [path]: newPathItem };
+  };
+
   // x-pagesを書き換える
   const pages = await Promise.all(
     (clonedApiDefinition.info[OAS_X_PAGES] ?? []).map(rewritePage)
   );
   clonedApiDefinition.info[OAS_X_PAGES] = pages.filter(Boolean) as OasXPages;
 
+  // pathsを書き換える
+  const paths = await Promise.all(
+    Object.keys(clonedApiDefinition.paths).map(rewritePathItem)
+  );
+  clonedApiDefinition.paths = Object.assign({}, ...paths);
+
   // validation
   const { isValid, errors } = lint(clonedApiDefinition);
   if (!isValid) {
     debug('OAS validation failure. errors:');
     (errors ?? []).forEach((error, i) => debug('%s: %o', i, error));
+    debug('oas: %s', JSON.stringify(clonedApiDefinition));
     throw oasValidationFailure();
   }
   return clonedApiDefinition;
 };
 
 // oasファイルのパスを取得
-export const getPath = (name: OasNames): string => {
+export const getPath = (name: VironDomains): string => {
   return path.resolve(__dirname, '..', 'openapi', `${name}.yaml`);
-};
-
-// oasをロード
-export const loadOas = async (path: string): Promise<VironOpenAPIObject> => {
-  const obj = load(await fs.promises.readFile(path, 'utf8'));
-  return obj as VironOpenAPIObject;
 };
 
 // oasをロードして$refを解決する
@@ -222,10 +260,6 @@ export const loadResolvedOas = async (
 const toExpressStylePath = (path: string): string =>
   path.replace(/{/g, ':').replace(/}/g, '');
 
-// uri(ex.`/users/1`) が oasのpath定義(ex.`/users/{userId}`) にヒットするか
-const match = (uri: string, path: string): Match =>
-  matchPath(toExpressStylePath(path))(uri);
-
 // uriにヒットするpathとpathItemを取得する
 export const getPathItem = (
   uri: string,
@@ -233,12 +267,26 @@ export const getPathItem = (
 ): {
   path: string | null;
   pathItem: PathItemObject | null;
+  params: Record<string, string> | null;
 } => {
   const { paths } = oas;
-  const matchedPath = Object.keys(paths).find((p: string) => !!match(uri, p));
+  let matchObj: { params: Record<string, string> } | undefined;
+  const matchedPath = Object.keys(paths).find((p: string) => {
+    const matcher =
+      typeof paths[p]['x-viron-path-matcher'] === 'function'
+        ? paths[p]['x-viron-path-matcher']
+        : matchPath(toExpressStylePath(p));
+    paths[p]['x-viron-path-matcher'] = matcher; // cache
+    const m = matcher(uri);
+    if (m) {
+      matchObj = m;
+    }
+    return !!m;
+  });
   return {
     path: matchedPath ?? null,
     pathItem: matchedPath ? paths[matchedPath] : null,
+    params: matchObj ? matchObj.params : null,
   };
 };
 
@@ -260,16 +308,20 @@ const findResourceId = (
   return resourceId ?? null;
 };
 
+// oasの$refを解決する
+export const dereference = async (
+  oas: VironOpenAPIObject
+): Promise<VironOpenAPIObject> => {
+  return (await jsonSchemaRefParser.dereference(oas)) as VironOpenAPIObject;
+};
+
 // uri,methodに対応するopeartionを取得
-export const findOperation = async (
+export const findOperation = (
   uri: string,
   method: string,
   oas: VironOpenAPIObject
-): Promise<OperationObject | null> => {
-  const dereferencedOas = (await jsonSchemaRefParser.dereference(
-    oas
-  )) as VironOpenAPIObject;
-  const { pathItem } = getPathItem(uri, dereferencedOas);
+): VironOperationObject | null => {
+  const { pathItem } = getPathItem(uri, oas);
   return pathItem?.[method.toLocaleLowerCase()] ?? null;
 };
 
@@ -295,21 +347,24 @@ type OperationIdPathMethodMap = Record<string, PathMethod>;
 let operationIdPathMethodMap: OperationIdPathMethodMap | null;
 const genOperationIdPathMethodMap = (
   oas: VironOpenAPIObject
-): OperationIdPathMethodMap => {
+): OperationIdPathMethodMap | null => {
   const { paths } = oas;
   Object.keys(paths).forEach((path) => {
-    Object.keys(paths[path]).forEach((method) => {
+    Object.keys(paths[path]).forEach((method: string) => {
+      if (!isApiMethod(method)) {
+        return;
+      }
       const operationObject = paths[path][method];
       if (operationObject.operationId) {
         operationIdPathMethodMap = operationIdPathMethodMap ?? {};
         operationIdPathMethodMap[operationObject.operationId] = {
-          path: path,
-          method: method as ApiMethod,
+          path,
+          method,
         };
       }
     });
   });
-  return operationIdPathMethodMap as OperationIdPathMethodMap;
+  return operationIdPathMethodMap;
 };
 
 // operationIdからpathとmethodを逆引き
@@ -318,21 +373,17 @@ const findPathMethodByOperationId = (
   oas: VironOpenAPIObject
 ): PathMethod | null => {
   const map = operationIdPathMethodMap ?? genOperationIdPathMethodMap(oas);
-  return map[operationId] ?? null;
+  return map?.[operationId] ?? null;
 };
 
-// uri,methodをactionsに持つcontentのresourceIdを取得
+// operationIdをactionsに持つcontentのresourceIdを取得
 const findResourceIdByActions = (
-  uri: string,
-  method: ApiMethod,
+  operationId: string,
   oas: VironOpenAPIObject
 ): string | null => {
   const contents = listContentsByOas(oas);
   const content = contents.find((content) =>
-    (content.actions ?? []).find((action) => {
-      const pm = findPathMethodByOperationId(action.operationId, oas);
-      return pm?.method === method && !!match(uri, pm.path);
-    })
+    (content.actions ?? []).find((action) => action.operationId === operationId)
   );
   return content?.resourceId ?? null;
 };
@@ -349,7 +400,11 @@ export const getResourceId = (
 ): string | null => {
   // operationIdからresourceIdを取得できれば終了
   const operationId = findOperationId(uri, method, oas);
-  const resourceId = operationId ? findResourceId(operationId, oas) : null;
+  if (!operationId) {
+    return null;
+  }
+
+  const resourceId = findResourceId(operationId, oas);
   if (resourceId) {
     debug(
       'Hit the passed uri and method. %s:%s, ResourceId: %s',
@@ -388,7 +443,7 @@ export const getResourceId = (
   }
 
   // uriとmethodがどこかのactionsに定義されているかもしれないので探す
-  const actionResourceId = findResourceIdByActions(uri, method, oas);
+  const actionResourceId = findResourceIdByActions(operationId, oas);
   if (actionResourceId) {
     debug(
       'Hit actions uri. %s:%s, ResourceId: %s',
@@ -401,4 +456,20 @@ export const getResourceId = (
 
   // ここまでヒットしなければresourceIdを特定できないのでnullを返す
   return null;
+};
+
+// 複数のoasをマージする
+export const merge = (
+  ...apiDefinitions: VironOpenAPIObject[]
+): VironOpenAPIObject => {
+  return deepmerge.all(apiDefinitions) as VironOpenAPIObject;
+};
+
+// @viron/libが提供している機能のoasを1つにして返す
+export const getVironSpec = async (): Promise<VironOpenAPIObject> => {
+  const names = Object.values(VIRON_DOMAINS);
+  const specs = await Promise.all(
+    names.map((name) => loadResolvedOas(getPath(name)))
+  );
+  return merge(...specs);
 };

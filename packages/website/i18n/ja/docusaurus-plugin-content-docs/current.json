@@ -10,5 +10,17 @@
   "sidebar.mySidebar.category.temp": {
     "message": "temp",
     "description": "The label for category temp in sidebar mySidebar"
+  },
+  "sidebar.mySidebar.category.Guides": {
+    "message": "Guides",
+    "description": "The label for category Guides in sidebar mySidebar"
+  },
+  "sidebar.mySidebar.category.Advanced-Guides": {
+    "message": "Advanced-Guides",
+    "description": "The label for category Advanced-Guides in sidebar mySidebar"
+  },
+  "sidebar.mySidebar.category.References": {
+    "message": "References",
+    "description": "The label for category References in sidebar mySidebar"
   }
 }

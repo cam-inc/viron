@@ -11,14 +11,17 @@ import {
   UserCreateAttributes,
   UserUpdateAttributes,
 } from '../../domains/user';
-import { UserModel } from '../../stores/definitions/mongo/users';
+import {
+  UserModel,
+  UserDocument,
+} from '../../infrastructures/mongo/models/users';
 import { ctx } from '../../context';
 
 const getModel = (): UserModel => ctx.stores.main.models.users as UserModel;
 
 const convertConditions = (
-  conditions: FilterQuery<User>
-): FilterQuery<User> => {
+  conditions: FilterQuery<UserDocument>
+): FilterQuery<UserDocument> => {
   if (conditions.id) {
     conditions._id = conditions.id;
     delete conditions.id;
@@ -33,7 +36,7 @@ export const findOneById = async (id: string): Promise<User | null> => {
 };
 
 export const find = async (
-  conditions: FilterQuery<User> = {},
+  conditions: FilterQuery<UserDocument> = {},
   sort: string[] | null = null,
   options?: QueryOptions
 ): Promise<User[]> => {
@@ -49,7 +52,7 @@ export const find = async (
 };
 
 export const findWithPager = async (
-  conditions: FilterQuery<User> = {},
+  conditions: FilterQuery<UserDocument> = {},
   size?: number,
   page?: number,
   sort: string[] | null = null
@@ -66,7 +69,7 @@ export const findWithPager = async (
 };
 
 export const findOne = async (
-  conditions: FilterQuery<User> = {}
+  conditions: FilterQuery<UserDocument> = {}
 ): Promise<User | null> => {
   const model = getModel();
   const doc = await model.findOne(
@@ -76,7 +79,7 @@ export const findOne = async (
 };
 
 export const count = async (
-  conditions: FilterQuery<User> = {}
+  conditions: FilterQuery<UserDocument> = {}
 ): Promise<number> => {
   const model = getModel();
   return await model.countDocuments(

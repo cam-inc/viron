@@ -10,7 +10,7 @@ declare global {
 }
 
 export default async (): Promise<void> => {
-  const mongod = new MongoMemoryServer();
+  const mongod = await MongoMemoryServer.create();
   global.mongod = mongod;
-  process.env.MONGOD_URI = await mongod.getUri();
+  process.env.MONGOD_URI = mongod.getUri();
 };

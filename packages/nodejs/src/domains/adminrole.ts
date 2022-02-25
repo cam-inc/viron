@@ -13,7 +13,7 @@ import {
 } from '../constants';
 import { ListWithPager, paging } from '../helpers';
 import { repositoryContainer } from '../repositories';
-import { getResourceId, VironOpenAPIObject } from './oas';
+import { findOperation, getResourceId, VironOpenAPIObject } from './oas';
 import { getDebug } from '../logging';
 
 const debug = getDebug('domains:adminrole');
@@ -39,10 +39,11 @@ interface ParsedPolicy {
 }
 
 const permissionMap = {
-  [API_METHOD.GET]: [PERMISSION.READ, PERMISSION.WRITE],
-  [API_METHOD.POST]: [PERMISSION.WRITE],
-  [API_METHOD.PUT]: [PERMISSION.WRITE],
-  [API_METHOD.DELETE]: [PERMISSION.WRITE],
+  [API_METHOD.GET]: [PERMISSION.READ, PERMISSION.WRITE, PERMISSION.ALL],
+  [API_METHOD.POST]: [PERMISSION.WRITE, PERMISSION.ALL],
+  [API_METHOD.PUT]: [PERMISSION.WRITE, PERMISSION.ALL],
+  [API_METHOD.PATCH]: [PERMISSION.WRITE, PERMISSION.ALL],
+  [API_METHOD.DELETE]: [PERMISSION.ALL],
 };
 
 export const rbacModel = newModel(`
@@ -194,7 +195,16 @@ export const hasPermissionByResourceId = async (
   const casbin = repositoryContainer.getCasbin();
   await sync();
   const tasks = permissions.map((permission) =>
-    casbin.enforce(id, resourceId, permission)
+    casbin.enforce(id, resourceId, permission).catch((e) => {
+      debug(
+        'Casbin Enforce failure. id: %s, resourceId: %s, permission: %s, error: %o',
+        id,
+        resourceId,
+        permission,
+        e
+      );
+      return false;
+    })
   );
   for await (const allowed of tasks) {
     if (allowed) {
@@ -210,20 +220,21 @@ export const hasPermissionByResourceId = async (
   return false;
 };
 
-// ユーザーがリソースを操作する権限を持っているかチェック
+// idがAPIをコールする権限を持っているかチェック
 export const hasPermission = async (
-  userId: string,
+  id: string,
   requestUri: string,
   requestMethod: ApiMethod,
   oas: VironOpenAPIObject
 ): Promise<boolean> => {
   const resourceId = getResourceId(requestUri, requestMethod, oas);
   if (!resourceId) {
-    // TODO: セキュリティ的にあまりよくないのであとでなんとかする
-    return true;
+    // リソースに紐づかないAPIはオペレーションがあれば通す
+    const operation = findOperation(requestUri, requestMethod, oas);
+    return !!operation;
   }
   return await hasPermissionByResourceId(
-    userId,
+    id,
     resourceId,
     method2Permissions(requestMethod)
   );
@@ -334,3 +345,6 @@ export const createViewer = async (
   await updatePermissionsForRole(ADMIN_ROLE.VIEWER, permissions);
   return true;
 };
+
+export const isApiMethod = (method: string): method is ApiMethod =>
+  Object.values<string>(API_METHOD).includes(method);

@@ -1,130 +1,123 @@
-import { BiChevronLeft } from '@react-icons/all-files/bi/BiChevronLeft';
-import { BiChevronRight } from '@react-icons/all-files/bi/BiChevronRight';
-import { BiChevronsLeft } from '@react-icons/all-files/bi/BiChevronsLeft';
-import { BiChevronsRight } from '@react-icons/all-files/bi/BiChevronsRight';
 import classnames from 'classnames';
 import _ from 'lodash';
 import React, { useCallback, useMemo } from 'react';
-import Button, {
-  Props as ButtonProps,
-  VARIANT as BUTTON_VARIANT,
-} from '$components/button';
-import { On } from '$constants/index';
+import { Props as BaseProps } from '~/components';
+import FilledButton, {
+  Props as FilledButtonProps,
+} from '~/components/button/filled';
+import TextOnButton, {
+  Props as TextOnButtonProps,
+} from '~/components/button/text/on';
+import ChevronDoubleLeftIcon from '~/components/icon/chevronDoubleLeft/outline';
+import ChevronDoubleRightIcon from '~/components/icon/chevronDoubleRight/outline';
+import ChevronLeftIcon from '~/components/icon/chevronLeft/outline';
+import ChevronRightIcon from '~/components/icon/chevronRight/outline';
+import { COLOR_SYSTEM } from '~/types';
 
-type Props = {
-  on: On;
+export type Props = BaseProps & {
   current: number;
   max: number;
   onRequestChange: (num: number) => void;
 };
-const Pagination: React.FC<Props> = ({ on, current, max, onRequestChange }) => {
-  const handleFirstClick = useCallback(
-    function () {
-      onRequestChange(1);
-    },
-    [onRequestChange]
-  );
+const Pagination: React.FC<Props> = ({
+  on,
+  className = '',
+  current,
+  max,
+  onRequestChange,
+}) => {
+  const handleFirstClick = useCallback<TextOnButtonProps['onClick']>(() => {
+    onRequestChange(1);
+  }, [onRequestChange]);
 
-  const handlePrevClick = useCallback(
-    function () {
-      let num: number = current - 1;
-      if (num < 1) {
-        num = 1;
-      }
-      onRequestChange(num);
-    },
-    [current, onRequestChange]
-  );
+  const handlePrevClick = useCallback<TextOnButtonProps['onClick']>(() => {
+    let num: number = current - 1;
+    if (num < 1) {
+      num = 1;
+    }
+    onRequestChange(num);
+  }, [current, onRequestChange]);
 
-  const handleNextClick = useCallback(
-    function () {
-      let num: number = current + 1;
-      if (max < num) {
-        num = max;
-      }
-      onRequestChange(num);
-    },
-    [current, max, onRequestChange]
-  );
+  const handleNextClick = useCallback<TextOnButtonProps['onClick']>(() => {
+    let num: number = current + 1;
+    if (max < num) {
+      num = max;
+    }
+    onRequestChange(num);
+  }, [current, max, onRequestChange]);
 
-  const handleLastClick = useCallback(
-    function () {
-      onRequestChange(max);
-    },
-    [max, onRequestChange]
-  );
+  const handleLastClick = useCallback<TextOnButtonProps['onClick']>(() => {
+    onRequestChange(max);
+  }, [max, onRequestChange]);
 
   const handlePageClick = useCallback<
-    NonNullable<ButtonProps<number>['onClick']>
+    TextOnButtonProps<number>['onClick'] | FilledButtonProps<number>['onClick']
   >(
-    function (num) {
-      onRequestChange(num);
+    (page) => {
+      onRequestChange(page);
     },
     [onRequestChange]
   );
 
-  const pages = useMemo<number[]>(
-    function () {
-      return _.range(current - 4, current + 4).filter(function (num) {
-        if (num < 1) {
-          return false;
-        }
-        if (max < num) {
-          return false;
-        }
-        return true;
-      });
-    },
-    [current, max]
-  );
+  const pages = useMemo<number[]>(() => {
+    return _.range(current - 4, current + 4).filter((num) => {
+      if (num < 1) {
+        return false;
+      }
+      if (max < num) {
+        return false;
+      }
+      return true;
+    });
+  }, [current, max]);
 
   return (
-    <div>
+    <div className={classnames(`text-thm-on-${on}`, className)}>
       <div className="flex items-center">
         <div className="flex-none mr-2 last:mr-0">
-          <Button
+          <TextOnButton
             on={on}
-            variant={BUTTON_VARIANT.TEXT}
-            Icon={BiChevronsLeft}
+            Icon={ChevronDoubleLeftIcon}
             onClick={handleFirstClick}
           />
         </div>
         <div className="flex-none mr-2 last:mr-0">
-          <Button
+          <TextOnButton
             on={on}
-            variant={BUTTON_VARIANT.TEXT}
-            Icon={BiChevronLeft}
+            Icon={ChevronLeftIcon}
             onClick={handlePrevClick}
           />
         </div>
-        {pages.map(function (page) {
-          return (
-            <div key={page} className="flex-none mr-2 last:mr-0">
-              <Button
-                on={on}
-                variant={
-                  page === current ? BUTTON_VARIANT.PAPER : BUTTON_VARIANT.TEXT
-                }
-                label={page.toString()}
+        {pages.map((page) => (
+          <div key={page} className="flex-none mr-2 last:mr-0">
+            {page === current ? (
+              <FilledButton<number>
+                cs={COLOR_SYSTEM.PRIMARY}
                 data={page}
+                label={page.toString()}
                 onClick={handlePageClick}
               />
-            </div>
-          );
-        })}
+            ) : (
+              <TextOnButton<number>
+                on={on}
+                data={page}
+                label={page.toString()}
+                onClick={handlePageClick}
+              />
+            )}
+          </div>
+        ))}
         <div className="flex-none mr-2 last:mr-0">
-          <Button
+          <TextOnButton
             on={on}
-            variant={BUTTON_VARIANT.TEXT}
-            Icon={BiChevronRight}
+            Icon={ChevronRightIcon}
             onClick={handleNextClick}
           />
         </div>
         <div className="flex-none mr-2 last:mr-0">
-          <Button
+          <TextOnButton
             on={on}
-            variant={BUTTON_VARIANT.TEXT}
-            Icon={BiChevronsRight}
+            Icon={ChevronDoubleRightIcon}
             onClick={handleLastClick}
           />
         </div>

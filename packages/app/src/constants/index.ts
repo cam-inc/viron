@@ -1,18 +1,10 @@
-import { isSSR } from '$utils/index';
-
-export const ON = {
-  BACKGROUND: 'background',
-  SURFACE: 'surface',
-  PRIMARY: 'primary',
-  COMPLEMENTARY: 'complementary',
-} as const;
-export type On = typeof ON[keyof typeof ON];
+import { isSSR } from '~/utils';
 
 export const URL = {
-  DOCUMENTATION: 'https://discovery.viron.app/docs/',
-  BLOG: 'https://discovery.viron.app/blog/',
-  RELEASE_NOTES: 'https://viron.app/TODO/release_notes/',
-  HELP: 'https://viron.app/TODO/help/',
+  DOCUMENTATION: 'https://discovery.viron.plus/docs/introduction',
+  BLOG: 'https://discovery.viron.plus/blog/',
+  RELEASE_NOTES: 'https://viron.plus/TODO/release_notes/',
+  HELP: 'https://viron.plus/TODO/help/',
   GITHUB: 'https://github.com/cam-inc/viron/',
   TWITTER: 'https://twitter.com/TODO',
 } as const;
@@ -24,328 +16,265 @@ export const ENVIRONMENTAL_VARIABLE = {
 } as const;
 export type EnvironmentalVariable =
   typeof ENVIRONMENTAL_VARIABLE[keyof typeof ENVIRONMENTAL_VARIABLE];
+export const isEnvironmentalVariable = (
+  str: string
+): str is EnvironmentalVariable => {
+  return (Object.values(ENVIRONMENTAL_VARIABLE) as string[]).includes(str);
+};
 
 export const OAUTH_REDIRECT_URI = (function () {
   if (isSSR) {
     return '';
   }
-  return `${window.location.origin}/oauthredirect`;
+  return `${globalThis.location.origin}/oauthredirect`;
 })();
 
-export const HTTP_STATUS_CODE = {
-  CONTINUE: 100,
-  SWITCHING_PROTOCOL: 101,
-  PROCESSING: 102,
-  EARLY_HINTS: 103,
-  OK: 200,
-  CREATED: 201,
-  ACCEPTED: 202,
-  NON_AUTHORITATIVE_INFORMATION: 203,
-  NO_CONTENT: 204,
-  RESET_CONTENT: 205,
-  PARTIAL_CONTENT: 206,
-  MULTI_STATUS: 207,
-  ALREADY_REPORTED: 208,
-  IM_USED: 226,
-  MULTIPLE_CHOICE: 300,
-  MOVED_PERMANENTLY: 301,
-  FOUND: 302,
-  SEE_OTHER: 303,
-  NOT_MODIFIED: 304,
-  TEMPORARY_REDIRECT: 307,
-  PERMANENT_REDIRECT: 308,
-  BAD_REQUEST: 400,
-  UNAUTHORIZED: 401,
-  PAYMENT_REQUIRED: 402,
-  FORBIDDEN: 403,
-  NOT_FOUND: 404,
-  METHOD_NOT_ALLOWED: 405,
-  NOT_ACCEPTABLE: 406,
-  PROXY_AUTHENTICATION_REQUIRED: 407,
-  REQUEST_TIMEOUT: 408,
-  CONFLICT: 409,
-  GONE: 410,
-  LENGTH_REQUIRED: 411,
-  PRECONDITION_FAILED: 412,
-  PAYLOAD_TOO_LARGE: 413,
-  URI_TOO_LONG: 414,
-  UNSUPPORTED_MEDIA_TYPE: 415,
-  RANGE_NOT_SATISFIABLE: 416,
-  EXPECTATION_FAILED: 417,
-  IM_A_TEAPOT: 418,
-  MISDIRECTED_REQUEST: 421,
-  UNPROCESSABLE_ENTITY: 422,
-  LOCKED: 423,
-  FAILED_DEPENDENCY: 424,
-  TOO_EARLY: 425,
-  UPGRADE_REQUIRED: 426,
-  PRECONDITION_REQUIRED: 428,
-  TOO_MANY_REQUESTS: 429,
-  REQUEST_HEADER_FIELDS_TOO_LARGE: 431,
-  UNAVAILABLE_FOR_LEGAL_REASONS: 451,
-  INTERNAL_SERVER_ERROR: 500,
-  NOT_IMPLEMENTED: 501,
-  BAD_GATEWAY: 502,
-  SERVER_UNAVAILABLE: 503,
-  GATEWAY_TIMEOUT: 504,
-  HTTP_VERSION_NOT_SUPPORTED: 505,
-  VARIANT_ALSO_NEGOTIATES: 506,
-  INSUFFICIENT_STORAGE: 507,
-  LOOP_DETECTED: 508,
-  NOT_EXTENDED: 510,
-  NETWORK_AUTHENTICATION_REQUIRED: 511,
-} as const;
-export type HTTPStatusCode =
-  typeof HTTP_STATUS_CODE[keyof typeof HTTP_STATUS_CODE];
-
-export const HTTP_STATUS: Record<
-  HTTPStatusCode,
-  { name: string; message: string }
-> = {
-  100: {
+export const HTTP_STATUS = {
+  CONTINUE: {
     name: 'Continue',
-    message: 'TODO',
+    code: 100,
   },
-  101: {
+  SWITCHING_PROTOCOL: {
     name: 'Swithing Protocols',
-    message: 'TODO',
+    code: 101,
   },
-  102: {
+  PROCESSING: {
     name: 'Processing',
-    message: 'TODO',
+    code: 102,
   },
-  103: {
+  EARLY_HINTS: {
     name: 'Early Hints',
-    message: 'TODO',
+    code: 103,
   },
-  200: {
+  OK: {
     name: 'OK',
-    message: 'TODO',
+    code: 200,
   },
-  201: {
+  CREATED: {
     name: 'Created',
-    message: 'TODO',
+    code: 201,
   },
-  202: {
+  ACCEPTED: {
     name: 'Accepted',
-    message: 'TODO',
+    code: 202,
   },
-  203: {
+  NON_AUTHORITATIVE_INFORMATION: {
     name: 'Non-Authoritative information',
-    message: 'TODO',
+    code: 203,
   },
-  204: {
+  NO_CONTENT: {
     name: 'No Content',
-    message: 'TODO',
+    code: 204,
   },
-  205: {
+  RESET_CONTENT: {
     name: 'Reset Content',
-    message: 'TODO',
+    code: 205,
   },
-  206: {
+  PARTIAL_CONTENT: {
     name: 'Partial Content',
-    message: 'TODO',
+    code: 206,
   },
-  207: {
+  MULTI_STATUS: {
     name: 'Multi Status',
-    message: 'TODO',
+    code: 207,
   },
-  208: {
+  ALREADY_REPORTED: {
     name: 'Already Reported',
-    message: 'TODO',
+    code: 208,
   },
-  226: {
+  IM_USED: {
     name: 'IM Used',
-    message: 'TODO',
+    code: 226,
   },
-  300: {
+  MULTIPLE_CHOICE: {
     name: 'Multiple Choice',
-    message: 'TODO',
+    code: 300,
   },
-  301: {
+  MOVED_PERMANENTLY: {
     name: 'Moved Permanently',
-    message: 'TODO',
+    code: 301,
   },
-  302: {
+  FOUND: {
     name: 'Found',
-    message: 'TODO',
+    code: 302,
   },
-  303: {
+  SEE_OTHER: {
     name: 'See Other',
-    message: 'TODO',
+    code: 303,
   },
-  304: {
+  NOT_MODIFIED: {
     name: 'Not Modified',
-    message: 'TODO',
+    code: 304,
   },
-  307: {
+  TEMPORARY_REDIRECT: {
     name: 'Temporary Redirect',
-    message: 'TODO',
+    code: 307,
   },
-  308: {
+  PERMANENT_REDIRECT: {
     name: 'Permanent Redirect',
-    message: 'TODO',
+    code: 308,
   },
-  400: {
+  BAD_REQUEST: {
     name: 'Bad Request',
-    message:
-      'The request could not be understood by the server due to malformed request payload syntax.',
+    code: 400,
   },
-  401: {
+  UNAUTHORIZED: {
     name: 'Unauthorized',
-    message: 'TODO',
+    code: 401,
   },
-  402: {
+  PAYMENT_REQUIRED: {
     name: 'Payment Required',
-    message: 'TODO',
+    code: 402,
   },
-  403: {
+  FORBIDDEN: {
     name: 'Forbidden',
-    message: 'TODO',
+    code: 403,
   },
-  404: {
+  NOT_FOUND: {
     name: 'Not Found',
-    message: 'TODO',
+    code: 404,
   },
-  405: {
+  METHOD_NOT_ALLOWED: {
     name: 'Method Not Allowed',
-    message: 'TODO',
+    code: 405,
   },
-  406: {
+  NOT_ACCEPTABLE: {
     name: 'Not Acceptable',
-    message: 'TODO',
+    code: 406,
   },
-  407: {
+  PROXY_AUTHENTICATION_REQUIRED: {
     name: 'Proxy Authentication Required',
-    message: 'TODO',
+    code: 407,
   },
-  408: {
+  REQUEST_TIMEOUT: {
     name: 'Request Timeout',
-    message: 'TODO',
+    code: 408,
   },
-  409: {
+  CONFLICT: {
     name: 'Conflict',
-    message: 'TODO',
+    code: 409,
   },
-  410: {
+  GONE: {
     name: 'Gone',
-    message: 'TODO',
+    code: 410,
   },
-  411: {
+  LENGTH_REQUIRED: {
     name: 'Length Required',
-    message: 'TODO',
+    code: 411,
   },
-  412: {
+  PRECONDITION_FAILED: {
     name: 'Precondition Failed',
-    message: 'TODO',
+    code: 412,
   },
-  413: {
+  PAYLOAD_TOO_LARGE: {
     name: 'Payload Too Large',
-    message: 'TODO',
+    code: 413,
   },
-  414: {
+  URI_TOO_LONG: {
     name: 'URI Too Long',
-    message: 'TODO',
+    code: 414,
   },
-  415: {
+  UNSUPPORTED_MEDIA_TYPE: {
     name: 'Unsupportedd Media Type',
-    message: 'TODO',
+    code: 415,
   },
-  416: {
+  RANGE_NOT_SATISFIABLE: {
     name: 'Range Not Satisfiable',
-    message: 'TODO',
+    code: 416,
   },
-  417: {
+  EXPECTATION_FAILED: {
     name: 'Expectation Failed',
-    message: 'TODO',
+    code: 417,
   },
-  418: {
+  IM_A_TEAPOT: {
     name: 'Im a Teapot',
-    message: 'TODO',
+    code: 418,
   },
-  421: {
+  MISDIRECTED_REQUEST: {
     name: 'Misdirected Request',
-    message: 'TODO',
+    code: 421,
   },
-  422: {
+  UNPROCESSABLE_ENTITY: {
     name: 'Unprocessable Entity',
-    message: 'TODO',
+    code: 422,
   },
-  423: {
+  LOCKED: {
     name: 'Locked',
-    message: 'TODO',
+    code: 423,
   },
-  424: {
+  FAILED_DEPENDENCY: {
     name: 'Failed Dependency',
-    message: 'TODO',
+    code: 424,
   },
-  425: {
+  TOO_EARLY: {
     name: 'Too Early',
-    message: 'TODO',
+    code: 425,
   },
-  426: {
+  UPGRADE_REQUIRED: {
     name: 'Upgrade Required',
-    message: 'TODO',
+    code: 426,
   },
-  428: {
+  PRECONDITION_REQUIRED: {
     name: 'Precondition Required',
-    message: 'TODO',
+    code: 428,
   },
-  429: {
+  TOO_MANY_REQUESTS: {
     name: 'Too Many Requests',
-    message: 'TODO',
+    code: 429,
   },
-  431: {
+  REQUEST_HEADER_FIELDS_TOO_LARGE: {
     name: 'Request Header Fields Too Large',
-    message: 'TODO',
+    code: 431,
   },
-  451: {
+  UNAVAILABLE_FOR_LEGAL_REASONS: {
     name: 'Unavailable For Legal Reasons',
-    message: 'TODO',
+    code: 451,
   },
-  500: {
+  INTERNAL_SERVER_ERROR: {
     name: 'Internal Server Error',
-    message: 'TODO',
+    code: 500,
   },
-  501: {
+  NOT_IMPLEMENTED: {
     name: 'Not Implemented',
-    message: 'TODO',
+    code: 501,
   },
-  502: {
+  BAD_GATEWAY: {
     name: 'Bad Gateway',
-    message: 'TODO',
+    code: 502,
   },
-  503: {
+  SERVER_UNAVAILABLE: {
     name: 'Server Unavailable',
-    message: 'TODO',
+    code: 503,
   },
-  504: {
+  GATEWAY_TIMEOUT: {
     name: 'Gateway Timeout',
-    message: 'TODO',
+    code: 504,
   },
-  505: {
+  HTTP_VERSION_NOT_SUPPORTED: {
     name: 'HTTP Version Not Supported',
-    message: 'TODO',
+    code: 505,
   },
-  506: {
+  VARIANT_ALSO_NEGOTIATES: {
     name: 'Variant Also Negotiates',
-    message: 'TODO',
+    code: 506,
   },
-  507: {
+  INSUFFICIENT_STORAGE: {
     name: 'Insufficient Storage',
-    message: 'TODO',
+    code: 507,
   },
-  508: {
+  LOOP_DETECTED: {
     name: 'Loop Detected',
-    message: 'TODO',
+    code: 508,
   },
-  510: {
+  NOT_EXTENDED: {
     name: 'Not Extended',
-    message: 'TODO',
+    code: 510,
   },
-  511: {
+  NETWORK_AUTHENTICATION_REQUIRED: {
     name: 'Network Authentication Required',
-    message: 'TODO',
+    code: 511,
   },
 } as const;
 export type HTTPStatus = typeof HTTP_STATUS[keyof typeof HTTP_STATUS];
+export type HTTPStatusCode =
+  typeof HTTP_STATUS[keyof typeof HTTP_STATUS]['code'];

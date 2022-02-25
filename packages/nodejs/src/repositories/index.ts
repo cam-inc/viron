@@ -3,14 +3,18 @@ import {
   Connection as MongooseConnection,
   FilterQuery as MongoFilterQuery,
   QueryOptions as MongoQueryOptions,
+  ConnectOptions as MongoConnectOptions,
 } from 'mongoose';
-import { Sequelize, Dialect } from 'sequelize';
+import { Sequelize, Dialect, Options as MysqlConnectOptions } from 'sequelize';
 import {
   FindOptions as MysqlFindOptions,
   WhereOptions as MysqlWhereOptions,
 } from 'sequelize/types';
 import MongooseAdapter from 'casbin-mongoose-adapter';
-import { SequelizeAdapter } from 'casbin-sequelize-adapter';
+import {
+  SequelizeAdapter,
+  SequelizeAdapterOptions,
+} from 'casbin-sequelize-adapter';
 import {
   domainsAdminRole,
   domainsAdminUser,
@@ -18,10 +22,24 @@ import {
   domainsAuth,
 } from '../domains';
 import { STORE_TYPE, StoreType } from '../constants';
-import { repositoryUninitialized } from '../errors';
+import {
+  repositoryInitializationError,
+  repositoryUninitialized,
+} from '../errors';
 import { ListWithPager } from '../helpers';
 import * as mongoRepositories from './mongo';
 import * as mysqlRepositories from './mysql';
+import {
+  createConnection as mongoCreateConnection,
+  getModels as mongoGetModels,
+} from '../infrastructures/mongo';
+import {
+  createConnection as mysqlCreateConnection,
+  getModels as mysqlGetModels,
+} from '../infrastructures/mysql';
+import { getDebug } from '../logging';
+
+const debug = getDebug('repositories');
 
 type Names = keyof typeof mongoRepositories & keyof typeof mysqlRepositories;
 
@@ -30,6 +48,15 @@ export type FindConditions<Entity> =
   | MysqlWhereOptions<Entity>;
 
 export type FindOptions<Entity> = MongoQueryOptions | MysqlFindOptions<Entity>;
+
+export interface MongoConfig {
+  openUri: string;
+  connectOptions: MongoConnectOptions;
+}
+
+export interface MysqlConfig {
+  connectOptions: MysqlConnectOptions;
+}
 
 export interface Repository<Entity, CreateAttributes, UpdateAttributes> {
   findOneById: (id: string) => Promise<Entity | null>;
@@ -66,34 +93,57 @@ export class RepositoryContainer {
 
   async init(
     storeType: StoreType,
-    conn: Sequelize | MongooseConnection
+    conn?: Sequelize | MongooseConnection,
+    config?: MongoConfig | MysqlConfig
   ): Promise<RepositoryContainer> {
     if (this.initialized) {
       return this;
     }
 
+    if (!conn && !config) {
+      throw repositoryInitializationError();
+    }
+
     switch (storeType) {
       case STORE_TYPE.MONGO: {
-        this.conn = conn as MongooseConnection;
+        const mongoConfig = config as MongoConfig;
+        this.conn = conn
+          ? (conn as MongooseConnection)
+          : await mongoCreateConnection(
+              mongoConfig.openUri,
+              mongoConfig.connectOptions
+            );
+        mongoGetModels(this.conn);
         this.repositories = mongoRepositories;
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const { url, options } = (this.conn.getClient() as any).s;
         const mongooseConfig = this.conn.config;
-        const casbinMongooseAdapter = await MongooseAdapter.newAdapter(url, {
+        const casbinMongooseAdapterOptions: MongoConnectOptions = {
           dbName: this.conn.name,
-          autoIndex: mongooseConfig.autoIndex,
-          user: options.user,
-          pass: options.password,
-          useNewUrlParser: options.useNewUrlParser,
-          useCreateIndex: mongooseConfig.useCreateIndex,
-          authSource: options.authSource,
-          useFindAndModify: mongooseConfig.useFindAndModify,
-          useUnifiedTopology: options.useUnifiedTopology,
-          ssl: options.ssl,
-          sslValidate: options.sslValidate,
-          sslCA: options.sslCA,
-        });
+          autoIndex:
+            mongooseConfig.autoIndex ?? mongoConfig?.connectOptions?.autoIndex,
+          user: options.user ?? options.credentials?.username,
+          pass: options.password ?? options.credentials?.password,
+          authSource: options.authSource ?? options.credentials?.source,
+          ssl: options.ssl ?? mongoConfig?.connectOptions?.ssl,
+          sslValidate:
+            options.sslValidate ?? mongoConfig?.connectOptions?.sslValidate,
+          sslCA: options.sslCA ?? mongoConfig?.connectOptions?.sslCA,
+          useCreateIndex: true,
+          useFindAndModify: false,
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+        };
+        debug(
+          'Init casbin-mongoose-adapter. url: %s, options: %O',
+          url,
+          casbinMongooseAdapterOptions
+        );
+        const casbinMongooseAdapter = await MongooseAdapter.newAdapter(
+          url,
+          casbinMongooseAdapterOptions
+        );
         this.casbin = await newEnforcer(
           domainsAdminRole.rbacModel,
           casbinMongooseAdapter
@@ -101,10 +151,14 @@ export class RepositoryContainer {
         break;
       }
       case STORE_TYPE.MYSQL: {
-        this.conn = conn as Sequelize;
+        const mysqlConfig = config as MysqlConfig;
+        this.conn = conn
+          ? (conn as Sequelize)
+          : await mysqlCreateConnection(mysqlConfig.connectOptions);
+        mysqlGetModels(this.conn);
         this.repositories = mysqlRepositories;
 
-        const casbinSequelizeAdapter = await SequelizeAdapter.newAdapter({
+        const casbinSequelizeAdapterOptions: SequelizeAdapterOptions = {
           dialect: this.conn.getDialect() as Dialect,
           database: this.conn.config.database,
           username: this.conn.config.username,
@@ -115,7 +169,14 @@ export class RepositoryContainer {
             : undefined,
           ssl: this.conn.config.ssl,
           protocol: this.conn.config.protocol,
-        });
+        };
+        debug(
+          'Init casbin-sequelize-adapter. options: %O',
+          casbinSequelizeAdapterOptions
+        );
+        const casbinSequelizeAdapter = await SequelizeAdapter.newAdapter(
+          casbinSequelizeAdapterOptions
+        );
         this.casbin = await newEnforcer(
           domainsAdminRole.rbacModel,
           casbinSequelizeAdapter
@@ -127,6 +188,7 @@ export class RepositoryContainer {
     this.initialized = true;
     this.casbinSyncedTime = Date.now();
     //this.casbin.enableLog(true);
+    debug('RepositoryContainer initialized!');
     return this;
   }
 

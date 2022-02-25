@@ -1,0 +1,44 @@
+{
+  "list": [
+    {
+      "type": "email",
+      "operationId": "signin_email"
+    }
+  ],
+  "oas": {
+    "openapi": "3.0.2",
+    "info": {
+      "title": "authentication",
+      "version": "0.0.1",
+      "x-pages": []
+    },
+    "paths": {
+      "/signin/email": {
+        "get": {
+          "operationId": "signin_email",
+          "parameters": [
+            {
+              "name": "password",
+              "in": "query",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "description",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

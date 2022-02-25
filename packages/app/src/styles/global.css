@@ -1,209 +1,151 @@
 /* TODO: cssルールに重複が無く最適に書き出されているかproductionモードで確認。 */
 /* TODO: クリティカルcssを抽出できるか調べること。 */
 
-/* Follow Google Material Design principles. */
-/* @see: https://material.io/design/color/dark-theme.html */
-
-/* Non-themable pages like `/dashboard` will apply default custom properties. */
 body {
-  --color-hue: 0;
-}
-
-/* Themable pages like `/endpoints/[endpointId]` will apply overwritten custom properties. */
-body[data-theme="red"] {
-  --color-hue: 0;
-}
-body[data-theme="ultimate orange"] {
-  --color-hue: 15;
-}
-body[data-theme="orange juice"] {
-  --color-hue: 30;
-}
-body[data-theme="amber"] {
-  --color-hue: 45;
-}
-body[data-theme="yellow"] {
-  --color-hue: 60;
-}
-body[data-theme="limoncello"] {
-  --color-hue: 75;
-}
-body[data-theme="radium"] {
-  --color-hue: 90;
-}
-body[data-theme="harlequin"] {
-  --color-hue: 105;
-}
-body[data-theme="green"] {
-  --color-hue: 120;
-}
-body[data-theme="lucent lime"] {
-  --color-hue: 135;
-}
-body[data-theme="guppie green"] {
-  --color-hue: 150;
-}
-body[data-theme="minty paradise"] {
-  --color-hue: 165;
-}
-body[data-theme="aqua"] {
-  --color-hue: 180;
-}
-body[data-theme="capri"] {
-  --color-hue: 195;
-}
-body[data-theme="brescian blue"] {
-  --color-hue: 210;
-}
-body[data-theme="rare blue"] {
-  --color-hue: 225;
-}
-body[data-theme="blue"] {
-  --color-hue: 240;
-}
-body[data-theme="electric ultramarine"] {
-  --color-hue: 255;
-}
-body[data-theme="violent violet"] {
-  --color-hue: 270;
-}
-body[data-theme="electric purple"] {
-  --color-hue: 285;
-}
-body[data-theme="magenta"] {
-  --color-hue: 300;
-}
-body[data-theme="brutal pink"] {
-  --color-hue: 315;
-}
-body[data-theme="neon rose"] {
-  --color-hue: 330;
-}
-body[data-theme="electric crimson"] {
-  --color-hue: 345;
-}
-
-/* Light/Dark mode toggle. */
-body {
-  --color-background: hsl(var(--color-hue) 50% 95%);
-  --color-on-background: hsl(var(--color-hue) 85% 35%);
-  --color-on-background-high: hsl(var(--color-hue) 100% 25%);
-  --color-on-background-medium: hsl(var(--color-hue) 85% 35%);
-  --color-on-background-low: hsl(var(--color-hue) 70% 45%);
-  --color-on-background-slight: hsl(var(--color-hue) 25% 80%);
-  --color-on-background-faint: hsl(var(--color-hue) 25% 90%);
-  --color-surface: hsl(var(--color-hue) 50% 100%);
-  --color-surface-00dp: hsl(var(--color-hue) 50% 100%);
-  --color-surface-01dp: hsl(var(--color-hue) 50% 100%);
-  --color-surface-02dp: hsl(var(--color-hue) 50% 100%);
-  --color-surface-03dp: hsl(var(--color-hue) 50% 100%);
-  --color-surface-04dp: hsl(var(--color-hue) 50% 100%);
-  --color-surface-05dp: hsl(var(--color-hue) 50% 100%);
-  --color-on-surface: hsl(var(--color-hue) 50% 35%);
-  --color-on-surface-high: hsl(var(--color-hue) 50% 25%);
-  --color-on-surface-medium: hsl(var(--color-hue) 50% 35%);
-  --color-on-surface-low: hsl(var(--color-hue) 50% 45%);
-  --color-on-surface-slight: hsl(var(--color-hue) 50% 85%);
-  --color-on-surface-faint: hsl(var(--color-hue) 50% 95%);
-  --color-primary: hsl(var(--color-hue) 100% 75%);
-  --color-on-primary: hsl(var(--color-hue) 85% 35%);
-  --color-on-primary-high: hsl(var(--color-hue) 100% 25%);
-  --color-on-primary-medium: hsl(var(--color-hue) 85% 35%);
-  --color-on-primary-low: hsl(var(--color-hue) 70% 45%);
-  --color-on-primary-slight: hsl(var(--color-hue) 75% 65%);
-  --color-on-primary-faint: hsl(var(--color-hue) 75% 70%);
-  --color-primary-variant: hsl(var(--color-hue) 70% 75%);
-  --color-on-primary-variant: hsl(var(--color-hue) 55% 35%);
-  --color-on-primary-variant-high: hsl(var(--color-hue) 70% 25%);
-  --color-on-primary-variant-medium: hsl(var(--color-hue) 55% 35%);
-  --color-on-primary-variant-low: hsl(var(--color-hue) 40% 45%);
-  --color-on-primary-variant-slight: hsl(var(--color-hue) 50% 65%);
-  --color-on-primary-variant-faint: hsl(var(--color-hue) 50% 70%);
-  --color-complementary: hsl(calc(var(--color-hue) + 180) 100% 75%);
-  --color-on-complementary: hsl(calc(var(--color-hue) + 180) 85% 35%);
-  --color-on-complementary-high: hsl(calc(var(--color-hue) + 180) 100% 25%);
-  --color-on-complementary-medium: hsl(calc(var(--color-hue) + 180) 85% 35%);
-  --color-on-complementary-low: hsl(calc(var(--color-hue) + 180) 70% 45%);
-  --color-on-complementary-slight: hsl(calc(var(--color-hue) + 180) 75% 65%);
-  --color-on-complementary-faint: hsl(calc(var(--color-hue) + 180) 75% 70%);
-  --color-complementary-variant: hsl(calc(var(--color-hue) + 180) 70% 75%);
-  --color-on-complementary-variant: hsl(calc(var(--color-hue) + 180) 55% 35%);
-  --color-on-complementary-variant-high: hsl(calc(var(--color-hue) + 180) 70% 25%);
-  --color-on-complementary-variant-medium: hsl(calc(var(--color-hue) + 180) 55% 35%);
-  --color-on-complementary-variant-low: hsl(calc(var(--color-hue) + 180) 40% 45%);
-  --color-on-complementary-variant-slight: hsl(calc(var(--color-hue) + 180) 50% 65%);
-  --color-on-complementary-variant-faint: hsl(calc(var(--color-hue) + 180) 50% 70%);
-  --color-error: hsl(0 75% 75%);
-  --color-on-error: hsl(0 50% 20%);
-  --color-on-error-high: hsl(0 50% 0%);
-  --color-on-error-medium: hsl(0 50% 20%);
-  --color-on-error-low: hsl(0 50% 40%);
-  --color-on-error-slight: hsl(0 75% 65%);
-  --color-on-error-faint: hsl(0 75% 70%);
+    --thm-primary: var(--thm-light-primary);
+    --thm-on-primary: var(--thm-light-on-primary);
+    --thm-on-primary-high: var(--thm-light-on-primary-high);
+    --thm-on-primary-low: var(--thm-light-on-primary-low);
+    --thm-on-primary-slight: var(--thm-light-on-primary-slight);
+    --thm-on-primary-faint: var(--thm-light-on-primary-faint);
+    --thm-primary-container: var(--thm-light-primary-container);
+    --thm-on-primary-container: var(--thm-light-on-primary-container);
+    --thm-on-primary-container-high: var(--thm-light-on-primary-container-high);
+    --thm-on-primary-container-low: var(--thm-light-on-primary-container-low);
+    --thm-on-primary-container-slight: var(--thm-light-on-primary-container-slight);
+    --thm-on-primary-container-faint: var(--thm-light-on-primary-container-faint);
+    --thm-secondary: var(--thm-light-secondary);
+    --thm-on-secondary: var(--thm-light-on-secondary);
+    --thm-on-secondary-high: var(--thm-light-on-secondary-high);
+    --thm-on-secondary-low: var(--thm-light-on-secondary-low);
+    --thm-on-secondary-slight: var(--thm-light-on-secondary-slight);
+    --thm-on-secondary-faint: var(--thm-light-on-secondary-faint);
+    --thm-secondary-container: var(--thm-light-secondary-container);
+    --thm-on-secondary-container: var(--thm-light-on-secondary-container);
+    --thm-on-secondary-container-high: var(--thm-light-on-secondary-container-high);
+    --thm-on-secondary-container-low: var(--thm-light-on-secondary-container-low);
+    --thm-on-secondary-container-slight: var(--thm-light-on-secondary-container-slight);
+    --thm-on-secondary-container-faint: var(--thm-light-on-secondary-container-faint);
+    --thm-tertiary: var(--thm-light-tertiary);
+    --thm-on-tertiary: var(--thm-light-on-tertiary);
+    --thm-on-tertiary-high: var(--thm-light-on-tertiary-high);
+    --thm-on-tertiary-low: var(--thm-light-on-tertiary-low);
+    --thm-on-tertiary-slight: var(--thm-light-on-tertiary-slight);
+    --thm-on-tertiary-faint: var(--thm-light-on-tertiary-faint);
+    --thm-tertiary-container: var(--thm-light-tertiary-container);
+    --thm-on-tertiary-container: var(--thm-light-on-tertiary-container);
+    --thm-on-tertiary-container-high: var(--thm-light-on-tertiary-container-high);
+    --thm-on-tertiary-container-low: var(--thm-light-on-tertiary-container-low);
+    --thm-on-tertiary-container-slight: var(--thm-light-on-tertiary-container-slight);
+    --thm-on-tertiary-container-faint: var(--thm-light-on-tertiary-container-faint);
+    --thm-error: var(--thm-light-error);
+    --thm-on-error: var(--thm-light-on-error);
+    --thm-on-error-high: var(--thm-light-on-error-high);
+    --thm-on-error-low: var(--thm-light-on-error-low);
+    --thm-on-error-slight: var(--thm-light-on-error-slight);
+    --thm-on-error-faint: var(--thm-light-on-error-faint);
+    --thm-error-container: var(--thm-light-error-container);
+    --thm-on-error-container: var(--thm-light-on-error-container);
+    --thm-on-error-container-high: var(--thm-light-on-error-container-high);
+    --thm-on-error-container-low: var(--thm-light-on-error-container-low);
+    --thm-on-error-container-slight: var(--thm-light-on-error-container-slight);
+    --thm-on-error-container-faint: var(--thm-light-on-error-container-faint);
+    --thm-background: var(--thm-light-background);
+    --thm-on-background: var(--thm-light-on-background);
+    --thm-on-background-high: var(--thm-light-on-background-high);
+    --thm-on-background-low: var(--thm-light-on-background-low);
+    --thm-on-background-slight: var(--thm-light-on-background-slight);
+    --thm-on-background-faint: var(--thm-light-on-background-faint);
+    --thm-surface: var(--thm-light-surface);
+    --thm-on-surface: var(--thm-light-on-surface);
+    --thm-on-surface-high: var(--thm-light-on-surface-high);
+    --thm-on-surface-low: var(--thm-light-on-surface-low);
+    --thm-on-surface-slight: var(--thm-light-on-surface-slight);
+    --thm-on-surface-faint: var(--thm-light-on-surface-faint);
+    --thm-surface-variant: var(--thm-light-surface-variant);
+    --thm-on-surface-variant: var(--thm-light-on-surface-variant);
+    --thm-on-surface-variant-high: var(--thm-light-on-surface-variant-high);
+    --thm-on-surface-variant-low: var(--thm-light-on-surface-variant-low);
+    --thm-on-surface-variant-slight: var(--thm-light-on-surface-variant-slight);
+    --thm-on-surface-variant-faint: var(--thm-light-on-surface-variant-faint);
+    --thm-outline: var(--thm-light-outline);
 }
 
 @media (prefers-color-scheme: dark) {
   body {
-    --color-background: hsl(var(--color-hue) 50% 5%);
-    --color-on-background: hsl(var(--color-hue) 50% 80%);
-    --color-on-background-high: hsl(var(--color-hue) 50% 100%);
-    --color-on-background-medium: hsl(var(--color-hue) 50% 80%);
-    --color-on-background-low: hsl(var(--color-hue) 50% 60%);
-    --color-on-background-slight: hsl(var(--color-hue) 50% 15%);
-    --color-on-background-faint: hsl(var(--color-hue) 50% 10%);
-    --color-surface: hsl(var(--color-hue) 50% 10%);
-    --color-surface-00dp: hsl(var(--color-hue) 50% 10%);
-    --color-surface-01dp: hsl(var(--color-hue) 50% 10.5%);
-    --color-surface-02dp: hsl(var(--color-hue) 50% 11%);
-    --color-surface-03dp: hsl(var(--color-hue) 50% 11.5%);
-    --color-surface-04dp: hsl(var(--color-hue) 50% 12%);
-    --color-surface-05dp: hsl(var(--color-hue) 50% 12.5%);
-    --color-on-surface: hsl(var(--color-hue) 50% 80%);
-    --color-on-surface-high: hsl(var(--color-hue) 50% 100%);
-    --color-on-surface-medium: hsl(var(--color-hue) 50% 80%);
-    --color-on-surface-low: hsl(var(--color-hue) 50% 60%);
-    --color-on-surface-slight: hsl(var(--color-hue) 50% 20%);
-    --color-on-surface-faint: hsl(var(--color-hue) 50% 15%);
-    --color-primary: hsl(var(--color-hue) 100% 25%);
-    --color-on-primary: hsl(var(--color-hue) 50% 80%);
-    --color-on-primary-high: hsl(var(--color-hue) 50% 100%);
-    --color-on-primary-medium: hsl(var(--color-hue) 50% 80%);
-    --color-on-primary-low: hsl(var(--color-hue) 50% 60%);
-    --color-on-primary-slight: hsl(var(--color-hue) 100% 35%);
-    --color-on-primary-faint: hsl(var(--color-hue) 100% 30%);
-    --color-primary-variant: hsl(var(--color-hue) 50% 25%);
-    --color-on-primary-variant: hsl(var(--color-hue) 50% 80%);
-    --color-on-primary-variant-high: hsl(var(--color-hue) 5% 100%);
-    --color-on-primary-variant-medium: hsl(var(--color-hue) 50% 80%);
-    --color-on-primary-variant-low: hsl(var(--color-hue) 50% 60%);
-    --color-on-primary-variant-slight: hsl(var(--color-hue) 50% 35%);
-    --color-on-primary-variant-faint: hsl(var(--color-hue) 50% 30%);
-    --color-complementary: hsl(calc(var(--color-hue) + 180) 100% 25%);
-    --color-on-complementary: hsl(calc(var(--color-hue) + 180) 50% 80%);
-    --color-on-complementary-high: hsl(calc(var(--color-hue) + 180) 50% 100%);
-    --color-on-complementary-medium: hsl(calc(var(--color-hue) + 180) 50% 80%);
-    --color-on-complementary-low: hsl(calc(var(--color-hue) + 180) 50% 60%);
-    --color-on-complementary-slight: hsl(calc(var(--color-hue) + 180) 100% 35%);
-    --color-on-complementary-faint: hsl(calc(var(--color-hue) + 180) 100% 30%);
-    --color-complementary-variant: hsl(calc(var(--color-hue) + 180) 50% 25%);
-    --color-on-complementary-variant: hsl(calc(var(--color-hue) + 180) 50% 80%);
-    --color-on-complementary-variant-high: hsl(calc(var(--color-hue) + 180) 50% 100%);
-    --color-on-complementary-variant-medium: hsl(calc(var(--color-hue) + 180) 50% 80%);
-    --color-on-complementary-variant-low: hsl(calc(var(--color-hue) + 180) 50% 60%);
-    --color-on-complementary-variant-slight: hsl(calc(var(--color-hue) + 180) 50% 35%);
-    --color-on-complementary-variant-faint: hsl(calc(var(--color-hue) + 180) 50% 30%);
-    --color-error: hsl(0 75% 25%);
-    --color-on-error: hsl(0 50% 80%);
-    --color-on-error-high: hsl(0 50% 100%);
-    --color-on-error-medium: hsl(0 50% 80%);
-    --color-on-error-low: hsl(0 50% 60%);
-    --color-on-error-slight: hsl(0 75% 35%);
-    --color-on-error-faint: hsl(0 75% 30%);
+    --thm-primary: var(--thm-dark-primary);
+    --thm-on-primary: var(--thm-dark-on-primary);
+    --thm-on-primary-high: var(--thm-dark-on-primary-high);
+    --thm-on-primary-low: var(--thm-dark-on-primary-low);
+    --thm-on-primary-slight: var(--thm-dark-on-primary-slight);
+    --thm-on-primary-faint: var(--thm-dark-on-primary-faint);
+    --thm-primary-container: var(--thm-dark-primary-container);
+    --thm-on-primary-container: var(--thm-dark-on-primary-container);
+    --thm-on-primary-container-high: var(--thm-dark-on-primary-container-high);
+    --thm-on-primary-container-low: var(--thm-dark-on-primary-container-low);
+    --thm-on-primary-container-slight: var(--thm-dark-on-primary-container-slight);
+    --thm-on-primary-container-faint: var(--thm-dark-on-primary-container-faint);
+    --thm-secondary: var(--thm-dark-secondary);
+    --thm-on-secondary: var(--thm-dark-on-secondary);
+    --thm-on-secondary-high: var(--thm-dark-on-secondary-high);
+    --thm-on-secondary-low: var(--thm-dark-on-secondary-low);
+    --thm-on-secondary-slight: var(--thm-dark-on-secondary-slight);
+    --thm-on-secondary-faint: var(--thm-dark-on-secondary-faint);
+    --thm-secondary-container: var(--thm-dark-secondary-container);
+    --thm-on-secondary-container: var(--thm-dark-on-secondary-container);
+    --thm-on-secondary-container-high: var(--thm-dark-on-secondary-container-high);
+    --thm-on-secondary-container-low: var(--thm-dark-on-secondary-container-low);
+    --thm-on-secondary-container-slight: var(--thm-dark-on-secondary-container-slight);
+    --thm-on-secondary-container-faint: var(--thm-dark-on-secondary-container-faint);
+    --thm-tertiary: var(--thm-dark-tertiary);
+    --thm-on-tertiary: var(--thm-dark-on-tertiary);
+    --thm-on-tertiary-high: var(--thm-dark-on-tertiary-high);
+    --thm-on-tertiary-low: var(--thm-dark-on-tertiary-low);
+    --thm-on-tertiary-slight: var(--thm-dark-on-tertiary-slight);
+    --thm-on-tertiary-faint: var(--thm-dark-on-tertiary-faint);
+    --thm-tertiary-container: var(--thm-dark-tertiary-container);
+    --thm-on-tertiary-container: var(--thm-dark-on-tertiary-container);
+    --thm-on-tertiary-container-high: var(--thm-dark-on-tertiary-container-high);
+    --thm-on-tertiary-container-low: var(--thm-dark-on-tertiary-container-low);
+    --thm-on-tertiary-container-slight: var(--thm-dark-on-tertiary-container-slight);
+    --thm-on-tertiary-container-faint: var(--thm-dark-on-tertiary-container-faint);
+    --thm-error: var(--thm-dark-error);
+    --thm-on-error: var(--thm-dark-on-error);
+    --thm-on-error-high: var(--thm-dark-on-error-high);
+    --thm-on-error-low: var(--thm-dark-on-error-low);
+    --thm-on-error-slight: var(--thm-dark-on-error-slight);
+    --thm-on-error-faint: var(--thm-dark-on-error-faint);
+    --thm-error-container: var(--thm-dark-error-container);
+    --thm-on-error-container: var(--thm-dark-on-error-container);
+    --thm-on-error-container-high: var(--thm-dark-on-error-container-high);
+    --thm-on-error-container-low: var(--thm-dark-on-error-container-low);
+    --thm-on-error-container-slight: var(--thm-dark-on-error-container-slight);
+    --thm-on-error-container-faint: var(--thm-dark-on-error-container-faint);
+    --thm-background: var(--thm-dark-background);
+    --thm-on-background: var(--thm-dark-on-background);
+    --thm-on-background-high: var(--thm-dark-on-background-high);
+    --thm-on-background-low: var(--thm-dark-on-background-low);
+    --thm-on-background-slight: var(--thm-dark-on-background-slight);
+    --thm-on-background-faint: var(--thm-dark-on-background-faint);
+    --thm-surface: var(--thm-dark-surface);
+    --thm-on-surface: var(--thm-dark-on-surface);
+    --thm-on-surface-high: var(--thm-dark-on-surface-high);
+    --thm-on-surface-low: var(--thm-dark-on-surface-low);
+    --thm-on-surface-slight: var(--thm-dark-on-surface-slight);
+    --thm-on-surface-faint: var(--thm-dark-on-surface-faint);
+    --thm-surface-variant: var(--thm-dark-surface-variant);
+    --thm-on-surface-variant: var(--thm-dark-on-surface-variant);
+    --thm-on-surface-variant-high: var(--thm-dark-on-surface-variant-high);
+    --thm-on-surface-variant-low: var(--thm-dark-on-surface-variant-low);
+    --thm-on-surface-variant-slight: var(--thm-dark-on-surface-variant-slight);
+    --thm-on-surface-variant-faint: var(--thm-dark-on-surface-variant-faint);
+    --thm-outline: var(--thm-dark-outline);
   }
 }
 
 body {
-  background-color: var(--color-background);
+  color: var(--thm-on-background);
+  background-color: var(--thm-background);
 }
 
 @tailwind base;

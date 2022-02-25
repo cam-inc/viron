@@ -1,27 +1,23 @@
 import classnames from 'classnames';
-import React from 'react';
-import { ON, On } from '$constants/index';
-import { ClassName } from '$types/index';
-import { CommonMark as CommonMarkType } from '$types/oas';
+import markdownit from 'markdown-it';
+import React, { useMemo } from 'react';
+import { Props as BaseProps } from '~/components';
+import { CommonMark } from '~/types/oas';
 
-type Props = {
-  on: On;
-  data: CommonMarkType;
-  className?: ClassName;
+type Props = BaseProps & {
+  data: CommonMark;
 };
-// TODO
-const CommonMark: React.FC<Props> = ({ on, data, className = '' }) => {
+const _CommonMark: React.FC<Props> = ({ on, data, className = '' }) => {
+  const parsedDescription = useMemo(() => {
+    const md = markdownit('commonmark');
+    return { __html: md.render(data) };
+  }, [data]);
+
   return (
     <div
-      className={classnames('text-xxs', className, {
-        'text-on-background': on === ON.BACKGROUND,
-        'text-on-surface': on === ON.SURFACE,
-        'text-on-primary': on === ON.PRIMARY,
-        'text-on-complementary': on === ON.COMPLEMENTARY,
-      })}
-    >
-      {data}
-    </div>
+      className={classnames(`text-xs text-thm-on-${on}`, className)}
+      dangerouslySetInnerHTML={parsedDescription}
+    />
   );
 };
-export default CommonMark;
+export default _CommonMark;

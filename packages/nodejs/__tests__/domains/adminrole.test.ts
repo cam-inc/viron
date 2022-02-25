@@ -163,12 +163,19 @@ describe('domains/adminrole', () => {
     it('Get policy list filtered by roleId', async () => {
       const result = await listPolicies('editor');
       assert.strictEqual(result.length, 2);
-      assert.strictEqual(result[0].roleId, 'editor');
-      assert.strictEqual(result[0].resourceId, 'blog');
-      assert.strictEqual(result[0].permission, PERMISSION.READ);
-      assert.strictEqual(result[1].roleId, 'editor');
-      assert.strictEqual(result[1].resourceId, 'blog');
-      assert.strictEqual(result[1].permission, PERMISSION.WRITE);
+      assert(
+        result.every((r) => {
+          if (r.roleId === 'editor' && r.resourceId === 'blog') {
+            if (
+              r.permission === PERMISSION.READ ||
+              r.permission === PERMISSION.WRITE
+            ) {
+              return true;
+            }
+          }
+          return false;
+        })
+      );
     });
 
     it('Get all policies', async () => {
@@ -349,39 +356,49 @@ describe('domains/adminrole', () => {
       assert.strictEqual(result.maxPage, 1);
       assert.strictEqual(result.currentPage, 1);
       assert.strictEqual(result.list.length, 3);
-      assert.strictEqual(result.list[0].id, 'editor');
-      assert.strictEqual(result.list[0].permissions.length, 2);
-      assert.strictEqual(result.list[0].permissions[0].resourceId, 'blog');
-      assert.strictEqual(
-        result.list[0].permissions[0].permission,
-        PERMISSION.WRITE
-      );
-      assert.strictEqual(result.list[0].permissions[1].resourceId, 'news');
-      assert.strictEqual(
-        result.list[0].permissions[1].permission,
-        PERMISSION.DENY
-      );
-      assert.strictEqual(result.list[1].id, 'reader');
-      assert.strictEqual(result.list[1].permissions[0].resourceId, 'blog');
-      assert.strictEqual(
-        result.list[1].permissions[0].permission,
-        PERMISSION.READ
-      );
-      assert.strictEqual(result.list[1].permissions[1].resourceId, 'news');
-      assert.strictEqual(
-        result.list[1].permissions[1].permission,
-        PERMISSION.READ
-      );
-      assert.strictEqual(result.list[2].id, 'director');
-      assert.strictEqual(result.list[2].permissions[0].resourceId, 'blog');
-      assert.strictEqual(
-        result.list[2].permissions[0].permission,
-        PERMISSION.WRITE
-      );
-      assert.strictEqual(result.list[2].permissions[1].resourceId, 'news');
-      assert.strictEqual(
-        result.list[2].permissions[1].permission,
-        PERMISSION.WRITE
+      assert(
+        result.list.every((r) => {
+          if (r.id === 'editor') {
+            return r.permissions.every((p) => {
+              if (p.resourceId === 'blog') {
+                assert.strictEqual(p.permission, PERMISSION.WRITE);
+                return true;
+              }
+              if (p.resourceId === 'news') {
+                assert.strictEqual(p.permission, PERMISSION.DENY);
+                return true;
+              }
+              return false;
+            });
+          }
+          if (r.id === 'reader') {
+            return r.permissions.every((p) => {
+              if (p.resourceId === 'blog') {
+                assert.strictEqual(p.permission, PERMISSION.READ);
+                return true;
+              }
+              if (p.resourceId === 'news') {
+                assert.strictEqual(p.permission, PERMISSION.READ);
+                return true;
+              }
+              return false;
+            });
+          }
+          if (r.id === 'director') {
+            return r.permissions.every((p) => {
+              if (p.resourceId === 'blog') {
+                assert.strictEqual(p.permission, PERMISSION.WRITE);
+                return true;
+              }
+              if (p.resourceId === 'news') {
+                assert.strictEqual(p.permission, PERMISSION.WRITE);
+                return true;
+              }
+              return false;
+            });
+          }
+          return false;
+        })
       );
     });
   });

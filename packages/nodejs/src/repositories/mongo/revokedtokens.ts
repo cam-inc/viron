@@ -1,5 +1,8 @@
 import { Connection, FilterQuery, QueryOptions } from 'mongoose';
-import { storeDefinitions } from '../../stores';
+import {
+  RevokedTokenDocument,
+  RevokedTokenModel,
+} from '../../infrastructures/mongo/models/revokedtokens';
 import { domainsAuth } from '../../domains';
 import { repositoryContainer } from '..';
 import {
@@ -10,15 +13,14 @@ import {
   normalizeMongoFilterQuery,
 } from '../../helpers';
 
-const getModel = (): storeDefinitions.mongo.revokedTokens.RevokedTokenModel => {
+const getModel = (): RevokedTokenModel => {
   const conn = repositoryContainer.conn as Connection;
-  return conn.models
-    .revokedtokens as storeDefinitions.mongo.revokedTokens.RevokedTokenModel;
+  return conn.models.revokedtokens as RevokedTokenModel;
 };
 
 const convertConditions = (
-  conditions: FilterQuery<domainsAuth.RevokedToken>
-): FilterQuery<domainsAuth.RevokedToken> => {
+  conditions: FilterQuery<RevokedTokenDocument>
+): FilterQuery<RevokedTokenDocument> => {
   if (conditions.id) {
     conditions._id = conditions.id;
     delete conditions.id;
@@ -35,7 +37,7 @@ export const findOneById = async (
 };
 
 export const find = async (
-  conditions: FilterQuery<domainsAuth.RevokedToken> = {},
+  conditions: FilterQuery<RevokedTokenDocument> = {},
   sort: string[] | null = null,
   options?: QueryOptions
 ): Promise<domainsAuth.RevokedToken[]> => {
@@ -51,7 +53,7 @@ export const find = async (
 };
 
 export const findWithPager = async (
-  conditions: FilterQuery<domainsAuth.RevokedToken> = {},
+  conditions: FilterQuery<RevokedTokenDocument> = {},
   size?: number,
   page?: number,
   sort: string[] | null = null
@@ -68,7 +70,7 @@ export const findWithPager = async (
 };
 
 export const findOne = async (
-  conditions: FilterQuery<domainsAuth.RevokedToken> = {}
+  conditions: FilterQuery<RevokedTokenDocument> = {}
 ): Promise<domainsAuth.RevokedToken | null> => {
   const model = getModel();
   const doc = await model.findOne(
@@ -78,7 +80,7 @@ export const findOne = async (
 };
 
 export const count = async (
-  conditions: FilterQuery<domainsAuth.RevokedToken> = {}
+  conditions: FilterQuery<RevokedTokenDocument> = {}
 ): Promise<number> => {
   const model = getModel();
   return await model.countDocuments(

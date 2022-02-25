@@ -1,6 +1,5 @@
-import { Sequelize } from 'sequelize';
-import { FindOptions, WhereOptions } from 'sequelize/types';
-import { storeDefinitions } from '../../stores';
+import { FindOptions, Sequelize, WhereOptions } from 'sequelize';
+import { AuditLogModelStatic } from '../../infrastructures/mysql/models/auditlogs';
 import { domainsAuditLog } from '../../domains';
 import { repositoryContainer } from '..';
 import {
@@ -11,10 +10,9 @@ import {
   normalizeMysqlFilterQuery,
 } from '../../helpers';
 
-const getModel = (): storeDefinitions.mysql.auditLogs.AuditLogModelCtor => {
+const getModel = (): AuditLogModelStatic => {
   const conn = repositoryContainer.conn as Sequelize;
-  return conn.models
-    .auditlogs as storeDefinitions.mysql.auditLogs.AuditLogModelCtor;
+  return conn.models.auditlogs as AuditLogModelStatic;
 };
 
 export const findOneById = async (

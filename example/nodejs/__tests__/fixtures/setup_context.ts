@@ -6,5 +6,5 @@ beforeAll(async () => {
   await setupMongo();
   await setupMysql();
 
-  await ctx.preflight();
+  await ctx.init();
 });
