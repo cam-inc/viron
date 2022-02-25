@@ -86,9 +86,11 @@ func new(params ...interface{}) error {
 	if err != nil {
 		return err
 	}
+
 	enforcer.LoadPolicy()
+	syncedTime = time.Now().Unix()
+
 	casbinInstance = enforcer
-	sync()
 	return nil
 }
 
@@ -166,7 +168,7 @@ func sync() {
 		return
 	}
 	now := time.Now().Unix()
-	if syncedTime+constant.CASBIN_SYNC_INTERVAL_MSEC > now {
+	if now > syncedTime+constant.CASBIN_SYNC_INTERVAL_SEC {
 		if err := casbinInstance.LoadPolicy(); err != nil {
 			logging.GetDefaultLogger().Error(err)
 		}
@@ -288,6 +290,7 @@ func hasPermissionByResourceID(id, resourceID string, permissions []string) bool
 
 	log.Debug("hasPermissionByResourceID called")
 	for _, permission := range permissions {
+		sync()
 		if ok, err := casbinInstance.Enforce(id, resourceID, permission); err != nil {
 			log.Debugf("Enforce %+v", err)
 		} else if ok {
