@@ -70,7 +70,7 @@ func ListAuditLog(ctx context.Context, audit *AuditLog, page, size int, sort []s
 		List: []*AuditLog{},
 	}
 	if err != nil {
-		res.Pager = Pagging(0, size, page)
+		res.Pager = Paging(0, size, page)
 		return res
 	}
 
@@ -83,7 +83,7 @@ func ListAuditLog(ctx context.Context, audit *AuditLog, page, size int, sort []s
 	}
 
 	count := repo.Count(ctx, nil)
-	res.Pager = Pagging(count, size, page)
+	res.Pager = Paging(count, size, page)
 
 	return res
 }
