@@ -164,7 +164,7 @@ func sync() {
 	}
 
 	if loadPolicyInterval == nil {
-		defaultInterval := int64(constant.CASBIN_LOAD_POLICY_INTERVAL_MSEC)
+		defaultInterval := int64(constant.CASBIN_LOAD_INTERVAL_MSEC)
 		loadPolicyInterval = &defaultInterval
 	}
 
