@@ -66,6 +66,8 @@ var (
 
 	syncedTime int64
 
+	loadPolicyInterval int64
+
 	permissionMap = map[string][]string{
 		constant.API_METHOD_GET:    []string{constant.PERMISSION_READ, constant.PERMISSION_WRITE, constant.PERMISSION_ALL},
 		constant.API_METHOD_POST:   []string{constant.PERMISSION_WRITE, constant.PERMISSION_ALL},
@@ -86,10 +88,16 @@ func new(params ...interface{}) error {
 	if err != nil {
 		return err
 	}
+
 	enforcer.LoadPolicy()
+	syncedTime = time.Now().Unix() // sec
+
 	casbinInstance = enforcer
-	sync()
 	return nil
+}
+
+func SetLoadPolicyInterval(sec int64) {
+	loadPolicyInterval = sec
 }
 
 func NewMySQL(conn *sql.DB) error {
@@ -101,13 +109,7 @@ func NewMySQL(conn *sql.DB) error {
 	if err != nil {
 		return err
 	}
-	//enforcer, err := casbin.NewEnforcer(m, a)
-	//if err != nil {
-	//	return err
-	//}
 
-	//casbinInstance = enforcer
-	//return nil
 	return new(m, a)
 }
 
@@ -132,12 +134,7 @@ func NewFile(filePath string) error {
 	if err != nil {
 		return err
 	}
-	//enforcer, err := casbin.NewEnforcer(m, filePath)
-	//if err != nil {
-	//	return err
-	//}
-	//casbinInstance = enforcer
-	//return nil
+
 	return new(m, filePath)
 }
 
@@ -165,8 +162,13 @@ func sync() {
 	if casbinInstance == nil {
 		return
 	}
-	now := time.Now().Unix()
-	if syncedTime+constant.CASBIN_SYNC_INTERVAL_MSEC > now {
+
+	if loadPolicyInterval == 0 {
+		loadPolicyInterval = int64(constant.CASBIN_LOAD_INTERVAL_SEC)
+	}
+
+	now := time.Now().Unix() // sec
+	if now > syncedTime+loadPolicyInterval {
 		if err := casbinInstance.LoadPolicy(); err != nil {
 			logging.GetDefaultLogger().Error(err)
 		}
@@ -288,6 +290,7 @@ func hasPermissionByResourceID(id, resourceID string, permissions []string) bool
 
 	log.Debug("hasPermissionByResourceID called")
 	for _, permission := range permissions {
+		sync()
 		if ok, err := casbinInstance.Enforce(id, resourceID, permission); err != nil {
 			log.Debugf("Enforce %+v", err)
 		} else if ok {
