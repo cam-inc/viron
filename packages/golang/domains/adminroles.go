@@ -79,7 +79,7 @@ var (
 	log logging.Logger
 )
 
-func new(params []interface{}, interval *int64) error {
+func new(params ...interface{}) error {
 	log = logging.GetDefaultLogger()
 	if casbinInstance != nil {
 		return nil
@@ -89,12 +89,6 @@ func new(params []interface{}, interval *int64) error {
 		return err
 	}
 
-	if interval == nil {
-		defaultInterval := int64(constant.CASBIN_SYNC_INTERVAL_MSEC)
-		SetLoadPolicyInterval(&defaultInterval)
-	} else {
-		SetLoadPolicyInterval(interval)
-	}
 	enforcer.LoadPolicy()
 	syncedTime = time.Now().UnixNano() / int64(time.Millisecond) // msec
 
@@ -106,7 +100,7 @@ func SetLoadPolicyInterval(msec *int64) {
 	loadPolicyInterval = msec
 }
 
-func NewMySQL(conn *sql.DB, interval *int64) error {
+func NewMySQL(conn *sql.DB) error {
 	a, err := sqladapter.NewAdapter(conn, "mysql", "casbin_rule_g")
 	if err != nil {
 		return err
@@ -116,10 +110,10 @@ func NewMySQL(conn *sql.DB, interval *int64) error {
 		return err
 	}
 
-	return new([]interface{}{m, a}, interval)
+	return new(m, a)
 }
 
-func NewMongo(opt *options.ClientOptions, dbName string, collectionName string, interval *int64) error {
+func NewMongo(opt *options.ClientOptions, dbName string, collectionName string) error {
 	a, err := mongodbadapter.NewAdapterWithCollectionName(opt, dbName, collectionName)
 	if err != nil {
 		return err
@@ -129,10 +123,10 @@ func NewMongo(opt *options.ClientOptions, dbName string, collectionName string, 
 		return err
 	}
 
-	return new([]interface{}{m, a}, interval)
+	return new(m, a)
 }
 
-func NewFile(filePath string, interval *int64) error {
+func NewFile(filePath string) error {
 	if casbinInstance != nil {
 		return nil
 	}
@@ -141,7 +135,7 @@ func NewFile(filePath string, interval *int64) error {
 		return err
 	}
 
-	return new([]interface{}{m, filePath}, interval)
+	return new(m, filePath)
 }
 
 func getPermissions(permissions []string) []string {
@@ -167,6 +161,11 @@ func genPolicy(roleID, resourceID, permission string) []string {
 func sync() {
 	if casbinInstance == nil {
 		return
+	}
+
+	if loadPolicyInterval == nil {
+		defaultInterval := int64(constant.CASBIN_LOAD_POLICY_INTERVAL_MSEC)
+		loadPolicyInterval = &defaultInterval
 	}
 
 	now := time.Now().UnixNano() / int64(time.Millisecond) // msec
