@@ -66,6 +66,8 @@ var (
 
 	syncedTime int64
 
+	loadPolicyInterval *int64
+
 	permissionMap = map[string][]string{
 		constant.API_METHOD_GET:    []string{constant.PERMISSION_READ, constant.PERMISSION_WRITE, constant.PERMISSION_ALL},
 		constant.API_METHOD_POST:   []string{constant.PERMISSION_WRITE, constant.PERMISSION_ALL},
@@ -77,7 +79,7 @@ var (
 	log logging.Logger
 )
 
-func new(params ...interface{}) error {
+func new(params []interface{}, interval *int64) error {
 	log = logging.GetDefaultLogger()
 	if casbinInstance != nil {
 		return nil
@@ -87,14 +89,24 @@ func new(params ...interface{}) error {
 		return err
 	}
 
+	if interval == nil {
+		defaultInterval := int64(constant.CASBIN_SYNC_INTERVAL_MSEC)
+		SetLoadPolicyInterval(&defaultInterval)
+	} else {
+		SetLoadPolicyInterval(interval)
+	}
 	enforcer.LoadPolicy()
-	syncedTime = time.Now().Unix()
+	syncedTime = time.Now().UnixNano() / int64(time.Millisecond) // msec
 
 	casbinInstance = enforcer
 	return nil
 }
 
-func NewMySQL(conn *sql.DB) error {
+func SetLoadPolicyInterval(msec *int64) {
+	loadPolicyInterval = msec
+}
+
+func NewMySQL(conn *sql.DB, interval *int64) error {
 	a, err := sqladapter.NewAdapter(conn, "mysql", "casbin_rule_g")
 	if err != nil {
 		return err
@@ -103,17 +115,11 @@ func NewMySQL(conn *sql.DB) error {
 	if err != nil {
 		return err
 	}
-	//enforcer, err := casbin.NewEnforcer(m, a)
-	//if err != nil {
-	//	return err
-	//}
 
-	//casbinInstance = enforcer
-	//return nil
-	return new(m, a)
+	return new([]interface{}{m, a}, interval)
 }
 
-func NewMongo(opt *options.ClientOptions, dbName string, collectionName string) error {
+func NewMongo(opt *options.ClientOptions, dbName string, collectionName string, interval *int64) error {
 	a, err := mongodbadapter.NewAdapterWithCollectionName(opt, dbName, collectionName)
 	if err != nil {
 		return err
@@ -123,10 +129,10 @@ func NewMongo(opt *options.ClientOptions, dbName string, collectionName string) 
 		return err
 	}
 
-	return new(m, a)
+	return new([]interface{}{m, a}, interval)
 }
 
-func NewFile(filePath string) error {
+func NewFile(filePath string, interval *int64) error {
 	if casbinInstance != nil {
 		return nil
 	}
@@ -134,13 +140,8 @@ func NewFile(filePath string) error {
 	if err != nil {
 		return err
 	}
-	//enforcer, err := casbin.NewEnforcer(m, filePath)
-	//if err != nil {
-	//	return err
-	//}
-	//casbinInstance = enforcer
-	//return nil
-	return new(m, filePath)
+
+	return new([]interface{}{m, filePath}, interval)
 }
 
 func getPermissions(permissions []string) []string {
@@ -167,8 +168,9 @@ func sync() {
 	if casbinInstance == nil {
 		return
 	}
-	now := time.Now().Unix()
-	if now > syncedTime+constant.CASBIN_SYNC_INTERVAL_SEC {
+
+	now := time.Now().UnixNano() / int64(time.Millisecond) // msec
+	if now > syncedTime+*loadPolicyInterval {
 		if err := casbinInstance.LoadPolicy(); err != nil {
 			logging.GetDefaultLogger().Error(err)
 		}

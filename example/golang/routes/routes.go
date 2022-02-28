@@ -52,7 +52,7 @@ func New() http.Handler {
 		if err := domains.SetUpMySQL(store.GetMySQLConnection()); err != nil {
 			panic(err)
 		}
-		if err := packageDomains.NewMySQL(store.GetMySQLConnection()); err != nil {
+		if err := packageDomains.NewMySQL(store.GetMySQLConnection(), cfg.StoreMySQL.CasbinLoadIntervalMsec); err != nil {
 			panic(err)
 		}
 		if err := migrate.InitMySQL(store.GetMySQLConnection(), cfg.StoreMySQL.DBName, "file:///viron/example/golang/pkg/migrate/sql"); err != nil {
@@ -64,7 +64,7 @@ func New() http.Handler {
 		if err := domains.SetUpMongo(conn.Client, cfg.StoreMongo.VironDB); err != nil {
 			panic(err)
 		}
-		if err := packageDomains.NewMongo(conn.Options, cfg.StoreMongo.VironDB, cfg.StoreMongo.CasbinCollectionName); err != nil {
+		if err := packageDomains.NewMongo(conn.Options, cfg.StoreMongo.VironDB, cfg.StoreMongo.CasbinCollectionName, cfg.StoreMongo.CasbinLoadIntervalMsec); err != nil {
 			panic(err)
 		}
 	}

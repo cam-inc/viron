@@ -1,5 +1,6 @@
 package domains
 
 func setUpRole() {
-	NewFile("./test_casbin")
+	CasbinLoadIntervalMsec := int64(0)
+	NewFile("./test_casbin", &CasbinLoadIntervalMsec)
 }
