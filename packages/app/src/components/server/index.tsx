@@ -1,49 +1,37 @@
-import { BiServer } from '@react-icons/all-files/bi/BiServer';
 import classnames from 'classnames';
 import React, { useCallback } from 'react';
-import CommonMark from '$components/commonMark';
-import Popover, { usePopover } from '$components/popover';
-import { On, ON } from '$constants/index';
-import { ClassName } from '$types/index';
-import { Server } from '$types/oas';
+import { Props as BaseProps } from '~/components';
+import CommonMark from '~/components/commonMark';
+import ServerIcon from '~/components/icon/server/outline';
+import Popover, { usePopover } from '~/portals/popover';
+import { Server } from '~/types/oas';
 
-type Props = {
-  on: On;
+type Props = BaseProps & {
   server: Server;
-  className?: ClassName;
 };
 const _Server: React.FC<Props> = ({ on, server, className = '' }) => {
   const popover = usePopover<HTMLDivElement>();
-  const handleMouseEnter = useCallback(
-    function () {
-      popover.open();
-    },
-    [popover]
-  );
-  const handleMouseLeave = useCallback(
-    function () {
-      popover.close();
-    },
-    [popover]
-  );
+  const handleMouseEnter = useCallback(() => {
+    popover.open();
+  }, [popover]);
+  const handleMouseLeave = useCallback(() => {
+    popover.close();
+  }, [popover]);
 
   return (
     <>
       <div
-        className={classnames('p-1 text-xs rounded border', className, {
-          'text-on-background-low border-on-background-low':
-            on === ON.BACKGROUND,
-          'text-on-surface-low border-on-surface-low': on === ON.SURFACE,
-          'text-on-primary-low border-on-primary-low': on === ON.PRIMARY,
-          'text-on-complementary-low border-on-complementary-low':
-            on === ON.COMPLEMENTARY,
-        })}
+        className={classnames(
+          'p-1 text-xs rounded border',
+          `text-thm-on-${on}-low border-thm-on-${on}-low`,
+          className
+        )}
         ref={popover.targetRef}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <div className="flex items-center gap-1">
-          <BiServer />
+          <ServerIcon className="w-em" />
           <div>{server.url}</div>
         </div>
       </div>

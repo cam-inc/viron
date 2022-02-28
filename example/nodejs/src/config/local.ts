@@ -15,11 +15,7 @@ export const get = (mode: Mode): Config => {
       autoIndex: true,
       user: 'root',
       pass: 'password',
-      useNewUrlParser: true,
-      useCreateIndex: true,
       authSource: 'admin',
-      useFindAndModify: false,
-      useUnifiedTopology: true,
     },
   };
 
@@ -41,6 +37,7 @@ export const get = (mode: Mode): Config => {
   const ret: Config = {
     store: {
       main: mode == MODE.MONGO ? mongo : mysql,
+      vironLib: mode == MODE.MONGO ? mongo : mysql,
     },
     cors: {
       allowOrigins: [
@@ -57,10 +54,18 @@ export const get = (mode: Mode): Config => {
       },
       googleOAuth2: {
         clientId: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? '',
-
         clientSecret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET ?? '',
         additionalScopes: [],
         userHostedDomains: ['cam-inc.co.jp', 'cyberagent.co.jp'],
+      },
+    },
+    aws: {
+      s3: {
+        accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID ?? '',
+        secretAccessKey: process.env.AWS_S3_SECRET_KEY ?? '',
+        region: 'ap-northeast-1',
+        bucketName: 'local-media.viron.work',
+        mediaDomain: 'local-media.viron.work',
       },
     },
     oas: {

@@ -2,10 +2,15 @@ import pino from 'pino';
 import { Sequelize } from 'sequelize';
 import { repositoryContainer, domainsAuth } from '@viron/lib';
 import { Mode, MODE, ServiceEnv, SERVICE_ENV } from './constants';
-import { preflight as preflightMongo } from './stores/mongo';
-import { preflight as preflightMysql } from './stores/mysql';
+import {
+  MongoStore,
+  init as initMongo,
+} from './infrastructures/mongo/connection';
+import {
+  MysqlStore,
+  init as initMysql,
+} from './infrastructures/mysql/connection';
 import { Config, get as getConfig, MongoConfig, MysqlConfig } from './config';
-import { Stores } from './stores';
 import { noSetEnvMode } from './errors';
 import { load as loadSampleData } from './sampledata';
 
@@ -14,6 +19,10 @@ export const logger = pino({
   level: 'debug',
   timestamp: true,
 });
+
+export interface Stores {
+  main: MongoStore | MysqlStore;
+}
 
 export class Context {
   public mode: Mode;
@@ -48,39 +57,36 @@ export class Context {
     this.config = getConfig(this.mode, this.serviceEnv);
   }
 
-  public async preflight(): Promise<void> {
-    await this.preflightStore();
+  public async init(): Promise<void> {
+    await this.initStore();
     await loadSampleData();
     domainsAuth.initJwt(this.config.auth.jwt);
   }
 
   /**
-   * Preflight store
+   * Store initialization
    */
-  public async preflightStore(): Promise<void> {
-    const mainConfig = this.config.store.main;
+  public async initStore(): Promise<void> {
+    const { main: configMain, vironLib: configVironLib } = this.config.store;
 
     switch (this.mode) {
-      case MODE.MONGO:
+      case MODE.MONGO: {
         // eslint-disable-next-line no-case-declarations
-        const configMongo = mainConfig as MongoConfig;
+        const configMongo = configMain as MongoConfig;
         this.stores = {
-          main: await preflightMongo(configMongo),
+          main: await initMongo(configMongo),
         };
-
-        // eslint-disable-next-line no-case-declarations
-        //const instanceMongo = this.stores.main.instance as Connection;
         logger.info(
           `Completed loading the store (main). type=${configMongo.type}, openUri=${configMongo.openUri}`
         );
         break;
-      case MODE.MYSQL:
+      }
+      case MODE.MYSQL: {
         // eslint-disable-next-line no-case-declarations
-        const configMysql = mainConfig as MysqlConfig;
+        const configMysql = configMain as MysqlConfig;
         this.stores = {
-          main: await preflightMysql(configMysql),
+          main: await initMysql(configMysql),
         };
-        // eslint-disable-next-line no-case-declarations
         const instanceMysql = this.stores.main.instance as Sequelize;
         logger.info(
           'Completed loading the store (main). type=%s "%s://%s:%s/%s". %O',
@@ -92,11 +98,12 @@ export class Context {
           instanceMysql.config
         );
         break;
+      }
       default:
         throw noSetEnvMode();
     }
 
-    repositoryContainer.init(this.mode, this.stores.main.instance);
+    await repositoryContainer.init(this.mode, undefined, configVironLib);
   }
 }
 

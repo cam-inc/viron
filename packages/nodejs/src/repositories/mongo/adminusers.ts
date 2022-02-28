@@ -1,5 +1,8 @@
 import { Connection, FilterQuery, QueryOptions } from 'mongoose';
-import { storeDefinitions } from '../../stores';
+import {
+  AdminUserDocument,
+  AdminUserModel,
+} from '../../infrastructures/mongo/models/adminusers';
 import { domainsAdminUser } from '../../domains';
 import {
   getMongoQueryOptions,
@@ -10,19 +13,18 @@ import {
 } from '../../helpers';
 import { repositoryContainer } from '..';
 
-type FilterQueryWithUserIds = FilterQuery<domainsAdminUser.AdminUser> & {
+type FilterQueryWithUserIds = FilterQuery<AdminUserDocument> & {
   userIds?: string[];
 };
 
-const getModel = (): storeDefinitions.mongo.adminUsers.AdminUserModel => {
+const getModel = (): AdminUserModel => {
   const conn = repositoryContainer.conn as Connection;
-  return conn.models
-    .adminusers as storeDefinitions.mongo.adminUsers.AdminUserModel;
+  return conn.models.adminusers as AdminUserModel;
 };
 
 const convertConditions = (
   conditions: FilterQueryWithUserIds
-): FilterQuery<domainsAdminUser.AdminUser> => {
+): FilterQuery<AdminUserDocument> => {
   if (conditions.id) {
     conditions._id = conditions.id;
     delete conditions.id;
@@ -77,7 +79,7 @@ export const findWithPager = async (
 };
 
 export const findOne = async (
-  conditions: FilterQuery<domainsAdminUser.AdminUser> = {}
+  conditions: FilterQuery<AdminUserDocument> = {}
 ): Promise<domainsAdminUser.AdminUser | null> => {
   const model = getModel();
   const doc = await model.findOne(

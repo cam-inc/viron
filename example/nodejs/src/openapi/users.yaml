@@ -11,14 +11,14 @@ info:
         # ユーザー情報の管理
         ユーザーデータの **作成・更新・削除** を行います。
       contents:
-        - title: ユーザー情報 
+        - title: ユーザー情報
           type: table
           operationId: listUsers
           pagination: true
           actions:
             # CSVダウンロード
             - operationId: downloadResources
-              defaultParametersValue: 
+              defaultParametersValue:
                 resourceName: users
                 format: csv
           resourceId: user
@@ -107,7 +107,7 @@ paths:
         - jwt: []
 
 components:
-  parameters: 
+  parameters:
     UserIdPathParam:
       name: userId
       in: path

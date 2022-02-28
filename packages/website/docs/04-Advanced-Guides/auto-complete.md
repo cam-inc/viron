@@ -1,5 +1,5 @@
 ---
-title: Autocomplete
+title: Auto-Complete
 ---
 
 Autocompleteについて。

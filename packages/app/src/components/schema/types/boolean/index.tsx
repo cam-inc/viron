@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import React, { useMemo } from 'react';
-import Select from '$components/select';
-import { getRegisterOptions } from '$utils/oas/v8n';
+import Select from '~/components/select';
+import { getRegisterOptions } from '~/utils/oas/v8n';
 import { Props } from '../../index';
 
 const SchemaOfTypeBoolean: React.FC<Props> = ({
@@ -12,15 +12,12 @@ const SchemaOfTypeBoolean: React.FC<Props> = ({
   schema,
   isDeepActive,
 }) => {
-  const registerOptions = useMemo<ReturnType<typeof getRegisterOptions>>(
-    function () {
-      if (!isDeepActive) {
-        return {};
-      }
-      return getRegisterOptions({ required, schema });
-    },
-    [required, schema, isDeepActive]
-  );
+  const registerOptions = useMemo<ReturnType<typeof getRegisterOptions>>(() => {
+    if (!isDeepActive) {
+      return {};
+    }
+    return getRegisterOptions({ required, schema });
+  }, [required, schema, isDeepActive]);
 
   return (
     <Select<string>

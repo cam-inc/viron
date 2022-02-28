@@ -1,7 +1,5 @@
 {
   "version": "2.0.0",
-  "description": "Design-based Management Console.",
-  "main": "TODO",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cam-inc/viron.git"
@@ -38,15 +36,20 @@
     "postpublish": "pinst --enable",
     "pre-commit": "npm run pre-commit --workspaces",
     "pre-push": "npm run pre-push --workspaces",
+    "changelog:intent": "changeset add",
+    "changelog:version": "changeset version",
     "build": "npm run build --workspaces",
     "clean": "npm run clean --workspaces",
     "format": "npm run format --workspaces",
     "lint": "npm run lint --workspacess",
     "test": "npm run test --workspaces",
     "example-nodejs:docker-compose:up:mongo": "docker-compose -f ./docker-compose.example-nodejs.mongo.yml up --build --force-recreate",
-    "example-nodejs:docker-compose:up:mysql": "docker-compose -f ./docker-compose.example-nodejs.mysql.yml up"
+    "example-nodejs:docker-compose:up:mysql": "docker-compose -f ./docker-compose.example-nodejs.mysql.yml up --build --force-recreate"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.20.0",
+    "@commitlint/cli": "^16.1.0",
+    "@commitlint/config-conventional": "^16.0.0",
     "husky": "^5.0.6",
     "pinst": "^2.1.1"
   },
@@ -61,5 +64,9 @@
     "node": ">=15.13.0",
     "npm": ">=7.9.0"
   },
-  "private": true
+  "private": true,
+  "volta": {
+    "node": "15.14.0",
+    "npm": "7.9.0"
+  }
 }

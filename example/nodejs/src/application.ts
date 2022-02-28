@@ -9,7 +9,6 @@ import {
   HttpIncomingMessage,
 } from 'exegesis-express';
 import { domainsAuth, domainsOas } from '@viron/lib';
-import { register } from './routes';
 import { middlewareI18n } from './middlewares/i18n';
 import { middlewareNotFound } from './middlewares/notfound';
 import { middlewareCors } from './middlewares/cors';
@@ -18,6 +17,8 @@ import { middlewareAuditLog } from './middlewares/auditlog';
 import { middlewareCacheControl } from './middlewares/cachecontrol';
 import { middlewareErrorHandler } from './middlewares/errorhandler';
 import { ctx } from './context';
+import { register } from './router';
+import { routes } from './routes';
 
 interface RequestContext {
   apiDefinition: domainsOas.VironOpenAPIObject;
@@ -36,6 +37,7 @@ declare global {
 
 interface ExegesisIncomingMessage extends HttpIncomingMessage {
   path: string;
+  file: Express.MulterS3.File;
   cookies: Record<string, string | null | undefined>;
   _context: RequestContext;
 }
@@ -74,7 +76,7 @@ export const createApplication = async (): Promise<Express> => {
   app.use(middlewareAuditLog());
 
   // Primary app routes.
-  await register(app);
+  await register(app, routes);
 
   app.use(middlewareNotFound());
   app.use(middlewareErrorHandler());

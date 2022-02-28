@@ -1,4 +1,8 @@
-import { OAS_X_SKIP_AUDITLOG } from '../constants';
+import {
+  OAS_X_SKIP_AUDITLOG,
+  TABLE_SORT_DELIMITER,
+  TABLE_SORT_ORDER,
+} from '../constants';
 import {
   ListWithPager,
   listSchemaPathRegExp,
@@ -40,7 +44,7 @@ export const list = async (
   conditions?: FindConditions<AuditLog>,
   size?: number,
   page?: number,
-  sort?: string[]
+  sort = [`createdAt${TABLE_SORT_DELIMITER}${TABLE_SORT_ORDER.DESC}`]
 ): Promise<ListWithPager<AuditLog>> => {
   const repository = repositoryContainer.getAuditLogRepository();
   return repository.findWithPager(conditions, size, page, sort);
@@ -62,38 +66,38 @@ export const createOneWithMasking = async (
   payload: Omit<AuditLogCreateAttributes, 'requestBody'>,
   requestBody?: Record<string, unknown>
 ): Promise<AuditLog | null> => {
-  const skip = await isSkip(uri, method, oas);
+  const skip = isSkip(uri, method, oas);
   if (skip) {
     return null;
   }
   const repository = repositoryContainer.getAuditLogRepository();
   return await repository.createOne({
     ...payload,
-    requestBody: await maskRequestBody(uri, method, oas, requestBody),
+    requestBody: maskRequestBody(uri, method, oas, requestBody),
   });
 };
 
 // スキップ判定
-export const isSkip = async (
+export const isSkip = (
   uri: string,
   method: string,
   oas: VironOpenAPIObject
-): Promise<boolean> => {
-  const operation = await findOperation(uri, method, oas);
+): boolean => {
+  const operation = findOperation(uri, method, oas);
   return !!operation?.[OAS_X_SKIP_AUDITLOG];
 };
 
 // `format: password` のフィールドをマスクする
-export const maskRequestBody = async (
+export const maskRequestBody = (
   uri: string,
   method: string,
   oas: VironOpenAPIObject,
   body?: Record<string, unknown>
-): Promise<string> => {
+): string => {
   if (!body) {
     return '{}';
   }
-  const operation = await findOperation(uri, method, oas);
+  const operation = findOperation(uri, method, oas);
   if (!operation || !operation.requestBody) {
     return JSON.stringify(body);
   }

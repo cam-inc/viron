@@ -13,7 +13,7 @@
   },
   "link.item.label.Documentation": {
     "message": "Documentation",
-    "description": "The label of footer link with label=Documentation linking to docs"
+    "description": "The label of footer link with label=Documentation linking to docs/introduction"
   },
   "link.item.label.Quick start": {
     "message": "Quick start",
@@ -38,5 +38,41 @@
   "copyright": {
     "message": "Copyright © 2021 CAM, Inc. Built with Docusaurus.",
     "description": "The footer copyright"
+  },
+  "link.title.Resources": {
+    "message": "Resources",
+    "description": "The title of the footer links column with title=Resources in the footer"
+  },
+  "link.title.Legal": {
+    "message": "Legal",
+    "description": "The title of the footer links column with title=Legal in the footer"
+  },
+  "link.item.label.Introduction": {
+    "message": "Introduction",
+    "description": "The label of footer link with label=Introduction linking to docs/introduction"
+  },
+  "link.item.label.Quick Start": {
+    "message": "Quick Start",
+    "description": "The label of footer link with label=Quick Start linking to docs/Getting-Started/quick-start"
+  },
+  "link.item.label.Demo": {
+    "message": "Demo",
+    "description": "The label of footer link with label=Demo linking to docs/Getting-Started/demo"
+  },
+  "link.item.label.Twitter": {
+    "message": "Twitter",
+    "description": "The label of footer link with label=Twitter linking to https://twitter.com/viron/TODO"
+  },
+  "link.item.label.Issues": {
+    "message": "Issues",
+    "description": "The label of footer link with label=Issues linking to https://github.com/cam-inc/viron/issues"
+  },
+  "link.item.label.Privacy Policy": {
+    "message": "Privacy Policy",
+    "description": "The label of footer link with label=Privacy Policy linking to https://viron.app/privacyPolicy/TODO"
+  },
+  "link.item.label.Terms of Service": {
+    "message": "Terms of Service",
+    "description": "The label of footer link with label=Terms of Service linking to https://viron.app/termsOfServicey/TODO"
   }
 }

@@ -1,7 +1,7 @@
 import classnames from 'classnames';
 import React from 'react';
 
-type Props = {
+export type Props = {
   left: string;
   right: string;
   className?: string;

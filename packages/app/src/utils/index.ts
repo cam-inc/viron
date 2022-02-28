@@ -1,7 +1,6 @@
-import { URL } from '$types/index';
+import { URL } from '~/types';
 
-// @ts-ignore
-const nodeEnv: string = __NODE_ENV__;
+const nodeEnv: string = process.env.GATSBY_MODE as string;
 
 export const isProduction: boolean = nodeEnv === 'production';
 
@@ -29,6 +28,7 @@ export const promiseErrorHandler = async function <T, E = Error>(
   try {
     res = await promise.then((res) => res);
   } catch (_err) {
+    // @ts-ignore
     err = _err;
   }
   return [res as T, err as E];

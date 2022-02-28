@@ -26,6 +26,16 @@ import {
   ArticleCreateAttributes,
   ArticleUpdateAttributes,
 } from '../domains/article';
+import {
+  Item,
+  ItemCreateAttributes,
+  ItemUpdateAttributes,
+} from '../domains/item';
+import {
+  Media,
+  MediaCreateAttributes,
+  MediaUpdateAttributes,
+} from '../domains/media';
 import { MODE } from '../constants';
 
 export type FindConditions<Entity> =
@@ -86,3 +96,15 @@ export const getArticleRepository = (): Repository<
   ArticleCreateAttributes,
   ArticleUpdateAttributes
 > => getRepository('articles');
+
+export const getItemRepository = (): Repository<
+  Item,
+  ItemCreateAttributes,
+  ItemUpdateAttributes
+> => getRepository('items');
+
+export const getMediaRepository = (): Repository<
+  Media,
+  MediaCreateAttributes,
+  MediaUpdateAttributes
+> => getRepository('medias');

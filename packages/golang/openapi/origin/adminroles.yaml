@@ -25,6 +25,9 @@ paths:
         - vironAdminRole
       summary: list admin roles
       description: 管理ロール一覧
+      parameters:
+        - $ref: './components.yaml#/components/parameters/VironPagerSizeQueryParam'
+        - $ref: './components.yaml#/components/parameters/VironPagerPageQueryParam'
       responses:
         200:
           description: OK

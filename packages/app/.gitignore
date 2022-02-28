@@ -1,6 +1,7 @@
 # Gatsby
 .cache
 public
+.env*
 
 # Cypress
 cypress/screenshots

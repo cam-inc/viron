@@ -1,53 +1,47 @@
-import { BiCaretDown } from '@react-icons/all-files/bi/BiCaretDown';
-import { BiCaretUp } from '@react-icons/all-files/bi/BiCaretUp';
 import classnames from 'classnames';
 import React, { useCallback } from 'react';
-import { ON, On } from '$constants/index';
-import { ClassName } from '$types/index';
-import { TableColumn, TableSort, TABLE_SORT } from '$types/oas';
+import { Props as BaseProps } from '~/components';
+import ChevronDownIcon from '~/components/icon/chevronDown/outline';
+import ChevronUpIcon from '~/components/icon/chevronUp/outline';
+import { TableColumn, Sort, SORT } from '~/types/oas';
 
 type Key = string;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Value = any;
 export type Data = Record<Key, Value>;
-type Column = Omit<TableColumn, 'type'> & {
-  type: TableColumn['type'] | 'actions';
-  sort: TableSort;
-};
 
-export type Props = {
-  on: On;
+export type Props = BaseProps & {
   dataSource: Data[];
-  columns: Column[];
-  className?: ClassName;
+  columns: TableColumn[];
   renderActions?: (data: Data) => JSX.Element;
   onRowClick?: (data: Data) => void;
-  onRequestSortChange?: (key: Column['key'], sort: Column['sort']) => void;
+  onRequestSortChange?: (key: TableColumn['key'], sort: Sort) => void;
 };
 const Table: React.FC<Props> = ({
   on,
+  className = '',
   dataSource,
   columns,
-  className = '',
   renderActions,
   onRowClick,
   onRequestSortChange,
 }) => {
-  const handleColumnHeadClick = useCallback<NonNullable<ThProps['onClick']>>(
-    function (column) {
+  const handleColumnHeadClick = useCallback<
+    NonNullable<ThTitleProp['onClick']>
+  >(
+    (column) => {
       if (!column.isSortable) {
         return;
       }
-      let sort: Column['sort'];
+      let sort: Sort;
       switch (column.sort) {
-        case TABLE_SORT.ASC:
-          sort = TABLE_SORT.DESC;
+        case SORT.ASC:
+          sort = SORT.DESC;
           break;
-        case TABLE_SORT.DESC:
-          sort = TABLE_SORT.NONE;
+        case SORT.DESC:
+          sort = SORT.NONE;
           break;
-        case TABLE_SORT.NONE:
-          sort = TABLE_SORT.ASC;
+        case SORT.NONE:
+          sort = SORT.ASC;
           break;
       }
       onRequestSortChange?.(column.key, sort);
@@ -56,7 +50,7 @@ const Table: React.FC<Props> = ({
   );
 
   const handleRowClick = useCallback<NonNullable<TrProps['onClick']>>(
-    function (data) {
+    (data) => {
       onRowClick?.(data);
     },
     [onRowClick]
@@ -67,65 +61,50 @@ const Table: React.FC<Props> = ({
       <div className="overflow-x-auto overscroll-x-contain">
         <table className="min-w-full border-collapse">
           <thead
-            className={classnames('border-b-2', {
-              'border-on-surface-faint': on === ON.SURFACE,
-            })}
+            className={classnames('border-b-2', `border-thm-on-${on}-faint`)}
           >
             <Tr on={on} isHead>
-              {columns.map(function (column) {
-                return (
-                  <React.Fragment key={column.key}>
-                    <Th
+              {columns.map((column) => (
+                <React.Fragment key={column.key}>
+                  <Th on={on}>
+                    <ThTitle
                       on={on}
                       column={column}
                       onClick={handleColumnHeadClick}
                     />
-                  </React.Fragment>
-                );
-              })}
+                  </Th>
+                </React.Fragment>
+              ))}
               {renderActions && (
-                <Th
-                  on={on}
-                  column={{
-                    type: 'actions',
-                    name: 'actions',
-                    // TODO: 重複しないように。
-                    key: 'actions',
-                    isSortable: false,
-                    sort: TABLE_SORT.NONE,
-                  }}
-                  isSticky
-                />
+                <Th on={on} isSticky>
+                  <div>actions</div>
+                </Th>
               )}
             </Tr>
           </thead>
           <tbody>
-            {dataSource.map(function (data, idx) {
-              return (
-                <React.Fragment key={idx}>
-                  <Tr on={on} data={data} onClick={handleRowClick}>
-                    {columns.map(function (column) {
-                      return (
-                        <React.Fragment key={column.key}>
-                          <Td on={on}>
-                            <Cell
-                              on={on}
-                              column={column}
-                              value={data[column.key]}
-                            />
-                          </Td>
-                        </React.Fragment>
-                      );
-                    })}
-                    {renderActions && (
-                      <Td on={on} isSticky>
-                        {renderActions(data)}
+            {dataSource.map((data, idx) => (
+              <React.Fragment key={idx}>
+                <Tr on={on} data={data} onClick={handleRowClick}>
+                  {columns.map((column) => (
+                    <React.Fragment key={column.key}>
+                      <Td on={on}>
+                        <Cell
+                          on={on}
+                          column={column}
+                          value={data[column.key]}
+                        />
                       </Td>
-                    )}
-                  </Tr>
-                </React.Fragment>
-              );
-            })}
+                    </React.Fragment>
+                  ))}
+                  {renderActions && (
+                    <Td on={on} isSticky>
+                      {renderActions(data)}
+                    </Td>
+                  )}
+                </Tr>
+              </React.Fragment>
+            ))}
           </tbody>
         </table>
       </div>
@@ -134,8 +113,7 @@ const Table: React.FC<Props> = ({
 };
 export default Table;
 
-type TrProps = {
-  on: On;
+type TrProps = BaseProps & {
   data?: Data;
   onClick?: (data: Data) => void;
   isHead?: boolean;
@@ -147,23 +125,13 @@ const Tr: React.FC<TrProps> = ({
   isHead = false,
   children,
 }) => {
-  const handleClick = useCallback(
-    function () {
-      onClick?.(data as Data);
-    },
-    [data, onClick]
-  );
+  const handleClick = useCallback(() => {
+    onClick?.(data as Data);
+  }, [data, onClick]);
   return (
     <tr
-      className={classnames('border-b', {
-        'border-on-background-faint': on === ON.BACKGROUND,
-        'hover:bg-on-background-faint': on === ON.BACKGROUND && !isHead,
-        'border-on-surface-faint': on === ON.SURFACE,
-        'hover:bg-on-surface-faint': on === ON.SURFACE && !isHead,
-        'border-on-primary-faint': on === ON.PRIMARY,
-        'hover:bg-on-primary-faint': on === ON.PRIMARY && !isHead,
-        'border-on-complementary-faint': on === ON.COMPLEMENTARY,
-        'hover:bg-on-complementary-faint': on === ON.COMPLEMENTARY && !isHead,
+      className={classnames(`border-b border-thm-on-${on}-faint`, {
+        [`hover:bg-thm-on-${on}-faint`]: !isHead,
       })}
       onClick={handleClick}
     >
@@ -172,99 +140,68 @@ const Tr: React.FC<TrProps> = ({
   );
 };
 
-type ThProps = {
-  on: On;
-  column: Column;
-  onClick?: (column: Column) => void;
+type ThProps = BaseProps & {
   isSticky?: boolean;
 };
-const Th: React.FC<ThProps> = ({ on, column, onClick, isSticky = false }) => {
-  const handleClick = useCallback(
-    function () {
-      onClick?.(column);
-    },
-    [column, onClick]
-  );
+const Th: React.FC<ThProps> = ({ on, isSticky = false, children }) => {
   const style: React.CSSProperties = {};
   if (isSticky) {
-    style.background = `linear-gradient(to right, rgba(0,0,0,0) 0, var(--color-${on}) 8px, var(--color-${on}) 100%)`;
+    style.background = `linear-gradient(to right, rgba(0,0,0,0) 0, var(--thm-${on}) 8px, var(--thm-${on}) 100%)`;
   }
   return (
     <th
-      className={classnames('text-xs text-left', {
+      className={classnames(`text-xs text-left text-thm-on-${on}-high`, {
         'p-2': !isSticky,
         'pr-2 py-2 pl-4 sticky right-0': isSticky,
-        'text-on-background-high': on === ON.BACKGROUND,
-        'text-on-surface-high': on === ON.SURFACE,
-        'text-on-primary-high': on === ON.PRIMARY,
-        'text-on-complementary-high': on === ON.COMPLEMENTARY,
       })}
       style={style}
-      onClick={handleClick}
     >
-      <div className="flex items-center">
-        {column.isSortable && (
-          <div className="flex-none mr-1">
-            <div
-              className={classnames({
-                'text-on-background-slight':
-                  on === ON.BACKGROUND && column.sort !== TABLE_SORT.ASC,
-                'text-on-background':
-                  on === ON.BACKGROUND && column.sort === TABLE_SORT.ASC,
-                'text-on-surface-slight':
-                  on === ON.SURFACE && column.sort !== TABLE_SORT.ASC,
-                'text-on-surface':
-                  on === ON.SURFACE && column.sort === TABLE_SORT.ASC,
-                'text-on-primary-slight':
-                  on === ON.PRIMARY && column.sort !== TABLE_SORT.ASC,
-                'text-on-primary':
-                  on === ON.PRIMARY && column.sort === TABLE_SORT.ASC,
-                'text-on-complementary-slight':
-                  on === ON.COMPLEMENTARY && column.sort !== TABLE_SORT.ASC,
-                'text-on-complementary':
-                  on === ON.COMPLEMENTARY && column.sort === TABLE_SORT.ASC,
-              })}
-            >
-              <BiCaretUp />
-            </div>
-            <div
-              className={classnames({
-                'text-on-background-slight':
-                  on === ON.BACKGROUND && column.sort !== TABLE_SORT.DESC,
-                'text-on-background':
-                  on === ON.BACKGROUND && column.sort === TABLE_SORT.DESC,
-                'text-on-surface-slight':
-                  on === ON.SURFACE && column.sort !== TABLE_SORT.DESC,
-                'text-on-surface':
-                  on === ON.SURFACE && column.sort === TABLE_SORT.DESC,
-                'text-on-primary-slight':
-                  on === ON.PRIMARY && column.sort !== TABLE_SORT.DESC,
-                'text-on-primary':
-                  on === ON.PRIMARY && column.sort === TABLE_SORT.DESC,
-                'text-on-complementary-slight':
-                  on === ON.COMPLEMENTARY && column.sort !== TABLE_SORT.DESC,
-                'text-on-complementary':
-                  on === ON.COMPLEMENTARY && column.sort === TABLE_SORT.DESC,
-              })}
-            >
-              <BiCaretDown />
-            </div>
-          </div>
-        )}
-        <div className="flex-1 min-w-0 font-bold">{column.name}</div>
-      </div>
+      {children}
     </th>
   );
 };
 
-const Td: React.FC<{ on: On; isSticky?: boolean }> = ({
+type ThTitleProp = BaseProps & {
+  column: TableColumn;
+  onClick?: (column: TableColumn) => void;
+};
+const ThTitle: React.FC<ThTitleProp> = ({ on, column, onClick }) => {
+  const handleClick = useCallback(() => {
+    onClick?.(column);
+  }, [column, onClick]);
+  return (
+    <div className="flex items-center" onClick={handleClick}>
+      <div className="flex-none mr-1">
+        <div
+          className={classnames({
+            [`text-thm-on-${on}`]: column.sort === SORT.ASC,
+            [`text-thm-on-${on}-slight`]: column.sort !== SORT.ASC,
+          })}
+        >
+          <ChevronUpIcon className="w-em" />
+        </div>
+        <div
+          className={classnames({
+            [`text-thm-on-${on}`]: column.sort === SORT.DESC,
+            [`text-thm-on-${on}-slight`]: column.sort !== SORT.DESC,
+          })}
+        >
+          <ChevronDownIcon className="w-em" />
+        </div>
+      </div>
+      <div className="flex-1 min-w-0 font-bold">{column.name}</div>
+    </div>
+  );
+};
+
+const Td: React.FC<BaseProps & { isSticky?: boolean }> = ({
   on,
   isSticky = false,
   children,
 }) => {
   const style: React.CSSProperties = {};
   if (isSticky) {
-    style.background = `linear-gradient(to right, rgba(0,0,0,0) 0, var(--color-${on}) 8px, var(--color-${on}) 100%)`;
+    style.background = `linear-gradient(to right, rgba(0,0,0,0) 0, var(--thm-${on}) 8px, var(--thm-${on}) 100%)`;
   }
   return (
     <td
@@ -279,34 +216,43 @@ const Td: React.FC<{ on: On; isSticky?: boolean }> = ({
   );
 };
 
-const Cell: React.FC<{ on: On; column: Column; value: Value }> = ({
+const Cell: React.FC<BaseProps & { column: TableColumn; value: Value }> = ({
   on,
   column,
   value,
 }) => {
-  // TODO: typeofして最適な見せ方に。
+  /*
+  const formattedValue = function(column: Column, value: Value) {
+    switch (column.schema.type) {
+      case 'string':
+        if (column.schema.format === ('date' || 'date-time')) {
+          const date = new Date(value as string);
+          const intlDate = new Intl.DateTimeFormat([], {
+            dateStyle: 'medium',
+            timeStyle: 'medium',
+          }).format(date);
+          return intlDate;
+        }
+        return JSON.stringify(value);
+      case 'number' || 'integer':
+        return (value as number).toLocaleString();
+      default:
+        return JSON.stringify(value);
+    }
+  };
+  */
   return (
     <>
+      <div
+        className={classnames(
+          `text-xxs whitespace-nowrap text-thm-on-${on}-slight`
+        )}
+      >
+        [{column.schema.type}]
+      </div>
       <div className="whitespace-nowrap">
-        <div
-          className={classnames('text-xxs', {
-            'text-on-background-slight': on === ON.BACKGROUND,
-            'text-on-surface-slight': on === ON.SURFACE,
-            'text-on-primary-slight': on === ON.PRIMARY,
-            'text-on-complementary-slight': on === ON.COMPLEMENTARY,
-          })}
-        >
-          [{column.type}]
-        </div>
-        <div
-          className={classnames('text-sm', {
-            'text-on-background': on === ON.BACKGROUND,
-            'text-on-surface': on === ON.SURFACE,
-            'text-on-primary': on === ON.PRIMARY,
-            'text-on-complementary': on === ON.COMPLEMENTARY,
-          })}
-        >
-          {JSON.stringify(value)}
+        <div className={classnames(`text-sm text-thm-on-${on}`)}>
+          {/*formattedValue(column, value)*/ JSON.stringify(value)}
         </div>
       </div>
     </>

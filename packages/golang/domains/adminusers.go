@@ -213,7 +213,7 @@ func ListAdminUser(ctx context.Context, opts *AdminUserConditions) (*AdminUsersW
 		withPager.List = append(withPager.List, adminuser)
 	}
 	count := CountAdminUser(ctx)
-	pager := Pagging(count, conditions.Size, conditions.Page)
+	pager := Paging(count, conditions.Size, conditions.Page)
 	withPager.Pager = pager
 	return withPager, nil
 }
