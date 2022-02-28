@@ -66,7 +66,7 @@ var (
 
 	syncedTime int64
 
-	loadPolicyInterval *int64
+	loadPolicyInterval int64
 
 	permissionMap = map[string][]string{
 		constant.API_METHOD_GET:    []string{constant.PERMISSION_READ, constant.PERMISSION_WRITE, constant.PERMISSION_ALL},
@@ -96,7 +96,7 @@ func new(params ...interface{}) error {
 	return nil
 }
 
-func SetLoadPolicyInterval(sec *int64) {
+func SetLoadPolicyInterval(sec int64) {
 	loadPolicyInterval = sec
 }
 
@@ -163,13 +163,12 @@ func sync() {
 		return
 	}
 
-	if loadPolicyInterval == nil {
-		defaultInterval := int64(constant.CASBIN_LOAD_INTERVAL_SEC)
-		loadPolicyInterval = &defaultInterval
+	if loadPolicyInterval == 0 {
+		loadPolicyInterval = int64(constant.CASBIN_LOAD_INTERVAL_SEC)
 	}
 
 	now := time.Now().Unix() // sec
-	if now > syncedTime+*loadPolicyInterval {
+	if now > syncedTime+loadPolicyInterval {
 		if err := casbinInstance.LoadPolicy(); err != nil {
 			logging.GetDefaultLogger().Error(err)
 		}
