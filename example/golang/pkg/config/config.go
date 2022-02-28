@@ -33,26 +33,26 @@ type (
 	}
 
 	Mongo struct {
-		URI                    string
-		User                   string
-		Password               string
-		VironDB                string
-		CasbinCollectionName   string
-		CasbinLoadIntervalMsec *int64
+		URI                   string
+		User                  string
+		Password              string
+		VironDB               string
+		CasbinCollectionName  string
+		CasbinLoadIntervalSec *int64
 	}
 
 	MySQL struct {
-		Dialect                string
-		User                   string `yaml:"user"`
-		Password               string `yaml:"password"`
-		Net                    string `yaml:"net"`
-		Host                   string `yaml:"host"`
-		Port                   int    `yaml:"port"`
-		DBName                 string `yaml:"dbname"`
-		TLSConfig              string `yaml:"tls"`
-		AllowNativePasswords   bool   `yaml:"native_password"`
-		ParseTime              bool   `yaml:"parse_time"`
-		CasbinLoadIntervalMsec *int64 `yaml:"casbin_load_interval_msec"`
+		Dialect               string
+		User                  string `yaml:"user"`
+		Password              string `yaml:"password"`
+		Net                   string `yaml:"net"`
+		Host                  string `yaml:"host"`
+		Port                  int    `yaml:"port"`
+		DBName                string `yaml:"dbname"`
+		TLSConfig             string `yaml:"tls"`
+		AllowNativePasswords  bool   `yaml:"native_password"`
+		ParseTime             bool   `yaml:"parse_time"`
+		CasbinLoadIntervalSec *int64 `yaml:"casbin_load_interval_sec"`
 	}
 
 	Cors struct {

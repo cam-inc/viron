@@ -90,14 +90,14 @@ func new(params ...interface{}) error {
 	}
 
 	enforcer.LoadPolicy()
-	syncedTime = time.Now().UnixNano() / int64(time.Millisecond) // msec
+	syncedTime = time.Now().Unix() // sec
 
 	casbinInstance = enforcer
 	return nil
 }
 
-func SetLoadPolicyInterval(msec *int64) {
-	loadPolicyInterval = msec
+func SetLoadPolicyInterval(sec *int64) {
+	loadPolicyInterval = sec
 }
 
 func NewMySQL(conn *sql.DB) error {
@@ -164,11 +164,11 @@ func sync() {
 	}
 
 	if loadPolicyInterval == nil {
-		defaultInterval := int64(constant.CASBIN_LOAD_INTERVAL_MSEC)
+		defaultInterval := int64(constant.CASBIN_LOAD_INTERVAL_SEC)
 		loadPolicyInterval = &defaultInterval
 	}
 
-	now := time.Now().UnixNano() / int64(time.Millisecond) // msec
+	now := time.Now().Unix() // sec
 	if now > syncedTime+*loadPolicyInterval {
 		if err := casbinInstance.LoadPolicy(); err != nil {
 			logging.GetDefaultLogger().Error(err)
