@@ -155,7 +155,8 @@ describe('domains/adminrole', () => {
 
       await updateRolesForUser(userId, ['reader', 'director']);
       const actual = await listRoles(userId);
-      assert.deepStrictEqual(actual, ['reader', 'director']);
+      assert.strictEqual(actual.length, 2);
+      assert(actual.every((a) => ['reader', 'director'].includes(a)));
     });
   });
 
@@ -247,10 +248,17 @@ describe('domains/adminrole', () => {
 
       const actual = await listPolicies('editor');
       assert.strictEqual(actual.length, 2);
-      assert.strictEqual(actual[0].resourceId, 'news');
-      assert.strictEqual(actual[0].permission, PERMISSION.READ);
-      assert.strictEqual(actual[1].resourceId, 'news');
-      assert.strictEqual(actual[1].permission, PERMISSION.WRITE);
+      assert(
+        actual.every((a) => {
+          if (a.resourceId !== 'news') {
+            return false;
+          }
+          return (
+            a.permission === PERMISSION.READ ||
+            a.permission === PERMISSION.WRITE
+          );
+        })
+      );
     });
   });
 
@@ -465,10 +473,17 @@ describe('domains/adminrole', () => {
 
       const actual = await listPolicies('editor');
       assert.strictEqual(actual.length, 2);
-      assert.strictEqual(actual[0].resourceId, 'news');
-      assert.strictEqual(actual[0].permission, PERMISSION.READ);
-      assert.strictEqual(actual[1].resourceId, 'news');
-      assert.strictEqual(actual[1].permission, PERMISSION.WRITE);
+      assert(
+        actual.every((a) => {
+          if (a.resourceId !== 'news') {
+            return false;
+          }
+          return (
+            a.permission === PERMISSION.READ ||
+            a.permission === PERMISSION.WRITE
+          );
+        })
+      );
     });
   });
 
@@ -489,10 +504,14 @@ describe('domains/adminrole', () => {
 
       const actual = await listPolicies(ADMIN_ROLE.VIEWER);
       assert.strictEqual(actual.length, 2);
-      assert.strictEqual(actual[0].resourceId, 'blog');
-      assert.strictEqual(actual[0].permission, PERMISSION.READ);
-      assert.strictEqual(actual[1].resourceId, 'news');
-      assert.strictEqual(actual[1].permission, PERMISSION.READ);
+      assert(
+        actual.every((a) => {
+          if (a.permission !== PERMISSION.READ) {
+            return false;
+          }
+          return a.resourceId === 'blog' || a.resourceId === 'news';
+        })
+      );
     });
 
     it('Failed to create viewer role when already exists.', async () => {
