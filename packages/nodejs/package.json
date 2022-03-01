@@ -22,7 +22,7 @@
   "dependencies": {
     "@viron/linter": "*",
     "casbin": "^5.6.1",
-    "casbin-mongoose-adapter": "^3.0.1",
+    "casbin-mongoose-adapter": "^4.0.2",
     "casbin-sequelize-adapter": "^2.2.0",
     "cookie": "^0.4.1",
     "debug": "^4.3.1",
