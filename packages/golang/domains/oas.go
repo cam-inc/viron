@@ -239,12 +239,11 @@ func findPermissionOperationIDs(operationID string, apiDef *openapi3.T) []string
 
 	var operationIDs []string
 	for path, pathItem := range apiDef.Paths {
-		// パスが一致する or 指定のoperationIDのパスに前方一致するパス かを判断
+		// 対象のパスかチェック
 		// ex) 指定のoperationIDのパスが "/users" だった場合
 		// "/users"                 -> パスが一致するのでtrue
 		// "/users/{xxx}"           -> 前方一致するのでtrue
-		// "/users/purchases/{xxx}" -> 前方一致するのでtrue
-		// "/purchases"             -> 条件に一致しないのでfalse
+		// "/usersusers"            -> 条件に一致しないのでfalse
 		if path == pathMethod.path || regexp.MustCompile(fmt.Sprintf(`^%s/.+$`, pathMethod.path)).MatchString(path) {
 			operations := pathItem.Operations()
 			for _, operation := range operations {
