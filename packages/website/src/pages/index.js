@@ -18,7 +18,7 @@ function Home() {
     description={`${description}`}>
 
       <header className={styles.header}>
-      <div>
+      <div className={styles.header__item}>
       <h1 className="hero__title">{siteConfig.title}</h1>
       <p className="hero__subtitle">{translate({
         id: 'cmn.tagline',
@@ -35,7 +35,7 @@ function Home() {
       })}
             </Link>
       </div>
-      <div>
+      <div className={styles.header__item}>
       <img src={useBaseUrl('img/viron_kv.png')}/>
       </div>
       </header>
