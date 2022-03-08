@@ -2,91 +2,122 @@
 title: Your First Endpoint
 ---
 
-As the first step of our guide, we walk you through how to set up a simple RESTfull API server for Viron to be connected.
+As the first step of our guide, we walk you through how Viron works and handle an OAS document by setting up a simple **mock** RESTful API server.
 
 :::note
-We assume you've already installed [Node.js](https://nodejs.org/) on your computer. If not, follow the official guidance before you keep reading on.
+It is up to you how the actual RESTful API server is set up as long as the server meets Viron's requirements.
 :::
 
-## Setup an API Server
+## Preparation
+As we use [Postman](https://www.postman.com/)'s [Mock Server function](https://learning.postman.com/docs/designing-and-developing-your-api/mocking-data/setting-up-mock/) for our guide, you **need to create your Postman account before reading on**. Here are some links that would help you understand what Postman is:
 
-Let's start by creating a simple RESTfull API server using [express](https://expressjs.com/) npm module. Express is a web framework for Node.js.
+- [Introduction](https://learning.postman.com/docs/getting-started/introduction/)
+- [Mock Server](https://learning.postman.com/docs/designing-and-developing-your-api/mocking-data/setting-up-mock/)
+- [from scratch](https://learning.postman.com/docs/designing-and-developing-your-api/mocking-data/setting-up-mock/#creating-a-mock-from-scratch)
 
-:::note
-As long as the API server is RESTfull, it's up to you how to set up a server. The reason why we chose express is that it's famous enough to be used as an example.
-:::
+## Creating a Mock Server
+Create a mock server [from scratch](https://learning.postman.com/docs/designing-and-developing-your-api/mocking-data/setting-up-mock/#creating-a-mock-from-scratch) on your account's Postman's workspace page with the initial data below.
 
-```sh
-mkdir guide
-cd guide
-npm init -y
-npm install express --save
+| | value |
+| ---- | ---- |
+| Request Method | `GET` |
+| Request URL | `/oas` |
+| Response Code | `200` |
+| Response Body | `blank` |
+
+Click the `Next` button at the bottom of the page to proceed to the next setting, `Configuration`. Input `RESTful Administration API Server for Viron` in the `Mock server name` field, leave other fields as they are, and click the `Create Mock Server` button to confirm.
+
+You will use the URL of the newly created mock server, so click the `Copy Mock URL` button to copy it.
+
+## Endpoint to Return an OAS Document
+Click the `Collections` menu on the left of the page, and you will find an `example response` under the `GET /oas` request. Edit the example response body by filling it with the data below, and click the `Save` button on the top of the page.
+
+**Content Type**: `JSON`
+
+**Body**:
+
+```json
+{
+  "openapi": "3.0.2",
+  "info":{
+    "title": "RESTful Administration API Server for Viron",
+    "version": "mock",
+    "x-pages": []
+  },
+  "paths": {}
+}
 ```
 
-Attach a file named `app.js` under the `guide` directory.
+**Response Headers**:
 
-:::warn
-TODO: httpsにすること。
-:::
+| key | value |
+| ---- | ---- |
+| access-control-allow-origin | `https://viron.plus` |
+| access-control-allow-credentials | `true` |
+| x-viron-authtypes-path | `/authentication` |
+| access-control-expose-headers | `x-viron-authtypes-path` |
 
-```js
-// app.js
-const express = require('express');
-const app = express();
-const port = 4000;
+The [access-control-allow-origin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin) and [access-control-allow-credentials](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials) are **required** response headers for Viron and your endpoint to authenticate requests from Viron users.
 
-app.get('/', (req, res) => {
-  res.send('Hello Viron!');
-});
+The `x-viron-authtypes-path` response header tells Viron users how to get authenticated.
 
-app.listen(port, () => {
-  console.log(`My first API server for Viron is up listening at http:localhost:${port}.`);
-});
-```
+## Creating a Request for Authentication
+Add a new `request` with the data below and click the `Save` button. This request provides Viron users with a way to authenticate.
 
-Now you are ready to launch your first RESTfull API server for Viron by executing the command below.
+| | value |
+| ---- | ---- |
+| Name | `/authentication` |
+| Method | `GET` |
+| URL | `{{url}}/authentication` |
 
-```sh
-node app.js
-```
+Then, add an `example response` under the request with the data below, and click the `Save` button.
 
-Open up your favorite browser and navigate to `https:localhost:4000`.
-If you see a paragraph `Hello Viron!` on the browser's screen, you are good and proceed to the next section!
+**Name**: `Default`
 
-## Serve an OAS Document
+**Content Type**: `JSON`
 
-The next step is to serve an OAS document.
-Edit the `app.js` you've just created by adding the lines below.
+**Body**:
 
-```js
-app.get('/oas.json', (req, res) => {
-  res.json({
-    openapi: '3.0.2',
-    info: {
-      title: 'My API Server',
-      description: 'My first RESTfull API server for Viron.'
+```json
+{
+  "list": [],
+  "oas": {
+    "openapi": "3.0.2",
+    "info": {
+      "title": "authentication",
+      "version": "mock",
+      "x-pages": []
     },
-    paths: {}
-  });
-});
+    "paths": {}
+  }
+}
 ```
 
-Visit `https://localhost:4000/oas.json` to see it works well.
+**Response Headers**:
 
-:::caution
-All OAS documents being provided to Viron should be of **https** protocol.
+| key | value |
+| ---- | ---- |
+| access-control-allow-origin | `https://viron.plus` |
+| access-control-allow-credentials | `true` |
+| x-viron-authtypes-path | `/authentication` |
+| access-control-expose-headers | `x-viron-authtypes-path` |
+
+:::note
+Since the endpoint we are creating is **public**, we leave the list value an empty array.
 :::
 
-## Provide Viron with the OAS Documevnt
+## Adding the Endpoint on the Viron Dashboard
 
-To provide Viron with the OAS document,
+Visit the [Viron dashboard](https://viron.plus/dashboard/endpoints) and add the endpoint you have created.
 
-### 1. Open up Viron on Browser
+| field name | value |
+| ---- | ---- |
+| ID | `mock` |
+| URL | `https://xxxxxxxxx.mock.pstmn.io/oas` |
+| Group | `blank` |
 
-Visit Viron at [https://viron.app/](`https://viron.app`). You'll see Viron's top page but just click the link [home](https://viron.app/home/) to be navigated to the page where you will connect the OAS document to Viron.
+:::note
+The base URL for your endpoint is one that you have copied after creating your mock server.
+:::
 
-### 2. Add Your Endpoint
-
-This page is a hub where you can navigate to a specific endpoint page and add a new endpoint.
-To add a new endpoint, you will need to input two fields which are `Endpoint ID` and `Endpoint URL`. Look for the input fields and type `My First Server` and `https://localhost:4000/oas.json` respectively.
-After clicking the submit button you will see your endpoint having been added.
+Go on the next step after confirming that your endpoint is on the Viron dashboard.
