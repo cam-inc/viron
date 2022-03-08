@@ -1,6 +1,7 @@
 // @see: https://docusaurus.io/docs/docusaurus.config.js
 module.exports = {
   title: 'VIRON',
+  tagline: 'The Magic to Turn OAS into GUI.',
   url: process.env.VIRON_WEBSITE_URL || 'https://discovery.viron.plus',
   baseUrl: '/',
   favicon: 'img/favicon.ico',
