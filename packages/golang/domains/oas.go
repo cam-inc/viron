@@ -239,13 +239,14 @@ func findPermissionOperationIDs(operationID string, apiDef *openapi3.T) []string
 
 	var operationIDs []string
 	for path, pathItem := range apiDef.Paths {
-		// 対象のpathかどうかをチェック
-		// ex)
-		// 対象のpath "/users
-		// 対象のpath "/users/{xxx}"
-		// 非対象のpath "/users/purchases/{xxx}"
-		// 非対象のpath "/users/{xxx}/purchases/{xxx}"
-		if path == pathMethod.path || (strings.Count(path, "/") == 2 && regexp.MustCompile(fmt.Sprintf(`^%s/{.+}$`, pathMethod.path)).MatchString(path)) {
+		// TODO: 一旦フロントの表示基準に合わせる
+		// https://github.com/cam-inc/viron/commit/58f24ea56f208733aa330bc92e6e62f9b4283d3f
+		// 対象のパスかチェック
+		// ex) 指定のoperationIDのパスが "/users" だった場合
+		// "/users"                 -> パスが一致するのでtrue
+		// "/users/{xxx}"           -> 前方一致するのでtrue
+		// "/usersusers"            -> 条件に一致しないのでfalse
+		if path == pathMethod.path || regexp.MustCompile(fmt.Sprintf(`^%s/.+$`, pathMethod.path)).MatchString(path) {
 			operations := pathItem.Operations()
 			for _, operation := range operations {
 				operationIDs = append(operationIDs, operation.OperationID)
