@@ -2,10 +2,9 @@
 title: Your First Number Content
 ---
 
-Viron `Content` is a page child, serving mainly as a monitor to display an assigned operation's response data. A page can have multiple contents inside.
+Viron `Content` is a page child, serving mainly as a monitor to display an assigned operation's response data. A page can have multiple contents inside. A Viron content has a `type` property that influences how response data should be displayed. In this step, we will use the type of `number`.
 
 ## Editing the OAS Document
-
 Edit the example response body of the request `GET /oas` as follows:
 
 ```json {11-17,26-28,31-52}
@@ -66,8 +65,8 @@ Edit the example response body of the request `GET /oas` as follows:
 ```
 
 Here we have added:
-- a Viron content to display the number of DAU on the page named `Page One`.
-- an [OAS Path Item Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#pathItemObject) that defines how to fetch the DAU data.
+- a Viron content to display the **number** of `DAU` on the page named `Page One`.
+- an [OAS Path Item Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#pathItemObject) that **defines how to fetch** the DAU data.
 
 The OAS document now says that the Viron content on the page should display the DAU number fetched by the operation named `getDAU`. Viron interprets the information and works accordingly.
 
@@ -84,7 +83,9 @@ For **Request**:
 
 For **Example Response**,
 
-**Content Type**: JSON
+**Name**: `Default`
+
+**Content Type**: `JSON`
 
 **Body**:
 ```json
@@ -100,7 +101,7 @@ For **Example Response**,
 | access-control-allow-origin | `https://viron.plus` |
 | access-control-allow-credentials | `true` |
 
-Visit the Viron endpoint page and refresh, and you will see the DAU number.
+Visit the Viron endpoint page and select `Page One`, and you will see the DAU number.
 
 :::note
 Visit documentations for [content](/docs/Advanced-Guides/contet) and [content-number](/docs/Advanced-Guides/content-number) for detail.
