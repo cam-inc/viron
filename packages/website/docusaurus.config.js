@@ -1,7 +1,7 @@
 // @see: https://docusaurus.io/docs/docusaurus.config.js
 module.exports = {
   title: 'VIRON',
-  url: process.env.VIRON_WEBSITE_URL || 'https://cam-inc.github.io',
+  url: process.env.VIRON_WEBSITE_URL || 'https://discovery.viron.plus',
   baseUrl: '/',
   favicon: 'img/favicon.ico',
   i18n: {
@@ -63,10 +63,6 @@ module.exports = {
               label: 'Quick Start',
               to: 'docs/Getting-Started/quick-start',
             },
-            {
-              label: 'Demo',
-              to: 'docs/Getting-Started/demo',
-            },
           ],
         },
         {
@@ -77,12 +73,12 @@ module.exports = {
               href: 'https://github.com/cam-inc/viron',
             },
             {
-              label: 'Twitter',
-              href: 'https://twitter.com/viron/TODO',
-            },
-            {
               label: 'Issues',
               href: 'https://github.com/cam-inc/viron/issues',
+            },
+            {
+              label: 'Contributing',
+              href: 'https://github.com/cam-inc/viron/blob/develop/CONTRIBUTING.md',
             },
             {
               label: 'Stack Overflow',
@@ -94,12 +90,12 @@ module.exports = {
           title: 'Legal',
           items: [
             {
-              label: 'Privacy Policy',
-              href: 'https://viron.app/privacyPolicy/TODO',
+              label: 'Code of Conduct',
+              href: 'https://github.com/cam-inc/viron/blob/develop/CODE_OF_CONDUCT.md',
             },
             {
-              label: 'Terms of Service',
-              href: 'https://viron.app/termsOfServicey/TODO',
+              label: 'License',
+              href: 'https://github.com/cam-inc/viron/blob/develop/LICENSE',
             },
           ],
         },
