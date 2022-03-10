@@ -2,7 +2,7 @@
 title: Content - Number
 ---
 
-The primary role of contents with the type `number` is to handle response data such as DAU, PV, or any kind of number-related ones.
+The primary role of contents with the type `number` is to handle response data such as `DAU`, `PV`, or any kind of number-related ones.
 
 Content Objects in an OAS document should be like this:
 
