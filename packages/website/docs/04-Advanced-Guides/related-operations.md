@@ -2,60 +2,68 @@
 title: Related Operations
 ---
 
-各Contentにおける関連Operationについて。
+[OAS Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#operationObject)s are the **keystones** for the reason that Viron sends requests based heavily on them and each content in the Viron page relates to them.
+
+## Three Types of Operation
+Viron categorizes OAS operations into three types:
+- `Base Operation`
+- `Sibling Operation`
+- `Descendant Operation`
+
+The following sections describe each type using a sample OAS document below:
 
 ```json
 {
-  openapi: '3.0.2',
-  info: {
-    'x-pages': [
+  "openapi": "3.0.2",
+  "info": {
+    "x-pages": [
       {
-        id: string;
-        contents: [
+        "id": "string",
+        "contents": [
           {
-            type: string;
-            operationId: 'getUsers';// ベースOperationId
-            defaultParametersValue?: {
-              [key in string]: any;
+            "type": "string",
+            "operationId": "getUsers", // Base Operation
+            "defaultParametersValue"?: { // optional default parameters paylod
+              [key in string]: any
             };
-            defaultRequestBodyValue?: any;
-            actions?: [// ベースOperationとは直接関連の無いOperationを明示的に関連Operationとして指定する為のプロパティ。
+            "defaultRequestBodyValue"?: any, // optional default request body paylod
+            "actions"?: [// optional property to specify related operations
               {
-                operationId: 'getCSVUsers';
-                defaultParametersValue?: RequestParametersValue;
-                defaultRequestBodyValue?: RequestRequestBodyValue;
+                "operationId": "getCSVUsers",
+                "defaultParametersValue"?: RequestParametersValue, // should meet the OAS Parameter Object specified
+                "defaultRequestBodyValue"?: RequestRequestBodyValue // // should meet the OAS Request Body Object specified
               },
               {
-                operationId: 'getCSVUser';
-                defaultParametersValue?: RequestParametersValue;
-                defaultRequestBodyValue?: RequestRequestBodyValue;
+                "operationId": "getCSVUser",
+                "defaultParametersValue"?: RequestParametersValue,
+                "defaultRequestBodyValue"?: RequestRequestBodyValue
               }
-            ];
+            ]
           }
         ]
       }
     ],
-    'x-table'?: {
-      responseListKey: 'list'
+    "x-table"?: {
+      "responseListKey": "list"
     };
   },
-  paths: {
-    '/users': {
-      get: {
-        operationId: 'getUsers',
-        responses: {
-          200: {
-            contetnt: {
-              'application/json': {
-                schema: {
-                  type: 'object',
-                  properties: {
-                    list: {
-                      type: 'array',
-                      items: {
-                        type: 'object',
-                        properties: {
-                          userId: { ... }
+  "paths": {
+    "/users": {
+      "get": { // Base Operation
+        "operationId": "getUsers",
+        "responses": {
+          "200": {
+            "contetnt": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "list": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "userId": { ... }
                         }
                       }
                     }
@@ -66,73 +74,71 @@ title: Related Operations
           }
         }
       },
-      post: {
-        operationId: 'postUsers'
+      "post": { // Sibling Operation
+        "operationId": "postUsers"
       }
     },
-    '/users/{userId}': {
-      get: {
-        operationId: 'getUser'
+    "/users/{userId}": {
+      "get": { // Descendant Operation
+        "operationId": "getUser"
       },
-      put: {
-        operationId: 'putUser'
+      "put": { // Descendant Operation
+        "operationId": "putUser"
       },
-      delete: {
-        operationId: 'deleteUser'
+      "delete": { // Descendant Operation
+        "operationId": "deleteUser"
       }
     },
-    '/csv/users': {
-      get: {
-        operationId: 'getCSVUsers'
-        parameters: [
+    "/csv/users": {
+      "get": { // Sibling Operation
+        "operationId": "getCSVUsers",
+        "parameters": [
           {
-            name: 'foo',
-            in: string;
+            "name": "foo",
+            "in": "string"
           }
         ]
-      },
+      }
     },
-    '/csv/users/{userId}': {
-      get: {
-        operationId: 'getCSVUser',
-        parameters: [
+    "/csv/users/{userId}": {
+      "get": { // Descendant Operation
+        "operationId": "getCSVUser",
+        "parameters": [
           {
-            name: 'userId',
-            in: string;
+            "name": "userId",
+            "in": "string"
           }
         ]
-      },
-    },
+      }
+    }
   }
 }
 ```
 
-## Sibling Operations
+## Base Operation
+**Base operations** are the ones that are specified in the Viron content with the property of `operationId`. Viron uses them to display some data on the Viron endpoint page. As the name implies, they are the **origins** of all `sibling` and `descendant` operations.
 
-ベースOperationに関連するOperationのこと。
-ベースOperationとpathが同じでmethodが違うすべてのOperationが対象。
-- `postUsers`
-actionsに指定したOperationのうち、そのOperationのparametersの中にベースOperationのresponse(typeがtableならresponse[Info['x-table'].responseListKey])内のkeyと同じkeyが一つも存在しない場合、それはSibling Operationの対象となる。
- - `getCSVUsers`
+Interpreting an OAS document, Viron searches for the [OAS Operation Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#operationObject) that matches the `operationId` specified, uses the found one as a `base operation`, and sends requests with payloads according to what the base operation defines. In the sample OAS document above, `getUsers` is a base operation.
 
-## Descendant Operations
+The optional `defaultParametersValue` and `defaultRequestBodyValue` properties are data that meet the [OAS Parameter Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#parameterObject) and [OAS Request Body Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#requestBodyObject) specified in a base operation. Those values play as **default overwritable values** when Viron sends GET requests.
 
-ベースOperationの子孫っぽく関連するOperationのこと。
-ベースOperationがtable(content.typeがtable)の場合、tableの各rowに関連するであろうOperation。
-ベースOperationのpath配下の全てのOperationが対象。(`${baseOparerion.path}/xxx/yyy/zzz`に該当する全メソッドのOperation)
- - `getUser`
- - `putUser`
- - `deleteUser`
-actionsに指定したOperationのうち、そのOperationのparametersの中に一つでもベースOperationのresponse(typeがtableならresponse[Info['x-table'].responseListKey])内のkeyと同じkeyが存在する場合、それはDescendant Operationの対象となる。
- - `getCSVUser`
+## Sibling Operation
+**Sibling operations** are siblings of a particular `base operation`. They are request-sendable operations for Viron through designate UIs. For example, an operation of `POST /users` would be a sibling of a base operation of `GET /users`. Sibling operations should meet the conditions:
+- The operation's request `method` **should not** be the same as the base operation's.
+- The [OAS Path Item Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#path-item-object) that includes the operation **should** have the same `pathname` as the base operation's.
+- Operations specified in the Viron content's `actions` property are sibling operations as long as their request payload key set **does not** contain one of the base operation's response payload keys.
 
-contentのtypeに応じて対象となるOperationに若干の差異がある。例えば、content.typeがnumberの時はDescendant Operationが存在しないはず。
+The sibling operations in the sample OAS document are `postUsers` and `getCSVUsers`.
 
-## Operationのpayloadについて
+Sibling operations use the `defaultParametersValue` and `defaultRequestBodyValue` properties specified by content in the `actions` property and the ones of the base operation's.
 
-ベースOperationのpayloadは、ユーザ入力値に加えて、defaultParametersValueとdefaultRequestBodyValue(`Info['x-pages'][number]['contents'][number].defaultXXXValue`)も使用される。
+## Descendant Operation
+**Descendant operations** are children of a particular base operation. They are request-sendable for Viron through designate UIs.  For example, operations of `PUT /users/{userId}` and `DELETE /users/{userId}` would be descendants of a base operation of `GET /users`. Descendant operations **should** meet the conditions:
+- The [OAS Path Item Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#path-item-object) that includes the operation **should** include the `pathname` of the base operation's one **at the head**. (i.e. `/{base operation's pathname}/xxx/yyy`)
+- Operations specified in the Viron content's `actions` property are descendant operations as long as their request payload key set **does** contain one of the base operation's response payload keys.
 
-Sibling Operationのpayloadは、ユーザ入力値に加えて、ベースOperationと同じdefaultParametersValueとdefaultRequestBodyValueも使用される。
+The descendant operations in the sample OAS document are `getUser`, `putUser`, `deleteUser`, and `getCSVUser`.
 
-Descendant Operationのpayloadは、ユーザ入力値に加えて、ベースOperationと同じdefaultParametersValueとdefaultRequestBodyValue、更にベースOperationレスポンスの一部が用いられる。(content.typeがtableの場合は各rowに該当するデータ)
-Descendant Operationのparametersはreadonlyとなり、ユーザ入力を受け付けない。
+Some Viron content types **may** affect whether an operation is treated as a descendant operation. For example, contents of the type `number` do not have any descendant operation.
+
+Descendant operations use the `defaultParametersValue` and `defaultRequestBodyValue` properties specified by content in the `actions` property, the ones of the base operation's, and some data of the base operation's response.

@@ -2,110 +2,210 @@
 title: Authentication
 ---
 
-- [ ] 401
-- [ ] x-viron-authtypes-path
-- [ ] providerとかtypeとか
-- [ ] 最初の一人のID/passはなんでもOK
-- [ ] 認証用cookieの設定について
-  - SameSite属性
-    - SameSite=None
-    - 独自配信する場合の設定はSameSite=Strict
-  - Secure属性
-    - 指定し、https通信上のみでcookieがサーバに送信されるようにすること。
-  - HttpOnly属性
-    - 指定し、JavaScriptのDocument.cookie APIアクセスを不可にする。
-  - Domain属性
-    - 指定すると制限が緩和されるので、未指定にするのがベター。(未指定時はcookieを送信したサーバのオリジンがdomain値となる)
-    - stg/prdなど環境別にoasを提供するケースにおいて、サブドメインで環境分けをしている場合はDomain属性値にそのサブドメインを指定する必要がある。(環境をまたいでcookieが送信されてしまうため)
-  - Path属性
-    - 基本的には/を指定すること。
-    - (レアケースだと思うけど...)stg/prdなど環境別にoasを提供するケースにおいて、pathnameで環境分けをしている場合はpath属性値にそのpathnameを指定する必要がある。(環境をまたいでcookieが送信されてしまうため)
-  - Expires属性とMax-Age属性
-    - ご自由に。
-- [ ] OAuthについて
-![flow](https://camo.qiitausercontent.com/cbceb0f0e391aeeb9220c484838d0c13e730c75d/68747470733a2f2f71696974612d696d6167652d73746f72652e73332e616d617a6f6e6177732e636f6d2f302f3130363034342f64393131396632312d373336642d643565642d393634642d3330363861663066636465392e706e67)
-① アプリXYZ
-ユーザがブラウザでviron.plusを開いている状態。
-ユーザがエンドポイントを登録する。
-401だったら、GET /authconfigsして[ authconfig(email), authconfig(signout), authconfig(oauth), authconfig(oauthcallback)  ]
+This page explains how Viron works with an endpoint to authenticate a user.
 
+## Public and Private
+An endpoint can be **public** or **private**. Public endpoints are accessible to everyone and do not need to authenticate a user. For example, the endpoint that we have created for [Guides](/docs/Guides/your-first-endpoint) is public. On the other hand, private endpoints are accessible only to authenticated users. The difference between public and private endpoints is whether the endpoint authenticates or not.
 
-② 認可エンドポイントへのリクエスト
-authconfigの
+## What Viron Does
+Viron sends a `GET` request to the endpoint's URL with `cookies` that have been previously set by the endpoint and waits for a response to come. When the response's status code is `200`, Viron treats the user as authenticated. When `401`, Viron refers to the custom response header `x-viron-authtypes-path` to send another request to the endpoint to know how to prompt the user to get authenticated. Then, Viron sends a request with payloads that the user has input to the endpoint and expects the response to include the `set-cookie` response header so Viron can send subsequent requests with the cookies.
+
+## The `x-viron-authtypes-path` custom response header
+This custom response header **should** be a part of the responses from the endpoint, and its value **should** be of URL `pathname`. Viron sends a request to the URL and expects the response body to be a JSON object with an authentication type `list` and an `OAS document`.
+
+The response header of `GET /oas`:
+```
+x-viron-authtypes-path: /authentication
+```
+
+The response body of `GET /authentication`:
+```json
 {
-  type: ‘oauth’,
-  provider: ‘google’,
-  pathObject: {
-    get: {
-      ‘/oauth’: { …. }
+  "list": [
+    // a list of authentication types
+  ],
+  "oas": {
+    // an OAS document
+  }
+}
+```
+
+## Authentication Types
+There are four types of authentication: `email`, `oauth`, `oauthcallback`, and `signout`. Each authentication has a schema of this:
+
+```json
+{
+  "type": "email" | "oauth" | "oauthcallback" | "signout";
+  "provider": string;
+  "operatioId": string; // Used to determine how to send a request.
+  "defaultParametersValue"?: any;
+  "defaultRequestBodyValue"?: any;
+}
+```
+
+### `email`
+When this type of authentication is specified, Viron prompts users to enter fields like `email` and `password` to get authenticated. The endpoint **should** return a response with a cookie set.
+
+```json
+{
+  "list": [
+    {
+      "type": "email",
+      "operationId": "signinEmail"
+    }
+  ],
+  "oas": {
+    "openapi": "3.0.2",
+    "info": {
+      "title": "Authentication",
+      "version": "1.0.0"
+    },
+    "paths": {
+      "/email/signin": {
+        "post": {
+          "operationId": "signinEmail", // Should match the one specified in the list.
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["email", "password"],
+                  "properties": {
+                    "email": {
+                      "type": "string",
+                      "format": "email"
+                    },
+                    "password": {
+                      "type": "string",
+                      "format": "password"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
-  defaultParametersValue: {
-    [key in string]: any;
-    redirect_uri: ‘${oauthRedirectURI}’// JSのテンプレーリテラル
-  }
-  defaultRequestBodyValue: any;
 }
-viron.plusから
-GET /vrn.fensi.plus/oauth….redirect_uri=https://viron.plus/oauthredirect
-Response
-  ここ飛べ: ://oauth.google.com/?response_type=code&client_id={クライアントID} // ※A
-  header
-    set-cookie: state:xxxx
-飛ぶ直前に、client側でlocalstorageなりにendpointidを保存しておく。
+```
 
--------
-viron.plusから
-GET ://oauth.google.com/
-  ?response_type=code            // 必須
-  &client_id={クライアントID}      // 必須
-  &redirect_uri={viron.plus/oauthredirect}  // 条件により必須
-  &scope={スコープ群}              // 任意
-  &state={任意文字列}              // 推奨
-  &code_challenge={チャレンジ}     // 任意
-  &code_challege_method={メソッド} // 任意
-  HTTP/1.1
-HOST: {認可サーバー}
+### `oauth` and `oauthcallback`
+Those types of authentication are for [the Authorization Code Grant of the OAuth 2.0 authorization framework](https://datatracker.ietf.org/doc/html/rfc6749#section-4.1).
 
-(上記の※Aと一緒)
-
-③④⑤ 認可画面で必要事項入力
-
-⑥ アプリXYZにリダイレクトされる
-Location: {viron.plus/oauthredirect}
-  ?code={認可コード}        // 必須
-  &state={任意文字列}       // 認可リクエストに state が含まれていれば必須
-
-⑦ アプリXYZにリダイレクトされる
-client側で①のタイミングで保存しておいたendpointidを取り出し、
-location.href: {viron.plus/oauthredirect?code={認可コード}&state={任意文字列}
-を取得して、
-authconfigの
+```json
 {
-  type: ‘oauthcallback’,
-  provider: ‘google’,
-  pathObject: {
-    [method]: {
-      ‘/oauthcallback’: { …. }
+  "list": [
+    {
+      "type": "oauth",
+      "operationId": "signinOAuth",
+      "defaultParametersValue": {
+        "redirectUri": "${oauthRedirectURI}" // An environmental variable
+      }
+    },
+    {
+      "type": "oauthcallback",
+      "operationId": "signinOAuthCallback",
+      "defaultRequestBodyValue": {
+        "redirectUri": "${oauthRedirectURI}" // An environmental variable
+      }
+    }
+  ],
+  "oas": {
+    "openapi": "3.0.2",
+    "info": {
+      "title": "Authentication",
+      "version": "1.0.0"
+    },
+    "paths": {
+      "/oauth/signin": {
+        "get": {
+          "operationId": "signinOAuth", // Should match the one specified in the list.
+          "parameters": [
+            {
+              "in": "query",
+              "name": "redirectUri",
+              "required": "true",
+              "schema": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          ],
+          "responses": {
+            "301": {
+              "description": "Redirect to the authorization endpoint."
+            }
+          }
+        }
+      },
+      "/oauth/signin/callback": {
+        "post": {
+          "operationId": "signinOAuthCallback", // Should match the one specified in the list.
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["code"],
+                  "properties": {
+                    "code": { // Authorization code
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
-  defaultParametersValue: {
-    [key in string]: any;
-    redirect_uri: ‘${oauthRedirectURI}’// JSのテンプレーリテラル
-  }
-  defaultRequestBodyValue: any;
 }
-から
-{vrn.fensi.plus/oauthcallback}?code={認可コード}&state={任意文字列}
-request header
-  cookie: state:xxxxx
-を生成してリクエストを投げる。
-i.e.
-request先: {vrn.fensi.plus/oauthcallback}?code={認可コード}&state={任意文字列}
-リファラ: viron.plus
-response:
-  header
-    set-cookie: authToken=xxxxxxxx
+```
 
-vrn.fensi.plusサーバは上記リクエストを受け取ったときに、
-認可コードとアクセストークンの交換をoauth.google.comと行う。取得したアクセストークンを基に、set-cookie値を生成してviron.plusへのレスポンスに含める。
+Viron directs the user to the authorization endpoint with a parameter of RedirectURI, whose default value is an [environmental variable](/docs/Advanced-Guides/environmental-variable). After successfully granted, the user will be redirected back to Viron with an `authorization code`. Then, Viron sends another request with the authorization code to the endpoint, expecting the response to set a cookie.
+
+### `signout`
+Use this type of authentication to `revoke` the cookie that has been set previously.
+
+```json
+{
+  "list": [
+    {
+      "type": "signout",
+      "operationId": "signout"
+    }
+  ],
+  "oas": {
+    "openapi": "3.0.2",
+    "info": {
+      "title": "Authentication",
+      "version": "1.0.0"
+    },
+    "paths": {
+      "/signout": {
+        "post": {
+          "operationId": "signout" // Should match the one specified in the list.
+        }
+      }
+    }
+  }
+}
+```
+
+## Cookie
+Below are recommended cookie attributes.
+
+| attribute | |
+| ---- | ---- |
+| SameSite | `None`. `Strict` if self-hosted. |
+| Secure | `enabled` |
+| HttpOnly | `enabled` |
+| Domain | `omitted`. If your endpoints share the same domain but use different subdomains, specify this attribute accordingly. |
+| Path | `/`. If your endpoints share the same domain but use different pathnames, specify this attribute accordingly. |
+| Expire | as you like. |
+| Max-Age | as you like. |
