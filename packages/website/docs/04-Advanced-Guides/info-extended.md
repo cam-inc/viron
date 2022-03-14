@@ -2,148 +2,45 @@
 title: Extended Info Object
 ---
 
-OASのInfoオブジェクトに対する、Viron拡張箇所について。
+This page explains the [OAS Info Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#infoObject) and the functions extended on it for Viron to shine.
 
-- [ ] x-thumbnail
-- [ ] x-theme
- - [ ] Light / Dark Modeについて
-- [ ] x-tags
-
-- [ ] x-pagesについて
- - [ ] id
- - [ ] title
- - [ ] description
- - [ ] group
- - [ ] contents
-
-- [ ] 各コンテンツについて(i.e. Info['x-pages'].contents[n])
- - [ ] title
- - [ ] type
- - [ ] operationId
- - [ ] defaultParametersValues
- - [ ] defaultRequestBodyValues
-
-- [ ] x-tableについて
- - [ ] responseListKey
- - [ ] pager
-   - [ ] requestPageKey
-   - [ ] requestSizeKey
-   - [ ] responseMaxpageKey
-   - [ ] responsePageKey
- - [ ] sort
-  - [ ] requestKey
-  - [ ] schema.typeがarrayであること。
-  - [ ] 値が'${keyA}:asc,${keyB}:desc,${keyC}:desc'の固定形式であること
-
-
-メモ
 ```json
-info: {
-  'x-table': {// styleがtableであるcontentの補助機能について
-    'responseListKey': 'list'// レスポンスのどのkeyが一覧データであるか
-    pager: {// 'pagerXxx' ぺージャー機能について
-      'requestPageKey': 'page';
-      'requestSizeKey': 'size';
-      'responseMaxpageKey': 'maxpage';
-      'responsePageKey': 'page';
-    },
-    sort; {// 'sortXxx' ソート機能について
-      'requestKey': 'sort'; // 「'sort': '${keyA}:asc,${keyB}:desc,${keyC}:desc'」の値の構造はキメ。
-    }
-  };
-  'x-pages': [
-    {
-      contents: [
-        {
-          operationId: 'listUsers';// どのOperationに該当するかの印。
-          style: 'table';// info['x-{style}']も考慮してね
-          defaultParametersValues: {
-            [key in string]: any;
-          };// Operationに沿ったデータにしてね // pagerのsizeとかpage値がここに含まれるはず。
-          defaultRequestBodyValues: any;// Operationに沿ったデータにしてね
-        }
-      ]
-    }
+"info": {
+  "title": "Project A", // (A)
+  "description": "A administration for the project A of development environment.",
+  "version": "latest", // (C)
+  "contact": { // (D)
+    // Contact Object
+  },
+  "termsOfService": "URL", // (D)
+  "license": { // (D)
+    // License Object
+  },
+  "x-thumbnail": "URL", // (E)
+  "x-theme": "red", // (F)
+  "x-tags": [// (G)
+    "development", "QA", "project A"
   ]
 }
-paths: {
-  '/users': {
-    get: {
-      operationId: 'listUsers',
-      parameters: [
-        {
-          name: 'sort',// info['x-table'].sort.requestKeyと同じ値に。
-          in: 'query',
-          schema: {
-            type: 'array',
-            items: {
-              type: 'string',
-            },
-            example: ['id:asc', 'name:desc']をstyleに通したもの
-          } | {
-            type: 'object',
-            properties: {// sort対象のkey群。
-              id: {
-                type: 'string'
-                enum: ['asc', 'desc']
-              },
-              name {
-                type: 'string',
-                enum: ['asc', 'desc']
-              }
-            },
-            example: {
-              id: 'asc',
-              name: 'desc'
-            }をstyleに通したもの
-          } | {
-            type: 'string',
-            example: 'id:asc,name:desc'をstyleに通したもの
-          }
-        },
-        {
-          name: 'page',// info['x-table'].pager.requestPageKeyと同じ値に。
-          in: 'query',
-          schema: {
-            type: 'number' | 'integer',
-          }
-        },
-        {
-          name: 'size',// info['x-table'].pager.requestSizeKeyと同じ値に。
-          in: 'query',
-          schema: {
-            type: 'number' | 'integer',
-          }
-        }
-      ],
-      requestBody: {
-        // parametersと同様の決まりなら、代わりにここに書いてもよい。
-      },
-      response: {
-        200.content.application/json: {
-          schema: {
-            type: 'object',
-            properties: {
-              list: {// info['x-table'].responseListKeyと同じ値に。
-                type: 'array',
-                items: {
-                  type: 'object'// ここは絶対objectね
-                  properties: {
-                    ご自由に。 keyがテーブルcolumnになる。valueが各rowのcellになる。
-                  }
-                }
-              },
-              maxpage: {// info['x-table'].pager.responseMaxpageKeyと同じ値に。
-                type: 'number'
-              },
-              page: {// info['x-table'].pager.responsePageKeyと同じ値に。
-                type: 'number'
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
 ```
+
+## Title - (A)
+This property defines the title of the endpoint. Viron uses this value when displaying the endpoint's general information on pages such as the dashboard.
+
+## Description - (B)
+This is a summary of the endpoint. [CommonMark](http://spec.commonmark.org/) syntax may be used for rich text representation.
+
+## Version - (C)
+This property defines the version of the endpoint, **not** that of the OAS.
+
+## Contact, Terms of Service, and License - (D)
+Those are the same as the OAS [Contact Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#contactObject), URL, and [License Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#licenseObject).
+
+## Thumbnail - (E)
+Use this property to show a thumbnail image. If not specified, the thumbnail image will be a Viron logo.
+
+## Theme - (F)
+This property affects how your endpoint page gets colored. The main scenario of using this is to visually differentiate endpoints of the same project; the endpoint for the development environment with blueish, for production reddish, and so on. Read [this](/docs/Advanced-Guides/theme) for detail.
+
+## Tag - (G)
+This property is different from the OAS [Tag Object](https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#tag-object), as `x-tag`s relates to the endpoint while the OAS's tags is used by operations.

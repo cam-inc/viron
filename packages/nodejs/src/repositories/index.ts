@@ -130,10 +130,6 @@ export class RepositoryContainer {
           sslValidate:
             options.sslValidate ?? mongoConfig?.connectOptions?.sslValidate,
           sslCA: options.sslCA ?? mongoConfig?.connectOptions?.sslCA,
-          useCreateIndex: true,
-          useFindAndModify: false,
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
         };
         debug(
           'Init casbin-mongoose-adapter. url: %s, options: %O',
