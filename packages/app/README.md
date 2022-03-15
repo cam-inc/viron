@@ -4,7 +4,7 @@
 
 ## Development
 
-1. Follow the section [here](../../README.md#setup) to setup.
+1. Follow the section [here](../../CONTRIBUTING.md#code-contribution) to setup.
 2. Build packages on list below by executing `npm run build --workspace=[package name]`.
   - @viron/linter
   - @viron/lib

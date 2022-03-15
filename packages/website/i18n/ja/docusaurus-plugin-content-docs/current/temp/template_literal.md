@@ -1,5 +1,0 @@
----
-title: Template Literal
----
-
-defaultParametersValueやdefaultRequestBodyValueのテンプレートリテラルについて。
