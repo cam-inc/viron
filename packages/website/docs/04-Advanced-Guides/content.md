@@ -12,7 +12,7 @@ Content is a `page child`, serving mainly as a monitor to display an assigned op
 The content format is probably much more straightforward than you may have expected, like this:
 
 ```json
-// a Page Object
+// a Page Item Object
 {
   "id": "indicators",
   "title": "Indicators",

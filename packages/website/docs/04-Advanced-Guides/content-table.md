@@ -24,7 +24,7 @@ The schema for the response data **must** be of an object with a property for li
   // Should be present when at least one table content exist.
   "x-table": {
     // The value should match the one of Response Object.
-    "responseKey": "list"
+    "responseListKey": "list"
   }
 }
 ```
