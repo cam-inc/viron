@@ -1,6 +1,6 @@
 {
   "name": "@viron/website",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "scripts": {
     "pre-commit": "echo PRE-COMMIT",
     "pre-push": "echo PRE-PUSH",

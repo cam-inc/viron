@@ -1,6 +1,19 @@
 # @viron/website
 
+## 0.2.0
+
+### Minor Changes
+
+- bcfa7138: `Advanced Guide / Linter` added.
+- 1fa1d63d: `References / Troubleshooting and Terminology` removed.
+- a8941327: `Advanced Guide / Pagination` added.
+- 37e40f7a: `Advanced Guide / Self Hosting` added.
+- 3a1cf831: `References / FAQs` added.
+- 451bbd97: i18n for Japanese
+- 3a1cf831: `References / Roadmap` added.
+
 ## 0.1.0
+
 ### Minor Changes
 
 - edae9e4e: `Guide / Your First Number Content` added.
