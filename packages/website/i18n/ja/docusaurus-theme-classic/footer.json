@@ -74,5 +74,17 @@
   "link.item.label.Terms of Service": {
     "message": "Terms of Service",
     "description": "The label of footer link with label=Terms of Service linking to https://viron.app/termsOfServicey/TODO"
+  },
+  "link.item.label.Contributing": {
+    "message": "Contributing",
+    "description": "The label of footer link with label=Contributing linking to https://github.com/cam-inc/viron/blob/develop/CONTRIBUTING.md"
+  },
+  "link.item.label.Code of Conduct": {
+    "message": "Code of Conduct",
+    "description": "The label of footer link with label=Code of Conduct linking to https://github.com/cam-inc/viron/blob/develop/CODE_OF_CONDUCT.md"
+  },
+  "link.item.label.License": {
+    "message": "License",
+    "description": "The label of footer link with label=License linking to https://github.com/cam-inc/viron/blob/develop/LICENSE"
   }
 }
