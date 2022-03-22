@@ -4,6 +4,7 @@ import { Props as BaseProps } from '~/components';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronUpIcon from '~/components/icon/chevronUp/outline';
 import { TableColumn, Sort, SORT } from '~/types/oas';
+import Cell from './cell';
 
 type Key = string;
 type Value = any;
@@ -87,7 +88,7 @@ const Table: React.FC<Props> = ({
                       <Td on={on}>
                         <Cell
                           on={on}
-                          column={column}
+                          schema={column.schema}
                           value={data[column.key]}
                         />
                       </Td>
@@ -209,48 +210,5 @@ const Td: React.FC<BaseProps & { isSticky?: boolean }> = ({
     >
       {children}
     </td>
-  );
-};
-
-const Cell: React.FC<BaseProps & { column: TableColumn; value: Value }> = ({
-  on,
-  column,
-  value,
-}) => {
-  /*
-  const formattedValue = function(column: Column, value: Value) {
-    switch (column.schema.type) {
-      case 'string':
-        if (column.schema.format === ('date' || 'date-time')) {
-          const date = new Date(value as string);
-          const intlDate = new Intl.DateTimeFormat([], {
-            dateStyle: 'medium',
-            timeStyle: 'medium',
-          }).format(date);
-          return intlDate;
-        }
-        return JSON.stringify(value);
-      case 'number' || 'integer':
-        return (value as number).toLocaleString();
-      default:
-        return JSON.stringify(value);
-    }
-  };
-  */
-  return (
-    <>
-      <div
-        className={classnames(
-          `text-xxs whitespace-nowrap text-thm-on-${on}-slight`
-        )}
-      >
-        [{column.schema.type}]
-      </div>
-      <div className="whitespace-nowrap">
-        <div className={classnames(`text-sm text-thm-on-${on}`)}>
-          {/*formattedValue(column, value)*/ JSON.stringify(value)}
-        </div>
-      </div>
-    </>
   );
 };
