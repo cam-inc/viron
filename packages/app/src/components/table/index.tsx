@@ -75,11 +75,7 @@ const Table: React.FC<Props> = ({
                   </Th>
                 </React.Fragment>
               ))}
-              {renderActions && (
-                <Th on={on} isSticky>
-                  <div>actions</div>
-                </Th>
-              )}
+              {renderActions && <Th on={on} isSticky />}
             </Tr>
           </thead>
           <tbody>

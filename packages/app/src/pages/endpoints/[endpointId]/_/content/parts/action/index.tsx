@@ -11,7 +11,6 @@ import React, { useCallback, useMemo } from 'react';
 import TextOnButton, {
   Props as TextOnButtonProps,
 } from '~/components/button/text/on';
-import Popover, { usePopover } from '~/portals/popover';
 import { COLOR_SYSTEM } from '~/types';
 import { METHOD, Request } from '~/types/oas';
 
@@ -41,26 +40,11 @@ const Action: React.FC<Props> = ({ request, onClick }) => {
     }
   }, [request]);
 
-  const handleRootClick = useCallback(
-    (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-      e.stopPropagation();
-    },
-    []
-  );
-
-  const popover = usePopover<HTMLDivElement>();
-  const handleRootMouseEnter = useCallback(() => {
-    popover.open();
-  }, [popover]);
-  const handleRootMouseLeave = useCallback(() => {
-    popover.close();
-  }, [popover]);
-
   const handleClick = useCallback<TextOnButtonProps['onClick']>(() => {
     onClick();
   }, [onClick]);
 
-  const info = useMemo<string>(() => {
+  const label = useMemo<string>(() => {
     const { operation } = request;
     if (operation.summary) {
       return operation.summary;
@@ -69,23 +53,12 @@ const Action: React.FC<Props> = ({ request, onClick }) => {
   }, [request]);
 
   return (
-    <>
-      <div
-        onClick={handleRootClick}
-        ref={popover.targetRef}
-        onMouseEnter={handleRootMouseEnter}
-        onMouseLeave={handleRootMouseLeave}
-      >
-        <TextOnButton
-          on={COLOR_SYSTEM.SURFACE}
-          Icon={Icon}
-          onClick={handleClick}
-        />
-      </div>
-      <Popover {...popover.bind}>
-        <div className="text-thm-on-surface whitespace-nowrap">{info}</div>
-      </Popover>
-    </>
+    <TextOnButton
+      on={COLOR_SYSTEM.SURFACE}
+      Icon={Icon}
+      label={label}
+      onClick={handleClick}
+    />
   );
 };
 export default Action;

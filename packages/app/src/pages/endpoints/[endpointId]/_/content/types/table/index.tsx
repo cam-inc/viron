@@ -1,5 +1,10 @@
 import React, { useCallback, useMemo, useState } from 'react';
+import TextButton, {
+  Props as TextButtonProps,
+} from '~/components/button/text/on';
+import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/outline';
 import Table, { Props as TableProps } from '~/components/table';
+import Popover, { usePopover } from '~/portals/popover';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document, Content, SORT } from '~/types/oas';
 import {
@@ -61,22 +66,18 @@ const ContentTable: React.FC<Props> = ({
   );
 
   const renderActions = useCallback<NonNullable<TableProps['renderActions']>>(
-    (data) => (
-      <div className="flex items-center">
-        {descendants.map((descendant, idx) => (
-          <div key={idx}>
-            <Descendant
-              endpoint={endpoint}
-              document={document}
-              descendant={descendant}
-              data={data}
-              onOperationSuccess={onDescendantOperationSuccess}
-              onOperationFail={onDescendantOperationFail}
-            />
-          </div>
-        ))}
-      </div>
-    ),
+    (data) => {
+      return (
+        <Operations
+          endpoint={endpoint}
+          document={document}
+          descendants={descendants}
+          data={data}
+          onOperationSuccess={onDescendantOperationSuccess}
+          onOperationFail={onDescendantOperationFail}
+        />
+      );
+    },
     [
       endpoint,
       document,
@@ -119,3 +120,59 @@ const ContentTable: React.FC<Props> = ({
   );
 };
 export default ContentTable;
+
+type OperationsProps = {
+  endpoint: Endpoint;
+  document: Document;
+  descendants: UseDescendantsReturn;
+  data: DescendantProps['data'];
+  onOperationSuccess: DescendantProps['onOperationSuccess'];
+  onOperationFail: DescendantProps['onOperationFail'];
+};
+const Operations: React.FC<OperationsProps> = ({
+  endpoint,
+  document,
+  descendants,
+  data,
+  onOperationSuccess,
+  onOperationFail,
+}) => {
+  const popover = usePopover<HTMLDivElement>();
+  const handleButtonClick = useCallback<TextButtonProps['onClick']>(() => {
+    popover.open();
+  }, [popover]);
+  const handleDescendantClick = useCallback<
+    NonNullable<DescendantProps['onClick']>
+  >(() => {
+    popover.hide();
+  }, [popover]);
+
+  return (
+    <>
+      <div ref={popover.targetRef}>
+        <TextButton
+          on={COLOR_SYSTEM.SURFACE}
+          Icon={DotsCircleHorizontalIcon}
+          onClick={handleButtonClick}
+        />
+      </div>
+      <Popover {...popover.bind}>
+        <ul>
+          {descendants.map((descendant, idx) => (
+            <li key={idx}>
+              <Descendant
+                endpoint={endpoint}
+                document={document}
+                descendant={descendant}
+                data={data}
+                onOperationSuccess={onOperationSuccess}
+                onOperationFail={onOperationFail}
+                onClick={handleDescendantClick}
+              />
+            </li>
+          ))}
+        </ul>
+      </Popover>
+    </>
+  );
+};
