@@ -51,3 +51,21 @@ The schema for the response data **must** be of an object with a property for li
   }
 }
 ```
+
+## Data Display
+How data in a table cell is displayed depends on the JSON Schema's two properties: [type](https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6.1.1) and [format](https://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.7.3).  The table below describes how the combination of those two affects data display.
+
+| type | format | description |
+| --- | --- | --- |
+| `string` | `-` | with a plain string. |
+| `string` | `uri` | a link string with the `<a>`. |
+| `string` | `uri-image` | an image with the `<img>`. |
+| `number` | `-` | with a plain locale string. |
+| `integer` | `-` | with a plain locale string. |
+| `object` | `-` | with a plain string. |
+| `array` | `-` | with a plain string. |
+| `boolean` | `-` | `TRUE` or `FALSE`. |
+
+:::note
+Please send a [feature request](https://github.com/cam-inc/viron/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=) for new combinations.
+:::
