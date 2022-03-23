@@ -6,6 +6,10 @@ import Drawer, { useDrawer } from '~/portals/drawer';
 import { useAppScreenGlobalStateValue } from '~/store';
 import { ClassName, COLOR_SYSTEM } from '~/types';
 
+const HEIGHT_SYSTEM_BAR = 8;
+const HEIGHT_APP_BAR = 64;
+const WIDTH_NAVIGATION = 160;
+
 export type Props = {
   renderAppBar?: (args: {
     className: ClassName;
@@ -25,6 +29,7 @@ export type Props = {
     style: CSSProperties;
     openNavigation: () => void;
     closeNavigation: () => void;
+    minHeight: number;
   }) => JSX.Element | null;
   renderSubBody?: (args: {
     className: ClassName;
@@ -62,8 +67,7 @@ const Layout: React.FC<Props> = ({
           setIsAppBarOpened(true);
         } else {
           // some amount of scroll required to close.
-          // 64 = app bar height
-          const threshold = 64;
+          const threshold = HEIGHT_APP_BAR;
           if (threshold < currentScrollY) {
             setIsAppBarOpened(false);
           }
@@ -99,21 +103,27 @@ const Layout: React.FC<Props> = ({
         className="bg-thm-background text-thm-on-background"
       >
         {/* region: System Bar */}
-        <div className="fixed z-layout-systembar top-0 right-0 left-0 h-[8px] bg-thm-secondary text-thm-on-secondary shadow-01dp" />
+        <div
+          style={{
+            height: `${HEIGHT_SYSTEM_BAR}px`,
+          }}
+          className="fixed z-layout-systembar top-0 right-0 left-0 bg-thm-secondary text-thm-on-secondary shadow-01dp"
+        />
         {/* region: App Bar */}
         {renderAppBar && (
           <div
-            className={classnames(
-              'fixed z-layout-appbar top-[8px] right-0 h-0',
-              {
-                'left-[160px]': renderNavigation && lg,
-                'left-0': !(renderNavigation && lg),
-              }
-            )}
+            style={{
+              top: `${HEIGHT_SYSTEM_BAR}px`,
+              left: renderNavigation && lg ? `${WIDTH_NAVIGATION}px` : '0',
+            }}
+            className="fixed z-layout-appbar right-0 h-0"
           >
             <div
+              style={{
+                height: `${HEIGHT_APP_BAR}px`,
+              }}
               className={classnames(
-                'h-[64px] bg-thm-primary text-thm-on-primary shadow-01dp transform transition duration-300 ease-out',
+                'bg-thm-primary text-thm-on-primary shadow-01dp transform transition duration-300 ease-out',
                 {
                   'pointer-events-none': !isAppBarOpened,
                   'opacity-0': !isAppBarOpened,
@@ -135,7 +145,13 @@ const Layout: React.FC<Props> = ({
         )}
         {/* region: Navigation */}
         {renderNavigation && lg && (
-          <div className="fixed z-layout-navigation top-[8px] left-0 bottom-0 w-[160px] bg-thm-surface text-thm-on-surface shadow-01dp border-r-2 border-thm-on-surface-faint overflow-y-scroll overscroll-y-contain">
+          <div
+            style={{
+              top: `${HEIGHT_SYSTEM_BAR}px`,
+              width: `${WIDTH_NAVIGATION}px`,
+            }}
+            className="fixed z-layout-navigation left-0 bottom-0 bg-thm-surface text-thm-on-surface shadow-01dp border-r-2 border-thm-on-surface-faint overflow-y-scroll overscroll-y-contain"
+          >
             <ErrorBoundary on={COLOR_SYSTEM.SURFACE}>
               {renderNavigation({
                 className: '',
@@ -170,10 +186,14 @@ const Layout: React.FC<Props> = ({
         )}
         {/* region: Body */}
         <div
+          style={{
+            paddingTop: renderAppBar
+              ? `${HEIGHT_SYSTEM_BAR + HEIGHT_APP_BAR}px`
+              : `${HEIGHT_SYSTEM_BAR}px`,
+            paddingBottom:
+              renderNavigation && lg ? `${WIDTH_NAVIGATION}px` : '0',
+          }}
           className={classnames('z-layout-body', {
-            'pt-[8px]': !renderAppBar,
-            'pt-[72px]': renderAppBar,
-            'pl-[160px]': lg && renderNavigation,
             'pb-[50vh]': renderSubBody,
           })}
         >
@@ -181,10 +201,20 @@ const Layout: React.FC<Props> = ({
             {renderBody({
               className: 'relative',
               style: {
-                minHeight: `${height - (renderAppBar ? 72 : 8)}px`,
+                minHeight: `${
+                  height -
+                  (renderAppBar
+                    ? HEIGHT_SYSTEM_BAR + HEIGHT_APP_BAR
+                    : HEIGHT_SYSTEM_BAR)
+                }px`,
               },
               openNavigation,
               closeNavigation,
+              minHeight:
+                height -
+                (renderAppBar
+                  ? HEIGHT_SYSTEM_BAR + HEIGHT_APP_BAR
+                  : HEIGHT_SYSTEM_BAR),
             })}
           </ErrorBoundary>
         </div>
