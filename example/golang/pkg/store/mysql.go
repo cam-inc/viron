@@ -30,11 +30,6 @@ func NewMySQL(config *config.MySQL) *sql.DB {
 		log.Debug("MySQL connect success")
 	}
 
-	//db.SetMaxOpenConns()
-	//db.SetMaxIdleConns()
-	//db.SetConnMaxIdleTime()
-	//db.SetConnMaxLifetime()
-
 	boil.DebugMode = true
 
 	return db

@@ -13,9 +13,6 @@ type (
 	Databases []*Database
 
 	Client struct {
-		//*mongo.Client
-		//Databases Databases
-		//vironDB string
 		Database *mongo.Database
 	}
 )

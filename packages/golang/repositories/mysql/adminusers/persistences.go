@@ -124,7 +124,6 @@ func (a *adminUsersPersistence) UpdateByID(ctx context.Context, id string, entit
 	}
 
 	columns := []string{models.AdminuserColumns.UpdatedAt}
-	//boil.Whitelist()
 
 	if up.Password != nil {
 		adminUser.Password = null.NewString(*up.Password, true)
