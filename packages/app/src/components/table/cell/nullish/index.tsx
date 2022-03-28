@@ -5,15 +5,13 @@ import { Schema } from '~/types/oas';
 
 export type Props = BaseProps & {
   schema: Schema;
-  value: number;
+  value: null | undefined;
 };
-const CellForTypeNumeric: React.FC<Props> = ({ on, schema, value }) => {
+const CellForTypeNullish: React.FC<Props> = ({ on, schema, value }) => {
   return (
     <div className="whitespace-nowrap">
-      <div className={classnames(`text-sm text-thm-on-${on}`)}>
-        {value.toLocaleString()}
-      </div>
+      <div className={classnames(`text-sm text-thm-on-${on}-slight`)}>-</div>
     </div>
   );
 };
-export default CellForTypeNumeric;
+export default CellForTypeNullish;

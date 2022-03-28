@@ -56,25 +56,10 @@ export default RootWrapper;
 
 const Root: React.FC<Props> = ({ children }) => {
   // Entry point.
-  const { launch, isLaunched, style } = useRoot();
+  const { launch, isLaunched, style, error } = useRoot();
   useEffect(() => {
     launch();
   }, []);
-
-  // Handle non-react-related errors that are dismissed.
-  const error = useError({
-    on: COLOR_SYSTEM.SURFACE,
-    withModal: true,
-  });
-  useEffect(() => {
-    const handler = (e: ErrorEvent) => {
-      error.setError(new UnhandledError(e.message));
-    };
-    window.addEventListener('error', handler);
-    return () => {
-      window.removeEventListener('error', handler);
-    };
-  }, [error.setError]);
 
   return (
     <>
@@ -97,8 +82,9 @@ type UseRootReturn = {
   launch: () => Promise<void>;
   isLaunched: boolean;
   style: JSX.Element;
+  error: ReturnType<typeof useError>;
 };
-const useRoot = function (): UseRootReturn {
+const useRoot = (): UseRootReturn => {
   const [isLaunched, setIsLaunched] = useAppIsLaunchedGlobalState();
   const setScreen = useAppScreenGlobalStateSet();
   const theme = useAppThemeGlobalStateValue();
@@ -123,9 +109,9 @@ const useRoot = function (): UseRootReturn {
 
   // Watch screen size.
   useEffect(() => {
-    const handler = function () {
+    const handler = () => {
       const { innerWidth, innerHeight } = window;
-      setScreen(function (currVal) {
+      setScreen((currVal) => {
         return {
           ...currVal,
           width: innerWidth,
@@ -138,15 +124,16 @@ const useRoot = function (): UseRootReturn {
     window.addEventListener('resize', debouncedHander, {
       passive: true,
     });
-    return function cleanup() {
+    // A cleanup function.
+    return () => {
       window.removeEventListener('resize', debouncedHander);
     };
   }, [setScreen]);
 
   // Watch Media Queries.
   useEffect(() => {
-    const set = function (matches: MediaQueryListEvent['matches']) {
-      setScreen(function (currVal) {
+    const set = (matches: MediaQueryListEvent['matches']) => {
+      setScreen((currVal) => {
         return {
           ...currVal,
           lg: matches,
@@ -161,7 +148,7 @@ const useRoot = function (): UseRootReturn {
     );
     set(mediaQueryList.matches);
 
-    const handler = function (e: MediaQueryListEvent) {
+    const handler = (e: MediaQueryListEvent) => {
       set(e.matches);
     };
     mediaQueryList.addEventListener('change', handler);
@@ -170,10 +157,26 @@ const useRoot = function (): UseRootReturn {
     };
   }, [setScreen]);
 
+  // Handle non-react-related errors that are dismissed.
+  const error = useError({
+    on: COLOR_SYSTEM.SURFACE,
+    withModal: true,
+  });
+  useEffect(() => {
+    const handler = (e: ErrorEvent) => {
+      error.setError(new UnhandledError(e.message));
+    };
+    window.addEventListener('error', handler);
+    return () => {
+      window.removeEventListener('error', handler);
+    };
+  }, [error.setError]);
+
   return {
     launch,
     isLaunched,
     style,
+    error,
   };
 };
 
