@@ -190,8 +190,7 @@ const Layout: React.FC<Props> = ({
             paddingTop: renderAppBar
               ? `${HEIGHT_SYSTEM_BAR + HEIGHT_APP_BAR}px`
               : `${HEIGHT_SYSTEM_BAR}px`,
-            paddingBottom:
-              renderNavigation && lg ? `${WIDTH_NAVIGATION}px` : '0',
+            paddingLeft: renderNavigation && lg ? `${WIDTH_NAVIGATION}px` : '0',
           }}
           className={classnames('z-layout-body', {
             'pb-[50vh]': renderSubBody,
