@@ -4,8 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/getkin/kin-openapi/openapi3"
-
 	"github.com/cam-inc/viron/packages/golang/repositories"
 	"github.com/cam-inc/viron/packages/golang/repositories/container"
 )
@@ -94,20 +92,4 @@ func CreateAuditLog(ctx context.Context, audit *AuditLog) error {
 		return err
 	}
 	return nil
-}
-
-func IsSkip(uri, method string, apiDef *openapi3.T) bool {
-	/*
-		// スキップ判定
-		export const isSkip = (
-		  uri: string,
-		  method: string,
-		  oas: VironOpenAPIObject
-		): boolean => {
-		  const { pathItem } = getPathItem(uri, oas);
-		  const operation = pathItem?.[method.toLowerCase()];
-		  return !!operation?.[OAS_X_SKIP_AUDITLOG];
-		};
-	*/
-	return false
 }

@@ -19,63 +19,6 @@ type authObj struct {
 	log logging.Logger
 }
 
-/*
-/*
-// サインアウト
-export const signout = async (context: RouteContext): Promise<void> => {
-  const token = context.req.cookies[COOKIE_KEY.VIRON_AUTHORIZATION];
-  context.origRes.clearCookie(COOKIE_KEY.VIRON_AUTHORIZATION);
-  await domainsAuth.signout(token);
-  context.res.status(204).end();
-};
-
-
-
-// GoogleOAuth2の認可画面へリダイレクト
-export const oauth2GoogleAuthorization = async (
-  context: RouteContext
-): Promise<void> => {
-  const { redirectUri } = context.params.query;
-  const state = domainsAuth.genState();
-
-  const authorizationUrl = domainsAuth.getGoogleOAuth2AuthorizationUrl(
-    redirectUri,
-    state,
-    ctx.config.auth.googleOAuth2
-  );
-
-  context.res.setHeader(HTTP_HEADER.SET_COOKIE, genOAuthStateCookie(state));
-  context.res.setHeader(HTTP_HEADER.LOCATION, authorizationUrl);
-  context.res.status(301).end();
-};
-
-// GoogleOAuth2のコールバック
-export const oauth2GoogleCallback = async (
-  context: RouteContext
-): Promise<void> => {
-  const cookieState = context.req.cookies[COOKIE_KEY.OAUTH2_STATE];
-  const { code, state, redirectUri } = context.requestBody;
-
-  if (!cookieState || !state || cookieState !== state) {
-    throw mismatchState();
-  }
-
-  const token = await domainsAuth.signinGoogleOAuth2(
-    code,
-    redirectUri,
-    ctx.config.auth.googleOAuth2
-  );
-  context.res.setHeader(
-    HTTP_HEADER.SET_COOKIE,
-    genAuthorizationCookie(token, {
-      maxAge: ctx.config.auth.jwt.expirationSec,
-    })
-  );
-  context.res.status(204).end();
-};
-
-*/
-
 // SigninEmail emailサインイン
 func (a *authObj) SigninEmail(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
