@@ -55,8 +55,23 @@ By contributing to this project, you agree to license your contribution under th
 
 Thank you all who have contributed to this project.
 
-## Contributors
-
-| [<img src="https://avatars1.githubusercontent.com/u/381941?s=130&v=4" width="130px;" style="background-color:white;"/><br />fkei](https://github.com/fkei) <br /> 🤔 💻  | [<img src="https://avatars0.githubusercontent.com/u/10769038?s=130&v=4" width="130px;"/><br />cathcheeno](https://github.com/cathcheeno)<br /> 🤔 💻 🌍 📖 📝 | [<img src="https://avatars2.githubusercontent.com/u/2404059?s=130&v=4" width="130px;"/><br />noritama](https://github.com/noritama)<br /> 🤔 💻  | [<img src="https://avatars1.githubusercontent.com/u/35751869?s=130&v=4" width="130px;"/><br />babarl](https://github.com/babarl)<br /> 🎨 | [<img src="https://avatars2.githubusercontent.com/u/3895795?s= 130&v=4" width="130px;"/><br />MuuKojima](https://github.com/MuuKojima)<br /> 💻  | [<img src="https://avatars2.githubusercontent.com/u/12236042?s=130&v=4" width="130px;"/><br />tosaka07](https://github.com/tosaka07)<br /> 💻  | [<img src="https://avatars0.githubusercontent.com/u/11499282?s=130&v=4" width="130px;"/><br />Jung0](https://github.com/Jung0)<br /> 💻  |
-| :---: | :---: | :---: | :---: | :---: | :---: | :---:
-[<img src="https://avatars1.githubusercontent.com/u/26865061?s=130&v=4" width="130px;"/><br />Takahisa<br />Kodama](https://github.com/TakahisaKodama)<br /> 💻 | [<img src="https://avatars.githubusercontent.com/u/444996?v=4" width="130px;"/><br />syama666](https://github.com/syama666)<br /> 💻 | [<img src="https://avatars.githubusercontent.com/u/24517668?v=4" width="130px;"/><br />takoring](https://github.com/takoring)<br /> 💻 | [<img src="https://avatars.githubusercontent.com/u/40456919?v=4" width="130px;"/><br />nezuu](https://github.com/nezuu)<br /> 💻 | [<img src="https://avatars.githubusercontent.com/u/12871716?v=4" width="130px;"/><br />ishikawa-pro](https://github.com/ishikawa-pro)<br /> 💻 | [<img src="https://avatars.githubusercontent.com/u/4863233?v=4" width="130px;"/><br />niwattitti](https://github.com/niwattitti)<br /> 🚇 | [<img src="https://avatars.githubusercontent.com/u/2027132?v=4"/><br />niwattitti](https://github.com/ejithon)<br /> 🤔
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/fkei"><img src="https://avatars1.githubusercontent.com/u/381941?s=130&v=4" width="100px;" alt=""/><br /><sub><b>fkei</b></sub></a><br />🤔 💻</td>
+    <td align="center"><a href="https://github.com/cathcheeno"><img src="https://avatars0.githubusercontent.com/u/10769038?s=130&v=4" width="100px;" alt=""/><br /><sub><b>cathcheeno</b></sub></a><br />🤔 💻 🌍 📖 📝</td>
+    <td align="center"><a href="https://github.com/noritama"><img src="https://avatars2.githubusercontent.com/u/2404059?s=130&v=4" width="100px;" alt=""/><br /><sub><b>noritama</b></sub></a><br />🤔 💻</td>
+    <td align="center"><a href="https://github.com/babarl"><img src="https://avatars1.githubusercontent.com/u/35751869?s=130&v=4" width="100px;" alt=""/><br /><sub><b>babarl</b></sub></a><br />🎨</td>
+    <td align="center"><a href="https://github.com/MuuKojima"><img src="https://avatars2.githubusercontent.com/u/3895795?s= 130&v=4" width="100px;" alt=""/><br /><sub><b>MuuKojima</b></sub></a><br />💻</td>
+    <td align="center"><a href="https://github.com/tosaka07"><img src="https://avatars2.githubusercontent.com/u/12236042?s=130&v=4" width="100px;" alt=""/><br /><sub><b>tosaka07</b></sub></a><br />💻</td>
+    <td align="center"><a href="https://github.com/Jung0"><img src="https://avatars0.githubusercontent.com/u/11499282?s=130&v=4" width="100px;" alt=""/><br /><sub><b>Jung0</b></sub></a><br />💻</td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/TakahisaKodama"><img src="https://avatars1.githubusercontent.com/u/26865061?s=130&v=4" width="100px;" alt=""/><br /><sub><b>TakahisaKodama</b></sub></a><br />💻</td>
+    <td align="center"><a href="https://github.com/syama666"><img src="https://avatars.githubusercontent.com/u/444996?v=4" width="100px;" alt=""/><br /><sub><b>syama666</b></sub></a><br />💻</td>
+    <td align="center"><a href="https://github.com/takoring"><img src="https://avatars.githubusercontent.com/u/24517668?v=4" width="100px;" alt=""/><br /><sub><b>takoring</b></sub></a><br />💻</td>
+    <td align="center"><a href="https://github.com/nezuu"><img src="https://avatars.githubusercontent.com/u/40456919?v=4" width="100px;" alt=""/><br /><sub><b>nezuu</b></sub></a><br />💻</td>
+    <td align="center"><a href="https://github.com/ishikawa-pro"><img src="https://avatars.githubusercontent.com/u/12871716?v=4" width="100px;" alt=""/><br /><sub><b>ishikawa-pro</b></sub></a><br />💻</td>
+    <td align="center"><a href="https://github.com/niwattitti"><img src="https://avatars.githubusercontent.com/u/4863233?v=4" width="100px;" alt=""/><br /><sub><b>niwattitti</b></sub></a><br />💻</td>
+    <td align="center"><a href="https://github.com/ejithon"><img src="https://avatars.githubusercontent.com/u/2027132?v=4" width="100px;" alt=""/><br /><sub><b>ejithon</b></sub></a><br />🤔</td>
+  </tr>
+</table>

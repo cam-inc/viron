@@ -426,6 +426,8 @@ export type Schema = {
   format?:
     | 'email'
     | 'hostname'
+    | 'uri'
+    | 'uri-image'
     | 'ipv4'
     | 'ipv6'
     | 'date'
