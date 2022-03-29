@@ -1,5 +1,11 @@
 # @viron/website
 
+## 0.3.0
+
+### Minor Changes
+
+- 18a8a9cc: Added JSON Schema format of `uri-image` to display string data with the img tag.
+
 ## 0.2.0
 
 ### Minor Changes
