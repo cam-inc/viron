@@ -127,22 +127,13 @@ const HomePage: React.FC<Props> = () => {
                 style={{
                   height: `${minHeight}px`,
                 }}
-                className="flex items-stretch"
+                className="flex items-stretch justify-center"
               >
                 {poster}
               </div>
               <div>{direction}</div>
             </div>
           )}
-        </div>
-      );
-      return (
-        <div className={className} style={style}>
-          <div className="absolute inset-0 flex flex-col lg:flex-row">
-            <div className="flex-1 p-4 flex items-center justify-center min-w-0 bg-thm-background text-thm-on-background">
-              poster
-            </div>
-          </div>
         </div>
       );
     },
