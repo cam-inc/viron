@@ -19,25 +19,6 @@ type (
 	adminroleImpl struct{}
 )
 
-/*
-
-
-
-
-
-
-// リソース一覧(enum用)
-export const listVironResourceIds = async (
-  context: RouteContext
-): Promise<void> => {
-  const resouceIds = domainsAdminRole.listResourcesByOas(
-    context.req._context.apiDefinition
-  );
-  context.res.json(resouceIds);
-};
-
-*/
-
 var (
 	permissions = []VironAdminRolePermissionPermission{
 		VironAdminRolePermissionPermissionDeny,

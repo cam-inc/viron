@@ -9,9 +9,8 @@ import (
 
 type (
 	AuthConfig struct {
-		Provider       string `json:"provider"`
-		AuthConfigType string `json:"type"`
-		//PathObject              map[string]map[string]*openapi3.Operation `json:"pathObject"`
+		Provider                string      `json:"provider"`
+		AuthConfigType          string      `json:"type"`
 		OperationID             string      `json:"operationId"`
 		DefaultParametersValue  interface{} `json:"defaultParametersValue,omitempty"`
 		DefaultRequestBodyValue interface{} `json:"defaultRequestBodyValue,omitempty"`
