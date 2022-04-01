@@ -76,7 +76,11 @@ func (a *adminuser) CreateVironAdminUser(w http.ResponseWriter, r *http.Request)
 }
 
 func (a *adminuser) RemoveVironAdminUser(w http.ResponseWriter, r *http.Request, id externalRef0.VironIdPathParam) {
-	panic("implement me")
+	if err := domains.RemoveAdminUserById(r.Context(), string(id)); err != nil {
+		helpers.SendError(w, err.StatusCode(), err)
+		return
+	}
+	helpers.Send(w, http.StatusNoContent, nil)
 }
 
 func (a *adminuser) UpdateVironAdminUser(w http.ResponseWriter, r *http.Request, id externalRef0.VironIdPathParam) {

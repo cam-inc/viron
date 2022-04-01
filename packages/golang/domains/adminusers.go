@@ -255,3 +255,25 @@ func UpdateAdminUserByID(ctx context.Context, id string, payload *AdminUser) *er
 	}
 	return nil
 }
+
+func RemoveAdminUserById(ctx context.Context, id string) *errors.VironError {
+	// 存在チェック
+	user := FindByID(ctx, id)
+	if user == nil {
+		return errors.AdminUserNotfound
+	}
+
+	// userを削除
+	repo := container.GetAdminUserRepository()
+	if err := repo.RemoveByID(ctx, id); err != nil {
+		return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("adminUser delete failed. %+v", err))
+	}
+
+	// ユーザーからロールを剥奪
+	if len(user.RoleIDs) > 0 {
+		for _, role := range user.RoleIDs {
+			RevokeRoleForUser(id, role)
+		}
+	}
+	return nil
+}

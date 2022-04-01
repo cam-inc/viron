@@ -127,8 +127,16 @@ func (a *adminUsersPersistence) UpdateByID(ctx context.Context, id string, entit
 
 }
 
-func (a *adminUsersPersistence) RemoveByID(ctx context.Context, s string) error {
-	panic("implement me")
+func (a *adminUsersPersistence) RemoveByID(ctx context.Context, id string) error {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	// 削除
+	if _, err = a.client.Collection(collectionName).DeleteOne(ctx, bson.D{{Key: "_id", Value: oid}}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func New(client *mongo.Client) repositories.Repository {
