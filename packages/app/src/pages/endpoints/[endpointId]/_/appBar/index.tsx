@@ -188,9 +188,9 @@ const Appbar: React.FC<Props> = ({
           </div>
           <div className="flex items-stretch h-2 my-2">
             <div className="flex-1 bg-thm-primary" />
-            <div className="flex-1 bg-thm-primary-variant" />
             <div className="flex-1 bg-thm-secondary" />
-            <div className="flex-1 bg-thm-secondary-variant" />
+            <div className="flex-1 bg-thm-on-surface" />
+            <div className="flex-1 bg-thm-on-surface-low" />
           </div>
           {document.info['x-tags'] && (
             <div className="flex items-center gap-2">
