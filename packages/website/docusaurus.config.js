@@ -15,6 +15,10 @@ module.exports = {
   organizationName: 'CAM, Inc.',
   projectName: 'viron',
   themeConfig: {
+    colorMode: {
+      defaultMode: 'dark',
+      disableSwitch: true,
+    },
     navbar: {
       title: 'Viron',
       logo: {
@@ -27,11 +31,13 @@ module.exports = {
           label: 'Docs',
           position: 'left',
         },
+        /*
         {
           to: 'blog',
           label: 'Blog',
           position: 'left'
         },
+        */
         {
           href: 'https://github.com/cam-inc/viron',
           label: 'GitHub',
@@ -48,10 +54,12 @@ module.exports = {
         {
           title: 'Resources',
           items: [
+            /*
             {
               label: 'Blog',
               to: 'blog',
             },
+            */
             {
               label: 'Documentation',
               to: 'docs/introduction',

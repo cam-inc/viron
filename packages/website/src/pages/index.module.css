@@ -3,11 +3,12 @@
  * and scoped locally.
  */
 
-.heroBanner {
-  padding: 4rem 0;
+.hero {
+  padding: 32px 16px;
   text-align: center;
   position: relative;
   overflow: hidden;
+  background-color: #333;
 }
 
 .inner {
@@ -39,4 +40,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.videoArea {
+  padding: 32px 16px;
+  box-shadow: 0 0 8px #000 inset;
+}
+
+.videoArea video {
+  display: block;
+  max-width: 840px;
+  width: 100%;;
+  margin: 0 auto;
 }
