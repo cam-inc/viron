@@ -6,6 +6,56 @@
 [![Read the Docs](https://img.shields.io/readthedocs/pip.svg)](https://discovery.viron.plus/docs/introduction/)
 [![GitHub last commit](https://img.shields.io/github/last-commit/cam-inc/viron.svg)]()
 
+<div align="center">
+  <img src="./arts/responsive/desktop.png" align="top" style="width:70%;" />
+  <img src="./arts/responsive/mobile.png" align="top" style="width:25%;" />
+</div>
+
+<br />
+
+<div align="center">
+  <img src="./arts/ui/nav.png" align="top" style="width:15%;" />
+  <img src="./arts/ui/form.png" align="top" style="width:25%;" />
+  <img src="./arts/ui/modal.png" align="top" style="width:20%;" />
+</div>
+
+
+<br />
+
+<div align="center">
+  <img src="./arts/ui/table.png" align="top" style="width:50%;" />
+</div>
+
+<br />
+
+<div align="center">
+  <img src="./arts/ui/app_bar.png" align="top" style="width:30%;" />
+  <img src="./arts/ui/endpoint_card.png" align="top" style="width:30%;" />
+  <img src="./arts/ui/info.png" align="top" style="width:30%;" />
+</div>
+
+<br />
+
+<div align="center">
+  <img src="./arts/theme/c_1.png" align="top" style="width:15%;" />
+  <img src="./arts/theme/c_2.png" align="top" style="width:15%;" />
+  <img src="./arts/theme/c_3.png" align="top" style="width:15%;" />
+  <img src="./arts/theme/c_4.png" align="top" style="width:15%;" />
+  <img src="./arts/theme/c_5.png" align="top" style="width:15%;" />
+</div>
+
+<br />
+
+<div align="center">
+  <img src="./arts/theme/p_1.png" align="top" width="40%"/>
+  <img src="./arts/theme/p_2.png" align="top" width="40%"/>
+  <img src="./arts/theme/p_3.png" align="top" width="40%"/>
+  <img src="./arts/theme/p_4.png" align="top" width="40%"/>
+  <img src="./arts/theme/p_5.png" align="top" width="40%"/>
+  <img src="./arts/theme/p_6.png" align="top" width="40%"/>
+</div>
+
+
 ## What is Viron
 
 Viron is a **web-based** administration tool, which
