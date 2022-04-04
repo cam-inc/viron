@@ -123,7 +123,7 @@ const Group: React.FC<GroupProps> = ({ group, list }) => {
   return (
     <div className="border-l-2 border-thm-background hover:border-thm-on-background-low">
       {/* Head */}
-      <div className="pl-2 flex items-center gap-2">
+      <div className="px-2 flex items-center gap-2">
         <TextButton
           on={COLOR_SYSTEM.SURFACE}
           label={`${group.name}(${list.length})`}
@@ -131,7 +131,7 @@ const Group: React.FC<GroupProps> = ({ group, list }) => {
           onClick={handleToggleClick}
         />
         {group.description && (
-          <div className="text-xxs text-thm-on-background-low">
+          <div className="text-xxs text-thm-on-background-low truncate">
             {group.description}
           </div>
         )}

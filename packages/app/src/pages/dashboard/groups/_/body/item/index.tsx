@@ -68,7 +68,7 @@ const Item: React.FC<Props> = ({ group }) => {
 
   return (
     <>
-      <div className="flex items-center gap-2 p-2 border-l-8 border-thm-primary hover:bg-thm-on-background-faint">
+      <div className="flex items-center gap-2 p-2 hover:bg-thm-on-background-faint">
         <div className="flex-1">
           <div className="text-base font-bold">{group.name}</div>
           <div className="flex items-center gap-2">
