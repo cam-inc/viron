@@ -7,8 +7,12 @@ On this page, we will guide you to try out Viron and see how it works by using t
 ## Visiting the Dashboard
 Access [https://viron.plus](https://viron.plus), the Viron home page, and click the `Dashboard` button to navigate to the dashboard page where you can add, edit and remove endpoints.
 
+![home page](/img/quickstart/home.png)
+
 ## Adding an Endpoint
-On the dashboard page, click the `Add-an-Endpoint` button to open a modal UI to add a new endpoint. Then, input the URL of `https://demo.viron.plus` in the field for URL.
+On the dashboard page, click the `Add an Endpoint` button to open a modal UI to add a new endpoint. Then, input the URL of `https://demo.viron.plus` in the field for URL.
+
+![add](/img/quickstart/add.png)
 
 :::note
 This endpoint is only a **demo-purpose** one, so you need to create your endpoint for the services you manage when you integrate Viron with your service workflow.
@@ -16,14 +20,24 @@ This endpoint is only a **demo-purpose** one, so you need to create your endpoin
 
 Finally, input `demo` for the ID field and leave the group field blank, and click the `Create` button to finish this task. You will see the newly added demo endpoint on the dashboard page.
 
+![modal](/img/quickstart/modal.png)
+
 ## Signing in the Endpoint
 To sign in using Goggle OAuth, click the `OAuth` button on the endpoint item on the dashboard and click the `Submit` button.
+
+![card](/img/quickstart/card.png)
+
+![authenticate](/img/quickstart/authenticate.png)
 
 :::note
 A Google account is required.
 :::
 
 You will be navigated to `Google's authentication page` to select an account. Choose one to use to be redirected back to Viron. After being redirected, click the `Submit` button to confirm.
+
+![callback](/img/quickstart/callback.png)
+
+
 
 ## Endpoint Page
 Being authenticated successfully, you will be on the **demo endpoint page**, where you can play around editing the demo data.

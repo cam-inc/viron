@@ -10,7 +10,7 @@ import HomepageFeatures from '@site/src/components/HomepageFeatures';
 function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
   return (
-    <header className={clsx('hero hero--primary', styles.heroBanner)}>
+    <header className={styles.hero}>
       <div className="container">
         <div className={styles.inner}>
           <div>
@@ -33,6 +33,14 @@ function HomepageHeader() {
   );
 }
 
+function Arts() {
+  return (
+      <div className={styles.videoArea}>
+      <video controls autoplay src={useBaseUrl(`video/demo.mp4`)} />
+      </div>
+  );
+}
+
 export default function Home() {
   const {siteConfig} = useDocusaurusContext();
   return (
@@ -41,6 +49,7 @@ export default function Home() {
       description="All you do is just create a API server and a OAS2.0 json file. Then viron admin tool is ready to use. You don\'t need to write frontend code!">
       <HomepageHeader />
       <main>
+      <Arts />
         <HomepageFeatures />
       </main>
     </Layout>
