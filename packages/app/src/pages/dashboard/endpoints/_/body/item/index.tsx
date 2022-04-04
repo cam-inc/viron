@@ -149,22 +149,24 @@ const _Item: React.FC<{
 
   return (
     <>
-      <div className="flex items-center gap-2">
-        <div className="flex-none">
-          <Thumbnail endpoint={endpoint} document={document || undefined} />
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="flex-1 flex items-start gap-2">
+          <div className="flex-none">
+            <Thumbnail endpoint={endpoint} document={document || undefined} />
+          </div>
+          <div className="flex-1">
+            <div className="text-thm-on-background-low text-xxs">
+              {endpoint.id}
+            </div>
+            <div className="text-thm-on-background text-sm font-bold">
+              {document?.info.title || authentication.oas.info.title || '---'}
+            </div>
+            <div className="text-thm-on-background-low text-xxs">
+              {endpoint.url}
+            </div>
+          </div>
         </div>
-        <div className="flex-1">
-          <div className="text-thm-on-background-low text-xxs">
-            {endpoint.id}
-          </div>
-          <div className="text-thm-on-background text-sm font-bold">
-            {document?.info.title || authentication.oas.info.title || '---'}
-          </div>
-          <div className="text-thm-on-background-low text-xxs">
-            {endpoint.url}
-          </div>
-        </div>
-        <div className="flex-none flex items-center gap-2">
+        <div className="flex-1 flex items-center justify-end gap-2">
           <div ref={menuPopover.targetRef}>
             <TextButton
               on={COLOR_SYSTEM.BACKGROUND}

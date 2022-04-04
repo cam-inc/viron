@@ -40,8 +40,8 @@ const _Navigation: React.FC<Props> = ({
       >
         <Logo
           className="h-8 drop-shadow-01dp"
-          left="text-thm-primary"
-          right="text-thm-secondary"
+          left="text-thm-on-surface-high"
+          right="text-thm-on-surface"
         />
       </Link>
     ),

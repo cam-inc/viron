@@ -75,7 +75,6 @@ export type Content = {
   defaultParametersValue?: RequestParametersValue;
   defaultRequestBodyValue?: RequestRequestBodyValue;
   pagination?: boolean;
-  // TODO: ドキュメントに書くこと
   autoRefreshSec?: number;
   actions?: {
     operationId: OperationId;

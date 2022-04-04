@@ -7,6 +7,7 @@ import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/out
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import Popover, { usePopover } from '~/portals/popover';
+import { useAppScreenGlobalStateValue } from '~/store';
 import { ClassName, COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document, Content, ContentId } from '~/types/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
@@ -45,6 +46,8 @@ const Head: React.FC<Props> = ({
   onUnpin,
   className = '',
 }) => {
+  const { lg } = useAppScreenGlobalStateValue();
+
   const handleSiblingOperationSuccess = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (data: any) => {
@@ -126,9 +129,11 @@ const Head: React.FC<Props> = ({
               <div className="">
                 <Search endpoint={endpoint} document={document} base={base} />
               </div>
-              <div className="">
-                <Pin isActive={isPinned} onClick={handlePinClick} />
-              </div>
+              {lg && (
+                <div className="">
+                  <Pin isActive={isPinned} onClick={handlePinClick} />
+                </div>
+              )}
             </div>
           </div>
         </div>

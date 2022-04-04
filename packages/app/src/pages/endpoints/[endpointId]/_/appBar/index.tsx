@@ -8,6 +8,7 @@ import TextOnButton, {
   Props as TextOnButtonProps,
 } from '~/components/button/text/on';
 import CommonMark from '~/components/commonMark';
+import DotsVerticalIcon from '~/components/icon/dotsVertical/outline';
 import MenuAlt1Icon from '~/components/icon/menuAlt1/outline';
 import ExternalLinkIcon from '~/components/icon/externalLink/outline';
 import ServerIcon from '~/components/icon/server/outline';
@@ -81,7 +82,7 @@ const Appbar: React.FC<Props> = ({
 
   // Contents Info
   const contentsPopover = usePopover<HTMLDivElement>();
-  const handleContentsClick = useCallback<FilledButtonProps['onClick']>(() => {
+  const handleContentsClick = useCallback<TextOnButtonProps['onClick']>(() => {
     contentsPopover.open();
   }, [contentsPopover]);
   const handleContentClick = useCallback<TextOnButtonProps<Content>['onClick']>(
@@ -159,9 +160,9 @@ const Appbar: React.FC<Props> = ({
           <div className="flex-1" />
           <div className="flex-none">
             <div ref={contentsPopover.targetRef}>
-              <FilledButton
-                cs={COLOR_SYSTEM.PRIMARY_CONTAINER}
-                label="Jump"
+              <TextOnButton
+                on={COLOR_SYSTEM.PRIMARY}
+                Icon={DotsVerticalIcon}
                 onClick={handleContentsClick}
               />
             </div>
