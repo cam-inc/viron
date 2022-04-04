@@ -7,8 +7,8 @@ import TextButton, {
   Props as TextButtonProps,
 } from '~/components/button/text/on';
 import Head from '~/components/head';
-import CollectionOutlineIcon from '~/components/icon/collection/outline';
-import CollectionSolidIcon from '~/components/icon/collection/solid';
+import ChevronDownIcon from '~/components/icon/chevronDown/outline';
+import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import ColorSwatchIcon from '~/components/icon/colorSwatch/outline';
 import PlusCircleIcon from '~/components/icon/plusCircle/outline';
 import Modal, { useModal } from '~/portals/modal';
@@ -80,12 +80,17 @@ const Body: React.FC<Props> = ({ className, style }) => {
               </ul>
             )}
             {!!listUngrouped.length && (
-              <ul className="mt-2">
+              <ul
+                className="mt-2 p-2"
+                style={{
+                  display: 'grid',
+                  gridGap: '8px',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+                  gridAutoRows: 'auto',
+                }}
+              >
                 {listUngrouped.map((item) => (
-                  <li
-                    key={item.id}
-                    className="border-b border-dashed border-thm-on-background-faint pb-2 mb-2 last:border-none last:mb-0 last:pb-0"
-                  >
+                  <li key={item.id} className="">
                     <Item endpoint={item} />
                   </li>
                 ))}
@@ -116,13 +121,13 @@ const Group: React.FC<GroupProps> = ({ group, list }) => {
   }, [list]);
 
   return (
-    <div className="border-l-4 border-thm-primary">
+    <div className="border-l-2 border-thm-background hover:border-thm-on-background-low">
       {/* Head */}
-      <div className="pl-2 flex items-center gap-2 border-l-4 border-thm-primary">
+      <div className="pl-2 flex items-center gap-2">
         <TextButton
           on={COLOR_SYSTEM.SURFACE}
           label={`${group.name}(${list.length})`}
-          Icon={isOpened ? CollectionSolidIcon : CollectionOutlineIcon}
+          Icon={isOpened ? ChevronDownIcon : ChevronRightIcon}
           onClick={handleToggleClick}
         />
         {group.description && (
@@ -133,16 +138,21 @@ const Group: React.FC<GroupProps> = ({ group, list }) => {
       </div>
       {/* Body */}
       <div
-        className={classnames('mt-2', {
+        className={classnames('mt-2 p-2', {
           hidden: !isOpened,
         })}
       >
-        <ul>
+        <ul
+          className=""
+          style={{
+            display: 'grid',
+            gridGap: '8px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+            gridAutoRows: 'auto',
+          }}
+        >
           {list.map((item) => (
-            <li
-              key={item.id}
-              className="border-b border-dashed border-thm-on-background-faint pb-2 mb-2 last:border-none last:mb-0 last:pb-0"
-            >
+            <li key={item.id} className="">
               <Item endpoint={item} />
             </li>
           ))}

@@ -104,7 +104,11 @@ const Item: React.FC<Props> = ({ endpoint }) => {
     );
   }, [endpoint, error, isPending, document, authentication]);
 
-  return <div className="p-2 hover:bg-thm-on-background-faint">{content}</div>;
+  return (
+    <div className="p-2 rounded border border-thm-on-background-slight hover:bg-thm-on-background-faint">
+      {content}
+    </div>
+  );
 };
 export default Item;
 
@@ -149,7 +153,7 @@ const _Item: React.FC<{
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-2">
+      <div className={`flex flex-wrap items-center gap-2 `}>
         <div className="flex-1 flex items-start gap-2">
           <div className="flex-none">
             <Thumbnail endpoint={endpoint} document={document || undefined} />
