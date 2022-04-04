@@ -70,7 +70,23 @@ const Item: React.FC<Props> = ({ endpoint }) => {
 
   const content = useMemo<JSX.Element | null>(() => {
     if (error) {
-      return <Error on={COLOR_SYSTEM.BACKGROUND} error={error} />;
+      return (
+        <div>
+          <Error on={COLOR_SYSTEM.BACKGROUND} error={error} />
+          <Thumbnail endpoint={endpoint} document={document || undefined} />
+          <div>
+            <div className="text-thm-on-background-low text-xxs">
+              {endpoint.id}
+            </div>
+            <div className="text-thm-on-background text-sm font-bold">
+              {document?.info.title || authentication?.oas.info.title || '---'}
+            </div>
+            <div className="text-thm-on-background-low text-xxs">
+              {endpoint.url}
+            </div>
+          </div>
+        </div>
+      );
     }
     if (isPending) {
       return <Spinner className="w-4" on={COLOR_SYSTEM.BACKGROUND} />;
