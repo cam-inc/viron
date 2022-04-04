@@ -27,7 +27,6 @@ const Body: React.FC<Props> = ({
   const handleDescendantOperationSuccess = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (data: any) => {
-      console.log(data);
       base.refresh();
     },
     [base]

@@ -70,7 +70,23 @@ const Item: React.FC<Props> = ({ endpoint }) => {
 
   const content = useMemo<JSX.Element | null>(() => {
     if (error) {
-      return <Error on={COLOR_SYSTEM.BACKGROUND} error={error} />;
+      return (
+        <div>
+          <Error on={COLOR_SYSTEM.BACKGROUND} error={error} />
+          <Thumbnail endpoint={endpoint} document={document || undefined} />
+          <div>
+            <div className="text-thm-on-background-low text-xxs">
+              {endpoint.id}
+            </div>
+            <div className="text-thm-on-background text-sm font-bold">
+              {document?.info.title || authentication?.oas.info.title || '---'}
+            </div>
+            <div className="text-thm-on-background-low text-xxs">
+              {endpoint.url}
+            </div>
+          </div>
+        </div>
+      );
     }
     if (isPending) {
       return <Spinner className="w-4" on={COLOR_SYSTEM.BACKGROUND} />;
@@ -88,7 +104,11 @@ const Item: React.FC<Props> = ({ endpoint }) => {
     );
   }, [endpoint, error, isPending, document, authentication]);
 
-  return <div className="p-2 hover:bg-thm-on-background-faint">{content}</div>;
+  return (
+    <div className="p-2 rounded border border-thm-on-background-slight hover:bg-thm-on-background-faint">
+      {content}
+    </div>
+  );
 };
 export default Item;
 
@@ -133,30 +153,37 @@ const _Item: React.FC<{
 
   return (
     <>
-      <div className="flex items-center gap-2">
-        <div className="flex-none">
-          <Thumbnail endpoint={endpoint} document={document || undefined} />
+      <div className="flex flex-col gap-2">
+        <div className="flex items-start gap-2">
+          {/* Info */}
+          <div className="flex-1 flex items-start gap-2">
+            <div className="flex-none">
+              <Thumbnail endpoint={endpoint} document={document || undefined} />
+            </div>
+            <div className="flex-1">
+              <div className="text-thm-on-background-low text-xxs">
+                {endpoint.id}
+              </div>
+              <div className="text-thm-on-background text-sm font-bold">
+                {document?.info.title || authentication.oas.info.title || '---'}
+              </div>
+              <div className="text-thm-on-background-low text-xxs">
+                {endpoint.url}
+              </div>
+            </div>
+          </div>
+          {/* Menu */}
+          <div className="flex-none">
+            <div ref={menuPopover.targetRef}>
+              <TextButton
+                on={COLOR_SYSTEM.BACKGROUND}
+                Icon={DotsCircleHorizontalIcon}
+                onClick={handleMenuClick}
+              />
+            </div>
+          </div>
         </div>
-        <div className="flex-1">
-          <div className="text-thm-on-background-low text-xxs">
-            {endpoint.id}
-          </div>
-          <div className="text-thm-on-background text-sm font-bold">
-            {document?.info.title || authentication.oas.info.title || '---'}
-          </div>
-          <div className="text-thm-on-background-low text-xxs">
-            {endpoint.url}
-          </div>
-        </div>
-        <div className="flex-none flex items-center gap-2">
-          <div ref={menuPopover.targetRef}>
-            <TextButton
-              on={COLOR_SYSTEM.BACKGROUND}
-              Icon={DotsCircleHorizontalIcon}
-              label="Menu"
-              onClick={handleMenuClick}
-            />
-          </div>
+        <div className="flex items-center justify-end gap-2">
           {document ? (
             <>
               <FilledButton

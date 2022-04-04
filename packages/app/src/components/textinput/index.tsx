@@ -35,7 +35,7 @@ const Textinput: React.FC<Props> = ({
   const bind: Bind = {
     type,
     id,
-    className: `block w-full p-1 border rounded border-thm-on-${on}-low bg-thm-${on} text-thm-on-${on} hover:bg-thm-on-${on}-faint focus:outline-none focus:ring-2 focus:ring-thm-on-${on} focus:bg-thm-on-${on}-faint focus:ring-thm-on-${on}`,
+    className: `block w-full p-1 border rounded border-thm-on-${on}-low bg-thm-${on} text-thm-on-${on} hover:bg-thm-on-${on}-faint focus:outline-none focus:ring-2 focus:bg-thm-on-${on}-faint focus:ring-thm-on-${on}`,
   };
   if (autocompleteId) {
     bind.list = autocompleteId;

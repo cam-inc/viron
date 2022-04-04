@@ -15,8 +15,8 @@ const _Navigation: React.FC<Props> = ({ className }) => {
       <div className="flex flex-col gap-2 items-center py-8">
         <Logo
           className="h-12 drop-shadow-01dp"
-          left="text-thm-primary"
-          right="text-thm-secondary"
+          left="text-thm-on-surface-high"
+          right="text-thm-on-surface"
         />
         <div className="text-thm-on-surface text-xs font-bold text-center">
           Give OAS, <br />
