@@ -67,6 +67,8 @@ func TestCreateAdminUser(t *testing.T) {
 
 func TestRemoveAdminUser(t *testing.T) {
 	// TODO: casbinInstanceを使ってる箇所をtestできるようにする
+	// https://github.com/cam-inc/viron/blob/next-golang/packages/golang/domains/adminusers.go
+
 	//setUpRole()
 	//
 	//id := "xxxxxxxxxxxxxxxx"
