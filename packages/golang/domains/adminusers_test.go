@@ -64,3 +64,36 @@ func TestCreateAdminUser(t *testing.T) {
 
 	assert.Equal(t, createdUser, payload)
 }
+
+func TestRemoveAdminUser(t *testing.T) {
+	// TODO: casbinInstanceを使ってる箇所をtestできるようにする
+	//setUpRole()
+	//
+	//id := "xxxxxxxxxxxxxxxx"
+	//pass := "pass"
+	//email := "test@example.com"
+	//adminUser := &repositories.AdminUserEntity{
+	//	ID:       id,
+	//	Email:    email,
+	//	Password: &pass,
+	//}
+	//f := mock.MockFunc{
+	//	Find: func(ctx context.Context, conditions repositories.Conditions) (repositories.EntitySlice, error) {
+	//		var results repositories.EntitySlice
+	//		results = append(results, adminUser)
+	//		return results, nil
+	//	},
+	//	RemoveByID: func(ctx context.Context, s string) error {
+	//		return nil
+	//	},
+	//}
+	//container.SetUpMock(map[string]mock.MockFunc{
+	//	"adminusers": f,
+	//})
+	//
+	//// 実行
+	//err := RemoveAdminUserById(context.Background(), id)
+	//
+	//// 検証
+	//assert.Nil(t, err)
+}
