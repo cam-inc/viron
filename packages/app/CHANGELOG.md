@@ -1,5 +1,11 @@
 # @viron/app
 
+## 2.1.1
+
+### Patch Changes
+
+- c1889658: bug fixes for modals of endpoint and group addition
+
 ## 2.1.0
 
 ### Minor Changes

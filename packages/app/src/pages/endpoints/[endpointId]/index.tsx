@@ -183,7 +183,8 @@ const EndpointPage: React.FC<Props> = ({ params }) => {
         return null;
       }
       if (isPending) {
-        return <div>TODO: pending...</div>;
+        // TODO: show spinner.
+        return null;
       }
       if (error) {
         return <Error on={COLOR_SYSTEM.BACKGROUND} error={error} />;

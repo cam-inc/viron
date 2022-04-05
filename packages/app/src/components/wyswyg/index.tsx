@@ -7,7 +7,8 @@ const WyswygLazy = React.lazy<typeof WyswygBase>(
 );
 
 const Spinner: React.FC = () => {
-  return <p>TODO: spinning...</p>;
+  // TODO: spinner
+  return null;
 };
 
 export type Props = WyswygProps;

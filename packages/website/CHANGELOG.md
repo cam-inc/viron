@@ -1,5 +1,11 @@
 # @viron/website
 
+## 0.3.1
+
+### Patch Changes
+
+- 609ddcc9: Added images for quick start doc.
+
 ## 0.3.0
 
 ### Minor Changes

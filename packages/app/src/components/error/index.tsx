@@ -84,6 +84,7 @@ const _Error: React.FC<Props> = ({ className = '', on, error }) => {
           </div>
         </div>
         {error.message && <div className="text-xs">{error.message}</div>}
+        {/*
         {error instanceof NetworkError && (
           <div>
             <div>TODO: NetworkError</div>
@@ -104,6 +105,7 @@ const _Error: React.FC<Props> = ({ className = '', on, error }) => {
             <div>TODO: コンテンツへのアクセス権がないよ。</div>
           </div>
         )}
+     */}
       </div>
     </div>
   );

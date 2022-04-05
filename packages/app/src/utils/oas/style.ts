@@ -85,7 +85,7 @@ export const serializeMatrix = function (
       );
     }
   }
-  throw new Error('TODO');
+  throw new Error('serialization failed');
 };
 
 export const serializeLabel = function (
@@ -133,7 +133,7 @@ export const serializeLabel = function (
     }
     return '.' + variable.map((value) => `${JSON.stringify(value)}`).join('.');
   }
-  throw new Error('TODO');
+  throw new Error('serialization failed');
 };
 
 export const serializeForm = function (
@@ -187,7 +187,7 @@ export const serializeForm = function (
       );
     }
   }
-  throw new Error('TODO');
+  throw new Error('serialization failed');
 };
 
 // @see: https://tools.ietf.org/html/rfc6570#section-3.2.2
@@ -197,7 +197,7 @@ export const serializeSimple = function (
 ): string {
   if (_.isString(variable)) {
     if (_.isEmpty(variable)) {
-      throw new Error('TODO');
+      throw new Error('serialization failed');
     }
     return variable;
   }
@@ -209,7 +209,7 @@ export const serializeSimple = function (
   }
   if (_.isPlainObject(variable)) {
     if (_.isEmpty(variable)) {
-      throw new Error('TODO');
+      throw new Error('serialization failed');
     }
     if (explode) {
       return Object.entries(variable)
@@ -223,20 +223,20 @@ export const serializeSimple = function (
   }
   if (_.isArray(variable)) {
     if (_.isEmpty(variable)) {
-      throw new Error('TODO');
+      throw new Error('serialization failed');
     }
     return variable.map((value) => `${JSON.stringify(value)}`).join(',');
   }
-  throw new Error('TODO');
+  throw new Error('serialization failed');
 };
 
 export const serializeSpaceDelimited = function (variable: Variable): string {
   if (_.isString(variable) || _.isNumber(variable) || _.isBoolean(variable)) {
-    throw new Error('TODO');
+    throw new Error('serialization failed');
   }
   if (_.isPlainObject(variable)) {
     if (_.isEmpty(variable)) {
-      throw new Error('TODO');
+      throw new Error('serialization failed');
     }
     return Object.entries(variable)
       .map(([key, value]) => `${key}%20${JSON.stringify(value)}`)
@@ -244,20 +244,20 @@ export const serializeSpaceDelimited = function (variable: Variable): string {
   }
   if (_.isArray(variable)) {
     if (_.isEmpty(variable)) {
-      throw new Error('TODO');
+      throw new Error('serialization failed');
     }
     return variable.map((value) => `${JSON.stringify(value)}`).join('%20');
   }
-  throw new Error('TODO');
+  throw new Error('serialization failed');
 };
 
 export const serializePipeDelimited = function (variable: Variable): string {
   if (_.isString(variable) || _.isNumber(variable) || _.isBoolean(variable)) {
-    throw new Error('TODO');
+    throw new Error('serialization failed');
   }
   if (_.isPlainObject(variable)) {
     if (_.isEmpty(variable)) {
-      throw new Error('TODO');
+      throw new Error('serialization failed');
     }
     return Object.entries(variable)
       .map(([key, value]) => `${key}|${JSON.stringify(value)}`)
@@ -265,11 +265,11 @@ export const serializePipeDelimited = function (variable: Variable): string {
   }
   if (_.isArray(variable)) {
     if (_.isEmpty(variable)) {
-      throw new Error('TODO');
+      throw new Error('serialization failed');
     }
     return variable.map((value) => `${JSON.stringify(value)}`).join('|');
   }
-  throw new Error('TODO');
+  throw new Error('serialization failed');
 };
 
 export const serializeDeepObject = function (
@@ -277,18 +277,18 @@ export const serializeDeepObject = function (
   variable: Variable
 ): string {
   if (_.isString(variable) || _.isNumber(variable) || _.isBoolean(variable)) {
-    throw new Error('TODO');
+    throw new Error('serialization failed');
   }
   if (_.isPlainObject(variable)) {
     if (_.isEmpty(variable)) {
-      throw new Error('TODO');
+      throw new Error('serialization failed');
     }
     return Object.entries(variable)
       .map(([key, value]) => `${name}[${key}]=${JSON.stringify(value)}`)
       .join('&');
   }
   if (_.isArray(variable)) {
-    throw new Error('TODO');
+    throw new Error('serialization failed');
   }
-  throw new Error('TODO');
+  throw new Error('serialization failed');
 };

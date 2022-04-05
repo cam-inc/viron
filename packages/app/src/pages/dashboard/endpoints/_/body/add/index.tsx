@@ -78,11 +78,7 @@ const AddEndpoint: React.FC<Props> = ({ className = '', onAdd, onCancel }) => {
     <div className={className}>
       <form className="space-y-8" onSubmit={handleSubmit}>
         <div>
-          <Head
-            on={COLOR_SYSTEM.SURFACE}
-            title="Create an Endpoint"
-            description="Groups are xxx"
-          />
+          <Head on={COLOR_SYSTEM.SURFACE} title="Create an Endpoint" />
         </div>
         <div>{formState.errors.manual?.message}</div>
         <div className="space-y-4">
@@ -102,9 +98,11 @@ const AddEndpoint: React.FC<Props> = ({ className = '', onAdd, onCancel }) => {
           />
           <Select<EndpointGroup>
             on={COLOR_SYSTEM.SURFACE}
+            label="Group"
             list={groupList}
-            Select={({ className, children }) => (
+            Select={({ id, className, children }) => (
               <select
+                id={id}
                 className={className}
                 value={watch('groupId')}
                 {...register('groupId')}

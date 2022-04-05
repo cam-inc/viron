@@ -1,10 +1,10 @@
 import { isSSR } from '~/utils';
 
 export const URL = {
-  DOCUMENTATION: 'https://discovery.viron.plus/docs/introduction',
+  DOCUMENTATION: 'https://discovery.viron.plus/docs/introduction/',
   BLOG: 'https://discovery.viron.plus/blog/',
-  RELEASE_NOTES: 'https://viron.plus/TODO/release_notes/',
-  HELP: 'https://viron.plus/TODO/help/',
+  RELEASE_NOTES: 'https://discovery.viron.plus/docs/References/changelog/',
+  HELP: 'https://discovery.viron.plus/docs/References/faq/',
   GITHUB: 'https://github.com/cam-inc/viron/',
   TWITTER: 'https://twitter.com/TODO',
 } as const;
