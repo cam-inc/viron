@@ -26,11 +26,13 @@ const links: {
     label: 'Documentation',
     isExternal: true,
   },
-  {
-    to: URL.BLOG,
-    label: 'Blog',
-    isExternal: true,
-  },
+  /*
+    {
+      to: URL.BLOG,
+      label: 'Blog',
+      isExternal: true,
+    },
+    */
   {
     to: URL.RELEASE_NOTES,
     label: 'Release Notes',

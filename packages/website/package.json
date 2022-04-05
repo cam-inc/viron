@@ -1,6 +1,6 @@
 {
   "name": "@viron/website",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "scripts": {
     "pre-commit": "echo PRE-COMMIT",
     "pre-push": "echo PRE-PUSH",
@@ -10,7 +10,7 @@
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
-    "serve": "docusaurus serve",
+    "serve": "docusaurus serve --port 4000",
     "clear": "docusaurus clear",
     "write-translations:ja": "docusaurus write-translations --locale ja",
     "test": "echo TEST"
