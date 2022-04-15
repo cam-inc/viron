@@ -75,7 +75,6 @@ export type Content = {
   defaultParametersValue?: RequestParametersValue;
   defaultRequestBodyValue?: RequestRequestBodyValue;
   pagination?: boolean;
-  // TODO: ドキュメントに書くこと
   autoRefreshSec?: number;
   actions?: {
     operationId: OperationId;
@@ -426,6 +425,8 @@ export type Schema = {
   format?:
     | 'email'
     | 'hostname'
+    | 'uri'
+    | 'uri-image'
     | 'ipv4'
     | 'ipv6'
     | 'date'

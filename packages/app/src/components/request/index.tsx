@@ -189,7 +189,7 @@ const _Request: React.FC<Props> = ({
         </div>
         {/* Tail */}
         <div
-          className={`flex-none p-2 border-t-2 border-thm-on-${on}-faint flex justify-start gap-2`}
+          className={`flex-none p-2 border-t-2 border-thm-on-${on}-faint flex justify-end gap-2`}
         >
           <FilledButton
             type="submit"

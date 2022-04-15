@@ -680,10 +680,11 @@ export const useEndpoint = (): UseEndpointReturn => {
       // Remove groupId for each endpoint items.
       setEndpointList((currVal) =>
         currVal.map((item) => {
+          const _item = { ...item };
           if (item.groupId === endpointGroupId) {
-            delete item.groupId;
+            delete _item.groupId;
           }
-          return item;
+          return _item;
         })
       );
       return {

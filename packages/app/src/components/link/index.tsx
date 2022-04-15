@@ -13,7 +13,7 @@ const Link: React.FC<Props> = ({ className = '', to, children }) => {
     );
   } else {
     return (
-      <a href={to} className={className}>
+      <a href={to} className={className} target="_blank">
         {children}
       </a>
     );

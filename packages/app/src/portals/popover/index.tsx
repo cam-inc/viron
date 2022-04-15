@@ -22,6 +22,7 @@ type Placement = typeof PLACEMENT[keyof typeof PLACEMENT];
 
 type Props = {
   isOpened: boolean;
+  isHidden: boolean;
   onRequestClose: () => void;
   // Target element ref for a popover to be placed.
   targetRef: React.RefObject<HTMLElement>;
@@ -29,6 +30,7 @@ type Props = {
 
 const Popover: React.FC<Props> = (props) => {
   const screen = useAppScreenGlobalStateValue();
+
   const { lg } = screen;
   if (lg) {
     return <PopoverLg {...props} />;
@@ -40,6 +42,7 @@ export default Popover;
 
 const PopoverLg: React.FC<Props> = ({
   isOpened,
+  isHidden,
   onRequestClose,
   targetRef,
   children,
@@ -125,6 +128,10 @@ const PopoverLg: React.FC<Props> = ({
     if (!targetElement) {
       return { x: 0, y: 0 } as Position;
     }
+
+    if (isHidden) {
+      return { x: 9999, y: 9999 } as Position;
+    }
     const space = 8;
     const rect = targetElement.getBoundingClientRect();
     const position: Position = { x: 0, y: 0 };
@@ -155,12 +162,12 @@ const PopoverLg: React.FC<Props> = ({
         break;
     }
     return position;
-  }, [targetRef, placement, isOpened]);
+  }, [targetRef, placement, isOpened, isHidden]);
 
   const content = useMemo<JSX.Element | null>(() => {
     const space = 8;
     const commonClassName =
-      'p-2 rounded bg-thm-surface border border-thm-on-surface-faint shadow-01dp overflow-scroll overscroll-contain';
+      'p-2 rounded bg-thm-surface border border-thm-on-surface-low shadow-01dp overflow-scroll overscroll-contain';
     switch (placement) {
       case PLACEMENT.TOP_LEFT: {
         return (
@@ -310,6 +317,7 @@ const PopoverLg: React.FC<Props> = ({
 };
 const PopoverNotLg: React.FC<Props> = ({
   isOpened,
+  isHidden,
   onRequestClose,
   children,
 }) => {
@@ -328,7 +336,11 @@ const PopoverNotLg: React.FC<Props> = ({
 
   return (
     <Portal target={TARGET.POPOVER}>
-      <div className="absolute inset-0 pointer-events-auto">
+      <div
+        className={classnames('absolute inset-0 pointer-events-auto', {
+          hidden: isHidden,
+        })}
+      >
         <div
           className={classnames(
             'absolute inset-0 transition duration-300 backdrop-filter backdrop-blur-sm',
@@ -363,9 +375,11 @@ const PopoverNotLg: React.FC<Props> = ({
 type UsePopoverReturn<T> = {
   open: () => void;
   close: () => void;
+  hide: () => void;
   targetRef: React.RefObject<T>;
   bind: {
-    isOpened: boolean;
+    isOpened: Props['isOpened'];
+    isHidden: Props['isHidden'];
     onRequestClose: Props['onRequestClose'];
     targetRef: React.RefObject<T>;
   };
@@ -374,14 +388,19 @@ export const usePopover = function <
   T extends HTMLElement
 >(): UsePopoverReturn<T> {
   const [isOpened, setIsOpened] = useState<boolean>(false);
+  const [isHidden, setIsHidden] = useState<boolean>(false);
   const handleRequestClose = useCallback(() => {
     setIsOpened(false);
   }, []);
   const open = useCallback(() => {
     setIsOpened(true);
+    setIsHidden(false);
   }, []);
   const close = useCallback(() => {
     setIsOpened(false);
+  }, []);
+  const hide = useCallback(() => {
+    setIsHidden(true);
   }, []);
   const targetRef = useRef<T>(null);
 
@@ -389,14 +408,16 @@ export const usePopover = function <
     () => ({
       open,
       close,
+      hide,
       targetRef,
       bind: {
         isOpened,
+        isHidden,
         onRequestClose: handleRequestClose,
         targetRef,
       },
     }),
-    [open, close, isOpened, handleRequestClose]
+    [open, close, hide, isOpened, isHidden, handleRequestClose]
   );
   return ret;
 };

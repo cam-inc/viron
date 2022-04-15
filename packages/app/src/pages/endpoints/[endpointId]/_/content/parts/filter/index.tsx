@@ -83,7 +83,7 @@ const Filter: React.FC<Props> = ({ base }) => {
             <Head
               on={COLOR_SYSTEM.SURFACE}
               title="Filter"
-              description="TODO: select items."
+              description="Select items to show."
             />
           </div>
           {/* Body */}
@@ -106,7 +106,7 @@ const Filter: React.FC<Props> = ({ base }) => {
             </div>
           </div>
           {/* Tail */}
-          <div className="flex-none p-2 border-t-2 border-thm-on-surface-faint">
+          <div className="flex-none flex justify-end p-2 border-t-2 border-thm-on-surface-faint">
             <FilledButton
               cs={COLOR_SYSTEM.PRIMARY}
               label="Apply"
