@@ -196,7 +196,7 @@ func ListAdminUser(ctx context.Context, opts *AdminUserConditions) (*AdminUsersW
 	for _, result := range results {
 		entity := &repositories.AdminUserEntity{}
 		result.Bind(entity)
-		entity.RoleIDs = listRoles(fmt.Sprintf("%s", entity.ID))
+		entity.RoleIDs = listRoles(entity.ID)
 		adminuser := &AdminUser{
 			ID:        entity.ID,
 			Email:     entity.Email,

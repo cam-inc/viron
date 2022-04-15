@@ -1,7 +1,6 @@
 package adminusers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/cam-inc/viron/packages/golang/logging"
@@ -67,7 +66,6 @@ func (a *adminuser) CreateVironAdminUser(w http.ResponseWriter, r *http.Request)
 	}
 	created, err := domains.CreateAdminUser(r.Context(), user, user.AuthType)
 	if err != nil {
-		fmt.Println(err)
 		helpers.SendError(w, http.StatusInternalServerError, err)
 		return
 	}
