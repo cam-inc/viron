@@ -157,7 +157,22 @@ func (a *adminUsersPersistence) UpdateByID(ctx context.Context, id string, entit
 }
 
 func (a *adminUsersPersistence) RemoveByID(ctx context.Context, id string) error {
-	panic("implement me")
+	unit64Id, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	m, err := models.FindAdminuser(ctx, a.conn, uint(unit64Id))
+	if err != nil {
+		return err
+	}
+
+	// 削除
+	_, err = m.Delete(ctx, a.conn)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func New(db *sql.DB) repositories.Repository {
