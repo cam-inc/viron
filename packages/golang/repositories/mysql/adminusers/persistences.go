@@ -3,7 +3,6 @@ package adminusers
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -49,9 +48,8 @@ func (a *adminUsersPersistence) Find(ctx context.Context, conditions repositorie
 	}
 
 	for _, r := range result {
-		id := fmt.Sprintf("%d", r.ID)
 		adminuser := &repositories.AdminUserEntity{
-			ID:                       id,
+			ID:                       string(r.ID),
 			Email:                    r.Email,
 			AuthType:                 r.AuthType,
 			Password:                 r.Password.Ptr(),
@@ -104,7 +102,7 @@ func (a *adminUsersPersistence) CreateOne(ctx context.Context, entity repositori
 	if err := model.Insert(ctx, a.conn, boil.Infer()); err != nil {
 		return nil, err
 	}
-	adminuser.ID = fmt.Sprintf("%d", model.ID)
+	adminuser.ID = string(model.ID)
 	return adminuser, nil
 }
 
@@ -157,7 +155,22 @@ func (a *adminUsersPersistence) UpdateByID(ctx context.Context, id string, entit
 }
 
 func (a *adminUsersPersistence) RemoveByID(ctx context.Context, id string) error {
-	panic("implement me")
+	unit64Id, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	m, err := models.FindAdminuser(ctx, a.conn, uint(unit64Id))
+	if err != nil {
+		return err
+	}
+
+	// 削除
+	_, err = m.Delete(ctx, a.conn)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func New(db *sql.DB) repositories.Repository {

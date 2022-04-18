@@ -64,3 +64,9 @@ func TestCreateAdminUser(t *testing.T) {
 
 	assert.Equal(t, createdUser, payload)
 }
+
+func TestRemoveAdminUser(t *testing.T) {
+	// TODO: テストするためには、casbinInstanceを使っている箇所をmock化する必要がある
+	// https://github.com/cam-inc/viron/blob/83a4ef0e2b58a6bba3b580d626bf697724325a35/packages/golang/domains/adminusers.go#L275
+	// https://github.com/cam-inc/viron/blob/next-golang/packages/golang/domains/adminusers.go
+}

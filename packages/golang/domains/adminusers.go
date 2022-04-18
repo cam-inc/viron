@@ -196,7 +196,7 @@ func ListAdminUser(ctx context.Context, opts *AdminUserConditions) (*AdminUsersW
 	for _, result := range results {
 		entity := &repositories.AdminUserEntity{}
 		result.Bind(entity)
-		entity.RoleIDs = listRoles(fmt.Sprintf("%s", entity.ID))
+		entity.RoleIDs = listRoles(entity.ID)
 		adminuser := &AdminUser{
 			ID:        entity.ID,
 			Email:     entity.Email,
@@ -252,6 +252,28 @@ func UpdateAdminUserByID(ctx context.Context, id string, payload *AdminUser) *er
 
 	if len(payload.RoleIDs) > 0 {
 		updateRolesForUser(id, payload.RoleIDs)
+	}
+	return nil
+}
+
+func RemoveAdminUserById(ctx context.Context, id string) *errors.VironError {
+	// 存在チェック
+	user := FindByID(ctx, id)
+	if user == nil {
+		return errors.AdminUserNotfound
+	}
+
+	// userを削除
+	repo := container.GetAdminUserRepository()
+	if err := repo.RemoveByID(ctx, id); err != nil {
+		return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("adminUser delete failed. %+v", err))
+	}
+
+	// ユーザーからロールを剥奪
+	if len(user.RoleIDs) > 0 {
+		for _, role := range user.RoleIDs {
+			RevokeRoleForUser(id, role)
+		}
 	}
 	return nil
 }

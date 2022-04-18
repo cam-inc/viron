@@ -2,7 +2,6 @@ package adminusers
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/cam-inc/viron/packages/golang/helpers"
@@ -92,13 +91,10 @@ func (a *adminUsersPersistence) CreateOne(ctx context.Context, entity repositori
 
 	result := &repositories.AdminUserEntity{}
 
-	fmt.Printf("InsertedID %+v\n", response.InsertedID)
 	if err := a.client.Collection(collectionName).FindOne(ctx, bson.D{{"_id", response.InsertedID}}).Decode(result); err != nil {
-		fmt.Printf("err %+v\n", err)
 		return nil, err
 	}
 	result.ID = result.OID.Hex()
-	fmt.Printf("result %+v\n", result)
 	return result, nil
 
 }
@@ -116,19 +112,23 @@ func (a *adminUsersPersistence) UpdateByID(ctx context.Context, id string, entit
 
 	up := adminUser.ToBSONSet()
 
-	fmt.Printf("update %+v\n", up)
-
-	if result, err := a.client.Collection(collectionName).UpdateByID(ctx, oid, up); err != nil {
+	if _, err = a.client.Collection(collectionName).UpdateByID(ctx, oid, up); err != nil {
 		return err
-	} else {
-		fmt.Printf("update-result %+v\n", result)
 	}
 	return nil
 
 }
 
-func (a *adminUsersPersistence) RemoveByID(ctx context.Context, s string) error {
-	panic("implement me")
+func (a *adminUsersPersistence) RemoveByID(ctx context.Context, id string) error {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+	// 削除
+	if _, err = a.client.Collection(collectionName).DeleteOne(ctx, bson.D{{Key: "_id", Value: oid}}); err != nil {
+		return err
+	}
+	return nil
 }
 
 func New(client *mongo.Client) repositories.Repository {

@@ -1,7 +1,6 @@
 package adminusers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/cam-inc/viron/packages/golang/logging"
@@ -67,7 +66,6 @@ func (a *adminuser) CreateVironAdminUser(w http.ResponseWriter, r *http.Request)
 	}
 	created, err := domains.CreateAdminUser(r.Context(), user, user.AuthType)
 	if err != nil {
-		fmt.Println(err)
 		helpers.SendError(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -76,7 +74,11 @@ func (a *adminuser) CreateVironAdminUser(w http.ResponseWriter, r *http.Request)
 }
 
 func (a *adminuser) RemoveVironAdminUser(w http.ResponseWriter, r *http.Request, id externalRef0.VironIdPathParam) {
-	panic("implement me")
+	if err := domains.RemoveAdminUserById(r.Context(), string(id)); err != nil {
+		helpers.SendError(w, err.StatusCode(), err)
+		return
+	}
+	helpers.Send(w, http.StatusNoContent, nil)
 }
 
 func (a *adminuser) UpdateVironAdminUser(w http.ResponseWriter, r *http.Request, id externalRef0.VironIdPathParam) {
