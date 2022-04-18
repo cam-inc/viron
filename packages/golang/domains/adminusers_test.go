@@ -66,36 +66,7 @@ func TestCreateAdminUser(t *testing.T) {
 }
 
 func TestRemoveAdminUser(t *testing.T) {
-	// TODO: casbinInstanceを使ってる箇所をtestできるようにする
+	// TODO: テストするためには、casbinInstanceを使っている箇所をmock化する必要がある
+	// https://github.com/cam-inc/viron/blob/83a4ef0e2b58a6bba3b580d626bf697724325a35/packages/golang/domains/adminusers.go#L275
 	// https://github.com/cam-inc/viron/blob/next-golang/packages/golang/domains/adminusers.go
-
-	//setUpRole()
-	//
-	//id := "xxxxxxxxxxxxxxxx"
-	//pass := "pass"
-	//email := "test@example.com"
-	//adminUser := &repositories.AdminUserEntity{
-	//	ID:       id,
-	//	Email:    email,
-	//	Password: &pass,
-	//}
-	//f := mock.MockFunc{
-	//	Find: func(ctx context.Context, conditions repositories.Conditions) (repositories.EntitySlice, error) {
-	//		var results repositories.EntitySlice
-	//		results = append(results, adminUser)
-	//		return results, nil
-	//	},
-	//	RemoveByID: func(ctx context.Context, s string) error {
-	//		return nil
-	//	},
-	//}
-	//container.SetUpMock(map[string]mock.MockFunc{
-	//	"adminusers": f,
-	//})
-	//
-	//// 実行
-	//err := RemoveAdminUserById(context.Background(), id)
-	//
-	//// 検証
-	//assert.Nil(t, err)
 }
