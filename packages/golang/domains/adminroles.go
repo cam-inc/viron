@@ -417,14 +417,24 @@ func CreateViewerRole(apiDef *openapi3.T) error {
 				Permission: policyMap[resourceID],
 			})
 		} else {
+			// resourceIDは存在するが、permissionで定義されていないものはデフォで追加
 			permissions = append(permissions, &AdminRolePermission{
 				ResourceID: resourceID,
 				Permission: constant.PERMISSION_READ,
 			})
 		}
 	}
-	if err := UpdatePermissionsForRole(constant.ADMIN_ROLE_VIEWER, permissions); err != nil {
-		return err
+
+	if len(policies) > 0 {
+		// すでにviewerがある場合は更新
+		if err := UpdatePermissionsForRole(constant.ADMIN_ROLE_VIEWER, permissions); err != nil {
+			return err
+		}
+	} else {
+		// viewerが無い場合は作成
+		if err := CreatePermissionsForRole(constant.ADMIN_ROLE_VIEWER, permissions); err != nil {
+			return err
+		}
 	}
 	return nil
 }
