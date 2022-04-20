@@ -3,26 +3,18 @@ package domains
 import (
 	"database/sql"
 	"fmt"
+	sqladapter "github.com/Blank-Xu/sql-adapter"
+	"github.com/cam-inc/viron/packages/golang/constant"
+	"github.com/cam-inc/viron/packages/golang/errors"
+	"github.com/cam-inc/viron/packages/golang/helpers"
+	"github.com/cam-inc/viron/packages/golang/logging"
+	"github.com/casbin/casbin/v2"
+	"github.com/casbin/casbin/v2/model"
+	mongodbadapter "github.com/casbin/mongodb-adapter/v3"
+	"github.com/getkin/kin-openapi/openapi3"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"net/http"
 	"time"
-
-	"go.mongodb.org/mongo-driver/mongo/options"
-
-	"github.com/cam-inc/viron/packages/golang/errors"
-
-	"github.com/cam-inc/viron/packages/golang/logging"
-
-	"github.com/cam-inc/viron/packages/golang/helpers"
-
-	"github.com/getkin/kin-openapi/openapi3"
-
-	"github.com/cam-inc/viron/packages/golang/constant"
-
-	"github.com/casbin/casbin/v2/model"
-
-	sqladapter "github.com/Blank-Xu/sql-adapter"
-	"github.com/casbin/casbin/v2"
-	mongodbadapter "github.com/casbin/mongodb-adapter/v3"
 )
 
 type (
@@ -262,20 +254,39 @@ func RevokePermissionForRole(roleID, resourceID string, permissions []string) bo
 	return ok
 }
 
-// UpdatePermissionsForRole ロールの権限を更新する
-func UpdatePermissionsForRole(roleID string, permissions []*AdminRolePermission) *errors.VironError {
-	policies := [][]string{}
+// CreatePermissionsForRole ロールの権限を作成する
+func CreatePermissionsForRole(roleID string, permissions []*AdminRolePermission) *errors.VironError {
+	var policies [][]string
 	for _, permission := range permissions {
 		policies = append(policies, genPolicy(roleID, permission.ResourceID, permission.Permission))
 	}
-
-	if _, err := removeRole(roleID); err != nil {
-		return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("removeRole %+v", err))
-	}
+	// policyを追加
 	if _, err := casbinInstance.AddPolicies(policies); err != nil {
 		return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("AddPolicies(%+v) %+v", policies, err))
 	}
+	return nil
+}
 
+// UpdatePermissionsForRole ロールの権限を更新する
+func UpdatePermissionsForRole(roleID string, permissions []*AdminRolePermission) *errors.VironError {
+	// 既存のpolicyを取得
+	oldPolices := casbinInstance.GetFilteredPolicy(0, roleID)
+	if len(oldPolices) == 0 {
+		return errors.Initialize(http.StatusInternalServerError, "policy find not found")
+	}
+	// 既存のpolicyを削除
+	if _, err := casbinInstance.RemovePolicies(oldPolices); err != nil {
+		return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("RemovePolicies %+v", err))
+	}
+	// 新規のpolicyを整形
+	var newPolicies [][]string
+	for _, permission := range permissions {
+		newPolicies = append(newPolicies, genPolicy(roleID, permission.ResourceID, permission.Permission))
+	}
+	// policyを追加
+	if _, err := casbinInstance.AddPolicies(newPolicies); err != nil {
+		return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("AddPolicies(%+v) %+v", newPolicies, err))
+	}
 	return nil
 }
 
@@ -406,14 +417,24 @@ func CreateViewerRole(apiDef *openapi3.T) error {
 				Permission: policyMap[resourceID],
 			})
 		} else {
+			// resourceIDは存在するが、permissionで定義されていないものはデフォで追加
 			permissions = append(permissions, &AdminRolePermission{
 				ResourceID: resourceID,
 				Permission: constant.PERMISSION_READ,
 			})
 		}
 	}
-	if err := UpdatePermissionsForRole(constant.ADMIN_ROLE_VIEWER, permissions); err != nil {
-		return err
+
+	if len(policies) > 0 {
+		// すでにviewerがある場合は更新
+		if err := UpdatePermissionsForRole(constant.ADMIN_ROLE_VIEWER, permissions); err != nil {
+			return err
+		}
+	} else {
+		// viewerが無い場合は作成
+		if err := CreatePermissionsForRole(constant.ADMIN_ROLE_VIEWER, permissions); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -424,8 +445,7 @@ func CreateAdminRoleOne(role *AdminRole) (*AdminRole, *errors.VironError) {
 	if len(policies) > 0 {
 		return nil, errors.AdminRoleExists
 	}
-
-	if err := UpdatePermissionsForRole(role.ID, role.Permissions); err != nil {
+	if err := CreatePermissionsForRole(role.ID, role.Permissions); err != nil {
 		return nil, err
 	}
 	return role, nil
@@ -441,5 +461,10 @@ func RemoveAdminRoleOne(roleID string) *errors.VironError {
 
 // UpdateAdminRoleByID IDで1件更新
 func UpdateAdminRoleByID(roleID string, permissions []*AdminRolePermission) *errors.VironError {
+	policies := listPolicies(roleID)
+	// vironの表示上、roleIdはプライマリキーの扱いなので変更できないようにした
+	if len(policies) == 0 {
+		return errors.Initialize(http.StatusInternalServerError, "roleID cannot be changed")
+	}
 	return UpdatePermissionsForRole(roleID, permissions)
 }
