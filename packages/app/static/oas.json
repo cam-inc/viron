@@ -55,6 +55,18 @@
         ]
       },
       {
+        "id": "allOf",
+        "title": "allOf merging",
+        "description": "# heading 1 \n ## heading 2",
+        "contents": [
+          {
+            "title": "Shops",
+            "type": "table",
+            "operationId": "get:/shops"
+          }
+        ]
+      },
+      {
         "id": "pathItem",
         "title": "PathItem全般",
         "description": "# heading 1 \n ## heading 2",
@@ -209,6 +221,24 @@
               "application/json": {
                 "schema": {
                   "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/shops": {
+      "description": "summary string.",
+      "get": {
+        "operationId": "get:/shops",
+        "responses": {
+          "200": {
+            "description": "allOf merging ",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShopList"
                 }
               }
             }
@@ -875,6 +905,76 @@
   },
   "components": {
     "schemas": {
+      "ShopList": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ShopPager"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "list": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Shop"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Shop": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ShopName"
+          },
+          {
+            "$ref": "#/components/schemas/ShopCategory"
+          }
+        ]
+      },
+      "ShopName": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "ShopCategory": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string"
+          }
+        }
+      },
+      "ShopPager": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ShopPagerPage"
+          },
+          {
+            "$ref": "#/components/schemas/ShopPagerMaxpage"
+          }
+        ]
+      },
+      "ShopPagerPage": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer"
+          }
+        }
+      },
+      "ShopPagerMaxpage": {
+        "type": "object",
+        "properties": {
+          "maxpage": {
+            "type" : "integer"
+          }
+        }
+      },
       "UserId": {
         "type": "string"
       },
