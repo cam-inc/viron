@@ -976,7 +976,8 @@
         }
       },
       "UserId": {
-        "type": "string"
+        "type": "string",
+        "description": "ユーザID"
       },
       "UserName": {
         "type": "string"
