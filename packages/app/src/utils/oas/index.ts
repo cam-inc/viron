@@ -89,6 +89,24 @@ export const resolve = (document: Record<string, unknown>): Document => {
       delete result.parent[result.parentProperty].$ref;
     },
   });
+  // Merge all schemas defined as `allOf`
+  JSONPath({
+    path: '$..[?(@.allOf)]',
+    json: document,
+    resultType: 'all',
+    callback: (result) => {
+      result.parent[result.parentProperty] = mergeAllOf(result.value.allOf);
+    },
+  });
+  // Clean up all `allOf` properties.
+  JSONPath({
+    path: '$..[?(@.allOf)]',
+    json: document,
+    resultType: 'all',
+    callback: (result) => {
+      delete result.parent[result.parentProperty].allOf;
+    },
+  });
   // Assign contentIds.
   (document as Document).info['x-pages'].forEach((page) => {
     page.contents = page.contents.map((content, idx) => {
@@ -125,6 +143,7 @@ export const resolve = (document: Record<string, unknown>): Document => {
       });
     });
   });
+
   return document as Document;
 };
 
@@ -848,5 +867,16 @@ export const getContentBaseOperationResponseKeys = (
 };
 
 export const mergeAllOf = (schemas: NonNullable<Schema['allOf']>): Schema => {
-  return _.merge({} as Schema, ...schemas);
+  const f = (schemas: Schema[]): Schema => {
+    return _.merge(
+      {},
+      ...schemas.map((schema) => {
+        if (schema.allOf) {
+          return f(schema.allOf);
+        }
+        return schema;
+      })
+    );
+  };
+  return f(schemas);
 };

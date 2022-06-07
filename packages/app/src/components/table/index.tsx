@@ -3,6 +3,7 @@ import React, { useCallback } from 'react';
 import { Props as BaseProps } from '~/components';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronUpIcon from '~/components/icon/chevronUp/outline';
+import Popover, { usePopover } from '~/portals/popover';
 import { TableColumn, Sort, SORT } from '~/types/oas';
 import Cell from './cell';
 
@@ -166,28 +167,54 @@ const ThTitle: React.FC<ThTitleProp> = ({ on, column, onClick }) => {
   const handleClick = useCallback(() => {
     onClick?.(column);
   }, [column, onClick]);
+
+  const popover = usePopover<HTMLDivElement>();
+  const handleMouseEnter = useCallback(() => {
+    if (column.schema.description) {
+      popover.open();
+    }
+  }, [popover, column]);
+  const handleMouseLeave = useCallback(() => {
+    popover.close();
+  }, [popover]);
+
   return (
-    <div className="flex items-center" onClick={handleClick}>
-      <div className="flex-none mr-1">
-        <div
-          className={classnames({
-            [`text-thm-on-${on}`]: column.sort === SORT.ASC,
-            [`text-thm-on-${on}-slight`]: column.sort !== SORT.ASC,
-          })}
-        >
-          <ChevronUpIcon className="w-em" />
+    <>
+      <div className="flex items-center" onClick={handleClick}>
+        <div className="flex-none mr-1">
+          <div
+            className={classnames({
+              [`text-thm-on-${on}`]: column.sort === SORT.ASC,
+              [`text-thm-on-${on}-slight`]: column.sort !== SORT.ASC,
+            })}
+          >
+            <ChevronUpIcon className="w-em" />
+          </div>
+          <div
+            className={classnames({
+              [`text-thm-on-${on}`]: column.sort === SORT.DESC,
+              [`text-thm-on-${on}-slight`]: column.sort !== SORT.DESC,
+            })}
+          >
+            <ChevronDownIcon className="w-em" />
+          </div>
         </div>
-        <div
-          className={classnames({
-            [`text-thm-on-${on}`]: column.sort === SORT.DESC,
-            [`text-thm-on-${on}-slight`]: column.sort !== SORT.DESC,
-          })}
-        >
-          <ChevronDownIcon className="w-em" />
+        <div className="flex-1 min-w-0 font-bold">
+          <span
+            ref={popover.targetRef}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            {column.name}
+          </span>
         </div>
       </div>
-      <div className="flex-1 min-w-0 font-bold">{column.name}</div>
-    </div>
+      <Popover {...popover.bind}>
+        <div className="w-max text-thm-on-surface">
+          {column.schema.description}
+        </div>
+      </Popover>
+    </>
   );
 };
 

@@ -1,5 +1,15 @@
 # @viron/app
 
+## 2.2.0
+
+### Minor Changes
+
+- a4a59e4a: Show a popover UI for each table field name.
+
+### Patch Changes
+
+- fe40ce49: Fix allOf handling.
+
 ## 2.1.1
 
 ### Patch Changes

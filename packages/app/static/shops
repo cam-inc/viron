@@ -1,0 +1,8 @@
+{
+  "list": [
+    { "name": "shopA", "category": "appliance" },
+    { "name": "shopB", "category": "book" }
+  ],
+  "page": 1,
+  "maxpage": 10
+}
