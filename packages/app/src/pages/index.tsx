@@ -1,5 +1,6 @@
 import { navigate, PageProps } from 'gatsby';
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { SIZE as BUTTON_SIZE } from '~/components/button';
 import FilledButton from '~/components/button/filled';
 import FilledOnButton from '~/components/button/filled/on';
@@ -21,6 +22,7 @@ type Props = PageProps;
 const HomePage: React.FC<Props> = () => {
   useTheme();
   const screen = useAppScreenGlobalStateValue();
+  const { t } = useTranslation();
 
   const handleDashboardButtonClick = useCallback(() => {
     navigate('/dashboard/endpoints');
@@ -45,11 +47,9 @@ const HomePage: React.FC<Props> = () => {
             />
           </div>
           <div className="text-xl font-bold mb-2 text-thm-on-background-high">
-            Give OAS, Get GUI.
+            {t('app.tagline')}
           </div>
-          <p className="text-center mb-2">
-            An Open-Source Frontend-NoCode Administration GUI Tool.
-          </p>
+          <p className="text-center mb-2">{t('app.description')}</p>
           <div className="text-xs text-thm-on-background-low">
             ver. {pkg.version}
           </div>
@@ -58,7 +58,7 @@ const HomePage: React.FC<Props> = () => {
       const direction = (
         <div className="p-4 bg-thm-surface text-thm-on-surface flex flex-col gap-2 items-center justify-center">
           <div className="mb-2">
-            Welcome to Viron{' '}
+            {t('pages.index.001')}{' '}
             <Logo
               className="inline w-em"
               left="text-thm-on-surface-high"
@@ -67,15 +67,15 @@ const HomePage: React.FC<Props> = () => {
             !
           </div>
           <div className="mb-8 max-w-75% text-sm leading-10">
-            Visit{' '}
+            {t('pages.index.002')}{' '}
             <FilledButton
               cs={COLOR_SYSTEM.PRIMARY}
               size={BUTTON_SIZE.SM}
-              label="Dashboard"
+              label={t('common.dashboard')}
               Icon={ColorSwatchIcon}
               onClick={handleDashboardButtonClick}
             />{' '}
-            to administrate your services. To learn more about Viron{' '}
+            {t('pages.index.003')}{' '}
             <Logo
               className="inline w-em"
               left="text-thm-on-surface-high"
@@ -85,7 +85,7 @@ const HomePage: React.FC<Props> = () => {
             <FilledOnButton
               on={COLOR_SYSTEM.SURFACE}
               size={BUTTON_SIZE.SM}
-              label="Documentation"
+              label={t('common.documentation')}
               Icon={BookOpenIcon}
               onClick={handleDocumentationButtonClick}
             />
@@ -93,11 +93,11 @@ const HomePage: React.FC<Props> = () => {
             <FilledOnButton
               on={COLOR_SYSTEM.SURFACE}
               size={BUTTON_SIZE.SM}
-              label="Contribution"
+              label={t('common.contribution')}
               Icon={UserGroupIcon}
               onClick={handleContributionButtonClick}
             />{' '}
-            are always welcomed.
+            {t('pages.index.004')}
           </div>
           <div className="py-2 px-8 mb-2 border-t border-b border-dotted border-thm-on-surface-slight">
             <NavigationLinks on={COLOR_SYSTEM.SURFACE_VARIANT} />
