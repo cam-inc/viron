@@ -1,0 +1,20 @@
+FROM golang:1.16
+
+RUN mkdir -p /viron/example/golang
+RUN mkdir -p /viron/packages/golang
+RUN chown -R root:root /viron
+ENV HOME /viron
+USER root
+WORKDIR $HOME
+
+# Copy packages
+COPY packages/golang $HOME/packages/golang
+
+# Copy source files
+COPY example/golang $HOME/example/golang
+
+EXPOSE 3000
+USER root
+
+WORKDIR $HOME/example/golang
+CMD go run main.go

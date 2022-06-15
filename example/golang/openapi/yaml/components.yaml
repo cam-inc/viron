@@ -1,0 +1,78 @@
+openapi: 3.0.2
+info:
+  version: 0.0.1
+  title: '@viron/example-golang components'
+
+components:
+  parameters:
+    IdPathParam:
+      name: id
+      in: path
+      schema:
+        type: string
+      required: true
+
+    PagerSizeQueryParam:
+      name: size
+      in: query
+      description: Size of list
+      schema:
+        type: integer
+      required: false
+    PagerPageQueryParam:
+      name: page
+      in: query
+      description: Page number of list
+      schema:
+        type: integer
+      required: false
+    SortQueryParam:
+      name: sort
+      in: query
+      description: Sort specification of list
+      schema:
+        type: array
+        minItems: 1
+        items:
+          type: string
+          pattern: "^.+?:(asc|desc)$"
+      style: form
+      explode: false
+
+    IdQueryParam:
+      name: id
+      in: query
+      schema:
+        type: string
+      required: false
+
+  schemas:
+    Pager:
+      type: object
+      properties:
+        maxPage:
+          type: integer
+        currentPage:
+          type: integer
+      required:
+        - maxPage
+        - currentPage
+
+    CreatedAt:
+      description: 作成日時
+      type: string
+      format: date-time
+
+    UpdatedAt:
+      description: 更新日時
+      type: string
+      format: date-time
+
+  securitySchemes:
+    jwt:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://localhost:3000/signin
+          scopes:
+            api:access: API access

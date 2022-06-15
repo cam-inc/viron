@@ -1,0 +1,8 @@
+[mysql]
+  dbname    = "viron_example"
+  host      = "localhost"
+  port      = 3306
+  user      = ""
+  pass      = ""
+  sslmode   = "false"
+  whitelist = ["adminusers", "auditlogs", "revokedtokens"]

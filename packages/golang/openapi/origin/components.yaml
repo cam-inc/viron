@@ -1,0 +1,85 @@
+openapi: 3.0.2
+info:
+  version: 0.0.1
+  title: '@viron/lib components'
+
+components:
+  schemas:
+    VironPager:
+      type: object
+      properties:
+        maxPage:
+          type: integer
+        currentPage:
+          type: integer
+      required:
+        - maxPage
+        - currentPage
+
+    VironCreatedAt:
+      description: 作成日時
+      type: string
+      format: date-time
+
+    VironUpdatedAt:
+      description: 更新日時
+      type: string
+      format: date-time
+
+  parameters:
+    VironIdPathParam:
+      name: id
+      in: path
+      schema:
+        type: string
+      required: true
+
+    VironPagerSizeQueryParam:
+      name: size
+      in: query
+      description: Size of list
+      schema:
+        type: integer
+      required: false
+
+    VironPagerPageQueryParam:
+      name: page
+      in: query
+      description: Page number of list
+      schema:
+        type: integer
+      required: false
+
+    VironSortQueryParam:
+      name: sort
+      in: query
+      description: Sort specification of list
+      schema:
+        type: array
+        minItems: 0
+        items:
+          type: string
+          pattern: '^.+?:(asc|desc)$'
+      style: form
+      explode: false
+
+    VironIdQueryParam:
+      name: id
+      in: query
+      schema:
+        type: string
+      required: false
+
+    VironRoleIdQueryParam:
+      name: roleId
+      in: query
+      schema:
+        type: string
+      required: false
+
+    VironEmailQueryParam:
+      name: email
+      in: query
+      schema:
+        type: string
+      required: false
