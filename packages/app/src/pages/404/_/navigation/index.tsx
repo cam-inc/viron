@@ -1,5 +1,6 @@
 import classnames from 'classnames';
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import Logo from '~/components/logo';
 import Navigation, { Props as NavigationProps } from '~/components/navigation';
 import NavigationLinks from '~/components/navigation/links';
@@ -10,6 +11,7 @@ import { COLOR_SYSTEM } from '~/types';
 
 type Props = Parameters<NonNullable<LayoutProps['renderNavigation']>>[0];
 const _Navigation: React.FC<Props> = ({ className }) => {
+  const { t } = useTranslation();
   const renderHead = useCallback<NonNullable<NavigationProps['renderHead']>>(
     () => (
       <div className="flex flex-col gap-2 items-center py-8">
@@ -19,8 +21,8 @@ const _Navigation: React.FC<Props> = ({ className }) => {
           right="text-thm-on-surface"
         />
         <div className="text-thm-on-surface text-xs font-bold text-center">
-          Give OAS, <br />
-          Get GUI.
+          {t('pages.404.003')} <br />
+          {t('pages.404.004')}
         </div>
       </div>
     ),

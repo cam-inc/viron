@@ -1,5 +1,6 @@
 import classnames from 'classnames';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Props as BaseProps } from '~/components';
 import ExternalLinkIcon from '~/components/icon/externalLink/outline';
 import Link from '~/components/link';
@@ -8,45 +9,46 @@ import { Pathname, URL as _URL } from '~/types';
 
 const links: {
   to: Pathname | _URL;
-  label: string;
+  key: string;
   isExternal: boolean;
 }[] = [
   {
     to: '/',
-    label: 'Home',
+    key: 'home',
     isExternal: false,
   },
   {
     to: '/dashboard/endpoints',
-    label: 'Dashboard',
+    key: 'dashboard',
     isExternal: false,
   },
   {
     to: URL.DOCUMENTATION,
-    label: 'Documentation',
+    key: 'documentation',
     isExternal: true,
   },
   /*
-    {
-      to: URL.BLOG,
-      label: 'Blog',
-      isExternal: true,
-    },
-    */
+      {
+        to: URL.BLOG,
+        key: 'blog',
+        isExternal: true,
+      },
+      */
   {
     to: URL.RELEASE_NOTES,
-    label: 'Release Notes',
+    key: 'releaseNotes',
     isExternal: true,
   },
   {
     to: URL.HELP,
-    label: 'Help',
+    key: 'help',
     isExternal: true,
   },
 ];
 
 type Props = BaseProps;
 const Links: React.FC<Props> = ({ className = '', on }) => {
+  const { t } = useTranslation();
   return (
     <ul
       className={classnames(
@@ -61,7 +63,7 @@ const Links: React.FC<Props> = ({ className = '', on }) => {
               className={`flex gap-1 items-center text-thm-on-${on} group-hover:underline group-active:text-thm-on-${on}-low group-focus:ring-2 group-focus:ring-thm-on-${on}`}
             >
               {item.isExternal && <ExternalLinkIcon className="w-em" />}
-              <div>{item.label}</div>
+              <div>{t(`common.${item.key}`)}</div>
             </div>
           </Link>
         </li>

@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Props as BaseProps } from '~/components';
 import GithubIcon from '~/components/icon/github/solid';
 import TwitterIcon from '~/components/icon/twitter/solid';
@@ -42,6 +43,8 @@ type ServiceProps = BaseProps & {
   service: ServiceType;
 };
 const Service: React.FC<ServiceProps> = ({ on, service }) => {
+  const { t } = useTranslation();
+
   const popover = usePopover<HTMLButtonElement>();
   const handleButtonClick = useCallback(() => {
     popover.open();
@@ -75,7 +78,7 @@ const Service: React.FC<ServiceProps> = ({ on, service }) => {
         </button>
       )}
       <Popover {...popover.bind}>
-        <div>Coming Soon.</div>
+        <div>{t('components.navigation.services.001')}</div>
       </Popover>
     </>
   );
