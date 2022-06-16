@@ -38,6 +38,12 @@ export default {
       '003': 'to administrate your services. To learn more about Viron',
       '004': 'are always welcomed.',
     },
+    oauthredirect: {
+      '001': 'OAuth',
+      '002': 'Endpoint Not Found.',
+      '003': 'Give OAS,',
+      '004': 'Get GUI.',
+    },
     theme: {
       '001': 'Modes',
       '002': 'Tonal Palettes',

@@ -2,6 +2,7 @@ import classnames from 'classnames';
 import _ from 'lodash';
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Error from '~/components/error';
 import Request from '~/components/request';
 import Spinner from '~/components/spinner';
@@ -17,6 +18,7 @@ export type Props = Parameters<LayoutProps['renderBody']>[0] & {
   search: string;
 };
 const Body: React.FC<Props> = ({ className = '', search }) => {
+  const { t } = useTranslation();
   const [error, setError] = useState<BaseError | null>(null);
   const [isPending, setIsPending] = useState<boolean>(true);
   const endpoint = useEndpointListItemGlobalStateValue({
@@ -32,7 +34,7 @@ const Body: React.FC<Props> = ({ className = '', search }) => {
     setError(null);
     setIsPending(true);
     if (!endpoint) {
-      setError(new BaseError('Endpoint Not Found.'));
+      setError(new BaseError(t('pages.oauthredirect.002')));
       setIsPending(false);
       return;
     }
