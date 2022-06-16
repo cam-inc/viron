@@ -1,5 +1,6 @@
 import classnames from 'classnames';
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import FilledButton, {
   Props as FilledButtonProps,
 } from '~/components/button/filled';
@@ -21,6 +22,7 @@ import Item from './item/';
 
 export type Props = Parameters<LayoutProps['renderBody']>[0];
 const Body: React.FC<Props> = ({ className, style }) => {
+  const { t } = useTranslation();
   const { listByGroup, listUngrouped } = useEndpoint();
 
   // Add modal.
@@ -47,10 +49,10 @@ const Body: React.FC<Props> = ({ className, style }) => {
                 title={
                   <div className="flex items-center gap-2">
                     <ColorSwatchIcon className="w-em" />
-                    <div>Dashboard / Endpoints</div>
+                    <div>{t('pages.dashboard.endpoints.002')}</div>
                   </div>
                 }
-                description="This is your personal, private dashboard."
+                description={t('pages.dashboard.endpoints.003')}
               />
             </div>
             <div>
@@ -62,7 +64,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
             <div className="p-4 flex justify-end border-b border-thm-on-background-slight">
               <FilledButton
                 cs={COLOR_SYSTEM.PRIMARY}
-                label="Add an Endpoint"
+                label={t('pages.dashboard.endpoints.004')}
                 Icon={PlusCircleIcon}
                 onClick={handleAddClick}
               />

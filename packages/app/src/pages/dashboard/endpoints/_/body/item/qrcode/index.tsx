@@ -1,5 +1,6 @@
 import qrcode from 'qrcode';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import FilledButton, {
   Props as FilledButtonProps,
 } from '~/components/button/filled';
@@ -15,6 +16,7 @@ type Props = {
 };
 
 const QRCode: React.FC<Props> = ({ endpoint }) => {
+  const { t } = useTranslation();
   const [error, setError] = useState<BaseError | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [data, setData] = useState<string>('');
@@ -51,10 +53,10 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
           title={
             <div className="flex items-center gap-2">
               <QrcodeIcon className="w-em" />
-              <div>QR Code</div>
+              <div>{t('common.qrCode')}</div>
             </div>
           }
-          description="Share an endpoint with the QR code."
+          description={t('pages.dashboard.endpoints.006')}
         />
       </div>
       <div className="flex justify-center">
@@ -62,14 +64,14 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
       </div>
       <div className="mt-4 pt-4 flex flex-col items-end gap-2 border-t border-dotted border-thm-on-surface-slight">
         <div className="">
-          Or, you can{' '}
+          {t('pages.dashboard.endpoints.007')}{' '}
           <FilledButton
             cs={COLOR_SYSTEM.PRIMARY}
             Icon={ClipboardCopyIcon}
-            label="Copy"
+            label={t('common.copy')}
             onClick={handleCopyClick}
           />{' '}
-          the URL.
+          {t('pages.dashboard.endpoints.008')}
         </div>
         <div className="text-thm-on-surface-low text-xxs text-right max-w-[380px] break-all">
           {data}

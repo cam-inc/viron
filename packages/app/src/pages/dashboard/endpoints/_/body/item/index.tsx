@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import FilledButton, {
   Props as FilledButtonProps,
 } from '~/components/button/filled';
@@ -118,6 +119,7 @@ const _Item: React.FC<{
   authentication: Authentication;
   onRequestRefresh: () => void;
 }> = ({ endpoint, document, authentication, onRequestRefresh }) => {
+  const { t } = useTranslation();
   const { navigate, removeEndpoint } = useEndpoint();
 
   const menuPopover = usePopover<HTMLDivElement>();
@@ -189,7 +191,7 @@ const _Item: React.FC<{
               <FilledButton
                 cs={COLOR_SYSTEM.PRIMARY}
                 Icon={TerminalIcon}
-                label="Enter"
+                label={t('common.enter')}
                 onClick={handleEnterClick}
               />
               {authentication.list.find((item) => item.type === 'signout') && (
@@ -211,7 +213,7 @@ const _Item: React.FC<{
           <TextButton
             on={COLOR_SYSTEM.SURFACE}
             Icon={InformationCircleIcon}
-            label="Information"
+            label={t('common.information')}
             onClick={handleInfoClick}
           />
         </div>
@@ -219,7 +221,7 @@ const _Item: React.FC<{
           <TextButton
             on={COLOR_SYSTEM.SURFACE}
             Icon={QrcodeIcon}
-            label="QR Code"
+            label={t('common.qrCode')}
             onClick={handleQrcodeClick}
           />
         </div>
@@ -227,7 +229,7 @@ const _Item: React.FC<{
           <TextButton
             on={COLOR_SYSTEM.SURFACE}
             Icon={TrashIcon}
-            label="Remove"
+            label={t('common.remove')}
             onClick={handleRemoveClick}
           />
         </div>

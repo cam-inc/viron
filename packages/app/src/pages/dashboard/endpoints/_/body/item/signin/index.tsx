@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import FilledButton, {
   Props as FilledButtonProps,
 } from '~/components/button/filled';
@@ -18,6 +19,8 @@ export type Props = {
   authentication: Authentication;
 };
 const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
+  const { t } = useTranslation();
+
   const authConfigOAuth = useMemo<AuthConfig | null>(
     () => authentication.list.find((item) => item.type === 'oauth') || null,
     [authentication]
@@ -44,7 +47,7 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
           <FilledButton
             cs={COLOR_SYSTEM.PRIMARY}
             Icon={LoginIcon}
-            label="OAuth"
+            label={t('common.oauth')}
             onClick={handleOAuthClick}
           />
         )}
@@ -52,7 +55,7 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
           <FilledButton
             cs={COLOR_SYSTEM.PRIMARY}
             Icon={LoginIcon}
-            label="Email"
+            label={t('common.email')}
             onClick={handleEmailClick}
           />
         )}

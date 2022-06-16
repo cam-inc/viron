@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import CommonMark from '~/components/commonMark';
 import Contact from '~/components/contact';
 import ExternalDocs from '~/components/externalDocs';
@@ -19,6 +20,7 @@ type Props = {
   document?: Document;
 };
 const Info: React.FC<Props> = ({ endpoint, document }) => {
+  const { t } = useTranslation();
   return (
     <div className="text-thm-on-surface">
       <div className="pb-4 mb-4 border-b border-thm-on-surface-slight">
@@ -27,7 +29,7 @@ const Info: React.FC<Props> = ({ endpoint, document }) => {
           title={
             <div className="flex items-center gap-2">
               <InformationCircleIcon className="w-em" />
-              <div>Information</div>
+              <div>{t('common.information')}</div>
             </div>
           }
         />

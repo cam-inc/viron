@@ -1,5 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { SIZE as BUTTON_SIZE } from '~/components/button';
@@ -22,6 +23,7 @@ export type Props = {
   onCancel: () => void;
 };
 const AddEndpoint: React.FC<Props> = ({ className = '', onAdd, onCancel }) => {
+  const { t } = useTranslation();
   const { groupList, connect, addEndpoint } = useEndpoint();
 
   const schema = useMemo(
@@ -78,7 +80,10 @@ const AddEndpoint: React.FC<Props> = ({ className = '', onAdd, onCancel }) => {
     <div className={className}>
       <form className="space-y-8" onSubmit={handleSubmit}>
         <div>
-          <Head on={COLOR_SYSTEM.SURFACE} title="Create an Endpoint" />
+          <Head
+            on={COLOR_SYSTEM.SURFACE}
+            title={t('pages.dashboard.endpoints.005')}
+          />
         </div>
         <div>{formState.errors.manual?.message}</div>
         <div className="space-y-4">
@@ -98,7 +103,7 @@ const AddEndpoint: React.FC<Props> = ({ className = '', onAdd, onCancel }) => {
           />
           <Select<EndpointGroup>
             on={COLOR_SYSTEM.SURFACE}
-            label="Group"
+            label={t('common.group')}
             list={groupList}
             Select={({ id, className, children }) => (
               <select
@@ -124,14 +129,14 @@ const AddEndpoint: React.FC<Props> = ({ className = '', onAdd, onCancel }) => {
           <OutlineButton
             on={COLOR_SYSTEM.SURFACE}
             size={BUTTON_SIZE.BASE}
-            label="Cancel"
+            label={t('common.cancel')}
             onClick={handleCancelClick}
           />
           <FilledButton
             type="submit"
             cs={COLOR_SYSTEM.PRIMARY}
             size={BUTTON_SIZE.BASE}
-            label="Create"
+            label={t('common.create')}
             onClick={handleCreateClick}
           />
         </div>

@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import React, { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import FilledButton, {
   Props as FilledButtonProps,
 } from '~/components/button/filled';
@@ -17,6 +18,7 @@ export type Props = {
   onSignout: () => void;
 };
 const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
+  const { t } = useTranslation();
   const { prepareSignout } = useEndpoint();
   const signout = useMemo<ReturnType<UseEndpointReturn['prepareSignout']>>(
     () => prepareSignout(endpoint, authentication),
@@ -52,7 +54,7 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
       <FilledButton
         cs={COLOR_SYSTEM.SECONDARY}
         Icon={LogoutIcon}
-        label="Signout"
+        label={t('common.signout')}
         onClick={handleClick}
       />
       <Drawer {...drawer.bind}>
