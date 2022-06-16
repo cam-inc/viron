@@ -1,6 +1,7 @@
 import { navigate } from 'gatsby';
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import FilledButton, {
   Props as FilledButtonProps,
 } from '~/components/button/filled';
@@ -15,6 +16,8 @@ export type Props = Parameters<LayoutProps['renderBody']>[0] & {
   search: string;
 };
 const Body: React.FC<Props> = ({ style, className = '', search }) => {
+  const { t } = useTranslation();
+
   const { connect, addEndpoint } = useEndpoint();
   const [error, setError] = useState<BaseError | null>(null);
   const [isPending, setIsPending] = useState<boolean>(true);
@@ -28,7 +31,7 @@ const Body: React.FC<Props> = ({ style, className = '', search }) => {
     try {
       endpoint = JSON.parse(queries.endpoint as string) as Endpoint;
     } catch {
-      setError(new BaseError('Broken endpoint data.'));
+      setError(new BaseError(t('pages.endpointimport.002')));
       setIsPending(false);
       return;
     }
@@ -82,13 +85,13 @@ const Body: React.FC<Props> = ({ style, className = '', search }) => {
     <div style={style} className={className}>
       <div className="p-4">
         <div>
-          Have completed importing an endpoint successfully.{' '}
+          {t('pages.endpointimport.003')}{' '}
           <FilledButton
             cs={COLOR_SYSTEM.PRIMARY}
-            label="Go back to the dashboard"
+            label={t('pages.endpointimport.004')}
             onClick={handleButtonClick}
           />{' '}
-          to continue.
+          {t('pages.endpointimport.005')}
         </div>
       </div>
     </div>

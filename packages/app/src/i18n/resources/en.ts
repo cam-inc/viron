@@ -38,6 +38,15 @@ export default {
       '003': 'to administrate your services. To learn more about Viron',
       '004': 'are always welcomed.',
     },
+    endpointimport: {
+      '001': 'Import',
+      '002': 'Broken endpoint data.',
+      '003': 'Have completed importing an endpoint successfully.',
+      '004': 'Go back to the dashboard',
+      '005': 'to continue.',
+      '006': 'Give OAS,',
+      '007': 'Get GUI.',
+    },
     oauthredirect: {
       '001': 'OAuth',
       '002': 'Endpoint Not Found.',
