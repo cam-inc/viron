@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { HSL } from '~/types';
 import { Mode } from '~/utils/colorSystem';
 
@@ -7,12 +8,13 @@ export type Props = {
   mode: Mode;
 };
 const _Mode: React.FC<Props> = ({ title, mode }) => {
+  const { t } = useTranslation();
   return (
     <div>
       <div className="text-[#fff] text-xxs mb-1">{title}</div>
       <div className="grid grid-cols-3 gap-1 rounded overflow-hidden">
         <Chip
-          title="Primary"
+          title={t('common.primary')}
           ground={mode.primary}
           on={mode.onPrimary}
           onHigh={mode.onPrimaryHigh}
@@ -21,7 +23,7 @@ const _Mode: React.FC<Props> = ({ title, mode }) => {
           onFaint={mode.onPrimaryFaint}
         >
           <Chip
-            title="Container"
+            title={t('common.container')}
             ground={mode.primaryContainer}
             on={mode.onPrimaryContainer}
             onHigh={mode.onPrimaryContainerHigh}
@@ -31,7 +33,7 @@ const _Mode: React.FC<Props> = ({ title, mode }) => {
           />
         </Chip>
         <Chip
-          title="Secondary"
+          title={t('common.secondary')}
           ground={mode.secondary}
           on={mode.onSecondary}
           onHigh={mode.onSecondaryHigh}
@@ -40,7 +42,7 @@ const _Mode: React.FC<Props> = ({ title, mode }) => {
           onFaint={mode.onSecondaryFaint}
         >
           <Chip
-            title="Container"
+            title={t('common.container')}
             ground={mode.secondaryContainer}
             on={mode.onSecondaryContainer}
             onHigh={mode.onSecondaryContainerHigh}
@@ -50,7 +52,7 @@ const _Mode: React.FC<Props> = ({ title, mode }) => {
           />
         </Chip>
         <Chip
-          title="Tertiary"
+          title={t('common.tertiary')}
           ground={mode.tertiary}
           on={mode.onTertiary}
           onHigh={mode.onTertiaryHigh}
@@ -59,7 +61,7 @@ const _Mode: React.FC<Props> = ({ title, mode }) => {
           onFaint={mode.onTertiaryFaint}
         >
           <Chip
-            title="Container"
+            title={t('common.container')}
             ground={mode.tertiaryContainer}
             on={mode.onTertiaryContainer}
             onHigh={mode.onTertiaryContainerHigh}
@@ -69,7 +71,7 @@ const _Mode: React.FC<Props> = ({ title, mode }) => {
           />
         </Chip>
         <Chip
-          title="Error"
+          title={t('common.error')}
           ground={mode.error}
           on={mode.onError}
           onHigh={mode.onErrorHigh}
@@ -78,7 +80,7 @@ const _Mode: React.FC<Props> = ({ title, mode }) => {
           onFaint={mode.onErrorFaint}
         >
           <Chip
-            title="Error Container"
+            title={t('common.errorContainer')}
             ground={mode.errorContainer}
             on={mode.onErrorContainer}
             onHigh={mode.onErrorContainerHigh}
@@ -88,7 +90,7 @@ const _Mode: React.FC<Props> = ({ title, mode }) => {
           />
         </Chip>
         <Chip
-          title="Background"
+          title={t('common.background')}
           ground={mode.background}
           on={mode.onBackground}
           onHigh={mode.onBackgroundHigh}
@@ -98,7 +100,7 @@ const _Mode: React.FC<Props> = ({ title, mode }) => {
         >
           <div className="mb-2">
             <Chip
-              title="Surface"
+              title={t('common.surface')}
               ground={mode.surface}
               on={mode.onSurface}
               onHigh={mode.onSurfaceHigh}
@@ -108,7 +110,7 @@ const _Mode: React.FC<Props> = ({ title, mode }) => {
             />
           </div>
           <Chip
-            title="Surface Variant"
+            title={t('common.surfaceVariant')}
             ground={mode.surfaceVariant}
             on={mode.onSurfaceVariant}
             onHigh={mode.onSurfaceVariantHigh}
