@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import FilledButton, {
   Props as FilledButtonProps,
 } from '~/components/button/filled';
@@ -22,6 +23,7 @@ export type Props = {
   base: UseBaseReturn;
 };
 const Filter: React.FC<Props> = ({ base }) => {
+  const { t } = useTranslation();
   const popover = usePopover<HTMLDivElement>();
   const handleMouseEnter = useCallback(() => {
     popover.open();
@@ -82,8 +84,8 @@ const Filter: React.FC<Props> = ({ base }) => {
           <div className="flex-none p-2 border-b-2 border-thm-on-surface-faint">
             <Head
               on={COLOR_SYSTEM.SURFACE}
-              title="Filter"
-              description="Select items to show."
+              title={t('common.information')}
+              description={t('pages.endpoints.002')}
             />
           </div>
           {/* Body */}
@@ -109,14 +111,14 @@ const Filter: React.FC<Props> = ({ base }) => {
           <div className="flex-none flex justify-end p-2 border-t-2 border-thm-on-surface-faint">
             <FilledButton
               cs={COLOR_SYSTEM.PRIMARY}
-              label="Apply"
+              label={t('common.apply')}
               onClick={handleApplyClick}
             />
           </div>
         </div>
       </Drawer>
       <Popover {...popover.bind}>
-        <div className="text-on-surface">Filter</div>
+        <div className="text-on-surface">{t('common.filter')}</div>
       </Popover>
     </>
   );

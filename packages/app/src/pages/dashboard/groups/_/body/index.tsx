@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import FilledButton, {
   Props as FilledButtonProps,
 } from '~/components/button/filled';
@@ -15,6 +16,7 @@ import Item from './item';
 
 export type Props = Parameters<LayoutProps['renderBody']>[0];
 const Body: React.FC<Props> = ({ className, style }) => {
+  const { t } = useTranslation();
   const { groupList } = useEndpoint();
 
   // Add modal.
@@ -41,10 +43,10 @@ const Body: React.FC<Props> = ({ className, style }) => {
                 title={
                   <div className="flex items-center gap-2">
                     <CollectionIcon className="w-em" />
-                    <div>Dashboard / Groups</div>
+                    <div>{t('pages.dashboard.group.002')}</div>
                   </div>
                 }
-                description="This is your personal, private dashboard."
+                description={t('pages.dashboard.group.003')}
               />
             </div>
             <div>
@@ -56,7 +58,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
             <div className="p-4 flex justify-end border-b border-thm-on-background-slight">
               <FilledButton
                 cs={COLOR_SYSTEM.PRIMARY}
-                label="Add a Group"
+                label={t('pages.dashboard.group.004')}
                 Icon={PlusCircleIcon}
                 onClick={handleAddClick}
               />

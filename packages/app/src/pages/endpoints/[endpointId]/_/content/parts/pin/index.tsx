@@ -1,6 +1,7 @@
 import { AiFillPushpin } from '@react-icons/all-files/ai/AiFillPushpin';
 import { AiOutlinePushpin } from '@react-icons/all-files/ai/AiOutlinePushpin';
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import FilledButton, {
   Props as FilledButtonProps,
 } from '~/components/button/filled';
@@ -15,6 +16,7 @@ export type Props = {
   onClick: () => void;
 };
 const Pin: React.FC<Props> = ({ isActive, onClick }) => {
+  const { t } = useTranslation();
   const handleButtonClick = useCallback<
     TextOnButtonProps['onClick'] | FilledButtonProps['onClick']
   >(() => {
@@ -51,7 +53,9 @@ const Pin: React.FC<Props> = ({ isActive, onClick }) => {
         )}
       </div>
       <Popover {...popover.bind}>
-        <div className="text-thm-on-surface">{isActive ? 'Unpin' : 'Pin'}</div>
+        <div className="text-thm-on-surface">
+          {isActive ? t('common.unpin') : t('common.pin')}
+        </div>
       </Popover>
     </>
   );

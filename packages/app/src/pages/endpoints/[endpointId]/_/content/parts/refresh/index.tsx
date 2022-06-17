@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import TextOnButton, {
   Props as TextOnButtonProps,
 } from '~/components/button/text/on';
@@ -11,6 +12,7 @@ export type Props = {
   base: UseBaseReturn;
 };
 const Refresh: React.FC<Props> = ({ base }) => {
+  const { t } = useTranslation();
   const handleButtonClick = useCallback<TextOnButtonProps['onClick']>(() => {
     base.refresh();
   }, [base]);
@@ -37,7 +39,7 @@ const Refresh: React.FC<Props> = ({ base }) => {
         />
       </div>
       <Popover {...popover.bind}>
-        <div className="text-thm-on-surface">Refresh</div>
+        <div className="text-thm-on-surface">{t('common.refresh')}</div>
       </Popover>
     </>
   );

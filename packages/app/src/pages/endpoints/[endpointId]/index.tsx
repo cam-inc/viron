@@ -3,6 +3,7 @@ import { navigate, PageProps } from 'gatsby';
 import _ from 'lodash';
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Error from '~/components/error';
 import Metadata from '~/components/metadata';
 import { BaseError } from '~/errors/index';
@@ -33,13 +34,14 @@ const EndpointPage: React.FC<Props> = ({ params }) => {
   const { connect, fetchDocument } = useEndpoint();
 
   useTheme(document);
+  const { t } = useTranslation();
 
   useEffect(() => {
     setError(null);
     setIsPending(true);
     setDocument(null);
     if (!endpoint) {
-      setError(new BaseError('endpoint not found.'));
+      setError(new BaseError(t('pages.endpoints.001')));
       setIsPending(false);
       return;
     }

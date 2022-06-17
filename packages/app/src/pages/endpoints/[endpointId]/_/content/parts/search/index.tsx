@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import TextOnButton, {
   Props as TextOnButtonProps,
 } from '~/components/button/text/on';
@@ -16,6 +17,7 @@ export type Props = {
   base: UseBaseReturn;
 };
 const Search: React.FC<Props> = ({ endpoint, document, base }) => {
+  const { t } = useTranslation();
   const drawer = useDrawer();
   const handleButtonClick = useCallback<TextOnButtonProps['onClick']>(() => {
     drawer.open();
@@ -62,7 +64,9 @@ const Search: React.FC<Props> = ({ endpoint, document, base }) => {
         />
       </Drawer>
       <Popover {...popover.bind}>
-        <div className="text-thm-on-surface whitespace-nowrap">Search</div>
+        <div className="text-thm-on-surface whitespace-nowrap">
+          {t('common.search')}
+        </div>
       </Popover>
     </>
   );
