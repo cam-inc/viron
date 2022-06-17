@@ -1,5 +1,6 @@
 import classnames from 'classnames';
 import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { Props as BaseProps } from '~/components';
 import { SIZE as BUTTON_SIZE } from '~/components/button';
@@ -41,6 +42,7 @@ const _Request: React.FC<Props> = ({
   className = '',
   renderHead,
 }) => {
+  const { t } = useTranslation();
   const {
     register,
     unregister,
@@ -195,7 +197,7 @@ const _Request: React.FC<Props> = ({
             type="submit"
             cs={COLOR_SYSTEM.PRIMARY}
             size={BUTTON_SIZE.BASE}
-            label="Submit"
+            label={t('common.submit')}
             onClick={handleSubmitClick}
           />
         </div>

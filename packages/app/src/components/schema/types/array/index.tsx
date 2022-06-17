@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import React, { useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Validate } from 'react-hook-form';
 import { SIZE as BUTTON_SIZE } from '~/components/button';
 import TextOnButton, {
@@ -35,6 +36,7 @@ const SchemaOfTypeArray: React.FC<Props> = ({
   isDeepActive,
   activeRef,
 }) => {
+  const { t } = useTranslation();
   const data: any[] | undefined = getValues(name);
   const nameForError = useNameForError({ schema, name });
   useEffect(() => {
@@ -108,7 +110,7 @@ const SchemaOfTypeArray: React.FC<Props> = ({
           on={on}
           size={BUTTON_SIZE.XS}
           Icon={PlusIcon}
-          label="Prepend"
+          label={t('common.prepend')}
           onClick={handlePrependClick}
         />
       )}
@@ -140,7 +142,7 @@ const SchemaOfTypeArray: React.FC<Props> = ({
                 size={BUTTON_SIZE.XS}
                 data={index}
                 Icon={MinusIcon}
-                label="Remove"
+                label={t('common.remove')}
                 onClick={handleRemoveClick}
               />
             )}
@@ -152,7 +154,7 @@ const SchemaOfTypeArray: React.FC<Props> = ({
               size={BUTTON_SIZE.XS}
               data={index + 1}
               Icon={PlusIcon}
-              label="Insert"
+              label={t('common.insert')}
               onClick={handleInsertClick}
             />
           )}
@@ -163,7 +165,7 @@ const SchemaOfTypeArray: React.FC<Props> = ({
         on={on}
         size={BUTTON_SIZE.XS}
         Icon={PlusIcon}
-        label="Append"
+        label={t('common.append')}
         onClick={handleAppendClick}
       />
     </div>
