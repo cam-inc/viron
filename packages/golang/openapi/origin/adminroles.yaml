@@ -136,6 +136,7 @@ components:
             - read
             - write
             - deny
+            - all
       required:
         - resourceId
         - permission
