@@ -38,8 +38,26 @@ func TestIsPathMatch(t *testing.T) {
 			Expect:  true,
 		},
 		{
+			Title:   "with pathParam and queryParam 1",
+			reqPath: "/parent/123?page=1",
+			defPath: "/parent/{parentId}",
+			Expect:  true,
+		},
+		{
+			Title:   "with pathParam and queryParam 2",
+			reqPath: "/parent/123/child?page=1",
+			defPath: "/parent/{parentId}/child",
+			Expect:  true,
+		},
+		{
 			Title:   "with multiple pathParam",
 			reqPath: "/parent/123/child/456",
+			defPath: "/parent/{parentId}/child/{childId}",
+			Expect:  true,
+		},
+		{
+			Title:   "with multiple pathParam and queryParam",
+			reqPath: "/parent/123/child/456?page=1",
 			defPath: "/parent/{parentId}/child/{childId}",
 			Expect:  true,
 		},
