@@ -85,6 +85,7 @@ func GetOas(apiDef *openapi3.T, roleIDs []string) *openapi3.T {
 				log.Debugf("roleId %s resourceId %s method2Permissions(pathMethod.method) %+v", roleID, content.ResourceID, method2Permissions(pathMethod.method))
 				if hasPermissionByResourceID(roleID, content.ResourceID, method2Permissions(pathMethod.method)) {
 					granted = append(granted, content)
+					break
 				}
 			}
 
@@ -96,7 +97,7 @@ func GetOas(apiDef *openapi3.T, roleIDs []string) *openapi3.T {
 			rewritedPages = append(rewritedPages, page)
 		}
 	}
-
+	
 	log.Debugf("rewritedPages %+v", rewritedPages)
 
 	clone.Info.Extensions[constant.OAS_X_PAGES] = rewritedPages
