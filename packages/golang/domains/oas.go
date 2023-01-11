@@ -96,11 +96,6 @@ func GetOas(apiDef *openapi3.T, roleIDs []string) *openapi3.T {
 			page.Contents = granted
 			rewritedPages = append(rewritedPages, page)
 		}
-		fmt.Println("============================")
-		fmt.Printf("%+v \n", page.Group)
-		for _, content := range page.Contents {
-			fmt.Printf("%+v \n", content)
-		}
 	}
 
 	clone.Info.Extensions[constant.OAS_X_PAGES] = rewritedPages
