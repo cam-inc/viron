@@ -22,7 +22,7 @@
     "mysql2": "^2.2.5",
     "pino": "^7.6.4",
     "pino-http": "^6.6.0",
-    "sequelize": "^6.5.0",
+    "sequelize": "^6.28.2",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
