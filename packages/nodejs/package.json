@@ -35,7 +35,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "6.1.8",
     "path-to-regexp": "^6.2.0",
-    "sequelize": "^6.12.5",
+    "sequelize": "^6.29.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
