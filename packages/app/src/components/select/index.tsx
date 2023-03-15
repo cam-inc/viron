@@ -5,7 +5,11 @@ import { ClassName } from '~/types';
 
 export type Props<T = unknown> = BaseProps & {
   list: T[];
-  Select: React.FC<{ id: string; className: ClassName }>;
+  Select: React.FC<{
+    id: string;
+    className: ClassName;
+    children: React.ReactNode;
+  }>;
   Option: React.FC<{ className: ClassName; data: T }>;
   OptionBlank?: React.FC<{ className: ClassName }>;
   label?: string;

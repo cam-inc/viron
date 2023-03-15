@@ -5,6 +5,7 @@ import { ClassName, ColorSystem } from '~/types/index';
 export type Props<T extends string = 'on'> = {
   style?: CSSProperties;
   className?: ClassName;
+  children?: React.ReactNode;
 } & {
   [P in T]: ColorSystem;
 };

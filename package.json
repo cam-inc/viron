@@ -61,12 +61,12 @@
     "example/nodejs"
   ],
   "engines": {
-    "node": ">=15.13.0",
-    "npm": ">=7.9.0"
+    "node": ">=18.14.0",
+    "npm": ">=9.3.1"
   },
   "private": true,
   "volta": {
-    "node": "15.14.0",
-    "npm": "7.9.0"
+    "node": "18.14.0",
+    "npm": "9.3.1"
   }
 }
