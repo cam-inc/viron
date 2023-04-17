@@ -158,7 +158,7 @@ export const setValueAs = function (
   };
 };
 
-export const getValidateSelfRequired = function (): Validate<any> {
+export const getValidateSelfRequired = function (): Validate<any, any> {
   return function (data) {
     if (_.isUndefined(data)) {
       return `Required.`;
@@ -173,7 +173,7 @@ export const getValidateSelfRequired = function (): Validate<any> {
 // @see: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00#section-5.1
 export const getValidateMultipleOf = function (
   multipleOf: NonNullable<Schema['multipleOf']>
-): Validate<number> {
+): Validate<number, any> {
   return function (data) {
     if (data % multipleOf !== 0) {
       return `${data} should be dividable by ${multipleOf}.`;
@@ -187,7 +187,7 @@ export const getValidateMultipleOf = function (
 export const getValidateMaximum = function (
   maximum: NonNullable<Schema['maximum']>,
   exclusiveMaximum: Schema['exclusiveMaximum']
-): Validate<number> {
+): Validate<number, any> {
   return function (data) {
     if (exclusiveMaximum) {
       if (maximum <= data) {
@@ -207,7 +207,7 @@ export const getValidateMaximum = function (
 export const getValidateMinimum = function (
   minimum: NonNullable<Schema['minimum']>,
   exclusiveMinimum: Schema['exclusiveMinimum']
-): Validate<number> {
+): Validate<number, any> {
   return function (data) {
     if (exclusiveMinimum) {
       if (data <= minimum) {
@@ -225,7 +225,7 @@ export const getValidateMinimum = function (
 // @see: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00#section-5.6
 export const getValidateMaxLength = function (
   maxLength: NonNullable<Schema['maxLength']>
-): Validate<string> {
+): Validate<string, any> {
   return function (data) {
     if (maxLength < data.length) {
       return `The length should be less than or equal to ${maxLength}`;
@@ -237,7 +237,7 @@ export const getValidateMaxLength = function (
 // @see: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00#section-5.7
 export const getValidateMinLength = function (
   minLength: NonNullable<Schema['minLength']>
-): Validate<string> {
+): Validate<string, any> {
   return function (data) {
     if (data.length < minLength) {
       return `The length should be greater than or equal to ${minLength}`;
@@ -249,7 +249,7 @@ export const getValidateMinLength = function (
 // @see: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00#section-5.8
 export const getValidatePattern = function (
   pattern: NonNullable<Schema['pattern']>
-): Validate<string> {
+): Validate<string, any> {
   return function (data) {
     if (!new RegExp(pattern).test(data)) {
       return `The pattern ${pattern} should match.`;
@@ -261,7 +261,7 @@ export const getValidatePattern = function (
 // @see: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00#section-5.10
 export const getValidateMaxItems = function (
   maxItems: NonNullable<Schema['maxItems']>
-): Validate<any[]> {
+): Validate<any[], any> {
   return function (data) {
     if (maxItems < data.length) {
       return `The length should be less than or equal to ${maxItems}`;
@@ -273,7 +273,7 @@ export const getValidateMaxItems = function (
 // @see: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00#section-5.11
 export const getValidateMinItems = function (
   minItems: NonNullable<Schema['minItems']>
-): Validate<any[]> {
+): Validate<any[], any> {
   return function (data) {
     if (data.length < minItems) {
       return `The length should be greater than or equal to ${minItems}`;
@@ -283,7 +283,7 @@ export const getValidateMinItems = function (
 };
 
 // @see: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00#section-5.12
-export const getValidateUniqueItems = function (): Validate<any[]> {
+export const getValidateUniqueItems = function (): Validate<any[], any> {
   return function (data) {
     if (data.length !== _.uniq(data).length) {
       return `All items should be unique.`;
@@ -295,7 +295,7 @@ export const getValidateUniqueItems = function (): Validate<any[]> {
 // @see: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00#section-5.13
 export const getValidateMaxProperties = function (
   maxProperties: NonNullable<Schema['maxProperties']>
-): Validate<Record<string, any>> {
+): Validate<Record<string, any>, any> {
   return function (data) {
     if (maxProperties < _.size(data)) {
       return `The length should be less than or equal to ${maxProperties}`;
@@ -307,7 +307,7 @@ export const getValidateMaxProperties = function (
 // @see: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00#section-5.14
 export const getValidateMinProperties = function (
   minProperties: NonNullable<Schema['minProperties']>
-): Validate<Record<string, any>> {
+): Validate<Record<string, any>, any> {
   return function (data) {
     if (_.size(data) < minProperties) {
       return `The length should be greater than or equal to ${minProperties}`;
@@ -319,7 +319,7 @@ export const getValidateMinProperties = function (
 // @see: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00#section-5.15
 export const getValidateRequired = function (
   required: NonNullable<Schema['required']>
-): Validate<Record<string, any>> {
+): Validate<Record<string, any>, any> {
   return function (data) {
     const remainings = [...required];
     _.remove(remainings, function (item) {
@@ -338,7 +338,7 @@ export const getValidateRequired = function (
 export const getValidateAdditionalProperties = function (
   additionalProperties: NonNullable<Schema['additionalProperties']>,
   properties: Schema['properties']
-): Validate<Record<string, any>> {
+): Validate<Record<string, any>, any> {
   return function (data) {
     // Always valid.
     if (additionalProperties === true) {
@@ -371,7 +371,7 @@ export const getValidateAdditionalProperties = function (
 export const getValidateEnum = function (
   _enum: NonNullable<Schema['enum']>,
   type: Schema['type']
-): Validate<any> {
+): Validate<any, any> {
   return function (data) {
     switch (type) {
       case 'integer':
@@ -400,7 +400,9 @@ export const getValidateEnum = function (
 
 // @see: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00#section-5.21
 // @see: https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.2.md#properties
-export const getValidateType = function (type: Schema['type']): Validate<any> {
+export const getValidateType = function (
+  type: Schema['type']
+): Validate<any, any> {
   return function (data) {
     if (type === 'integer') {
       if (!_.isInteger(data)) {
@@ -439,7 +441,7 @@ export const getValidateType = function (type: Schema['type']): Validate<any> {
 // @see: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00#section-5.22
 export const getValidateAllOf = function (
   allOf: NonNullable<Schema['allOf']>
-): Validate<any> {
+): Validate<any, any> {
   return function (data) {
     // TODO
     return true;
@@ -449,7 +451,7 @@ export const getValidateAllOf = function (
 // @see: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00#section-5.23
 export const getValidateAnyOf = function (
   anyOf: NonNullable<Schema['anyOf']>
-): Validate<any> {
+): Validate<any, any> {
   return function (data) {
     // TODO
     return true;
@@ -459,7 +461,7 @@ export const getValidateAnyOf = function (
 // @see: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00#section-5.24
 export const getValidateOneOf = function (
   oneOf: NonNullable<Schema['oneOf']>
-): Validate<any> {
+): Validate<any, any> {
   return function (data) {
     // TODO
     return true;
@@ -469,7 +471,7 @@ export const getValidateOneOf = function (
 // @see: https://datatracker.ietf.org/doc/html/draft-wright-json-schema-validation-00#section-5.25
 export const getValidateNot = function (
   not: NonNullable<Schema['not']>
-): Validate<any> {
+): Validate<any, any> {
   return function (data) {
     // TODO
     return true;
@@ -480,7 +482,7 @@ export const getValidateNot = function (
 export const getValidateFormat = function (
   format: NonNullable<Schema['format']>,
   type: Schema['type']
-): Validate<any> {
+): Validate<any, any> {
   if (type === 'string') {
     if (format === 'wyswyg') {
       return function (data: string) {
