@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import { HSL } from '~/types';
 import { Mode } from '~/utils/colorSystem';
 
@@ -123,15 +123,17 @@ const _Mode: React.FC<Props> = ({ title, mode }) => {
 };
 export default _Mode;
 
-const Chip: React.FC<{
-  title: string;
-  ground: HSL;
-  on: HSL;
-  onHigh: HSL;
-  onLow: HSL;
-  onSlight: HSL;
-  onFaint: HSL;
-}> = ({ title, ground, on, onHigh, onLow, onSlight, onFaint, children }) => {
+const Chip: React.FC<
+  PropsWithChildren<{
+    title: string;
+    ground: HSL;
+    on: HSL;
+    onHigh: HSL;
+    onLow: HSL;
+    onSlight: HSL;
+    onFaint: HSL;
+  }>
+> = ({ title, ground, on, onHigh, onLow, onSlight, onFaint, children }) => {
   return (
     <div
       className="p-2"

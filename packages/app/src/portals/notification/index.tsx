@@ -1,5 +1,11 @@
 import classnames from 'classnames';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import XCircleIcon from '~/components/icon/xCircle/outline';
 import Portal, { TARGET } from '~/portals';
 
@@ -8,7 +14,7 @@ type Props = {
   onRequestClose: () => void;
   timeoutSec?: number;
 };
-const Notification: React.FC<Props> = ({
+const Notification: React.FC<PropsWithChildren<Props>> = ({
   isOpened,
   onRequestClose,
   timeoutSec = 5,

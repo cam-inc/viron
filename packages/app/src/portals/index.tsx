@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 import ReactDOM from 'react-dom';
 import { BaseError } from '~/errors';
+import { isBrowser } from '~/utils';
+import { error } from '~/utils/logger';
 import { ID as DRAWER_WRAPPER_ID } from '~/wrappers/drawer';
 import { ID as MODAL_WRAPPER_ID } from '~/wrappers/modal';
 import { ID as NOTIFICATION_WRAPPER_ID } from '~/wrappers/notification';
 import { ID as POPOVER_WRAPPER_ID } from '~/wrappers/popover';
 import { ID as PROGRESS_WRAPPER_ID } from '~/wrappers/progress';
-import { isBrowser } from '~/utils';
-import { error } from '~/utils/logger';
 
 export const TARGET = {
   DRAWER: DRAWER_WRAPPER_ID,
@@ -16,12 +16,12 @@ export const TARGET = {
   POPOVER: POPOVER_WRAPPER_ID,
   PROGRESS: PROGRESS_WRAPPER_ID,
 } as const;
-export type Target = typeof TARGET[keyof typeof TARGET];
+export type Target = (typeof TARGET)[keyof typeof TARGET];
 
 type Props = {
   target: Target;
 };
-const Portal: React.FC<Props> = ({ target, children }) => {
+const Portal: React.FC<PropsWithChildren<Props>> = ({ target, children }) => {
   if (!isBrowser) {
     return null;
   }

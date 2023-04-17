@@ -1,7 +1,12 @@
 import classnames from 'classnames';
 import { PluginOptions } from 'gatsby';
 import _ from 'lodash';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+} from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { HelmetProvider } from 'react-helmet-async';
@@ -54,7 +59,7 @@ const RootWrapper: React.FC<Props> = (props) => {
 };
 export default RootWrapper;
 
-const Root: React.FC<Props> = ({ children }) => {
+const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
   // Entry point.
   const { launch, isLaunched, style, error } = useRoot();
   useEffect(() => {
