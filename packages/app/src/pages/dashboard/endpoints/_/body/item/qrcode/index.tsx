@@ -27,7 +27,7 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
     const data = `${
       new URL(location.href).origin
     }/endpointimport?endpoint=${encodeURIComponent(JSON.stringify(endpoint))}`;
-    qrcode.toCanvas(canvasElement, data, function (error: Error) {
+    qrcode.toCanvas(canvasElement, data, function (error) {
       if (error) {
         setError(new BaseError(error.message));
       }
