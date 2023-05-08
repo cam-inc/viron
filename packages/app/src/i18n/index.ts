@@ -5,8 +5,10 @@ import {
   useTranslation as useTranslationI18n,
 } from 'react-i18next';
 import { isDevelopment } from '~/utils';
-import resourceEn from './resources/en';
-import resourceJa from './resources/ja';
+import { resources } from './resources';
+
+export const defaultNS = 'common';
+export { resources };
 
 i18n
   // @see: https://github.com/i18next/i18next-browser-languageDetector
@@ -18,14 +20,9 @@ i18n
     debug: isDevelopment,
     fallbackLng: 'en',
     // Refer to README.md for more detail.
-    resources: {
-      en: {
-        translation: resourceEn,
-      },
-      ja: {
-        translation: resourceJa,
-      },
-    },
+    ns: ['common'],
+    defaultNS,
+    resources,
     // @see: https://react.i18next.com/latest/i18next-instance
     react: {
       useSuspense: false,
