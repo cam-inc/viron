@@ -56,9 +56,7 @@ module.exports = {
     },
   ],
   // @see: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/#flags
-  flags: {
-    FAST_DEV: true,
-  },
+  flags: {},
   // @see: https://www.gatsbyjs.com/docs/api-proxy/#advanced-proxying
   developMiddleware: (app) => {
     app.use((req, res, next) => {

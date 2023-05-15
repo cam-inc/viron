@@ -33,15 +33,16 @@ const SchemaOfTypeObject: React.FC<Props> = ({
         clearErrors(nameForError);
         return;
       }
-      const errorMessages: ReturnType<Validate<Record<string, any>>>[] = [];
+      const errorMessages: ReturnType<Validate<Record<string, any>, any>>[] =
+        [];
       const registerOptions = getRegisterOptions({ required, schema });
       _.forEach(
         registerOptions.validate as Record<
           string,
-          Validate<Record<string, any>>
+          Validate<Record<string, any>, any>
         >,
         function (v) {
-          const result = v(data);
+          const result = v(data, undefined);
           if (result !== true) {
             errorMessages.push(result);
           }
