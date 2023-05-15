@@ -1,15 +1,12 @@
 import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import {
-  initReactI18next,
-  useTranslation as useTranslationI18n,
-} from 'react-i18next';
+import { initReactI18next } from 'react-i18next';
 import { isDevelopment } from '~/utils';
 import { resource as en } from './resources/en';
 import { resource as ja } from './resources/ja';
 
-export const defaultNS = 'common';
-export const resources = {
+const defaultNS = 'common';
+const resources = {
   en,
   ja,
 } as const;
@@ -32,7 +29,3 @@ i18n
       useSuspense: false,
     },
   });
-
-export default i18n;
-
-export const useTranslation = useTranslationI18n;
