@@ -5,10 +5,14 @@ import {
   useTranslation as useTranslationI18n,
 } from 'react-i18next';
 import { isDevelopment } from '~/utils';
-import { resources } from './resources';
+import { resource as en } from './resources/en';
+import { resource as ja } from './resources/ja';
 
 export const defaultNS = 'common';
-export { resources };
+export const resources = {
+  en,
+  ja,
+} as const;
 
 i18n
   // @see: https://github.com/i18next/i18next-browser-languageDetector
