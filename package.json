@@ -31,7 +31,7 @@
   },
   "homepage": "https://github.com/cam-inc/viron#readme",
   "scripts": {
-    "postinstall": "husky install",
+    "postinstall": "which husky && husky install || echo skip.",
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable",
     "pre-commit": "npm run pre-commit --workspaces",
