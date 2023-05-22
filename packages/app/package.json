@@ -5,10 +5,6 @@
     "node": ">=18.14.0",
     "npm": ">=9.3.1"
   },
-  "volta": {
-    "node": "18.14.0",
-    "npm": "9.3.1"
-  },
   "browserslist": [
     ">5%",
     "last 2 versions",
