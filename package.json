@@ -31,9 +31,7 @@
   },
   "homepage": "https://github.com/cam-inc/viron#readme",
   "scripts": {
-    "postinstall": "husky install",
-    "prepublishOnly": "pinst --disable",
-    "postpublish": "pinst --enable",
+    "prepare": "which husky && husky install || echo skip.",
     "pre-commit": "npm run pre-commit --workspaces",
     "pre-push": "npm run pre-push --workspaces",
     "changelog:intent": "changeset add",
@@ -50,8 +48,7 @@
     "@changesets/cli": "^2.20.0",
     "@commitlint/cli": "^16.1.0",
     "@commitlint/config-conventional": "^16.0.0",
-    "husky": "^5.0.6",
-    "pinst": "^2.1.1"
+    "husky": "^8.0.3"
   },
   "workspaces": [
     "packages/app",
