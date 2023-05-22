@@ -9,14 +9,15 @@ phases:
   pre_build:
     commands:
       - echo Install packages...
-      - cd $CODEBUILD_SRC_DIR/packages/app
-      - npm install --no-progress --legacy-peer-deps && npm cache verify
+      - npm install --no-progress
 
   build:
     commands:
+      - echo Building linter...
+      - npm run build -w packages/linter -w packages/app
       - echo Building app...
-      - cd $CODEBUILD_SRC_DIR/packages/app
-      - npm run build:prefix
+      - npm run build:prefix -w packages/app
+
 
 artifacts:
   files:
