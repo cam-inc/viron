@@ -10,11 +10,11 @@ phases:
     commands:
       - echo Install packages...
       - npm install --no-progress
+      - echo Building linter...
+      - npm run build -w packages/linter
 
   build:
     commands:
-      - echo Building linter...
-      - npm run build -w packages/linter -w packages/app
       - echo Building app...
       - npm run build:prefix -w packages/app
 
