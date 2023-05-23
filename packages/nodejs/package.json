@@ -12,7 +12,7 @@
     "lint:ts:fix": "eslint --fix \"**/*.ts\"",
     "pre-commit": "lint-staged",
     "pre-push": "npm run test",
-    "test": "echo \"skip\"",
+    "test": "jest -c ./jest.config.ts",
     "test:watch": "jest --watch"
   },
   "main": "./dist/index.js",
