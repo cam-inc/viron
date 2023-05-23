@@ -5,6 +5,11 @@ phases:
   install:
     runtime-versions:
       nodejs: latest
+    commands:
+      - echo install dependencies for E2E Testing...
+      - apt-get update -y
+      # https://docs.cypress.io/guides/continuous-integration/introduction#Dependencies
+      - apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb 
 
   build:
     commands:
