@@ -1,4 +1,5 @@
 import classnames from 'classnames';
+import { useTranslation } from 'gatsby-plugin-react-i18next';
 import React from 'react';
 import { Props as BaseProps } from '~/components';
 import ExternalLinkIcon from '~/components/icon/externalLink/outline';
@@ -12,18 +13,8 @@ const links: {
   isExternal: boolean;
 }[] = [
   {
-    to: '/',
-    label: 'Home',
-    isExternal: false,
-  },
-  {
-    to: '/dashboard/endpoints',
-    label: 'Dashboard',
-    isExternal: false,
-  },
-  {
     to: URL.DOCUMENTATION,
-    label: 'Documentation',
+    label: 'documentation',
     isExternal: true,
   },
   /*
@@ -35,18 +26,19 @@ const links: {
     */
   {
     to: URL.RELEASE_NOTES,
-    label: 'Release Notes',
+    label: 'releaseNotes',
     isExternal: true,
   },
   {
     to: URL.HELP,
-    label: 'Help',
+    label: 'help',
     isExternal: true,
   },
 ];
 
 type Props = BaseProps;
 const Links: React.FC<Props> = ({ className = '', on }) => {
+  const { t } = useTranslation();
   return (
     <ul
       className={classnames(
@@ -61,7 +53,7 @@ const Links: React.FC<Props> = ({ className = '', on }) => {
               className={`flex gap-1 items-center text-thm-on-${on} group-hover:underline group-active:text-thm-on-${on}-low group-focus:ring-2 group-focus:ring-thm-on-${on}`}
             >
               {item.isExternal && <ExternalLinkIcon className="w-em" />}
-              <div>{item.label}</div>
+              <div>{t(item.label)}</div>
             </div>
           </Link>
         </li>
