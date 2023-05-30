@@ -11,6 +11,7 @@ import useTheme from '~/hooks/theme';
 import Layout, { Props as LayoutProps } from '~/layouts';
 import { useAppScreenGlobalStateValue } from '~/store';
 import { COLOR_SYSTEM } from '~/types';
+import pkg from '../../package.json';
 
 type Props = PageProps;
 const HomePage: React.FC<Props> = () => {
@@ -36,6 +37,9 @@ const HomePage: React.FC<Props> = () => {
             {t('catchphrase')}
           </div>
           <p className="text-center mb-2">{t('subCatchphrase')}</p>
+          <div className="text-xs text-thm-on-background-low">
+            {t('version', { version: pkg.version })}
+          </div>
         </div>
       );
       const direction = (

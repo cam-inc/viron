@@ -1,4 +1,5 @@
 {
+  "version": "ver. {{version}}",
   "catchphrase": "Give OAS, Get GUI.",
   "subCatchphrase": "An Open-Source Frontend-NoCode Administration GUI Tool.",
   "welcomeMessage": "Welcome to Viron!",
