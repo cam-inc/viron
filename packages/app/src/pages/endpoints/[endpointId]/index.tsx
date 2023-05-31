@@ -1,5 +1,5 @@
 import { useLocation } from '@reach/router';
-import { navigate, PageProps } from 'gatsby';
+import { graphql, navigate, PageProps } from 'gatsby';
 import _ from 'lodash';
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -268,3 +268,17 @@ const EndpointPage: React.FC<Props> = ({ params }) => {
 };
 
 export default EndpointPage;
+
+export const query = graphql`
+  query ($language: String!) {
+    locales: allLocale(filter: { language: { eq: $language } }) {
+      edges {
+        node {
+          ns
+          data
+          language
+        }
+      }
+    }
+  }
+`;

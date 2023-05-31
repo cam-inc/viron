@@ -18,7 +18,6 @@ import Error, { useError } from '~/components/error';
 import ErrorBoundary from '~/components/errorBoundary';
 import Spinner from '~/components/spinner';
 import { UnhandledError } from '~/errors';
-import '~/i18n';
 import {
   GlobalStateProvider,
   useAppIsLaunchedGlobalState,

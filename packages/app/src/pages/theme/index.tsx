@@ -1,4 +1,4 @@
-import { PageProps } from 'gatsby';
+import { PageProps, graphql } from 'gatsby';
 import React, { useCallback } from 'react';
 import Metadata from '~/components/metadata';
 import Layout, { Props as LayoutProps } from '~/layouts';
@@ -37,3 +37,17 @@ const ThemePage: React.FC<Props> = () => {
   );
 };
 export default ThemePage;
+
+export const query = graphql`
+  query ($language: String!) {
+    locales: allLocale(filter: { language: { eq: $language } }) {
+      edges {
+        node {
+          ns
+          data
+          language
+        }
+      }
+    }
+  }
+`;

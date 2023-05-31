@@ -1,37 +1,26 @@
 import { navigate, PageProps } from 'gatsby';
+import { graphql } from 'gatsby';
+import { useTranslation } from 'gatsby-plugin-react-i18next';
 import React, { useCallback } from 'react';
-import { SIZE as BUTTON_SIZE } from '~/components/button';
 import FilledButton from '~/components/button/filled';
-import FilledOnButton from '~/components/button/filled/on';
-import BookOpenIcon from '~/components/icon/bookOpen/outline';
-import ColorSwatchIcon from '~/components/icon/colorSwatch/outline';
-import UserGroupIcon from '~/components/icon/userGroup/outline';
 import Logo from '~/components/logo';
 import Metadata from '~/components/metadata';
 import NavigationLinks from '~/components/navigation/links';
 import NavigationServices from '~/components/navigation/services';
-import { URL } from '~/constants';
-import Layout, { Props as LayoutProps } from '~/layouts';
 import useTheme from '~/hooks/theme';
+import Layout, { Props as LayoutProps } from '~/layouts';
 import { useAppScreenGlobalStateValue } from '~/store';
 import { COLOR_SYSTEM } from '~/types';
 import pkg from '../../package.json';
 
 type Props = PageProps;
 const HomePage: React.FC<Props> = () => {
+  const { t } = useTranslation();
   useTheme();
   const screen = useAppScreenGlobalStateValue();
 
   const handleDashboardButtonClick = useCallback(() => {
     navigate('/dashboard/endpoints');
-  }, []);
-
-  const handleDocumentationButtonClick = useCallback(() => {
-    globalThis.open(URL.DOCUMENTATION);
-  }, []);
-
-  const handleContributionButtonClick = useCallback(() => {
-    globalThis.open(URL.GITHUB);
   }, []);
 
   const renderBody = useCallback<LayoutProps['renderBody']>(
@@ -45,60 +34,26 @@ const HomePage: React.FC<Props> = () => {
             />
           </div>
           <div className="text-xl font-bold mb-2 text-thm-on-background-high">
-            Give OAS, Get GUI.
+            {t('catchphrase')}
           </div>
-          <p className="text-center mb-2">
-            An Open-Source Frontend-NoCode Administration GUI Tool.
-          </p>
+          <p className="text-center mb-2">{t('subCatchphrase')}</p>
           <div className="text-xs text-thm-on-background-low">
-            ver. {pkg.version}
+            {t('version', { version: pkg.version })}
           </div>
         </div>
       );
       const direction = (
         <div className="p-4 bg-thm-surface text-thm-on-surface flex flex-col gap-2 items-center justify-center">
-          <div className="mb-2">
-            Welcome to Viron{' '}
-            <Logo
-              className="inline w-em"
-              left="text-thm-on-surface-high"
-              right="text-thm-on-surface"
-            />{' '}
-            !
+          <div className="mb-2">{t('welcomeMessage')}</div>
+          <div className="mb-6 max-w-75% text-sm leading-10">
+            {t('description')}
           </div>
-          <div className="mb-8 max-w-75% text-sm leading-10">
-            Visit{' '}
-            <FilledButton
-              cs={COLOR_SYSTEM.PRIMARY}
-              size={BUTTON_SIZE.SM}
-              label="Dashboard"
-              Icon={ColorSwatchIcon}
-              onClick={handleDashboardButtonClick}
-            />{' '}
-            to administrate your services. To learn more about Viron{' '}
-            <Logo
-              className="inline w-em"
-              left="text-thm-on-surface-high"
-              right="text-thm-on-surface"
-            />
-            , read{' '}
-            <FilledOnButton
-              on={COLOR_SYSTEM.SURFACE}
-              size={BUTTON_SIZE.SM}
-              label="Documentation"
-              Icon={BookOpenIcon}
-              onClick={handleDocumentationButtonClick}
-            />
-            . Your{' '}
-            <FilledOnButton
-              on={COLOR_SYSTEM.SURFACE}
-              size={BUTTON_SIZE.SM}
-              label="Contribution"
-              Icon={UserGroupIcon}
-              onClick={handleContributionButtonClick}
-            />{' '}
-            are always welcomed.
-          </div>
+          <FilledButton
+            className="mb-8"
+            cs={COLOR_SYSTEM.PRIMARY}
+            label={t('startButtonLabel')}
+            onClick={handleDashboardButtonClick}
+          />
           <div className="py-2 px-8 mb-2 border-t border-b border-dotted border-thm-on-surface-slight">
             <NavigationLinks on={COLOR_SYSTEM.SURFACE_VARIANT} />
           </div>
@@ -137,7 +92,7 @@ const HomePage: React.FC<Props> = () => {
         </div>
       );
     },
-    [screen]
+    [handleDashboardButtonClick, screen.lg, t]
   );
 
   return (
@@ -149,3 +104,17 @@ const HomePage: React.FC<Props> = () => {
 };
 
 export default HomePage;
+
+export const query = graphql`
+  query ($language: String!) {
+    locales: allLocale(filter: { language: { eq: $language } }) {
+      edges {
+        node {
+          ns
+          data
+          language
+        }
+      }
+    }
+  }
+`;
