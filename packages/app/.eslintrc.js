@@ -59,6 +59,29 @@ module.exports = {
         warnOnUnassignedImports: true,
       },
     ],
+    'no-restricted-imports': [
+      'error',
+      {
+        patterns: [
+          {
+            group: ['gatsby', 'gatsby-plugin-react-i18next'],
+            importNames: ['Link'],
+            message: 'Please use Link from `~/components/link` instead.',
+          },
+          {
+            group: ['gatsby'],
+            importNames: ['navigate'],
+            message:
+              'Please use useNavigaton from `~/hooks/navigation` instead.',
+          },
+          {
+            group: ['react-i18next', 'gatsby-plugin-react-i18next'],
+            importNames: ['useTranslation'],
+            message: 'Please use useTranslation from `~/hooks/i18n` instead.',
+          },
+        ],
+      },
+    ],
   },
   settings: {
     react: {

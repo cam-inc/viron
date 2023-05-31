@@ -22,11 +22,7 @@ const _Contact: React.FC<Props> = ({ on, className = '', data }) => {
   }, [data]);
 
   return (
-    <Link
-      className={classnames('group focus:outline-none', className)}
-      on={on}
-      to={to}
-    >
+    <Link className={classnames('group focus:outline-none', className)} to={to}>
       <div
         className={`flex gap-1 items-center text-xs text-thm-on-${on} group-hover:underline group-active:text-thm-on-${on}-low group-focus:ring-2 group-focus:ring-thm-on-${on}`}
       >

@@ -1,18 +1,19 @@
-import { navigate } from 'gatsby';
 import React, { useCallback, useMemo } from 'react';
 import Tabs, { Props as TabsProps } from '~/components/tabs';
+import { useNavigation } from '~/hooks/navigation';
 import { COLOR_SYSTEM } from '~/types';
 
 export const ITEM = {
   ENDPOINTS: 'endpoints',
   GROUPS: 'groups',
 } as const;
-export type Item = typeof ITEM[keyof typeof ITEM];
+export type Item = (typeof ITEM)[keyof typeof ITEM];
 
 export type Props = {
   item: Item;
 };
 const _Tabs: React.FC<Props> = ({ item }) => {
+  const { navigate } = useNavigation();
   const list = useMemo<TabsProps['list']>(
     () => [
       {
@@ -29,9 +30,12 @@ const _Tabs: React.FC<Props> = ({ item }) => {
     [item]
   );
 
-  const handleChange = useCallback<TabsProps['onChange']>((id) => {
-    navigate(`/dashboard/${id}`);
-  }, []);
+  const handleChange = useCallback<TabsProps['onChange']>(
+    (id) => {
+      navigate(`/dashboard/${id}`);
+    },
+    [navigate]
+  );
 
   return (
     <div>

@@ -8,14 +8,14 @@ export const URL = {
   GITHUB: 'https://github.com/cam-inc/viron/',
   TWITTER: 'https://twitter.com/TODO',
 } as const;
-export type Url = typeof URL[keyof typeof URL];
+export type Url = (typeof URL)[keyof typeof URL];
 
 export const ENVIRONMENTAL_VARIABLE = {
   AUTOCOMPLETE_VALUE: '${autocompleteValue}',
   OAUTH_REDIRECT_URI: '${oauthRedirectURI}',
 } as const;
 export type EnvironmentalVariable =
-  typeof ENVIRONMENTAL_VARIABLE[keyof typeof ENVIRONMENTAL_VARIABLE];
+  (typeof ENVIRONMENTAL_VARIABLE)[keyof typeof ENVIRONMENTAL_VARIABLE];
 export const isEnvironmentalVariable = (
   str: string
 ): str is EnvironmentalVariable => {
@@ -275,6 +275,6 @@ export const HTTP_STATUS = {
     code: 511,
   },
 } as const;
-export type HTTPStatus = typeof HTTP_STATUS[keyof typeof HTTP_STATUS];
+export type HTTPStatus = (typeof HTTP_STATUS)[keyof typeof HTTP_STATUS];
 export type HTTPStatusCode =
-  typeof HTTP_STATUS[keyof typeof HTTP_STATUS]['code'];
+  (typeof HTTP_STATUS)[keyof typeof HTTP_STATUS]['code'];

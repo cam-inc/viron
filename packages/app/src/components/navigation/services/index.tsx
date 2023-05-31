@@ -50,11 +50,7 @@ const Service: React.FC<ServiceProps> = ({ on, service }) => {
   return (
     <>
       {!service.isComingSoon ? (
-        <Link
-          className="block group focus:outline-none"
-          on={on}
-          to={service.to}
-        >
+        <Link className="block group focus:outline-none" to={service.to}>
           <div
             className={`text-2xl text-thm-on-${on} group-hover:text-thm-on-${on}-low group-active:text-thm-on-${on}-slight group-focus:ring-2 group-focus:ring-thm-on-${on}`}
           >

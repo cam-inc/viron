@@ -1,4 +1,3 @@
-import { navigate as _navigate } from 'gatsby';
 import _ from 'lodash';
 import { useCallback, useMemo, useRef } from 'react';
 import {
@@ -21,6 +20,7 @@ import {
   UnexpectedError,
   getHTTPError,
 } from '~/errors';
+import { useNavigation } from '~/hooks/navigation';
 import { remove, KEY, set } from '~/storage';
 import {
   useEndpointListGlobalState,
@@ -203,6 +203,7 @@ export type UseEndpointReturn = {
   export: () => { error: BaseError | null };
 };
 export const useEndpoint = (): UseEndpointReturn => {
+  const { navigate: _navigate } = useNavigation();
   const [endpointList, setEndpointList] = useEndpointListGlobalState();
   const setEndpointGroupList = useEndpointGroupListGlobalStateSet();
   const endpointListByGroup = useEndpointListByGroupGlobalStateValue();

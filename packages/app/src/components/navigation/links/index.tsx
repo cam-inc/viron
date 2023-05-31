@@ -1,11 +1,12 @@
 import classnames from 'classnames';
-import { useTranslation } from 'gatsby-plugin-react-i18next';
 import React from 'react';
 import { Props as BaseProps } from '~/components';
 import ExternalLinkIcon from '~/components/icon/externalLink/outline';
+import NavigationSelector from '~/components/languageSelector';
 import Link from '~/components/link';
 import { URL } from '~/constants';
-import { Pathname, URL as _URL } from '~/types';
+import { useTranslation } from '~/hooks/i18n';
+import { COLOR_SYSTEM, Pathname, URL as _URL } from '~/types';
 
 const links: {
   to: Pathname | _URL;
@@ -48,7 +49,7 @@ const Links: React.FC<Props> = ({ className = '', on }) => {
     >
       {links.map((item) => (
         <li key={item.to}>
-          <Link className="group focus:outline-none" on={on} to={item.to}>
+          <Link className="group focus:outline-none" to={item.to}>
             <div
               className={`flex gap-1 items-center text-thm-on-${on} group-hover:underline group-active:text-thm-on-${on}-low group-focus:ring-2 group-focus:ring-thm-on-${on}`}
             >
@@ -58,6 +59,9 @@ const Links: React.FC<Props> = ({ className = '', on }) => {
           </Link>
         </li>
       ))}
+      <li>
+        <NavigationSelector on={COLOR_SYSTEM.SURFACE_VARIANT} />
+      </li>
     </ul>
   );
 };
