@@ -1,11 +1,15 @@
 {
   "version": "ver. {{version}}",
   "catchphrase": "Give OAS, Get GUI.",
-  "subCatchphrase": "An Open-Source Frontend-NoCode Administration GUI Tool.",
+  "subCatchphrase": "An Open-Source Frontend-NoCode<br />Administration GUI Tool.",
   "welcomeMessage": "Vironにようこそ！",
   "description": "Vironとは、統一した操作性・ダッシュボードを持つ、オープンソースの管理画面ツールです。OpenAPI(Swagger)に対応したAPIを書くだけで、フロントエンドもデザインも学習コストもかけずに、複数の管理画面とダッシュボードを作ることができます。",
   "startButtonLabel": "Vironを利用する",
   "documentation": "ドキュメント",
   "releaseNotes": "リリースノート",
-  "help": "ヘルプ"
+  "help": "ヘルプ",
+  "service": {
+    "twitter": "Twitter",
+    "github": "GitHub"
+  }
 }
