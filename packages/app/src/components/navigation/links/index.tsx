@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import React from 'react';
 import { Props as BaseProps } from '~/components';
 import ExternalLinkIcon from '~/components/icon/externalLink/outline';
-import NavigationSelector from '~/components/languageSelector';
+import LanguageSelector from '~/components/languageSelector';
 import Link from '~/components/link';
 import { URL } from '~/constants';
 import { useTranslation } from '~/hooks/i18n';
@@ -60,7 +60,7 @@ const Links: React.FC<Props> = ({ className = '', on }) => {
         </li>
       ))}
       <li>
-        <NavigationSelector on={COLOR_SYSTEM.SURFACE_VARIANT} />
+        <LanguageSelector on={COLOR_SYSTEM.SURFACE_VARIANT} />
       </li>
     </ul>
   );

@@ -6,7 +6,7 @@ import Link from '~/components/link';
 import { useTranslation } from '~/hooks/i18n';
 
 type Props = BaseProps;
-const NavigationSelector: React.FC<Props> = ({ className = '', on }) => {
+const LanguageSelector: React.FC<Props> = ({ className = '', on }) => {
   const { t } = useTranslation();
   const { languages, originalPath } = useI18next();
   return (
@@ -27,4 +27,4 @@ const NavigationSelector: React.FC<Props> = ({ className = '', on }) => {
     </ul>
   );
 };
-export default NavigationSelector;
+export default LanguageSelector;
