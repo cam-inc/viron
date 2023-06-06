@@ -21,18 +21,18 @@
   "dashboard": {
     "endpoints": {
       "title": "ダッシュボード",
-      "description": "追加された管理画面を一覧表示します"
+      "description": "追加された$t(endpoint)を一覧表示します"
     },
     "groups": {
       "title": "ダッシュボード",
-      "description": "追加された管理画面を一覧表示します"
+      "description": "追加された$t(endpoint)を一覧表示します"
     }
   },
   "addEndpointButtonLabel": "$t(endpoint)の追加",
   "addGroupButtonLabel": "$t(group)の追加",
-  "exportEndpoints": "管理画面リストのエクスポート",
-  "importEndpoints": "管理画面リストのインポート",
-  "enterEndpoint": "管理画面",
+  "exportEndpoints": "$t(endpoint)リストのエクスポート",
+  "importEndpoints": "$t(endpoint)リストのインポート",
+  "enterEndpoint": "$t(endpoint)",
   "signout": "サインアウト",
   "oAuth": "OAuth",
   "email": "Email",
@@ -52,7 +52,6 @@
   },
   "endpointQRCodeShare": {
     "title": "QRコードの共有",
-    "description": "Share an endpoint with the QR code.",
     "copyUrlButtonLabel": "URLをコピー"
   }
 }
