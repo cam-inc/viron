@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import Tabs, { Props as TabsProps } from '~/components/tabs';
-import { useNavigation } from '~/hooks/navigation';
+import { useI18n } from '~/hooks/i18n';
 import { COLOR_SYSTEM } from '~/types';
 
 export const ITEM = {
@@ -13,7 +13,7 @@ export type Props = {
   item: Item;
 };
 const _Tabs: React.FC<Props> = ({ item }) => {
-  const { navigate } = useNavigation();
+  const { navigate } = useI18n();
   const list = useMemo<TabsProps['list']>(
     () => [
       {

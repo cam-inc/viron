@@ -71,8 +71,7 @@ module.exports = {
           {
             group: ['gatsby'],
             importNames: ['navigate'],
-            message:
-              'Please use useNavigaton from `~/hooks/navigation` instead.',
+            message: 'Please use useI8n from `~/hooks/i18n` instead.',
           },
           {
             group: ['react-i18next', 'gatsby-plugin-react-i18next'],

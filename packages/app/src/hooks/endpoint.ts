@@ -20,7 +20,7 @@ import {
   UnexpectedError,
   getHTTPError,
 } from '~/errors';
-import { useNavigation } from '~/hooks/navigation';
+import { useI18n } from '~/hooks/i18n';
 import { remove, KEY, set } from '~/storage';
 import {
   useEndpointListGlobalState,
@@ -203,7 +203,7 @@ export type UseEndpointReturn = {
   export: () => { error: BaseError | null };
 };
 export const useEndpoint = (): UseEndpointReturn => {
-  const { navigate: _navigate } = useNavigation();
+  const { navigate: _navigate } = useI18n();
   const [endpointList, setEndpointList] = useEndpointListGlobalState();
   const setEndpointGroupList = useEndpointGroupListGlobalStateSet();
   const endpointListByGroup = useEndpointListByGroupGlobalStateValue();

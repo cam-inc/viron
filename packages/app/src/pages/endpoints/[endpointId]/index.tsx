@@ -7,7 +7,7 @@ import Error from '~/components/error';
 import Metadata from '~/components/metadata';
 import { BaseError } from '~/errors/index';
 import { useEndpoint } from '~/hooks/endpoint';
-import { useNavigation } from '~/hooks/navigation';
+import { useI18n } from '~/hooks/i18n';
 import useTheme from '~/hooks/theme';
 import Layout, { Props as LayoutProps } from '~/layouts/index';
 import { useEndpointListItemGlobalStateValue } from '~/store';
@@ -25,7 +25,7 @@ type ContentId = Info['x-pages'][number]['contents'][number]['id'];
 
 type Props = PageProps;
 const EndpointPage: React.FC<Props> = ({ params }) => {
-  const { navigate } = useNavigation();
+  const { navigate } = useI18n();
   const [isPending, setIsPending] = useState<boolean>(true);
   const [error, setError] = useState<BaseError | null>(null);
   const [document, setDocument] = useState<Document | null>(null);

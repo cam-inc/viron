@@ -7,7 +7,7 @@ import Metadata from '~/components/metadata';
 import NavigationLinks from '~/components/navigation/links';
 import NavigationServices from '~/components/navigation/services';
 import { useTranslation } from '~/hooks/i18n';
-import { useNavigation } from '~/hooks/navigation';
+import { useI18n } from '~/hooks/i18n';
 import useTheme from '~/hooks/theme';
 import Layout, { Props as LayoutProps } from '~/layouts';
 import { useAppScreenGlobalStateValue } from '~/store';
@@ -17,7 +17,7 @@ import pkg from '../../package.json';
 type Props = PageProps;
 const HomePage: React.FC<Props> = () => {
   const { t } = useTranslation();
-  const { navigate } = useNavigation();
+  const { navigate } = useI18n();
   useTheme();
   const screen = useAppScreenGlobalStateValue();
 
