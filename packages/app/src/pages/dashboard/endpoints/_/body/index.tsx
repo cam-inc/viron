@@ -11,9 +11,10 @@ import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import ColorSwatchIcon from '~/components/icon/colorSwatch/outline';
 import PlusCircleIcon from '~/components/icon/plusCircle/outline';
-import Modal, { useModal } from '~/portals/modal';
 import { useEndpoint } from '~/hooks/endpoint';
+import { useTranslation } from '~/hooks/i18n';
 import { Props as LayoutProps } from '~/layouts/';
+import Modal, { useModal } from '~/portals/modal';
 import { COLOR_SYSTEM, Endpoint, EndpointGroup } from '~/types';
 import Tabs, { ITEM as TABS_ITEM } from '../../../_/tabs';
 import Add, { Props as AddProps } from './add/';
@@ -21,6 +22,7 @@ import Item from './item/';
 
 export type Props = Parameters<LayoutProps['renderBody']>[0];
 const Body: React.FC<Props> = ({ className, style }) => {
+  const { t } = useTranslation();
   const { listByGroup, listUngrouped } = useEndpoint();
 
   // Add modal.
@@ -47,10 +49,10 @@ const Body: React.FC<Props> = ({ className, style }) => {
                 title={
                   <div className="flex items-center gap-2">
                     <ColorSwatchIcon className="w-em" />
-                    <div>Dashboard / Endpoints</div>
+                    <div>{t('dashboard.endpoints.title')}</div>
                   </div>
                 }
-                description="This is your personal, private dashboard."
+                description={t('dashboard.endpoints.description')}
               />
             </div>
             <div>
@@ -62,7 +64,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
             <div className="p-4 flex justify-end border-b border-thm-on-background-slight">
               <FilledButton
                 cs={COLOR_SYSTEM.PRIMARY}
-                label="Add an Endpoint"
+                label={t('addEndpointButtonLabel')}
                 Icon={PlusCircleIcon}
                 onClick={handleAddClick}
               />

@@ -11,5 +11,47 @@
   "language": {
     "en": "English",
     "ja": "日本語"
+  },
+  "endpoint": "Endpoint",
+  "endpoints": "Endpoints",
+  "group": "Group",
+  "groups": "Groups",
+  "endpointsTabLabel": "$t(endpoints)",
+  "groupsTabLabel": "$t(groups)",
+  "dashboard": {
+    "endpoints": {
+      "title": "Dashboard / Endpoints",
+      "description": "This is your personal, private dashboard."
+    },
+    "groups": {
+      "title": "Dashboard / Groups",
+      "description": "This is your personal, private dashboard."
+    }
+  },
+  "addEndpointButtonLabel": "Add an $t(endpoint)",
+  "addGroupButtonLabel": "Add a $t(group)",
+  "exportEndpoints": "Export Endpoints",
+  "importEndpoints": "Import Endpoints",
+  "enterEndpoint": "Enter",
+  "signout": "Signout",
+  "oAuth": "OAuth",
+  "email": "Email",
+  "addEndpoint": {
+    "title": "Create an Endpoint",
+    "idInputLabel": "ID",
+    "urlInputLabel": "URL",
+    "groupInputLabel": "Group",
+    "addButtonLabel": "Create",
+    "cancelButtonLabel": "Cancel"
+  },
+  "endpointInformationButtonLabel": "Information",
+  "endpointQRCodeShareButtonLabel": "QR Code",
+  "removeEndpointButtonLabel": "Remove",
+  "endpointInformation": {
+    "title": "Information"
+  },
+  "endpointQRCodeShare": {
+    "title": "QR Code",
+    "copyUrlButtonLabel": "Copy URL"
   }
 }
