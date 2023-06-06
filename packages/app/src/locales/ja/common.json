@@ -7,5 +7,9 @@
   "startButtonLabel": "Vironを利用する",
   "documentation": "ドキュメント",
   "releaseNotes": "リリースノート",
-  "help": "ヘルプ"
+  "help": "ヘルプ",
+  "language": {
+    "en": "English",
+    "ja": "日本語"
+  }
 }

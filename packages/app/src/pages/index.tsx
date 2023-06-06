@@ -1,12 +1,12 @@
-import { navigate, PageProps } from 'gatsby';
+import { PageProps } from 'gatsby';
 import { graphql } from 'gatsby';
-import { useTranslation } from 'gatsby-plugin-react-i18next';
 import React, { useCallback } from 'react';
 import FilledButton from '~/components/button/filled';
 import Logo from '~/components/logo';
 import Metadata from '~/components/metadata';
 import NavigationLinks from '~/components/navigation/links';
 import NavigationServices from '~/components/navigation/services';
+import { useTranslation, useI18n } from '~/hooks/i18n';
 import useTheme from '~/hooks/theme';
 import Layout, { Props as LayoutProps } from '~/layouts';
 import { useAppScreenGlobalStateValue } from '~/store';
@@ -16,12 +16,13 @@ import pkg from '../../package.json';
 type Props = PageProps;
 const HomePage: React.FC<Props> = () => {
   const { t } = useTranslation();
+  const { navigate } = useI18n();
   useTheme();
   const screen = useAppScreenGlobalStateValue();
 
   const handleDashboardButtonClick = useCallback(() => {
     navigate('/dashboard/endpoints');
-  }, []);
+  }, [navigate]);
 
   const renderBody = useCallback<LayoutProps['renderBody']>(
     ({ className, style, minHeight }) => {

@@ -103,7 +103,6 @@ const Info: React.FC<Props> = ({ endpoint, document }) => {
               {document.info.termsOfService && (
                 <Link
                   className="group focus:outline-none"
-                  on={COLOR_SYSTEM.SURFACE}
                   to={document.info.termsOfService}
                 >
                   <div className="flex gap-1 items-center text-xs text-thm-on-surface group-hover:underline group-active:text-thm-on-surface-low group-focus:ring-2 group-focus:ring-thm-on-surface">

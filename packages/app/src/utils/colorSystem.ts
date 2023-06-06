@@ -30,7 +30,7 @@ export const THEME_HUE: Record<Theme, Hue> = {
   [THEME.NEON_ROSE]: 330,
   [THEME.ELECTRIC_CRIMSON]: 345,
 } as const;
-export type ThemeHue = typeof THEME_HUE[keyof typeof THEME_HUE];
+export type ThemeHue = (typeof THEME_HUE)[keyof typeof THEME_HUE];
 
 export type PrimaryKeyColor = HSL;
 export type SecondaryKeyColor = HSL;
@@ -88,13 +88,13 @@ export const TONE_LEVEL = {
   '98': 98,
   '100': 100,
 } as const;
-export type ToneLevel = typeof TONE_LEVEL[keyof typeof TONE_LEVEL];
+export type ToneLevel = (typeof TONE_LEVEL)[keyof typeof TONE_LEVEL];
 
 export const MODE_NAME = {
   LIGHT: 'light',
   DARK: 'dark',
 } as const;
-export type ModeName = typeof MODE_NAME[keyof typeof MODE_NAME];
+export type ModeName = (typeof MODE_NAME)[keyof typeof MODE_NAME];
 export const ROLE = {
   PRIMARY: 'primary',
   ON_PRIMARY: 'onPrimary',
@@ -164,7 +164,7 @@ export const ROLE = {
   ON_SURFACE_VARIANT_FAINT: 'onSurfaceVariantFaint',
   OUTLINE: 'outline',
 } as const;
-export type Role = typeof ROLE[keyof typeof ROLE];
+export type Role = (typeof ROLE)[keyof typeof ROLE];
 export type Mode = Record<Role, HSL>;
 
 export type Tokens = {

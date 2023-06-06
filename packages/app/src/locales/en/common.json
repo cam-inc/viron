@@ -7,5 +7,9 @@
   "startButtonLabel": "Get started",
   "documentation": "Documentation",
   "releaseNotes": "Release Notes",
-  "help": "Help"
+  "help": "Help",
+  "language": {
+    "en": "English",
+    "ja": "日本語"
+  }
 }
