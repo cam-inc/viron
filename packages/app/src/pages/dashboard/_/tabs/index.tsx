@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import Tabs, { Props as TabsProps } from '~/components/tabs';
-import { useI18n } from '~/hooks/i18n';
+import { useI18n, useTranslation } from '~/hooks/i18n';
 import { COLOR_SYSTEM } from '~/types';
 
 export const ITEM = {
@@ -14,20 +14,21 @@ export type Props = {
 };
 const _Tabs: React.FC<Props> = ({ item }) => {
   const { navigate } = useI18n();
+  const { t } = useTranslation();
   const list = useMemo<TabsProps['list']>(
     () => [
       {
         id: ITEM.ENDPOINTS,
-        label: 'Endpoints',
+        label: t('endpointsTabLabel'),
         isActive: item === ITEM.ENDPOINTS,
       },
       {
         id: ITEM.GROUPS,
-        label: 'Groups',
+        label: t('groupsTabLabel'),
         isActive: item === ITEM.GROUPS,
       },
     ],
-    [item]
+    [item, t]
   );
 
   const handleChange = useCallback<TabsProps['onChange']>(

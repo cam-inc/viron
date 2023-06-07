@@ -8,6 +8,7 @@ import LoginIcon from '~/components/icon/login/outline';
 import Request from '~/components/request';
 import { BaseError } from '~/errors';
 import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
+import { useTranslation } from '~/hooks/i18n';
 import Drawer, { useDrawer } from '~/portals/drawer';
 import Modal, { useModal } from '~/portals/modal';
 import { Authentication, AuthConfig, COLOR_SYSTEM, Endpoint } from '~/types/';
@@ -18,6 +19,7 @@ export type Props = {
   authentication: Authentication;
 };
 const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
+  const { t } = useTranslation();
   const authConfigOAuth = useMemo<AuthConfig | null>(
     () => authentication.list.find((item) => item.type === 'oauth') || null,
     [authentication]
@@ -44,7 +46,7 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
           <FilledButton
             cs={COLOR_SYSTEM.PRIMARY}
             Icon={LoginIcon}
-            label="OAuth"
+            label={t('oAuth')}
             onClick={handleOAuthClick}
           />
         )}
@@ -52,7 +54,7 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
           <FilledButton
             cs={COLOR_SYSTEM.PRIMARY}
             Icon={LoginIcon}
-            label="Email"
+            label={t('email')}
             onClick={handleEmailClick}
           />
         )}

@@ -7,6 +7,7 @@ import Error from '~/components/error';
 import LogoutIcon from '~/components/icon/logout/outline';
 import Request from '~/components/request';
 import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
+import { useTranslation } from '~/hooks/i18n';
 import Drawer, { useDrawer } from '~/portals/drawer';
 import { Authentication, COLOR_SYSTEM, Endpoint } from '~/types';
 import { RequestValue } from '~/types/oas';
@@ -17,6 +18,7 @@ export type Props = {
   onSignout: () => void;
 };
 const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
+  const { t } = useTranslation();
   const { prepareSignout } = useEndpoint();
   const signout = useMemo<ReturnType<UseEndpointReturn['prepareSignout']>>(
     () => prepareSignout(endpoint, authentication),
@@ -52,7 +54,7 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
       <FilledButton
         cs={COLOR_SYSTEM.SECONDARY}
         Icon={LogoutIcon}
-        label="Signout"
+        label={t('signout')}
         onClick={handleClick}
       />
       <Drawer {...drawer.bind}>
