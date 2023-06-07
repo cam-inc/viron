@@ -60,7 +60,7 @@ const HomePage: React.FC<Props> = () => {
             on={COLOR_SYSTEM.SURFACE_VARIANT}
           />
           <NavigationServices.renewal
-            className="mt-2 flex gap-2"
+            className="mt-6 flex gap-2"
             on={COLOR_SYSTEM.SURFACE_VARIANT}
           />
         </article>
