@@ -66,7 +66,7 @@ module.exports = {
       options: {
         localeJsonSourceName: 'locale', // name given to 'gatsby-source-filesystem' plugin.
         languages: ['en', 'ja'],
-        defaultLanguage: 'ja',
+        defaultLanguage: 'en',
         fallbackLanguage: 'en',
         redirect: false,
         // you can pass any i18next options

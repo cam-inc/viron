@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Props as BaseProps } from '~/components';
 import GithubIcon from '~/components/icon/github/solid';
 import TwitterIcon from '~/components/icon/twitter/solid';
 import Link from '~/components/link';
 import { URL } from '~/constants';
+import { useTranslation } from '~/hooks/i18n';
 import Popover, { usePopover } from '~/portals/popover';
 import { Pathname, URL as _URL } from '~/types';
 
@@ -71,11 +71,7 @@ const Service: React.FC<ServiceProps> = ({ on, service }) => {
   return (
     <>
       {!service.isComingSoon ? (
-        <Link
-          className="block group focus:outline-none"
-          on={on}
-          to={service.to}
-        >
+        <Link className="block group focus:outline-none" to={service.to}>
           <div
             className={`text-2xl text-thm-on-${on} group-hover:text-thm-on-${on}-low group-active:text-thm-on-${on}-slight group-focus:ring-2 group-focus:ring-thm-on-${on}`}
           >
@@ -114,7 +110,6 @@ const ServiceRenewal: React.FC<ServiceProps> = ({ on, service }) => {
       {!service.isComingSoon ? (
         <Link
           className={`flex gap-1 text-xs items-center text-thm-on-${on} hover:underline active:text-thm-on-${on}-low focus:outline outline-2 outline-thm-outline`}
-          on={on}
           to={service.to}
         >
           {service.icon}

@@ -6,12 +6,12 @@ const LEVEL = {
   ERROR: 'error', //50
   FATAL: 'fatal', //60
 } as const;
-type Level = typeof LEVEL[keyof typeof LEVEL];
+type Level = (typeof LEVEL)[keyof typeof LEVEL];
 export const NAMESPACE = {
   GENERAL: 'general',
   REACT_COMPONENT: 'reactComponent',
 } as const;
-type Namespace = typeof NAMESPACE[keyof typeof NAMESPACE];
+type Namespace = (typeof NAMESPACE)[keyof typeof NAMESPACE];
 type Payload = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   messages: any[];

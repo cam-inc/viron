@@ -215,7 +215,7 @@ const Appbar: React.FC<Props> = ({
           )}
           {document.externalDocs && (
             <div className="flex justify-end">
-              <Link on={COLOR_SYSTEM.SURFACE} to={document.externalDocs.url}>
+              <Link to={document.externalDocs.url}>
                 <div className="flex items-center gap-1 text-xxs text-thm-on-surface-low">
                   <div>External Docs</div>
                   <ExternalLinkIcon className="w-em" />
@@ -225,7 +225,7 @@ const Appbar: React.FC<Props> = ({
           )}
           {document.info.termsOfService && (
             <div className="flex justify-end">
-              <Link on={COLOR_SYSTEM.SURFACE} to={document.info.termsOfService}>
+              <Link to={document.info.termsOfService}>
                 <div className="flex items-center gap-1 text-xxs text-thm-on-surface-low">
                   <div>Terms of Service</div>
                   <ExternalLinkIcon className="w-em" />
@@ -236,7 +236,7 @@ const Appbar: React.FC<Props> = ({
           {document.info.contact && (
             <div className="flex justify-end">
               {/* TODO: Contactコンポーネントを作ること。*/}
-              <Link on={COLOR_SYSTEM.SURFACE} to="https://viron.plus">
+              <Link to="https://viron.plus">
                 <div className="flex items-center gap-1 text-xxs text-thm-on-surface-low">
                   <div>{document.info.contact.name || 'Contact'}</div>
                   <ExternalLinkIcon className="w-em" />
@@ -247,7 +247,7 @@ const Appbar: React.FC<Props> = ({
           {document.info.license && (
             <div className="flex justify-end">
               {/* TODO: Licenseコンポーネントを作ること。*/}
-              <Link on={COLOR_SYSTEM.SURFACE} to="https://viron.plus">
+              <Link to="https://viron.plus">
                 <div className="flex items-center gap-1 text-xxs text-thm-on-surface-low">
                   <div>{document.info.license.name}</div>
                   <ExternalLinkIcon className="w-em" />
