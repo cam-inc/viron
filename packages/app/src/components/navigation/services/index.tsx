@@ -9,17 +9,20 @@ import Popover, { usePopover } from '~/portals/popover';
 import { Pathname, URL as _URL } from '~/types';
 
 type ServiceType = {
+  i18nKey: string;
   to: Pathname | _URL;
   icon: JSX.Element;
   isComingSoon?: boolean;
 };
 const services: ServiceType[] = [
   {
+    i18nKey: 'service.twitter',
     to: URL.TWITTER,
     icon: <TwitterIcon className="w=em" />,
     isComingSoon: true,
   },
   {
+    i18nKey: 'service.github',
     to: URL.GITHUB,
     icon: <GithubIcon className="w-em" />,
   },
@@ -113,7 +116,7 @@ const ServiceRenewal: React.FC<ServiceProps> = ({ on, service }) => {
           to={service.to}
         >
           {service.icon}
-          <span>{t('service.twitter')}</span>
+          <span>{t(service.i18nKey)}</span>
         </Link>
       ) : (
         <button
@@ -122,7 +125,7 @@ const ServiceRenewal: React.FC<ServiceProps> = ({ on, service }) => {
           onClick={handleButtonClick}
         >
           {service.icon}
-          <span>{t('service.github')}</span>
+          <span>{t(service.i18nKey)}</span>
         </button>
       )}
       <Popover {...popover.bind}>
