@@ -68,7 +68,7 @@ const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
   return (
     <>
       {style}
-      <div id="root" className="relative font-mono">
+      <div id="root" className="relative">
         <div>{children}</div>
         <DrawerWrapper className="fixed inset-0 z-wrapper-drawer" />
         <ModalWrapper className="fixed inset-0 z-wrapper-modal" />

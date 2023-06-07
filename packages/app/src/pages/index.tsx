@@ -6,7 +6,7 @@ import Logo from '~/components/logo';
 import Metadata from '~/components/metadata';
 import NavigationLinks from '~/components/navigation/links';
 import NavigationServices from '~/components/navigation/services';
-import { useTranslation, useI18n } from '~/hooks/i18n';
+import { useTranslation, useI18n, Trans } from '~/hooks/i18n';
 import useTheme from '~/hooks/theme';
 import Layout, { Props as LayoutProps } from '~/layouts';
 import { useAppScreenGlobalStateValue } from '~/store';
@@ -27,67 +27,71 @@ const HomePage: React.FC<Props> = () => {
   const renderBody = useCallback<LayoutProps['renderBody']>(
     ({ className, style, minHeight }) => {
       const poster = (
-        <div className="p-4 bg-thm-background text-thm-on-background flex flex-col items-center justify-center">
-          <div className="w-24 mb-4">
+        <div className="bg-thm-background text-thm-on-background flex flex-col items-center justify-center">
+          <div className="w-24">
             <Logo
               left="text-thm-on-background-high"
               right="text-thm-on-background"
             />
           </div>
-          <div className="text-xl font-bold mb-2 text-thm-on-background-high">
+          <div className="text-2xl mt-8 font-bold mb-2 text-thm-on-background-high">
             {t('catchphrase')}
           </div>
-          <p className="text-center mb-2">{t('subCatchphrase')}</p>
-          <div className="text-xs text-thm-on-background-low">
+          <p className="text-center mt-3 text-xs">
+            <Trans t={t} i18nKey="subCatchphrase" components={{ br: <br /> }} />
+          </p>
+          <div className="text-xxs mt-6 text-thm-on-background-low">
             {t('version', { version: pkg.version })}
           </div>
         </div>
       );
       const direction = (
-        <div className="p-4 bg-thm-surface text-thm-on-surface flex flex-col gap-2 items-center justify-center">
-          <div className="mb-2">{t('welcomeMessage')}</div>
-          <div className="mb-6 max-w-75% text-sm leading-10">
-            {t('description')}
-          </div>
-          <FilledButton
-            className="mb-8"
+        <article className="w-72 mx-auto">
+          <h1 className="text-lg font-bold mb-4">{t('welcomeMessage')}</h1>
+          <p className="mb-6 text-sm leading-relaxed">{t('description')}</p>
+          <FilledButton.renewal
+            className="mb-21 w-full"
             cs={COLOR_SYSTEM.PRIMARY}
             label={t('startButtonLabel')}
             onClick={handleDashboardButtonClick}
           />
-          <div className="py-2 px-8 mb-2 border-t border-b border-dotted border-thm-on-surface-slight">
-            <NavigationLinks on={COLOR_SYSTEM.SURFACE_VARIANT} />
-          </div>
-          <div>
-            <NavigationServices on={COLOR_SYSTEM.SURFACE_VARIANT} />
-          </div>
-        </div>
+          <NavigationLinks.renewal
+            className="flex gap-2"
+            on={COLOR_SYSTEM.SURFACE_VARIANT}
+          />
+          <NavigationServices.renewal
+            className="mt-6 flex gap-2"
+            on={COLOR_SYSTEM.SURFACE_VARIANT}
+          />
+        </article>
       );
 
       return (
         <div className={className} style={style}>
           {screen.lg ? (
-            <div className="absolute inset-0 flex items-stretch justify-center">
+            <div className="absolute inset-0 flex">
               {/* Left Side */}
-              <div className="flex-1 flex items-stretch justify-center">
+              <div className="flex-1 flex items-center justify-center">
                 {poster}
               </div>
               {/* Right Side */}
-              <div className="flex-1 flex items-stretch justify-center">
+              <div className="py-8 bg-thm-surface text-thm-on-surface flex-1 flex items-center justify-center">
                 {direction}
               </div>
             </div>
           ) : (
-            <div>
-              <div
-                style={{
-                  height: `${minHeight}px`,
-                }}
-                className="flex items-stretch justify-center"
-              >
+            <div
+              style={{
+                height: `${minHeight}px`,
+              }}
+              className="flex flex-col"
+            >
+              <div className="pt-19 pb-7 flex items-stretch justify-center ">
                 {poster}
               </div>
-              <div>{direction}</div>
+              <div className="py-8 bg-thm-surface text-thm-on-surface grow">
+                {direction}
+              </div>
             </div>
           )}
         </div>

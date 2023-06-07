@@ -225,6 +225,7 @@ export const getTokens = (theme: Theme): Tokens => {
     SURFACE_VARIANT_ON_LOW: 40,
     SURFACE_VARIANT_ON_SLIGHT: 75,
     SURFACE_VARIANT_ON_FAINT: 80,
+    OUTLINE: 50,
   };
   const DARK_TONE: Record<string, ToneLevel> = {
     GROUND: 30,
@@ -257,6 +258,7 @@ export const getTokens = (theme: Theme): Tokens => {
     SURFACE_VARIANT_ON_LOW: 60,
     SURFACE_VARIANT_ON_SLIGHT: 25,
     SURFACE_VARIANT_ON_FAINT: 20,
+    OUTLINE: 60,
   };
   return {
     tonalPalettes: {
@@ -532,7 +534,10 @@ export const getTokens = (theme: Theme): Tokens => {
           getTones(keyColors.neutral.variant),
           LIGHT_TONE.SURFACE_VARIANT_ON_FAINT
         ).hsl,
-        outline: pickTone(getTones(keyColors.neutral.variant), 50).hsl,
+        outline: pickTone(
+          getTones(keyColors.neutral.variant),
+          LIGHT_TONE.OUTLINE
+        ).hsl,
       },
       [MODE_NAME.DARK]: {
         primary: pickTone(getTones(keyColors.accent.primary), DARK_TONE.GROUND)
@@ -785,7 +790,10 @@ export const getTokens = (theme: Theme): Tokens => {
           getTones(keyColors.neutral.variant),
           DARK_TONE.SURFACE_VARIANT_ON_FAINT
         ).hsl,
-        outline: pickTone(getTones(keyColors.neutral.variant), 60).hsl,
+        outline: pickTone(
+          getTones(keyColors.neutral.variant),
+          DARK_TONE.OUTLINE
+        ).hsl,
       },
     },
   };

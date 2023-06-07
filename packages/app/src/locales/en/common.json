@@ -1,13 +1,17 @@
 {
   "version": "ver. {{version}}",
   "catchphrase": "Give OAS, Get GUI.",
-  "subCatchphrase": "An Open-Source Frontend-NoCode Administration GUI Tool.",
+  "subCatchphrase": "An Open-Source Frontend-NoCode<br />Administration GUI Tool.",
   "welcomeMessage": "Welcome to Viron!",
   "description": "Viron is an open source admin tool with unified usability and dashboards, allowing you to create multiple admin screens and dashboards by simply writing an OpenAPI (Swagger) compliant API, with no front-end, no design and no learning costs.",
   "startButtonLabel": "Get started",
   "documentation": "Documentation",
   "releaseNotes": "Release Notes",
   "help": "Help",
+  "service": {
+    "twitter": "Twitter",
+    "github": "GitHub"
+  },
   "language": {
     "en": "English",
     "ja": "日本語"

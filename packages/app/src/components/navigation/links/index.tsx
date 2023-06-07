@@ -38,7 +38,9 @@ const links: {
 ];
 
 type Props = BaseProps;
-const Links: React.FC<Props> = ({ className = '', on }) => {
+const Links: React.FC<Props> & {
+  renewal: React.FC<Props>;
+} = ({ className = '', on }) => {
   const { t } = useTranslation();
   return (
     <ul
@@ -65,4 +67,25 @@ const Links: React.FC<Props> = ({ className = '', on }) => {
     </ul>
   );
 };
+const Renewal: React.FC<Props> = ({ className = '', on }) => {
+  const { t } = useTranslation();
+  return (
+    <ul className={className}>
+      {links.map((item) => (
+        <li key={item.to}>
+          <Link
+            className={`flex gap-1 text-xs items-center text-thm-on-${on} hover:underline active:text-thm-on-${on}-low focus:outline outline-2 outline-thm-outline`}
+            to={item.to}
+          >
+            {item.isExternal && <ExternalLinkIcon className="w-em" />}
+            <div>{t(item.label)}</div>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+Links.renewal = Renewal;
+
 export default Links;
