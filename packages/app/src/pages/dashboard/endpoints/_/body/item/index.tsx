@@ -14,6 +14,7 @@ import TrashIcon from '~/components/icon/trash/outline';
 import Spinner from '~/components/spinner';
 import { BaseError } from '~/errors';
 import { useEndpoint } from '~/hooks/endpoint';
+import { useTranslation } from '~/hooks/i18n';
 import Modal, { useModal } from '~/portals/modal';
 import Popover, { usePopover } from '~/portals/popover';
 import { Authentication, COLOR_SYSTEM, Endpoint } from '~/types';
@@ -23,7 +24,6 @@ import Qrcode from './qrcode';
 import Signin from './signin/';
 import Signout, { Props as SignoutProps } from './signout/';
 import Thumbnail from './thumbnail/';
-import { useTranslation } from '~/hooks/i18n';
 
 export type Props = {
   endpoint: Endpoint;

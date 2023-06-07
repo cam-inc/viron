@@ -32,7 +32,7 @@
   "addGroupButtonLabel": "$t(group)の追加",
   "exportEndpoints": "$t(endpoint)リストのエクスポート",
   "importEndpoints": "$t(endpoint)リストのインポート",
-  "enterEndpoint": "$t(endpoint)",
+  "enterEndpoint": "管理画面",
   "signout": "サインアウト",
   "oAuth": "OAuth",
   "email": "Email",
