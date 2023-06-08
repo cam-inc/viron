@@ -1,0 +1,71 @@
+openapi: 3.0.2
+
+info:
+  version: 0.0.1
+  title: '@viron/lib admin account'
+  description: admin user account api specifications
+  x-pages:
+    - id: vironAdminAccount
+      group: 管理画面/管理
+      title: Viron アカウント設定
+      description: アカウント設定を閲覧できます
+      contents:
+        - operationId: listVironAdminAccounts
+          resourceId: vironAdminAccount
+          type: table
+          pagination: true
+
+tags:
+  - name: vironAdminAccounts
+
+paths:
+  /viron/adminaccounts:
+    get:
+      operationId: listVironAdminAccounts
+      tags:
+        - vironAdminAccount
+      summary: list admin account
+      description: 管理ユーザーアカウント
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: './adminusers.yaml#/components/schemas/VironAdminUserListWithPager'
+      security:
+        - jwt: []
+
+  /viron/adminaccounts/{id}:
+    put:
+      operationId: updateVironAdminAccount
+      tags:
+        - vironAdminAccount
+      summary: update an admin account
+      description: 管理ユーザーのアカウント情報を更新する
+      parameters:
+        - $ref: './components.yaml#/components/parameters/VironIdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VironAdminAccountUpdatePayload'
+      responses:
+        204:
+          description: OK
+      security:
+        - jwt: []
+
+components:
+  schemas:
+    VironAdminAccountUpdatePayload:
+      type: object
+      properties:
+        password:
+          description: パスワード
+          type: string
+          format: password
+          pattern: "^.*?[a-zA-Z\\d!?#$%&@*+/-_<=>]{8,}"
+      required:
+        - password

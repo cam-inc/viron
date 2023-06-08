@@ -27,7 +27,7 @@ const ExternalDocs: React.FC<Props> = ({ on, data, className = '' }) => {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <Link className="group focus-outline-none" on={on} to={data.url}>
+        <Link className="group focus-outline-none" to={data.url}>
           <div
             className={`flex gap-1 items-center text-xs text-thm-on-${on} group-hover:underline group-active:text-thm-on-${on}-low group-focus:ring-2 group-focus:ring-thm-on-${on}`}
           >

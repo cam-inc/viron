@@ -20,4 +20,4 @@ export const SIZE = {
   XL: 'xl',
   '2XL': '2xl',
 };
-export type Size = typeof SIZE[keyof typeof SIZE];
+export type Size = (typeof SIZE)[keyof typeof SIZE];

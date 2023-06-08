@@ -1,0 +1,61 @@
+{
+  "version": "ver. {{version}}",
+  "catchphrase": "Give OAS, Get GUI.",
+  "subCatchphrase": "An Open-Source Frontend-NoCode<br />Administration GUI Tool.",
+  "welcomeMessage": "Welcome to Viron!",
+  "description": "Viron is an open source admin tool with unified usability and dashboards, allowing you to create multiple admin screens and dashboards by simply writing an OpenAPI (Swagger) compliant API, with no front-end, no design and no learning costs.",
+  "startButtonLabel": "Get started",
+  "documentation": "Documentation",
+  "releaseNotes": "Release Notes",
+  "help": "Help",
+  "service": {
+    "twitter": "Twitter",
+    "github": "GitHub"
+  },
+  "language": {
+    "en": "English",
+    "ja": "日本語"
+  },
+  "endpoint": "Endpoint",
+  "endpoints": "Endpoints",
+  "group": "Group",
+  "groups": "Groups",
+  "endpointsTabLabel": "$t(endpoints)",
+  "groupsTabLabel": "$t(groups)",
+  "dashboard": {
+    "endpoints": {
+      "title": "Dashboard / $t(endpoints)",
+      "description": "This is your personal, private dashboard."
+    },
+    "groups": {
+      "title": "Dashboard / $t(groups)",
+      "description": "This is your personal, private dashboard."
+    }
+  },
+  "addEndpointButtonLabel": "Add an $t(endpoint)",
+  "addGroupButtonLabel": "Add a $t(group)",
+  "exportEndpoints": "Export $t(endpoints)",
+  "importEndpoints": "Import $t(endpoints)",
+  "enterEndpoint": "Enter",
+  "signout": "Signout",
+  "oAuth": "OAuth",
+  "email": "Email",
+  "addEndpoint": {
+    "title": "Create an $t(endpoint)",
+    "idInputLabel": "ID",
+    "urlInputLabel": "URL",
+    "groupInputLabel": "$t(group)",
+    "addButtonLabel": "Create",
+    "cancelButtonLabel": "Cancel"
+  },
+  "endpointInformationButtonLabel": "Information",
+  "endpointQRCodeShareButtonLabel": "QR Code",
+  "removeEndpointButtonLabel": "Remove",
+  "endpointInformation": {
+    "title": "Information"
+  },
+  "endpointQRCodeShare": {
+    "title": "QR Code",
+    "copyUrlButtonLabel": "Copy URL"
+  }
+}

@@ -13,12 +13,14 @@ import Server from '~/components/server';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document } from '~/types/oas';
 import Thumbnail from '../thumbnail';
+import { useTranslation } from '~/hooks/i18n';
 
 type Props = {
   endpoint: Endpoint;
   document?: Document;
 };
 const Info: React.FC<Props> = ({ endpoint, document }) => {
+  const { t } = useTranslation();
   return (
     <div className="text-thm-on-surface">
       <div className="pb-4 mb-4 border-b border-thm-on-surface-slight">
@@ -27,7 +29,7 @@ const Info: React.FC<Props> = ({ endpoint, document }) => {
           title={
             <div className="flex items-center gap-2">
               <InformationCircleIcon className="w-em" />
-              <div>Information</div>
+              <div>{t('endpointInformation.title')}</div>
             </div>
           }
         />
@@ -103,7 +105,6 @@ const Info: React.FC<Props> = ({ endpoint, document }) => {
               {document.info.termsOfService && (
                 <Link
                   className="group focus:outline-none"
-                  on={COLOR_SYSTEM.SURFACE}
                   to={document.info.termsOfService}
                 >
                   <div className="flex gap-1 items-center text-xs text-thm-on-surface group-hover:underline group-active:text-thm-on-surface-low group-focus:ring-2 group-focus:ring-thm-on-surface">

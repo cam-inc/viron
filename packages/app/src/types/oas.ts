@@ -64,7 +64,7 @@ export const CONTENT_TYPE = {
   TABLE: 'table',
 } as const;
 export type ContentId = string;
-export type ContentType = typeof CONTENT_TYPE[keyof typeof CONTENT_TYPE];
+export type ContentType = (typeof CONTENT_TYPE)[keyof typeof CONTENT_TYPE];
 export type Content = {
   // Will be assigned on client side.
   id: ContentId;
@@ -110,7 +110,7 @@ export const THEME = {
   NEON_ROSE: 'neon rose',
   ELECTRIC_CRIMSON: 'electric crimson',
 } as const;
-export type Theme = typeof THEME[keyof typeof THEME];
+export type Theme = (typeof THEME)[keyof typeof THEME];
 
 // [extended] Common setting for page contents that are type of table.
 export type X_Number = {
@@ -130,7 +130,7 @@ export const SORT = {
   DESC: 'desc',
   NONE: 'none',
 } as const;
-export type Sort = typeof SORT[keyof typeof SORT];
+export type Sort = (typeof SORT)[keyof typeof SORT];
 export type TableColumn = {
   schema: Schema;
   name: string;
@@ -219,7 +219,7 @@ export const METHOD = {
   PATCH: 'patch',
   TRACE: 'trace',
 } as const;
-export type Method = typeof METHOD[keyof typeof METHOD];
+export type Method = (typeof METHOD)[keyof typeof METHOD];
 
 // This is not a part of OAS.
 export type Request = {

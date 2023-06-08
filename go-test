@@ -1,0 +1,14 @@
+#!/bin/sh
+cd ./packages/golang
+
+output=./cover.out
+echo "mode: set" > $output
+index=1
+for p in `go list ./... | grep -v  github.com/cam-inc/viron/packages/golang/repositories/mysql/gen`; do
+  go test $p -v -coverprofile=$index.out
+  tail -n +2 $index.out >> $output
+  index=$((index+=1))
+  echo $index
+done
+go tool cover -func=$output
+cd -

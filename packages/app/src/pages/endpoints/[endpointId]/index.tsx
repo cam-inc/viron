@@ -1,5 +1,5 @@
 import { useLocation } from '@reach/router';
-import { navigate, PageProps } from 'gatsby';
+import { graphql, PageProps } from 'gatsby';
 import _ from 'lodash';
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -7,6 +7,7 @@ import Error from '~/components/error';
 import Metadata from '~/components/metadata';
 import { BaseError } from '~/errors/index';
 import { useEndpoint } from '~/hooks/endpoint';
+import { useI18n } from '~/hooks/i18n';
 import useTheme from '~/hooks/theme';
 import Layout, { Props as LayoutProps } from '~/layouts/index';
 import { useEndpointListItemGlobalStateValue } from '~/store';
@@ -24,6 +25,7 @@ type ContentId = Info['x-pages'][number]['contents'][number]['id'];
 
 type Props = PageProps;
 const EndpointPage: React.FC<Props> = ({ params }) => {
+  const { navigate } = useI18n();
   const [isPending, setIsPending] = useState<boolean>(true);
   const [error, setError] = useState<BaseError | null>(null);
   const [document, setDocument] = useState<Document | null>(null);
@@ -268,3 +270,17 @@ const EndpointPage: React.FC<Props> = ({ params }) => {
 };
 
 export default EndpointPage;
+
+export const query = graphql`
+  query ($language: String!) {
+    locales: allLocale(filter: { language: { eq: $language } }) {
+      edges {
+        node {
+          ns
+          data
+          language
+        }
+      }
+    }
+  }
+`;

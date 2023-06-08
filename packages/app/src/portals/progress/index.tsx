@@ -1,12 +1,22 @@
 import classnames from 'classnames';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import Portal, { TARGET } from '~/portals';
 
 type Props = {
   isOpened: boolean;
   onRequestClose: () => void;
 };
-const Progress: React.FC<Props> = ({ isOpened, onRequestClose, children }) => {
+const Progress: React.FC<PropsWithChildren<Props>> = ({
+  isOpened,
+  onRequestClose,
+  children,
+}) => {
   const [isVisible, setIsVisible] = useState<boolean>(isOpened);
   useEffect(() => {
     setIsVisible(isOpened);

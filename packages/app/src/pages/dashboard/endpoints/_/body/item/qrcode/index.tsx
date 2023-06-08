@@ -8,6 +8,7 @@ import Head from '~/components/head';
 import ClipboardCopyIcon from '~/components/icon/clipboardCopy/outline';
 import QrcodeIcon from '~/components/icon/qrcode/outline';
 import { BaseError } from '~/errors';
+import { useTranslation } from '~/hooks/i18n';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
 
 type Props = {
@@ -15,6 +16,7 @@ type Props = {
 };
 
 const QRCode: React.FC<Props> = ({ endpoint }) => {
+  const { t } = useTranslation();
   const [error, setError] = useState<BaseError | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [data, setData] = useState<string>('');
@@ -27,7 +29,7 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
     const data = `${
       new URL(location.href).origin
     }/endpointimport?endpoint=${encodeURIComponent(JSON.stringify(endpoint))}`;
-    qrcode.toCanvas(canvasElement, data, function (error: Error) {
+    qrcode.toCanvas(canvasElement, data, function (error) {
       if (error) {
         setError(new BaseError(error.message));
       }
@@ -51,26 +53,21 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
           title={
             <div className="flex items-center gap-2">
               <QrcodeIcon className="w-em" />
-              <div>QR Code</div>
+              <div>{t('endpointQRCodeShare.title')}</div>
             </div>
           }
-          description="Share an endpoint with the QR code."
         />
       </div>
       <div className="flex justify-center">
         <canvas ref={canvasRef} />
       </div>
       <div className="mt-4 pt-4 flex flex-col items-end gap-2 border-t border-dotted border-thm-on-surface-slight">
-        <div className="">
-          Or, you can{' '}
-          <FilledButton
-            cs={COLOR_SYSTEM.PRIMARY}
-            Icon={ClipboardCopyIcon}
-            label="Copy"
-            onClick={handleCopyClick}
-          />{' '}
-          the URL.
-        </div>
+        <FilledButton
+          cs={COLOR_SYSTEM.PRIMARY}
+          Icon={ClipboardCopyIcon}
+          label={t('endpointQRCodeShare.copyUrlButtonLabel')}
+          onClick={handleCopyClick}
+        />
         <div className="text-thm-on-surface-low text-xxs text-right max-w-[380px] break-all">
           {data}
         </div>
