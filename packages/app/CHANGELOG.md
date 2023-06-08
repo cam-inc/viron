@@ -1,5 +1,18 @@
 # @viron/app
 
+## 2.3.0
+
+### Minor Changes
+
+- 24511853: Japanese localization support for top page.
+- c155e3a8: I18n support for dashboard.
+- 4e0c764a: Implementation of language selector.
+
+### Patch Changes
+
+- d02c51af: Updated Gatsby version to v5 from v4
+- b6382c10: Remove unnecessary volta version specification.
+
 ## 2.2.0
 
 ### Minor Changes
