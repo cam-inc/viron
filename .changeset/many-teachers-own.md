@@ -1,5 +1,6 @@
 ---
-"@viron/app": minor
+"@viron/app": patch
 ---
 
-Remove language selector because of navigation bug.
+Temporarily hide the language switch button.
+Switching languages may cause problems.
