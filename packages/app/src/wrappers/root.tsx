@@ -1,12 +1,7 @@
 import classnames from 'classnames';
 import { PluginOptions } from 'gatsby';
 import _ from 'lodash';
-import React, {
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useMemo,
-} from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { HelmetProvider } from 'react-helmet-async';
@@ -18,6 +13,7 @@ import Error, { useError } from '~/components/error';
 import ErrorBoundary from '~/components/errorBoundary';
 import Spinner from '~/components/spinner';
 import { UnhandledError } from '~/errors';
+import '~/i18n';
 import {
   GlobalStateProvider,
   useAppIsLaunchedGlobalState,
@@ -58,7 +54,7 @@ const RootWrapper: React.FC<Props> = (props) => {
 };
 export default RootWrapper;
 
-const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
+const Root: React.FC<Props> = ({ children }) => {
   // Entry point.
   const { launch, isLaunched, style, error } = useRoot();
   useEffect(() => {
@@ -68,7 +64,7 @@ const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
   return (
     <>
       {style}
-      <div id="root" className="relative">
+      <div id="root" className="relative font-mono">
         <div>{children}</div>
         <DrawerWrapper className="fixed inset-0 z-wrapper-drawer" />
         <ModalWrapper className="fixed inset-0 z-wrapper-modal" />

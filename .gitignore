@@ -50,5 +50,3 @@ tsconfig.tsbuildinfo
 !.gitkeep
 
 .env
-
-.idea

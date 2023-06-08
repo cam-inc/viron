@@ -1,103 +1,143 @@
-import { PageProps } from 'gatsby';
-import { graphql } from 'gatsby';
+import { navigate, PageProps } from 'gatsby';
 import React, { useCallback } from 'react';
+import { SIZE as BUTTON_SIZE } from '~/components/button';
 import FilledButton from '~/components/button/filled';
+import FilledOnButton from '~/components/button/filled/on';
+import BookOpenIcon from '~/components/icon/bookOpen/outline';
+import ColorSwatchIcon from '~/components/icon/colorSwatch/outline';
+import UserGroupIcon from '~/components/icon/userGroup/outline';
 import Logo from '~/components/logo';
 import Metadata from '~/components/metadata';
 import NavigationLinks from '~/components/navigation/links';
 import NavigationServices from '~/components/navigation/services';
-import { useTranslation, useI18n, Trans } from '~/hooks/i18n';
-import useTheme from '~/hooks/theme';
+import { URL } from '~/constants';
 import Layout, { Props as LayoutProps } from '~/layouts';
+import useTheme from '~/hooks/theme';
 import { useAppScreenGlobalStateValue } from '~/store';
 import { COLOR_SYSTEM } from '~/types';
 import pkg from '../../package.json';
 
 type Props = PageProps;
 const HomePage: React.FC<Props> = () => {
-  const { t } = useTranslation();
-  const { navigate } = useI18n();
   useTheme();
   const screen = useAppScreenGlobalStateValue();
 
   const handleDashboardButtonClick = useCallback(() => {
     navigate('/dashboard/endpoints');
-  }, [navigate]);
+  }, []);
+
+  const handleDocumentationButtonClick = useCallback(() => {
+    globalThis.open(URL.DOCUMENTATION);
+  }, []);
+
+  const handleContributionButtonClick = useCallback(() => {
+    globalThis.open(URL.GITHUB);
+  }, []);
 
   const renderBody = useCallback<LayoutProps['renderBody']>(
     ({ className, style, minHeight }) => {
       const poster = (
-        <div className="bg-thm-background text-thm-on-background flex flex-col items-center justify-center">
-          <div className="w-24">
+        <div className="p-4 bg-thm-background text-thm-on-background flex flex-col items-center justify-center">
+          <div className="w-24 mb-4">
             <Logo
               left="text-thm-on-background-high"
               right="text-thm-on-background"
             />
           </div>
-          <div className="text-2xl mt-8 font-bold mb-2 text-thm-on-background-high">
-            {t('catchphrase')}
+          <div className="text-xl font-bold mb-2 text-thm-on-background-high">
+            Give OAS, Get GUI.
           </div>
-          <p className="text-center mt-3 text-xs">
-            <Trans t={t} i18nKey="subCatchphrase" components={{ br: <br /> }} />
+          <p className="text-center mb-2">
+            An Open-Source Frontend-NoCode Administration GUI Tool.
           </p>
-          <div className="text-xxs mt-6 text-thm-on-background-low">
-            {t('version', { version: pkg.version })}
+          <div className="text-xs text-thm-on-background-low">
+            ver. {pkg.version}
           </div>
         </div>
       );
       const direction = (
-        <article className="w-72 mx-auto">
-          <h1 className="text-lg font-bold mb-4">{t('welcomeMessage')}</h1>
-          <p className="mb-6 text-sm leading-relaxed">{t('description')}</p>
-          <FilledButton.renewal
-            className="mb-21 w-full"
-            cs={COLOR_SYSTEM.PRIMARY}
-            label={t('startButtonLabel')}
-            onClick={handleDashboardButtonClick}
-          />
-          <NavigationLinks.renewal
-            className="flex gap-2"
-            on={COLOR_SYSTEM.SURFACE_VARIANT}
-          />
-          <NavigationServices.renewal
-            className="mt-6 flex gap-2"
-            on={COLOR_SYSTEM.SURFACE_VARIANT}
-          />
-        </article>
+        <div className="p-4 bg-thm-surface text-thm-on-surface flex flex-col gap-2 items-center justify-center">
+          <div className="mb-2">
+            Welcome to Viron{' '}
+            <Logo
+              className="inline w-em"
+              left="text-thm-on-surface-high"
+              right="text-thm-on-surface"
+            />{' '}
+            !
+          </div>
+          <div className="mb-8 max-w-75% text-sm leading-10">
+            Visit{' '}
+            <FilledButton
+              cs={COLOR_SYSTEM.PRIMARY}
+              size={BUTTON_SIZE.SM}
+              label="Dashboard"
+              Icon={ColorSwatchIcon}
+              onClick={handleDashboardButtonClick}
+            />{' '}
+            to administrate your services. To learn more about Viron{' '}
+            <Logo
+              className="inline w-em"
+              left="text-thm-on-surface-high"
+              right="text-thm-on-surface"
+            />
+            , read{' '}
+            <FilledOnButton
+              on={COLOR_SYSTEM.SURFACE}
+              size={BUTTON_SIZE.SM}
+              label="Documentation"
+              Icon={BookOpenIcon}
+              onClick={handleDocumentationButtonClick}
+            />
+            . Your{' '}
+            <FilledOnButton
+              on={COLOR_SYSTEM.SURFACE}
+              size={BUTTON_SIZE.SM}
+              label="Contribution"
+              Icon={UserGroupIcon}
+              onClick={handleContributionButtonClick}
+            />{' '}
+            are always welcomed.
+          </div>
+          <div className="py-2 px-8 mb-2 border-t border-b border-dotted border-thm-on-surface-slight">
+            <NavigationLinks on={COLOR_SYSTEM.SURFACE_VARIANT} />
+          </div>
+          <div>
+            <NavigationServices on={COLOR_SYSTEM.SURFACE_VARIANT} />
+          </div>
+        </div>
       );
 
       return (
         <div className={className} style={style}>
           {screen.lg ? (
-            <div className="absolute inset-0 flex">
+            <div className="absolute inset-0 flex items-stretch justify-center">
               {/* Left Side */}
-              <div className="flex-1 flex items-center justify-center">
+              <div className="flex-1 flex items-stretch justify-center">
                 {poster}
               </div>
               {/* Right Side */}
-              <div className="py-8 bg-thm-surface text-thm-on-surface flex-1 flex items-center justify-center">
+              <div className="flex-1 flex items-stretch justify-center">
                 {direction}
               </div>
             </div>
           ) : (
-            <div
-              style={{
-                height: `${minHeight}px`,
-              }}
-              className="flex flex-col"
-            >
-              <div className="pt-19 pb-7 flex items-stretch justify-center ">
+            <div>
+              <div
+                style={{
+                  height: `${minHeight}px`,
+                }}
+                className="flex items-stretch justify-center"
+              >
                 {poster}
               </div>
-              <div className="py-8 bg-thm-surface text-thm-on-surface grow">
-                {direction}
-              </div>
+              <div>{direction}</div>
             </div>
           )}
         </div>
       );
     },
-    [handleDashboardButtonClick, screen.lg, t]
+    [screen]
   );
 
   return (
@@ -109,17 +149,3 @@ const HomePage: React.FC<Props> = () => {
 };
 
 export default HomePage;
-
-export const query = graphql`
-  query ($language: String!) {
-    locales: allLocale(filter: { language: { eq: $language } }) {
-      edges {
-        node {
-          ns
-          data
-          language
-        }
-      }
-    }
-  }
-`;

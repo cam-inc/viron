@@ -1,17 +1,15 @@
-// eslint-disable-next-line no-restricted-imports
-import { Link as I18nextLink } from 'gatsby-plugin-react-i18next';
-import React, { ComponentProps } from 'react';
+import { Link as GatsbyLink, GatsbyLinkProps } from 'gatsby';
+import React from 'react';
 import { Props as BaseProps } from '~/components';
 
-type Props = Omit<BaseProps, 'on'> &
-  Pick<ComponentProps<typeof I18nextLink>, 'to' | 'language'>;
-const Link: React.FC<Props> = ({ className = '', to, language, children }) => {
+type Props = BaseProps & Pick<GatsbyLinkProps<Record<string, string>>, 'to'>;
+const Link: React.FC<Props> = ({ className = '', to, children }) => {
   const isInternal = /^\/(?!\/)/.test(to);
   if (isInternal) {
     return (
-      <I18nextLink to={to} className={className} language={language}>
+      <GatsbyLink to={to} className={className}>
         {children}
-      </I18nextLink>
+      </GatsbyLink>
     );
   } else {
     return (

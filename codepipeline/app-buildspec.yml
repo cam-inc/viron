@@ -4,22 +4,18 @@ run-as: root
 phases:
   install:
     runtime-versions:
-      nodejs: 18
+      nodejs: latest
 
   pre_build:
     commands:
       - echo Install packages...
-      - cd $CODEBUILD_SRC_DIR/packages/linter
-      - npm install --no-progress
-      - echo Building linter...
-      - npm run build
+      - cd $CODEBUILD_SRC_DIR/packages/app
+      - npm install --no-progress --legacy-peer-deps && npm cache verify
 
   build:
     commands:
-      - echo Install packages...
-      - cd $CODEBUILD_SRC_DIR/packages/app
-      - npm install --no-progress
       - echo Building app...
+      - cd $CODEBUILD_SRC_DIR/packages/app
       - npm run build
 
 artifacts:

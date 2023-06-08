@@ -54,31 +54,11 @@ module.exports = {
         },
       },
     },
-    {
-      resolve: 'gatsby-source-filesystem',
-      options: {
-        path: `${__dirname}/src/locales`,
-        name: 'locale',
-      },
-    },
-    {
-      resolve: 'gatsby-plugin-react-i18next',
-      options: {
-        localeJsonSourceName: 'locale', // name given to 'gatsby-source-filesystem' plugin.
-        languages: ['en', 'ja'],
-        defaultLanguage: 'en',
-        fallbackLanguage: 'en',
-        redirect: false,
-        // you can pass any i18next options
-        i18nextOptions: {
-          defaultNS: 'common',
-          fallbackLng: 'en',
-        },
-      },
-    },
   ],
   // @see: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/#flags
-  flags: {},
+  flags: {
+    FAST_DEV: true,
+  },
   // @see: https://www.gatsbyjs.com/docs/api-proxy/#advanced-proxying
   developMiddleware: (app) => {
     app.use((req, res, next) => {

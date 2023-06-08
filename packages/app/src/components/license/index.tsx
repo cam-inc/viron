@@ -13,6 +13,7 @@ const _License: React.FC<Props> = ({ on, className = '', data }) => {
     return (
       <Link
         className={classnames('group focus:outline-none', className)}
+        on={on}
         to={data.url}
       >
         <div

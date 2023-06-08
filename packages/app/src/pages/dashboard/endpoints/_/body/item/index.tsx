@@ -14,7 +14,6 @@ import TrashIcon from '~/components/icon/trash/outline';
 import Spinner from '~/components/spinner';
 import { BaseError } from '~/errors';
 import { useEndpoint } from '~/hooks/endpoint';
-import { useTranslation } from '~/hooks/i18n';
 import Modal, { useModal } from '~/portals/modal';
 import Popover, { usePopover } from '~/portals/popover';
 import { Authentication, COLOR_SYSTEM, Endpoint } from '~/types';
@@ -119,7 +118,6 @@ const _Item: React.FC<{
   authentication: Authentication;
   onRequestRefresh: () => void;
 }> = ({ endpoint, document, authentication, onRequestRefresh }) => {
-  const { t } = useTranslation();
   const { navigate, removeEndpoint } = useEndpoint();
 
   const menuPopover = usePopover<HTMLDivElement>();
@@ -191,7 +189,7 @@ const _Item: React.FC<{
               <FilledButton
                 cs={COLOR_SYSTEM.PRIMARY}
                 Icon={TerminalIcon}
-                label={t('enterEndpoint')}
+                label="Enter"
                 onClick={handleEnterClick}
               />
               {authentication.list.find((item) => item.type === 'signout') && (
@@ -213,7 +211,7 @@ const _Item: React.FC<{
           <TextButton
             on={COLOR_SYSTEM.SURFACE}
             Icon={InformationCircleIcon}
-            label={t('endpointInformationButtonLabel')}
+            label="Information"
             onClick={handleInfoClick}
           />
         </div>
@@ -221,7 +219,7 @@ const _Item: React.FC<{
           <TextButton
             on={COLOR_SYSTEM.SURFACE}
             Icon={QrcodeIcon}
-            label={t('endpointQRCodeShareButtonLabel')}
+            label="QR Code"
             onClick={handleQrcodeClick}
           />
         </div>
@@ -229,7 +227,7 @@ const _Item: React.FC<{
           <TextButton
             on={COLOR_SYSTEM.SURFACE}
             Icon={TrashIcon}
-            label={t('removeEndpointButtonLabel')}
+            label="Remove"
             onClick={handleRemoveClick}
           />
         </div>

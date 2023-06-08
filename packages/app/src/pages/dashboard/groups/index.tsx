@@ -1,4 +1,4 @@
-import { PageProps, graphql } from 'gatsby';
+import { PageProps } from 'gatsby';
 import React, { useCallback } from 'react';
 import Metadata from '~/components/metadata';
 import useTheme from '~/hooks/theme';
@@ -38,17 +38,3 @@ const DashboardGroupsPage: React.FC<Props> = () => {
 };
 
 export default DashboardGroupsPage;
-
-export const query = graphql`
-  query ($language: String!) {
-    locales: allLocale(filter: { language: { eq: $language } }) {
-      edges {
-        node {
-          ns
-          data
-          language
-        }
-      }
-    }
-  }
-`;

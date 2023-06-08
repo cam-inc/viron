@@ -6,7 +6,6 @@ import Head from '~/components/head';
 import CollectionIcon from '~/components/icon/collection/outline';
 import PlusCircleIcon from '~/components/icon/plusCircle/outline';
 import { useEndpoint } from '~/hooks/endpoint';
-import { useTranslation } from '~/hooks/i18n';
 import { Props as LayoutProps } from '~/layouts/index';
 import Modal, { useModal } from '~/portals/modal';
 import { COLOR_SYSTEM } from '~/types';
@@ -16,7 +15,6 @@ import Item from './item';
 
 export type Props = Parameters<LayoutProps['renderBody']>[0];
 const Body: React.FC<Props> = ({ className, style }) => {
-  const { t } = useTranslation();
   const { groupList } = useEndpoint();
 
   // Add modal.
@@ -43,10 +41,10 @@ const Body: React.FC<Props> = ({ className, style }) => {
                 title={
                   <div className="flex items-center gap-2">
                     <CollectionIcon className="w-em" />
-                    <div>{t('dashboard.groups.title')}</div>
+                    <div>Dashboard / Groups</div>
                   </div>
                 }
-                description={t('dashboard.groups.description')}
+                description="This is your personal, private dashboard."
               />
             </div>
             <div>
@@ -58,7 +56,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
             <div className="p-4 flex justify-end border-b border-thm-on-background-slight">
               <FilledButton
                 cs={COLOR_SYSTEM.PRIMARY}
-                label={t('addGroupButtonLabel')}
+                label="Add a Group"
                 Icon={PlusCircleIcon}
                 onClick={handleAddClick}
               />

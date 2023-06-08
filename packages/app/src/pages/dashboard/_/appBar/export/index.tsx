@@ -6,14 +6,12 @@ import FilledButton, {
 import Error, { useError } from '~/components/error';
 import ShareIcon from '~/components/icon/share/outline';
 import { useEndpoint } from '~/hooks/endpoint';
-import { useTranslation } from '~/hooks/i18n';
 import { ClassName, COLOR_SYSTEM } from '~/types';
 
 type Props = {
   className?: ClassName;
 };
 const Export: React.FC<Props> = ({ className = '' }) => {
-  const { t } = useTranslation();
   const { export: _export } = useEndpoint();
   const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
 
@@ -28,7 +26,7 @@ const Export: React.FC<Props> = ({ className = '' }) => {
         className={className}
         cs={COLOR_SYSTEM.PRIMARY_CONTAINER}
         size={BUTTON_SIZE.SM}
-        label={t('exportEndpoints')}
+        label="Export"
         Icon={ShareIcon}
         onClick={handleClick}
       />

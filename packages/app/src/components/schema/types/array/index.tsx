@@ -43,12 +43,12 @@ const SchemaOfTypeArray: React.FC<Props> = ({
       return;
     }
 
-    const errorMessages: ReturnType<Validate<any[], any>>[] = [];
+    const errorMessages: ReturnType<Validate<any[]>>[] = [];
     const registerOptions = getRegisterOptions({ required, schema });
     _.forEach(
-      registerOptions.validate as Record<string, Validate<any[], any>>,
+      registerOptions.validate as Record<string, Validate<any[]>>,
       (v) => {
-        const result = v(data || [], undefined);
+        const result = v(data || []);
         if (result !== true) {
           errorMessages.push(result);
         }

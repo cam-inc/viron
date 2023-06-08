@@ -30,7 +30,7 @@ export const THEME_HUE: Record<Theme, Hue> = {
   [THEME.NEON_ROSE]: 330,
   [THEME.ELECTRIC_CRIMSON]: 345,
 } as const;
-export type ThemeHue = (typeof THEME_HUE)[keyof typeof THEME_HUE];
+export type ThemeHue = typeof THEME_HUE[keyof typeof THEME_HUE];
 
 export type PrimaryKeyColor = HSL;
 export type SecondaryKeyColor = HSL;
@@ -88,13 +88,13 @@ export const TONE_LEVEL = {
   '98': 98,
   '100': 100,
 } as const;
-export type ToneLevel = (typeof TONE_LEVEL)[keyof typeof TONE_LEVEL];
+export type ToneLevel = typeof TONE_LEVEL[keyof typeof TONE_LEVEL];
 
 export const MODE_NAME = {
   LIGHT: 'light',
   DARK: 'dark',
 } as const;
-export type ModeName = (typeof MODE_NAME)[keyof typeof MODE_NAME];
+export type ModeName = typeof MODE_NAME[keyof typeof MODE_NAME];
 export const ROLE = {
   PRIMARY: 'primary',
   ON_PRIMARY: 'onPrimary',
@@ -164,7 +164,7 @@ export const ROLE = {
   ON_SURFACE_VARIANT_FAINT: 'onSurfaceVariantFaint',
   OUTLINE: 'outline',
 } as const;
-export type Role = (typeof ROLE)[keyof typeof ROLE];
+export type Role = typeof ROLE[keyof typeof ROLE];
 export type Mode = Record<Role, HSL>;
 
 export type Tokens = {
@@ -225,7 +225,6 @@ export const getTokens = (theme: Theme): Tokens => {
     SURFACE_VARIANT_ON_LOW: 40,
     SURFACE_VARIANT_ON_SLIGHT: 75,
     SURFACE_VARIANT_ON_FAINT: 80,
-    OUTLINE: 50,
   };
   const DARK_TONE: Record<string, ToneLevel> = {
     GROUND: 30,
@@ -258,7 +257,6 @@ export const getTokens = (theme: Theme): Tokens => {
     SURFACE_VARIANT_ON_LOW: 60,
     SURFACE_VARIANT_ON_SLIGHT: 25,
     SURFACE_VARIANT_ON_FAINT: 20,
-    OUTLINE: 60,
   };
   return {
     tonalPalettes: {
@@ -534,10 +532,7 @@ export const getTokens = (theme: Theme): Tokens => {
           getTones(keyColors.neutral.variant),
           LIGHT_TONE.SURFACE_VARIANT_ON_FAINT
         ).hsl,
-        outline: pickTone(
-          getTones(keyColors.neutral.variant),
-          LIGHT_TONE.OUTLINE
-        ).hsl,
+        outline: pickTone(getTones(keyColors.neutral.variant), 50).hsl,
       },
       [MODE_NAME.DARK]: {
         primary: pickTone(getTones(keyColors.accent.primary), DARK_TONE.GROUND)
@@ -790,10 +785,7 @@ export const getTokens = (theme: Theme): Tokens => {
           getTones(keyColors.neutral.variant),
           DARK_TONE.SURFACE_VARIANT_ON_FAINT
         ).hsl,
-        outline: pickTone(
-          getTones(keyColors.neutral.variant),
-          DARK_TONE.OUTLINE
-        ).hsl,
+        outline: pickTone(getTones(keyColors.neutral.variant), 60).hsl,
       },
     },
   };

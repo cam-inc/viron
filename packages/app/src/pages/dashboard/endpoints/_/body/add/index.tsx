@@ -13,7 +13,6 @@ import Head from '~/components/head';
 import Select from '~/components/select';
 import Textinput from '~/components/textinput';
 import { useEndpoint } from '~/hooks/endpoint';
-import { useTranslation } from '~/hooks/i18n';
 import { ClassName, COLOR_SYSTEM, Endpoint, EndpointGroup } from '~/types';
 import { endpointId, url } from '~/utils/v8n';
 
@@ -23,7 +22,6 @@ export type Props = {
   onCancel: () => void;
 };
 const AddEndpoint: React.FC<Props> = ({ className = '', onAdd, onCancel }) => {
-  const { t } = useTranslation();
   const { groupList, connect, addEndpoint } = useEndpoint();
 
   const schema = useMemo(
@@ -80,27 +78,27 @@ const AddEndpoint: React.FC<Props> = ({ className = '', onAdd, onCancel }) => {
     <div className={className}>
       <form className="space-y-8" onSubmit={handleSubmit}>
         <div>
-          <Head on={COLOR_SYSTEM.SURFACE} title={t('addEndpoint.title')} />
+          <Head on={COLOR_SYSTEM.SURFACE} title="Create an Endpoint" />
         </div>
         <div>{formState.errors.manual?.message}</div>
         <div className="space-y-4">
           <Textinput
             type="text"
-            label={t('addEndpoint.idInputLabel')}
+            label="ID"
             on={COLOR_SYSTEM.SURFACE}
             error={formState.errors.id}
             render={(bind) => <input {...bind} {...register('id')} />}
           />
           <Textinput
             type="text"
-            label={t('addEndpoint.urlInputLabel')}
+            label="URL"
             on={COLOR_SYSTEM.SURFACE}
             error={formState.errors.id}
             render={(bind) => <input {...bind} {...register('url')} />}
           />
           <Select<EndpointGroup>
             on={COLOR_SYSTEM.SURFACE}
-            label={t('addEndpoint.groupInputLabel')}
+            label="Group"
             list={groupList}
             Select={({ id, className, children }) => (
               <select
@@ -126,14 +124,14 @@ const AddEndpoint: React.FC<Props> = ({ className = '', onAdd, onCancel }) => {
           <OutlineButton
             on={COLOR_SYSTEM.SURFACE}
             size={BUTTON_SIZE.BASE}
-            label={t('addEndpoint.cancelButtonLabel')}
+            label="Cancel"
             onClick={handleCancelClick}
           />
           <FilledButton
             type="submit"
             cs={COLOR_SYSTEM.PRIMARY}
             size={BUTTON_SIZE.BASE}
-            label={t('addEndpoint.addButtonLabel')}
+            label="Create"
             onClick={handleCreateClick}
           />
         </div>

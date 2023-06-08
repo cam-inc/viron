@@ -1,6 +1,6 @@
 import classnames from 'classnames';
+import { Link } from 'gatsby';
 import React, { useCallback } from 'react';
-import Link from '~/components/link';
 import Logo from '~/components/logo';
 import Navigation, { Props as NavigationProps } from '~/components/navigation';
 import NavigationLinks from '~/components/navigation/links';

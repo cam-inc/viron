@@ -61,11 +61,11 @@ const SchemaOfTypeString: React.FC<Props> = ({
           clearErrors(nameForError);
           return;
         }
-        const errorMessages: ReturnType<Validate<string, any>>[] = [];
+        const errorMessages: ReturnType<Validate<string>>[] = [];
         _.forEach(
-          registerOptions.validate as Record<string, Validate<string, any>>,
+          registerOptions.validate as Record<string, Validate<string>>,
           function (v) {
-            const result = v(_data, undefined);
+            const result = v(_data);
             if (result !== true) {
               errorMessages.push(result);
             }

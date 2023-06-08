@@ -1,11 +1,5 @@
 import classnames from 'classnames';
-import React, {
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Portal, { TARGET } from '~/portals';
 
 type Props = {
@@ -13,7 +7,7 @@ type Props = {
   onRequestClose: () => void;
   position: 'left' | 'right';
 };
-const Drawer: React.FC<PropsWithChildren<Props>> = ({
+const Drawer: React.FC<Props> = ({
   isOpened,
   onRequestClose,
   position,

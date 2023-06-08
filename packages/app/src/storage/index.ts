@@ -5,7 +5,7 @@ export const KEY = {
   ENDPOINT_GROUP_LIST: 'endpointGroupList',
   OAUTH_ENDPOINT_ID: 'oauthEndpointId',
 } as const;
-export type Key = (typeof KEY)[keyof typeof KEY];
+export type Key = typeof KEY[keyof typeof KEY];
 
 export const get = function <T>(key: Key): T {
   return store.get(key);

@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 import React, {
-  PropsWithChildren,
   useCallback,
   useEffect,
   useMemo,
@@ -19,7 +18,7 @@ const PLACEMENT = {
   BOTTOM: 'Bottom',
   BOTTOM_LEFT: 'BottomLeft',
 } as const;
-type Placement = (typeof PLACEMENT)[keyof typeof PLACEMENT];
+type Placement = typeof PLACEMENT[keyof typeof PLACEMENT];
 
 type Props = {
   isOpened: boolean;
@@ -41,7 +40,7 @@ const Popover: React.FC<Props> = (props) => {
 };
 export default Popover;
 
-const PopoverLg: React.FC<PropsWithChildren<Props>> = ({
+const PopoverLg: React.FC<Props> = ({
   isOpened,
   isHidden,
   onRequestClose,
@@ -316,7 +315,7 @@ const PopoverLg: React.FC<PropsWithChildren<Props>> = ({
     </Portal>
   );
 };
-const PopoverNotLg: React.FC<PropsWithChildren<Props>> = ({
+const PopoverNotLg: React.FC<Props> = ({
   isOpened,
   isHidden,
   onRequestClose,

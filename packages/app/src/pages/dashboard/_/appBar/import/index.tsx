@@ -1,10 +1,9 @@
 import React, { useCallback, useState } from 'react';
 import { SIZE as BUTTON_SIZE } from '~/components/button';
 import FilledButton from '~/components/button/filled';
-import Error, { useError } from '~/components/error';
 import ArrowCircleDownIcon from '~/components/icon/arrowCircleDown/outline';
+import Error, { useError } from '~/components/error';
 import { useEndpoint } from '~/hooks/endpoint';
-import { useTranslation } from '~/hooks/i18n';
 import Modal, { useModal } from '~/portals/modal';
 import { ClassName, COLOR_SYSTEM, Distribution } from '~/types';
 import Targets from './targets';
@@ -13,7 +12,6 @@ type Props = {
   className?: ClassName;
 };
 const Import: React.FC<Props> = ({ className = '' }) => {
-  const { t } = useTranslation();
   const modal = useModal();
   const error = useError({
     on: COLOR_SYSTEM.SURFACE,
@@ -45,7 +43,7 @@ const Import: React.FC<Props> = ({ className = '' }) => {
         className={className}
         cs={COLOR_SYSTEM.PRIMARY_CONTAINER}
         size={BUTTON_SIZE.SM}
-        label={t('importEndpoints')}
+        label="Import"
         Icon={ArrowCircleDownIcon}
         onClick={handleButtonClick}
       />
