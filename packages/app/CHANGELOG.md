@@ -1,5 +1,12 @@
 # @viron/app
 
+## 2.3.1
+
+### Patch Changes
+
+- dbc6c331: Temporarily hide the language switch button.
+  Switching languages may cause problems.
+
 ## 2.3.0
 
 ### Minor Changes
