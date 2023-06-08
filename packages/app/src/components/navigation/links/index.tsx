@@ -2,11 +2,10 @@ import classnames from 'classnames';
 import React from 'react';
 import { Props as BaseProps } from '~/components';
 import ExternalLinkIcon from '~/components/icon/externalLink/outline';
-import LanguageSelector from '~/components/languageSelector';
 import Link from '~/components/link';
 import { URL } from '~/constants';
 import { useTranslation } from '~/hooks/i18n';
-import { COLOR_SYSTEM, Pathname, URL as _URL } from '~/types';
+import { Pathname, URL as _URL } from '~/types';
 
 const links: {
   to: Pathname | _URL;
@@ -61,9 +60,6 @@ const Links: React.FC<Props> & {
           </Link>
         </li>
       ))}
-      <li>
-        <LanguageSelector on={COLOR_SYSTEM.SURFACE_VARIANT} />
-      </li>
     </ul>
   );
 };
