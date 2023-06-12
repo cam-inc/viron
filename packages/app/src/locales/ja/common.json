@@ -57,5 +57,9 @@
   "endpointQRCodeShare": {
     "title": "QRコードの共有",
     "copyUrlButtonLabel": "URLをコピー"
+  },
+  "internalPagePaths": {
+    "root": "トップ",
+    "endpoints": "ダッシュボード"
   }
 }

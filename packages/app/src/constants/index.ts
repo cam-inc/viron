@@ -1,5 +1,10 @@
 import { isSSR } from '~/utils';
 
+export const INTERNAL_PAGE_PATHS = {
+  ROOT: '/',
+  ENDPOINTS: '/dashboard/endpoints/',
+};
+
 export const URL = {
   DOCUMENTATION: 'https://discovery.viron.plus/docs/introduction/',
   BLOG: 'https://discovery.viron.plus/blog/',

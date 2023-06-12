@@ -2,6 +2,7 @@ import classnames from 'classnames';
 import React, { useCallback } from 'react';
 import Logo from '~/components/logo';
 import Navigation, { Props as NavigationProps } from '~/components/navigation';
+import NavigationInternalPages from '~/components/navigation/internalPages';
 import NavigationLinks from '~/components/navigation/links';
 import NavigationServices from '~/components/navigation/services';
 import NavigationVersion from '~/components/navigation/version';
@@ -15,17 +16,26 @@ const _Navigation: React.FC<Props> = ({ className, style }) => {
   const renderHead = useCallback<NonNullable<NavigationProps['renderHead']>>(
     function () {
       return (
-        <div className="flex flex-col gap-2 items-center py-8">
+        <div className="flex items-center p-4 gap-2">
           <Logo
-            className="h-12 drop-shadow-01dp"
+            className="h-4 drop-shadow-01dp"
             left="text-thm-on-surface-high"
             right="text-thm-on-surface"
           />
-          <div className="text-thm-on-surface text-xs font-bold text-center">
-            Give OAS, <br />
-            Get GUI.
-          </div>
+          <div className="text-thm-on-surface text-lg font-bold">viron</div>
         </div>
+      );
+    },
+    []
+  );
+
+  const renderBody = useCallback<NonNullable<NavigationProps['renderBody']>>(
+    function () {
+      return (
+        <NavigationInternalPages
+          className="mx-2 space-y-1"
+          on={COLOR_SYSTEM.BACKGROUND}
+        />
       );
     },
     []
@@ -34,16 +44,18 @@ const _Navigation: React.FC<Props> = ({ className, style }) => {
   const renderTail = useCallback<NonNullable<NavigationProps['renderTail']>>(
     function () {
       return (
-        <div className="p-2">
-          <div className="flex justify-center py-2 border-t border-dotted border-thm-on-surface-low">
-            <NavigationLinks on={COLOR_SYSTEM.SURFACE} />
+        <div className="my-4 ml-3">
+          <div className="mb-6 space-y-4">
+            <NavigationLinks.renewal
+              className="space-y-4"
+              on={COLOR_SYSTEM.SURFACE}
+            />
+            <NavigationServices.renewal
+              className="space-y-4"
+              on={COLOR_SYSTEM.SURFACE}
+            />
           </div>
-          <div className="flex justify-center py-2 border-t border-dotted border-thm-on-surface-low">
-            <NavigationServices on={COLOR_SYSTEM.SURFACE} />
-          </div>
-          <div className="flex justify-center py-2 border-t border-dotted border-thm-on-surface-low">
-            <NavigationVersion on={COLOR_SYSTEM.SURFACE} />
-          </div>
+          <NavigationVersion on={COLOR_SYSTEM.SURFACE} />
         </div>
       );
     },
@@ -52,10 +64,11 @@ const _Navigation: React.FC<Props> = ({ className, style }) => {
 
   return (
     <nav className={classnames(className, 'h-full')} style={style}>
-      <Navigation
+      <Navigation.renewal
         on={COLOR_SYSTEM.SURFACE}
         className="h-full"
         renderHead={renderHead}
+        renderBody={renderBody}
         renderTail={renderTail}
       />
     </nav>
