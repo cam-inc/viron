@@ -17,12 +17,12 @@ const paths: {
   {
     to: INTERNAL_PAGE_PATHS.ROOT,
     label: 'internalPagePaths.root',
-    icon: <HomeOutlineIcon className="w=em" />,
+    icon: <HomeOutlineIcon className="w-em" />,
   },
   {
     to: INTERNAL_PAGE_PATHS.ENDPOINTS,
     label: 'internalPagePaths.endpoints',
-    icon: <BarsOutLineIcon className="w=em" />,
+    icon: <BarsOutLineIcon className="w-em" />,
   },
 ];
 
