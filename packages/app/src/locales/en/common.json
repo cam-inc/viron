@@ -57,5 +57,9 @@
   "endpointQRCodeShare": {
     "title": "QR Code",
     "copyUrlButtonLabel": "Copy URL"
+  },
+  "internalPagePaths": {
+    "root": "Top",
+    "endpoints": "Dashboard"
   }
 }

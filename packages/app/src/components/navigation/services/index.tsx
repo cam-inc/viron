@@ -18,7 +18,7 @@ const services: ServiceType[] = [
   {
     i18nKey: 'service.twitter',
     to: URL.TWITTER,
-    icon: <TwitterIcon className="w=em" />,
+    icon: <TwitterIcon className="w-em" />,
     isComingSoon: true,
   },
   {
