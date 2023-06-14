@@ -31,7 +31,7 @@ const InternalPages: React.FC<Props> = ({ className = '', on }) => {
   const { t } = useTranslation();
 
   const { originalPath } = useI18n();
-  console.log(originalPath, on);
+
   return (
     <ul className={classnames(className)}>
       {paths.map((item) => (
