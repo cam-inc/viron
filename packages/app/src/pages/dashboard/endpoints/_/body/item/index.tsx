@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import FilledButton, {
-  Props as FilledButtonProps,
-} from '~/components/button/filled';
+import OutlineButton, {
+  Props as OutlineButtonProps,
+} from '~/components/button/outline';
 import TextButton, {
   Props as TextButtonProps,
 } from '~/components/button/text/on';
 import Error from '~/components/error/';
-import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/outline';
 import InformationCircleIcon from '~/components/icon/informationCircle/outline';
+import MoreIcon from '~/components/icon/more/outline';
 import QrcodeIcon from '~/components/icon/qrcode/outline';
 import TerminalIcon from '~/components/icon/terminal/outline';
 import TrashIcon from '~/components/icon/trash/outline';
@@ -106,9 +106,9 @@ const Item: React.FC<Props> = ({ endpoint }) => {
   }, [endpoint, error, isPending, document, authentication]);
 
   return (
-    <div className="p-2 rounded border border-thm-on-background-slight hover:bg-thm-on-background-faint">
+    <article className="py-6 px-5 rounded-2xl border border-thm-on-background hover:bg-thm-on-background-faint">
       {content}
-    </div>
+    </article>
   );
 };
 export default Item;
@@ -126,7 +126,7 @@ const _Item: React.FC<{
   const infoModal = useModal();
   const qrcodeModal = useModal();
 
-  const handleMenuClick = useCallback<TextButtonProps['onClick']>(() => {
+  const handleMenuClick = useCallback(() => {
     menuPopover.open();
   }, [menuPopover]);
 
@@ -145,7 +145,7 @@ const _Item: React.FC<{
     removeEndpoint(endpoint.id);
   }, [endpoint, removeEndpoint, menuPopover]);
 
-  const handleEnterClick = useCallback<FilledButtonProps['onClick']>(() => {
+  const handleEnterClick = useCallback<OutlineButtonProps['onClick']>(() => {
     navigate(endpoint);
   }, [endpoint, navigate]);
 
@@ -155,42 +155,44 @@ const _Item: React.FC<{
 
   return (
     <>
-      <div className="flex flex-col gap-2">
-        <div className="flex items-start gap-2">
-          {/* Info */}
-          <div className="flex-1 flex items-start gap-2">
-            <div className="flex-none">
-              <Thumbnail endpoint={endpoint} document={document || undefined} />
-            </div>
-            <div className="flex-1">
-              <div className="text-thm-on-background-low text-xxs">
-                {endpoint.id}
-              </div>
-              <div className="text-thm-on-background text-sm font-bold">
-                {document?.info.title || authentication.oas.info.title || '---'}
-              </div>
-              <div className="text-thm-on-background-low text-xxs">
-                {endpoint.url}
-              </div>
-            </div>
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-between items-center">
+          {/* thumbnail */}
+          <div className="flex-none">
+            <Thumbnail endpoint={endpoint} document={document || undefined} />
           </div>
-          {/* Menu */}
+          {/* Popover icon */}
           <div className="flex-none">
             <div ref={menuPopover.targetRef}>
-              <TextButton
-                on={COLOR_SYSTEM.BACKGROUND}
-                Icon={DotsCircleHorizontalIcon}
+              {/* TODO: Add this as component*/}
+              <button
+                className="p-1 hover:bg-thm-background text-2xl rounded text-bg-thm-on-background"
                 onClick={handleMenuClick}
-              />
+              >
+                <MoreIcon />
+              </button>
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-end gap-2">
+        {/* Info */}
+        <div className="flex flex-col">
+          <div className="text-thm-on-background-low text-xxs break-all">
+            {endpoint.id}
+          </div>
+          <div className="text-thm-on-background text-sm font-bold break-all">
+            {document?.info.title || authentication.oas.info.title || '---'}
+          </div>
+          <div className="text-thm-on-background-low text-xxs break-all">
+            {endpoint.url}
+          </div>
+        </div>
+        <div className="flex items-center gap-2 justify-end">
           {document ? (
             <>
-              <FilledButton
-                cs={COLOR_SYSTEM.PRIMARY}
-                Icon={TerminalIcon}
+              <OutlineButton.renewal
+                className="grow max-w-50%"
+                cs={COLOR_SYSTEM.BACKGROUND}
+                IconRight={TerminalIcon}
                 label={t('enterEndpoint')}
                 onClick={handleEnterClick}
               />
