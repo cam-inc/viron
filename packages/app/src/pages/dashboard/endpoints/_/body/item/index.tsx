@@ -72,17 +72,21 @@ const Item: React.FC<Props> = ({ endpoint }) => {
   const content = useMemo<JSX.Element | null>(() => {
     if (error) {
       return (
-        <div>
-          <Error on={COLOR_SYSTEM.BACKGROUND} error={error} />
-          <Thumbnail endpoint={endpoint} document={document || undefined} />
-          <div>
-            <div className="text-thm-on-background-low text-xxs">
+        <div className="flex flex-col gap-4 h-full justify-between">
+          <div className="flex items-start gap-6">
+            <div className="flex-none">
+              <Thumbnail endpoint={endpoint} document={document || undefined} />
+            </div>
+            <Error on={COLOR_SYSTEM.BACKGROUND} error={error} />
+          </div>
+          <div className="flex flex-col">
+            <div className="text-thm-on-background-low text-xxs break-all">
               {endpoint.id}
             </div>
-            <div className="text-thm-on-background text-sm font-bold">
+            <div className="text-thm-on-background text-sm font-bold break-all">
               {document?.info.title || authentication?.oas.info.title || '---'}
             </div>
-            <div className="text-thm-on-background-low text-xxs">
+            <div className="text-thm-on-background-low text-xxs break-all">
               {endpoint.url}
             </div>
           </div>
@@ -106,7 +110,7 @@ const Item: React.FC<Props> = ({ endpoint }) => {
   }, [endpoint, error, isPending, document, authentication]);
 
   return (
-    <article className="py-6 px-5 rounded-2xl border border-thm-on-background hover:bg-thm-on-background-faint">
+    <article className="py-6 px-5 rounded-2xl border border-thm-on-background hover:bg-thm-on-background-faint h-full">
       {content}
     </article>
   );
