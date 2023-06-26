@@ -170,7 +170,7 @@ const _Item: React.FC<{
             <div ref={menuPopover.targetRef}>
               {/* TODO: Add this as component*/}
               <button
-                className="p-1 hover:bg-thm-background text-2xl rounded text-bg-thm-on-background"
+                className="p-1 hover:bg-thm-on-background-slight text-2xl rounded text-bg-thm-on-background"
                 onClick={handleMenuClick}
               >
                 <MoreIcon />

@@ -115,7 +115,7 @@ const Renewal = function <T = null>({
         paddingLeft: pl,
       }}
       className={classnames(
-        `flex items-center gap-1 px-3 py-2 bg-thm-${cs} hover:opacity-25 active:opacity-50 focus:outline outline-4 outline-thm-outline text-thm-on-${cs} border border-thm-on-${cs}`,
+        `flex items-center gap-1 px-3 py-2 bg-thm-${cs} hover:bg-thm-on-${cs}-slight active:opacity-50 focus:outline outline-4 outline-thm-outline text-thm-on-${cs} border border-thm-on-${cs}`,
         {
           'rounded-full': rounded,
           'text-xxs': size === SIZE.XXS,
