@@ -2,4 +2,4 @@
 "@viron/app": patch
 ---
 
-update endpoints desgin
+update endpoints page design
