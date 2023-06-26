@@ -83,11 +83,9 @@ const Body: React.FC<Props> = ({ className, style }) => {
             )}
             {!!listUngrouped.length && (
               <ul
-                className="mt-2 p-2"
+                className="mt-2 p-2 grid gap-6"
                 style={{
-                  display: 'grid',
-                  gridGap: '8px',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 591px))',
                   gridAutoRows: 'auto',
                 }}
               >
@@ -145,11 +143,9 @@ const Group: React.FC<GroupProps> = ({ group, list }) => {
         })}
       >
         <ul
-          className=""
+          className="grid gap-6"
           style={{
-            display: 'grid',
-            gridGap: '8px',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 591px))',
             gridAutoRows: 'auto',
           }}
         >
