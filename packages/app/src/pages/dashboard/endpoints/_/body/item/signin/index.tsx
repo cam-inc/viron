@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import React, { useCallback, useMemo, useState } from 'react';
-import OutlineButton, {
-  Props as OutlineButtonProps,
-} from '~/components/button/outline';
+import FilledButton, {
+  Props as FilledButtonProps,
+} from '~/components/button/filled';
 import Error from '~/components/error/';
 import LoginIcon from '~/components/icon/login/outline';
 import Request from '~/components/request';
@@ -30,12 +30,12 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
   );
 
   const drawerOAuth = useDrawer();
-  const handleOAuthClick = useCallback<OutlineButtonProps['onClick']>(() => {
+  const handleOAuthClick = useCallback<FilledButtonProps['onClick']>(() => {
     drawerOAuth.open();
   }, [drawerOAuth]);
 
   const drawerEmail = useDrawer();
-  const handleEmailClick = useCallback<OutlineButtonProps['onClick']>(() => {
+  const handleEmailClick = useCallback<FilledButtonProps['onClick']>(() => {
     drawerEmail.open();
   }, [drawerEmail]);
 
@@ -43,18 +43,18 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
     <>
       <div className="flex items-center gap-2 grow">
         {authConfigOAuth && (
-          <OutlineButton.renewal
+          <FilledButton.renewal
             className="w-full"
-            cs={COLOR_SYSTEM.BACKGROUND}
+            cs={COLOR_SYSTEM.PRIMARY}
             IconRight={LoginIcon}
             label={t('oAuth')}
             onClick={handleOAuthClick}
           />
         )}
         {authConfigEmail && (
-          <OutlineButton.renewal
+          <FilledButton.renewal
             className="w-full"
-            cs={COLOR_SYSTEM.BACKGROUND}
+            cs={COLOR_SYSTEM.PRIMARY}
             IconRight={LoginIcon}
             label={t('email')}
             onClick={handleEmailClick}
