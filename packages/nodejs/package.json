@@ -33,7 +33,7 @@
     "json-schema-ref-parser": "^9.0.7",
     "json-schema-traverse": "^1.0.0",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "6.1.8",
+    "mongoose": "6.4.6",
     "path-to-regexp": "^6.2.0",
     "sequelize": "^6.12.5",
     "uuid": "^8.3.2"
