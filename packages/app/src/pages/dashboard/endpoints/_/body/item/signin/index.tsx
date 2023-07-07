@@ -44,7 +44,7 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
       <div className="flex items-center gap-2 grow">
         {authConfigOAuth && (
           <FilledButton.renewal
-            className="w-full"
+            className="w-full max-w-50%"
             cs={COLOR_SYSTEM.PRIMARY}
             IconRight={LoginIcon}
             label={t('oAuth')}
@@ -53,7 +53,7 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
         )}
         {authConfigEmail && (
           <FilledButton.renewal
-            className="w-full"
+            className="w-full max-w-50%"
             cs={COLOR_SYSTEM.PRIMARY}
             IconRight={LoginIcon}
             label={t('email')}
