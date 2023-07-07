@@ -1,8 +1,8 @@
 import classnames from 'classnames';
 import React, { useCallback, useState } from 'react';
-import FilledButton, {
-  Props as FilledButtonProps,
-} from '~/components/button/filled';
+import OutlineButton, {
+  Props as OutlineButtonProps,
+} from '~/components/button/outline';
 import TextButton, {
   Props as TextButtonProps,
 } from '~/components/button/text/on';
@@ -10,7 +10,7 @@ import Head from '~/components/head';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import ColorSwatchIcon from '~/components/icon/colorSwatch/outline';
-import PlusCircleIcon from '~/components/icon/plusCircle/outline';
+import PlusIcon from '~/components/icon/plus/outline';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
 import { Props as LayoutProps } from '~/layouts/';
@@ -27,7 +27,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
 
   // Add modal.
   const modal = useModal();
-  const handleAddClick = useCallback<FilledButtonProps['onClick']>(() => {
+  const handleAddClick = useCallback<OutlineButtonProps['onClick']>(() => {
     modal.open();
   }, [modal.open]);
   const handleAddAdd = useCallback<AddProps['onAdd']>(() => {
@@ -62,10 +62,10 @@ const Body: React.FC<Props> = ({ className, style }) => {
           {/* Body */}
           <div className="">
             <div className="p-4 flex justify-end border-b border-thm-on-background-slight">
-              <FilledButton
+              <OutlineButton.renewal
                 cs={COLOR_SYSTEM.PRIMARY}
                 label={t('addEndpointButtonLabel')}
-                Icon={PlusCircleIcon}
+                Icon={PlusIcon}
                 onClick={handleAddClick}
               />
             </div>

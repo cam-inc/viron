@@ -109,13 +109,20 @@ const Renewal = function <T = null>({
     onClick(data as T);
   }, [data, onClick]);
 
+  const normalStyle = `bg-thm-${cs} hover:bg-thm-on-${cs}-slight text-thm-on-${cs} border-thm-on-${cs}-low`;
+  const olStyle = `bg-thm-background hover:bg-thm-on-background-slight text-thm-${cs} border-thm-${cs}`;
+
+  let buttonStyle = normalStyle;
+  if (cs === 'primary') {
+    buttonStyle = olStyle;
+  }
   return (
     <button
       style={{
         paddingLeft: pl,
       }}
       className={classnames(
-        `flex items-center gap-1 px-3 py-2 bg-thm-${cs} hover:bg-thm-on-${cs}-slight active:opacity-50 focus:outline outline-4 outline-thm-outline text-thm-on-${cs} border border-thm-on-${cs}`,
+        `flex items-center gap-1 px-3 py-2 active:opacity-50 focus:outline outline-4 outline-thm-outline border`,
         {
           'rounded-full': rounded,
           'text-xxs': size === SIZE.XXS,
@@ -125,6 +132,7 @@ const Renewal = function <T = null>({
           'text-xl': size === SIZE.XL,
           'text-2xl': size === SIZE['2XL'],
         },
+        buttonStyle,
         className
       )}
       type={type}
