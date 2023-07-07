@@ -41,7 +41,7 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
 
   return (
     <>
-      <div className="flex items-center gap-2 grow">
+      <div className="flex items-center gap-2 w-full">
         {authConfigOAuth && (
           <FilledButton.renewal
             className="w-full max-w-50%"
