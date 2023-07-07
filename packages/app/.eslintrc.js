@@ -75,7 +75,7 @@ module.exports = {
           },
           {
             group: ['react-i18next', 'gatsby-plugin-react-i18next'],
-            importNames: ['useTranslation'],
+            importNames: ['useTranslation', 'useI18next'],
             message: 'Please use useTranslation from `~/hooks/i18n` instead.',
           },
         ],
