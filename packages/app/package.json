@@ -52,7 +52,6 @@
     "@editorjs/editorjs": "^2.22.1",
     "@heroicons/react": "^1.0.5",
     "@hookform/resolvers": "^2.0.0",
-    "@parcel/watcher": "2.1.0",
     "@react-icons/all-files": "^4.1.0",
     "@tailwindcss/aspect-ratio": "^0.2.1",
     "@viron/linter": "*",
