@@ -3,6 +3,7 @@ import React, { useCallback } from 'react';
 import Logo from '~/components/logo';
 import Navigation, { Props as NavigationProps } from '~/components/navigation';
 import NavigationInternalPages from '~/components/navigation/internalPages';
+import NavigationLanguages from '~/components/navigation/languages';
 import NavigationLinks from '~/components/navigation/links';
 import NavigationServices from '~/components/navigation/services';
 import NavigationVersion from '~/components/navigation/version';
@@ -53,6 +54,10 @@ const _Navigation: React.FC<Props> = ({ className, style }) => {
             <NavigationServices.renewal
               className="space-y-4"
               on={COLOR_SYSTEM.SURFACE}
+            />
+            <NavigationLanguages
+              className="mt-6 flex gap-2"
+              on={COLOR_SYSTEM.SURFACE_VARIANT}
             />
           </div>
           <NavigationVersion on={COLOR_SYSTEM.SURFACE} />

@@ -4,6 +4,7 @@ import React, { useCallback } from 'react';
 import FilledButton from '~/components/button/filled';
 import Logo from '~/components/logo';
 import Metadata from '~/components/metadata';
+import NavigationLanguages from '~/components/navigation/languages';
 import NavigationLinks from '~/components/navigation/links';
 import NavigationServices from '~/components/navigation/services';
 import { useTranslation, useI18n, Trans } from '~/hooks/i18n';
@@ -60,6 +61,10 @@ const HomePage: React.FC<Props> = () => {
             on={COLOR_SYSTEM.SURFACE_VARIANT}
           />
           <NavigationServices.renewal
+            className="mt-6 flex gap-2"
+            on={COLOR_SYSTEM.SURFACE_VARIANT}
+          />
+          <NavigationLanguages
             className="mt-6 flex gap-2"
             on={COLOR_SYSTEM.SURFACE_VARIANT}
           />
