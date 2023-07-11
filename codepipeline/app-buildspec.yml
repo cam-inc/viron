@@ -9,7 +9,7 @@ phases:
   pre_build:
     commands:
       - echo Install packages...
-      - npm install --no-progress
+      - npm ci --no-progress
       - echo Building linter...
       - cd $CODEBUILD_SRC_DIR/packages/linter
       - npm run build
