@@ -1,5 +1,10 @@
 # @viron/nodejs
 
+## 2.1.0
+- update mongoose version to 7.3.2
+- update casbin-mongoose-adapter version to 5.2.0
+- update typescript version to 5.1.6
+
 ## 2.0.0
 
 ### Breaking Changes

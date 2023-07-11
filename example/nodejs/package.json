@@ -4,7 +4,6 @@
   "description": "A toolkit to speedily build a viron api server",
   "main": "dist/server.js",
   "dependencies": {
-    "@viron/lib": "1.0.4",
     "accepts": "^1.3.7",
     "aws-sdk": "^2.985.0",
     "compression": "^1.7.4",
@@ -59,7 +58,7 @@
     "ts-jest": "^27.1.3",
     "ts-node": "^10.4.0",
     "ts-node-dev": "^1.1.1",
-    "typescript": "^4.1.3"
+    "typescript": "^5.1.6"
   },
   "scripts": {
     "pre-commit": "lint-staged",
