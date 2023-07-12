@@ -1,6 +1,9 @@
 ---
 "@viron/lib": minor
-"@viron/example-nodejs": minor
 ---
 
-update mongoose version
+update some packages version
+  - mongoose
+  - typescript
+  - casbin-mongoose-adapter
+  - jest
