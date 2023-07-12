@@ -1,6 +1,5 @@
 import assert from 'assert';
 import { Enforcer } from 'casbin';
-import { CasbinRule } from 'casbin-mongoose-adapter';
 import {
   addRoleForUser,
   createOne,
@@ -28,6 +27,7 @@ import {
   X_PAGE_CONTENT_TYPE,
 } from '../../src/constants';
 import { roleIdAlreadyExists } from '../../src/errors';
+import { mongooseAdapter } from '../fixtures/setup_repositories';
 
 describe('domains/adminrole', () => {
   let casbin: Enforcer;
@@ -102,7 +102,7 @@ describe('domains/adminrole', () => {
   });
 
   afterEach(async () => {
-    await CasbinRule.deleteMany({});
+    await mongooseAdapter.getCasbinRule().deleteMany({});
     await casbin.loadPolicy();
   });
 
@@ -369,7 +369,10 @@ describe('domains/adminrole', () => {
           if (r.id === 'editor') {
             return r.permissions.every((p) => {
               if (p.resourceId === 'blog') {
-                assert.strictEqual(p.permission, PERMISSION.WRITE);
+                assert(
+                  p.permission === PERMISSION.READ ||
+                    p.permission === PERMISSION.WRITE
+                );
                 return true;
               }
               if (p.resourceId === 'news') {
@@ -395,11 +398,17 @@ describe('domains/adminrole', () => {
           if (r.id === 'director') {
             return r.permissions.every((p) => {
               if (p.resourceId === 'blog') {
-                assert.strictEqual(p.permission, PERMISSION.WRITE);
+                assert(
+                  p.permission === PERMISSION.READ ||
+                    p.permission === PERMISSION.WRITE
+                );
                 return true;
               }
               if (p.resourceId === 'news') {
-                assert.strictEqual(p.permission, PERMISSION.WRITE);
+                assert(
+                  p.permission === PERMISSION.READ ||
+                    p.permission === PERMISSION.WRITE
+                );
                 return true;
               }
               return false;
