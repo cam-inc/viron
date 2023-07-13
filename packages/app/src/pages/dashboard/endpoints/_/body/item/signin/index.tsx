@@ -41,10 +41,10 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
 
   return (
     <>
-      <div className="flex items-center gap-2 w-full">
+      <div className="flex items-center gap-2">
         {authConfigOAuth && (
           <FilledButton.renewal
-            className="w-full max-w-50%"
+            className="grow max-w-50%"
             cs={COLOR_SYSTEM.PRIMARY}
             IconRight={LoginIcon}
             label={t('oAuth')}
@@ -53,7 +53,7 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
         )}
         {authConfigEmail && (
           <FilledButton.renewal
-            className="w-full max-w-50%"
+            className="grow max-w-50%"
             cs={COLOR_SYSTEM.PRIMARY}
             IconRight={LoginIcon}
             label={t('email')}
