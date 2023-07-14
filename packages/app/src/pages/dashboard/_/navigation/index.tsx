@@ -35,7 +35,7 @@ const _Navigation: React.FC<Props> = ({ className, style }) => {
       return (
         <NavigationInternalPages
           className="mx-2 space-y-1"
-          on={COLOR_SYSTEM.BACKGROUND}
+          on={COLOR_SYSTEM.SURFACE}
         />
       );
     },
