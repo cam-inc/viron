@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import React, { useCallback, useMemo } from 'react';
-import FilledButton, {
-  Props as FilledButtonProps,
-} from '~/components/button/filled';
+import OutlineButton, {
+  Props as OutlineButtonProps,
+} from '~/components/button/outline';
 import Error from '~/components/error';
 import LogoutIcon from '~/components/icon/logout/outline';
 import Request from '~/components/request';
@@ -26,7 +26,7 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
   );
 
   const drawer = useDrawer();
-  const handleClick = useCallback<FilledButtonProps['onClick']>(() => {
+  const handleClick = useCallback<OutlineButtonProps['onClick']>(() => {
     drawer.open();
   }, [drawer]);
 
@@ -51,9 +51,10 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
 
   return (
     <>
-      <FilledButton
-        cs={COLOR_SYSTEM.SECONDARY}
-        Icon={LogoutIcon}
+      <OutlineButton.renewal
+        className="grow max-w-50%"
+        cs={COLOR_SYSTEM.BACKGROUND}
+        IconRight={LogoutIcon}
         label={t('signout')}
         onClick={handleClick}
       />
