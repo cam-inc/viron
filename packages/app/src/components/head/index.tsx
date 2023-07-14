@@ -11,7 +11,7 @@ const Head: React.FC<Props> = ({ on, className = '', title, description }) => {
     <div className={classnames('', className)}>
       <div className={`text-thm-on-${on} text-2xl font-bold`}>{title}</div>
       {description && (
-        <div className={`text-thm-on-${on}-low text-sm mt-2`}>
+        <div className={`text-thm-on-${on}-low text-xs mt-1`}>
           {description}
         </div>
       )}
