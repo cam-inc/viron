@@ -9,3 +9,30 @@ exports.onCreateWebpackConfig = ({ actions }) => {
     },
   });
 };
+
+exports.onCreatePage = ({ page, actions }) => {
+  const { i18n } = page.context;
+  const { languages } = i18n;
+  const { createPage } = actions;
+
+  const languageRegexPart = `^(?:/(${languages.join('|')}))?`;
+  const clientRoutes = [
+    {
+      pathRegexPart: '/endpoints/[^/]+/$',
+      matchPath: '/endpoints/:endpointId',
+    },
+  ];
+
+  for (const route of clientRoutes) {
+    const [matches, language] =
+      page.path.match(
+        new RegExp(`${languageRegexPart}${route.pathRegexPart}`)
+      ) || [];
+    if (matches) {
+      const { matchPath } = route;
+      page.matchPath = language ? `/${language}${matchPath}` : matchPath;
+      createPage(page);
+      break;
+    }
+  }
+};
