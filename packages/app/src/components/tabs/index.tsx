@@ -51,21 +51,15 @@ const Renewal: React.FC<Props> = ({ on, className = '', list, onChange }) => {
         {list.map((item) => (
           <li
             key={item.id}
-            className={classnames(
-              'block border-thm-primary w-full max-w-[178px]',
-              {
-                'border-b-2': item.isActive,
-              }
-            )}
+            className={classnames('w-[178px]', {
+              'border-b-2 border-thm-primary': item.isActive,
+            })}
           >
             <button
               onClick={() => handleItemClick(item.id)}
-              className={classnames(
-                `block p-2  w-full text-sm border-thm-on-${on}-low`,
-                {
-                  'font-bold': item.isActive,
-                }
-              )}
+              className={classnames(`block p-2 w-full text-sm`, {
+                'font-bold': item.isActive,
+              })}
             >
               {item.label}
             </button>
