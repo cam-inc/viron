@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import OutlineButton, {
-  Props as OutlineButtonProps,
-} from '~/components/button/outline';
+import OutlineOnButton, {
+  Props as OutlineOnButtonProps,
+} from '~/components/button/outline/on';
 import TextButton, {
   Props as TextButtonProps,
 } from '~/components/button/text/on';
@@ -149,7 +149,7 @@ const _Item: React.FC<{
     removeEndpoint(endpoint.id);
   }, [endpoint, removeEndpoint, menuPopover]);
 
-  const handleEnterClick = useCallback<OutlineButtonProps['onClick']>(() => {
+  const handleEnterClick = useCallback<OutlineOnButtonProps['onClick']>(() => {
     navigate(endpoint);
   }, [endpoint, navigate]);
 
@@ -193,7 +193,7 @@ const _Item: React.FC<{
         <div className="flex items-center gap-2 justify-end">
           {document ? (
             <>
-              <OutlineButton.renewal
+              <OutlineOnButton.renewal
                 className="grow max-w-50%"
                 cs={COLOR_SYSTEM.BACKGROUND}
                 IconRight={TerminalIcon}
