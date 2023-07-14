@@ -200,7 +200,6 @@ const _Item: React.FC<{
                 label={t('enterEndpoint')}
                 onClick={handleEnterClick}
               />
-
               {authentication.list.find((item) => item.type === 'signout') && (
                 <Signout
                   endpoint={endpoint}
