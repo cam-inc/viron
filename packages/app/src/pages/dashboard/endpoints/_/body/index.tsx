@@ -43,15 +43,10 @@ const Body: React.FC<Props> = ({ className, style }) => {
         <div className="">
           {/* Head */}
           <div>
-            <div className="p-4">
+            <div className="py-6 pl-8">
               <Head
                 on={COLOR_SYSTEM.BACKGROUND}
-                title={
-                  <div className="flex items-center gap-2">
-                    <ColorSwatchIcon className="w-em" />
-                    <div>{t('dashboard.endpoints.title')}</div>
-                  </div>
-                }
+                title={<div>{t('dashboard.endpoints.title')}</div>}
                 description={t('dashboard.endpoints.description')}
               />
             </div>
