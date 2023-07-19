@@ -18,13 +18,13 @@ const services: ServiceType[] = [
   {
     i18nKey: 'service.twitter',
     to: URL.TWITTER,
-    icon: <TwitterIcon className="w-[1.75em] h-[1.75em]" />,
+    icon: <TwitterIcon className="w-[1.42em] h-[1.42em]" />,
     isComingSoon: true,
   },
   {
     i18nKey: 'service.github',
     to: URL.GITHUB,
-    icon: <GithubIcon className="w-[1.75em] h-[1.75em]" />,
+    icon: <GithubIcon className="w-[1.42em] h-[1.42em]" />,
   },
 ];
 
@@ -112,7 +112,7 @@ const ServiceRenewal: React.FC<ServiceProps> = ({ on, service }) => {
     <>
       {!service.isComingSoon ? (
         <Link
-          className={`flex gap-2 text-xs items-center text-thm-on-${on} hover:underline active:text-thm-on-${on}-low focus:outline outline-2 outline-thm-outline`}
+          className={`flex gap-2 text-sm items-center text-thm-on-${on} hover:underline active:text-thm-on-${on}-low focus:outline outline-2 outline-thm-outline`}
           to={service.to}
         >
           {service.icon}
@@ -120,7 +120,7 @@ const ServiceRenewal: React.FC<ServiceProps> = ({ on, service }) => {
         </Link>
       ) : (
         <button
-          className={`flex gap-2 text-xs items-center text-thm-on-${on} hover:underline active:text-thm-on-${on}-low focus:outline outline-2 outline-thm-outline`}
+          className={`flex gap-2 text-sm items-center text-thm-on-${on} hover:underline active:text-thm-on-${on}-low focus:outline outline-2 outline-thm-outline`}
           ref={popover.targetRef}
           onClick={handleButtonClick}
         >
