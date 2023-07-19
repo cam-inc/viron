@@ -2,4 +2,4 @@
 "@viron/app": patch
 ---
 
-Renewed navigation component.
+Renewed internalPages of navigation component.
