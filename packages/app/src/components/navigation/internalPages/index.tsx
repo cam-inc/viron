@@ -40,9 +40,9 @@ const InternalPages: React.FC<Props> = ({ className = '', on }) => {
             className={classNames(
               'flex gap-2 text-xs items-center pl-1 py-1 rounded-lg active:opacity-50',
               {
-                [`bg-thm-on-${on}-low text-thm-on-${on}-faint hover:bg-thm-on-${on}-low focus:outline outline-2 outline-thm-${on}`]:
+                [`bg-thm-on-${on}-low text-thm-on-${on}-faint hover:opacity-75 focus:outline outline-2 outline-thm-${on}`]:
                   item.to === originalPath,
-                [`text-thm-on-${on} hover:bg-thm-on-${on}-low hover:text-thm-${on} focus:outline outline-2 outline-thm-${on}`]:
+                [`text-thm-on-${on}  hover:opacity-75 focus:outline outline-2 outline-thm-${on}`]:
                   item.to !== originalPath,
               }
             )}
