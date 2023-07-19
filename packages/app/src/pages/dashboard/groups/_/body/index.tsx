@@ -1,10 +1,9 @@
+import { PlusIcon } from '@heroicons/react/outline';
 import React, { useCallback } from 'react';
-import FilledButton, {
-  Props as FilledButtonProps,
-} from '~/components/button/filled';
+import OutlineButton, {
+  Props as OutlineButtonProps,
+} from '~/components/button/outline';
 import Head from '~/components/head';
-import CollectionIcon from '~/components/icon/collection/outline';
-import PlusCircleIcon from '~/components/icon/plusCircle/outline';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
 import { Props as LayoutProps } from '~/layouts/index';
@@ -21,7 +20,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
 
   // Add modal.
   const modal = useModal();
-  const handleAddClick = useCallback<FilledButtonProps['onClick']>(() => {
+  const handleAddClick = useCallback<OutlineButtonProps['onClick']>(() => {
     modal.open();
   }, [modal.open]);
   const handleAddAdd = useCallback<AddProps['onAdd']>(() => {
@@ -37,15 +36,10 @@ const Body: React.FC<Props> = ({ className, style }) => {
         <div className="">
           {/* Head */}
           <div>
-            <div className="p-4">
+            <div className="py-6 pl-8">
               <Head
                 on={COLOR_SYSTEM.BACKGROUND}
-                title={
-                  <div className="flex items-center gap-2">
-                    <CollectionIcon className="w-em" />
-                    <div>{t('dashboard.groups.title')}</div>
-                  </div>
-                }
+                title={<div>{t('dashboard.groups.title')}</div>}
                 description={t('dashboard.groups.description')}
               />
             </div>
@@ -56,10 +50,10 @@ const Body: React.FC<Props> = ({ className, style }) => {
           {/* Body */}
           <div className="">
             <div className="p-4 flex justify-end border-b border-thm-on-background-slight">
-              <FilledButton
+              <OutlineButton.renewal
                 cs={COLOR_SYSTEM.PRIMARY}
-                label={t('addGroupButtonLabel')}
-                Icon={PlusCircleIcon}
+                label={t('addEndpointButtonLabel')}
+                Icon={PlusIcon}
                 onClick={handleAddClick}
               />
             </div>
