@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { SIZE as BUTTON_SIZE } from '~/components/button';
 import FilledButton from '~/components/button/filled';
 import Error, { useError } from '~/components/error';
-import ArrowCircleDownIcon from '~/components/icon/arrowCircleDown/outline';
+import DownloadIcon from '~/components/icon/download/outline';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
 import Modal, { useModal } from '~/portals/modal';
@@ -41,12 +41,12 @@ const Import: React.FC<Props> = ({ className = '' }) => {
 
   return (
     <>
-      <FilledButton
+      <FilledButton.renewal
         className={className}
-        cs={COLOR_SYSTEM.PRIMARY_CONTAINER}
+        cs={COLOR_SYSTEM.SURFACE}
         size={BUTTON_SIZE.SM}
         label={t('importEndpoints')}
-        Icon={ArrowCircleDownIcon}
+        Icon={DownloadIcon}
         onClick={handleButtonClick}
       />
       <input {..._import.bind} />
