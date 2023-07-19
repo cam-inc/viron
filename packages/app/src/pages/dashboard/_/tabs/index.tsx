@@ -40,7 +40,11 @@ const _Tabs: React.FC<Props> = ({ item }) => {
 
   return (
     <div>
-      <Tabs on={COLOR_SYSTEM.BACKGROUND} list={list} onChange={handleChange} />
+      <Tabs.renewal
+        on={COLOR_SYSTEM.BACKGROUND}
+        list={list}
+        onChange={handleChange}
+      />
     </div>
   );
 };

@@ -8,19 +8,26 @@ import {
 import { setupMongo } from './setup_mongo';
 
 let container: RepositoryContainer;
+export let mongooseAdapter: MongooseAdapter;
+export let sequelizeAdapter: SequelizeAdapter;
 
 beforeAll(async () => {
   const conn = await setupMongo();
   container = await repositoryContainer.init(STORE_TYPE.MONGO, conn);
+  const adapter = container.getCasbin().getAdapter();
+  if (adapter instanceof MongooseAdapter) {
+    mongooseAdapter = adapter;
+  } else if (adapter instanceof SequelizeAdapter) {
+    sequelizeAdapter = adapter;
+  }
 }, 10000);
 
 afterAll(async () => {
   if (container) {
-    const adapter = container.getCasbin().getAdapter();
-    if (adapter instanceof MongooseAdapter) {
-      await adapter.close();
-    } else if (adapter instanceof SequelizeAdapter) {
-      await adapter.close();
+    if (mongooseAdapter) {
+      await mongooseAdapter.close();
+    } else if (sequelizeAdapter) {
+      await sequelizeAdapter.close();
     }
 
     await container.conn.close();
