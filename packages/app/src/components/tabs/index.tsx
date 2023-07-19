@@ -57,7 +57,7 @@ const Renewal: React.FC<Props> = ({ on, className = '', list, onChange }) => {
           >
             <button
               onClick={() => handleItemClick(item.id)}
-              className={classnames(`block p-2 w-full text-sm`, {
+              className={classnames('block p-2 w-full text-sm', {
                 'font-bold': item.isActive,
               })}
             >
