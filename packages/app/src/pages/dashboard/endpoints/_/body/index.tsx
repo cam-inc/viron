@@ -9,7 +9,6 @@ import TextButton, {
 import Head from '~/components/head';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
-import ColorSwatchIcon from '~/components/icon/colorSwatch/outline';
 import PlusIcon from '~/components/icon/plus/outline';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
@@ -40,7 +39,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
   return (
     <>
       <div className={className} style={style}>
-        <div className="">
+        <div className="max-w-[1252px] mx-auto @container">
           {/* Head */}
           <div>
             <div className="py-6 pl-8">
@@ -55,7 +54,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
             </div>
           </div>
           {/* Body */}
-          <div className="">
+          <div>
             <div className="p-4 flex justify-end border-b border-thm-on-background-slight">
               <OutlineButton.renewal
                 cs={COLOR_SYSTEM.PRIMARY}
@@ -65,7 +64,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
               />
             </div>
             {!!listByGroup.length && (
-              <ul className="">
+              <ul>
                 {listByGroup.map((item) => (
                   <li
                     key={item.group.id}
@@ -77,15 +76,9 @@ const Body: React.FC<Props> = ({ className, style }) => {
               </ul>
             )}
             {!!listUngrouped.length && (
-              <ul
-                className="mt-2 p-2 grid gap-6"
-                style={{
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 591px))',
-                  gridAutoRows: 'auto',
-                }}
-              >
+              <ul className="grid grid-cols-1 @740px:grid-cols-2 @995px:grid-cols-3 gap-6 mt-2 p-2">
                 {listUngrouped.map((item) => (
-                  <li key={item.id} className="">
+                  <li key={item.id}>
                     <Item endpoint={item} />
                   </li>
                 ))}
@@ -132,25 +125,21 @@ const Group: React.FC<GroupProps> = ({ group, list }) => {
         )}
       </div>
       {/* Body */}
-      <div
-        className={classnames('mt-2 p-2', {
-          hidden: !isOpened,
-        })}
+
+      <ul
+        className={classnames(
+          'grid grid-cols-1 @740px:grid-cols-2 @995px:grid-cols-3 gap-6 mt-2 p-2',
+          {
+            hidden: !isOpened,
+          }
+        )}
       >
-        <ul
-          className="grid gap-6"
-          style={{
-            gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 591px))',
-            gridAutoRows: 'auto',
-          }}
-        >
-          {list.map((item) => (
-            <li key={item.id} className="">
-              <Item endpoint={item} />
-            </li>
-          ))}
-        </ul>
-      </div>
+        {list.map((item) => (
+          <li key={item.id}>
+            <Item endpoint={item} />
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
