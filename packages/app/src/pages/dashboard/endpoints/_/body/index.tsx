@@ -76,7 +76,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
               </ul>
             )}
             {!!listUngrouped.length && (
-              <ul className="grid grid-cols-1 @740px:grid-cols-2 @995px:grid-cols-3 gap-6 mt-2 p-2">
+              <ul className="grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 mt-2 p-2">
                 {listUngrouped.map((item) => (
                   <li key={item.id}>
                     <Item endpoint={item} />
@@ -128,7 +128,7 @@ const Group: React.FC<GroupProps> = ({ group, list }) => {
 
       <ul
         className={classnames(
-          'grid grid-cols-1 @740px:grid-cols-2 @995px:grid-cols-3 gap-6 mt-2 p-2',
+          'grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 mt-2 p-2',
           {
             hidden: !isOpened,
           }

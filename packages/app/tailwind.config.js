@@ -191,10 +191,6 @@ module.exports = {
         'layout-subbody': 2,
         'layout-body': 1,
       },
-      containers: {
-        '740px': '740px',
-        '995px': '995px',
-      },
     },
   },
   plugins: [
