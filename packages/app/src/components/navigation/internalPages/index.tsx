@@ -17,12 +17,12 @@ const paths: {
   {
     to: INTERNAL_PAGE_PATHS.ROOT,
     label: 'internalPagePaths.root',
-    icon: <HomeOutlineIcon className="w-em" />,
+    icon: <HomeOutlineIcon className="w-[1.42em] h-[1.42em]" />,
   },
   {
     to: INTERNAL_PAGE_PATHS.ENDPOINTS,
     label: 'internalPagePaths.endpoints',
-    icon: <BarsOutLineIcon className="w-em" />,
+    icon: <BarsOutLineIcon className="w-[1.42em] h-[1.42em]" />,
   },
 ];
 
@@ -38,11 +38,11 @@ const InternalPages: React.FC<Props> = ({ className = '', on }) => {
         <li key={item.to}>
           <Link
             className={classNames(
-              'flex gap-1 text-xs items-center pl-2 py-1 rounded-lg active:opacity-50',
+              'flex gap-2 text-sm items-center pl-1 py-1 rounded-lg active:opacity-50',
               {
-                [`bg-thm-on-${on} text-thm-${on} hover:bg-thm-on-${on}-low focus:outline outline-2 outline-thm-${on}`]:
+                [`bg-thm-on-${on}-low text-thm-on-${on}-faint hover:opacity-75 focus:outline outline-2 outline-thm-${on}`]:
                   item.to === originalPath,
-                [`text-thm-on-${on} hover:bg-thm-on-${on}-low hover:text-thm-${on} focus:outline outline-2 outline-thm-${on}`]:
+                [`text-thm-on-${on}  hover:opacity-75 focus:outline outline-2 outline-thm-${on}`]:
                   item.to !== originalPath,
               }
             )}

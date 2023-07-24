@@ -70,10 +70,10 @@ const Renewal: React.FC<Props> = ({ className = '', on }) => {
       {links.map((item) => (
         <li key={item.to}>
           <Link
-            className={`flex gap-2 text-xs items-center text-thm-on-${on} hover:underline active:text-thm-on-${on}-low focus:outline outline-2 outline-thm-outline`}
+            className={`flex gap-2 text-sm items-center text-thm-on-${on} hover:underline active:text-thm-on-${on}-low focus:outline outline-2 outline-thm-outline`}
             to={item.to}
           >
-            {item.isExternal && <ExternalLinkIcon className="w-[1.75em]" />}
+            {item.isExternal && <ExternalLinkIcon className="w-[1.42em]" />}
             <div>{t(item.label)}</div>
           </Link>
         </li>
