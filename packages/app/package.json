@@ -57,6 +57,7 @@
     "@viron/linter": "*",
     "babel-jest": "^27.0.6",
     "babel-preset-gatsby": "^3.11.0",
+    "browser-lang": "^0.2.1",
     "classnames": "^2.2.6",
     "color-blend": "^3.0.1",
     "gatsby": "^5.11.0",
