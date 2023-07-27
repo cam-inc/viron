@@ -1,16 +1,15 @@
 import classnames from 'classnames';
 import React, { useCallback, useState } from 'react';
-import FilledButton, {
-  Props as FilledButtonProps,
-} from '~/components/button/filled';
+import OutlineButton, {
+  Props as OutlineButtonProps,
+} from '~/components/button/outline';
 import TextButton, {
   Props as TextButtonProps,
 } from '~/components/button/text/on';
 import Head from '~/components/head';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
-import ColorSwatchIcon from '~/components/icon/colorSwatch/outline';
-import PlusCircleIcon from '~/components/icon/plusCircle/outline';
+import PlusIcon from '~/components/icon/plus/outline';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
 import { Props as LayoutProps } from '~/layouts/';
@@ -27,7 +26,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
 
   // Add modal.
   const modal = useModal();
-  const handleAddClick = useCallback<FilledButtonProps['onClick']>(() => {
+  const handleAddClick = useCallback<OutlineButtonProps['onClick']>(() => {
     modal.open();
   }, [modal.open]);
   const handleAddAdd = useCallback<AddProps['onAdd']>(() => {
@@ -40,18 +39,13 @@ const Body: React.FC<Props> = ({ className, style }) => {
   return (
     <>
       <div className={className} style={style}>
-        <div className="">
+        <div className="max-w-[1252px] mx-auto @container">
           {/* Head */}
           <div>
-            <div className="p-4">
+            <div className="py-6 pl-8">
               <Head
                 on={COLOR_SYSTEM.BACKGROUND}
-                title={
-                  <div className="flex items-center gap-2">
-                    <ColorSwatchIcon className="w-em" />
-                    <div>{t('dashboard.endpoints.title')}</div>
-                  </div>
-                }
+                title={<div>{t('dashboard.endpoints.title')}</div>}
                 description={t('dashboard.endpoints.description')}
               />
             </div>
@@ -60,17 +54,17 @@ const Body: React.FC<Props> = ({ className, style }) => {
             </div>
           </div>
           {/* Body */}
-          <div className="">
+          <div>
             <div className="p-4 flex justify-end border-b border-thm-on-background-slight">
-              <FilledButton
+              <OutlineButton.renewal
                 cs={COLOR_SYSTEM.PRIMARY}
                 label={t('addEndpointButtonLabel')}
-                Icon={PlusCircleIcon}
+                Icon={PlusIcon}
                 onClick={handleAddClick}
               />
             </div>
             {!!listByGroup.length && (
-              <ul className="">
+              <ul>
                 {listByGroup.map((item) => (
                   <li
                     key={item.group.id}
@@ -82,17 +76,9 @@ const Body: React.FC<Props> = ({ className, style }) => {
               </ul>
             )}
             {!!listUngrouped.length && (
-              <ul
-                className="mt-2 p-2"
-                style={{
-                  display: 'grid',
-                  gridGap: '8px',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-                  gridAutoRows: 'auto',
-                }}
-              >
+              <ul className="grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 mt-2 p-2">
                 {listUngrouped.map((item) => (
-                  <li key={item.id} className="">
+                  <li key={item.id}>
                     <Item endpoint={item} />
                   </li>
                 ))}
@@ -139,27 +125,21 @@ const Group: React.FC<GroupProps> = ({ group, list }) => {
         )}
       </div>
       {/* Body */}
-      <div
-        className={classnames('mt-2 p-2', {
-          hidden: !isOpened,
-        })}
+
+      <ul
+        className={classnames(
+          'grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 mt-2 p-2',
+          {
+            hidden: !isOpened,
+          }
+        )}
       >
-        <ul
-          className=""
-          style={{
-            display: 'grid',
-            gridGap: '8px',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-            gridAutoRows: 'auto',
-          }}
-        >
-          {list.map((item) => (
-            <li key={item.id} className="">
-              <Item endpoint={item} />
-            </li>
-          ))}
-        </ul>
-      </div>
+        {list.map((item) => (
+          <li key={item.id}>
+            <Item endpoint={item} />
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

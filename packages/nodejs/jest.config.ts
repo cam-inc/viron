@@ -5,12 +5,12 @@ const config: Config.InitialOptions = {
   verbose: true,
   testEnvironment: 'node',
   transform: {
-    '^.+\\.ts$': 'ts-jest',
-  },
-  globals: {
-    'ts-jest': {
-      tsconfig: 'tsconfig.test.json',
-    },
+    '^.+\\.ts$': [
+      'ts-jest',
+      {
+        tsconfig: 'tsconfig.test.json',
+      },
+    ],
   },
   testPathIgnorePatterns: [
     'node_modules/',

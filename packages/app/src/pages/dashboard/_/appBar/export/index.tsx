@@ -4,7 +4,7 @@ import FilledButton, {
   Props as FilledButtonProps,
 } from '~/components/button/filled';
 import Error, { useError } from '~/components/error';
-import ShareIcon from '~/components/icon/share/outline';
+import UploadIcon from '~/components/icon/upload/outline';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
 import { ClassName, COLOR_SYSTEM } from '~/types';
@@ -24,12 +24,12 @@ const Export: React.FC<Props> = ({ className = '' }) => {
 
   return (
     <>
-      <FilledButton
+      <FilledButton.renewal
         className={className}
-        cs={COLOR_SYSTEM.PRIMARY_CONTAINER}
+        cs={COLOR_SYSTEM.SURFACE}
         size={BUTTON_SIZE.SM}
         label={t('exportEndpoints')}
-        Icon={ShareIcon}
+        Icon={UploadIcon}
         onClick={handleClick}
       />
       <Error {...error.bind} />

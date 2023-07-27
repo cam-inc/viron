@@ -97,7 +97,7 @@ const Add: React.FC<Props> = ({ onAdd, onCancel }) => {
         </div>
         <div className="flex justify-end gap-2">
           <OutlineButton
-            on={COLOR_SYSTEM.SURFACE}
+            cs={COLOR_SYSTEM.SURFACE}
             label="Cancel"
             onClick={handleCancelClick}
           />

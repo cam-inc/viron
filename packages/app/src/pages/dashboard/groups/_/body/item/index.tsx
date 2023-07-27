@@ -156,7 +156,7 @@ const RemoveConfirmation: React.FC<RemoveConfirmationProps> = ({
       />
       <div className="flex justify-end gap-2">
         <OutlineOnButton
-          on={COLOR_SYSTEM.SURFACE}
+          cs={COLOR_SYSTEM.SURFACE}
           label="Cancel"
           onClick={handleCancelClick}
         />
