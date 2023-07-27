@@ -1,5 +1,37 @@
 # @viron/app
 
+## 2.4.0
+
+### Minor Changes
+
+- 11e3d680: Add Language switcher
+- bc50ad64: Add redirect function so that oauth redirect works.
+
+### Patch Changes
+
+- 8a593073: Renewed Head component and AddEndpointButton component on dashboard/groups page.
+- f8b0d18b: I changed to use npm-ci on CI.
+  Because npm-ci installs modules according to package-lock.json.
+- 461920c9: update dashboard desgin
+- 350b5aed: Added changes to components due to changes to OutlineButton.
+- a683c738: Enlarged navigation icon.
+  Added OutlineTwitter icon.
+- 81df1448: Renewed appBar button.
+  Added "download" and "upload" icons.
+- 8e849501: Replaced AddEndpointButton from FilledButton to OutlineButton.
+  OutlineButton's outline color was not &{cs}-low, so the color was changed.
+- 233f9547: Renewed design of Head component on dashboard page.
+- 2c7e3425: update navigation design
+- 86f2d9ed: Update Gatsby version specified in Package.json
+- 1487e40d: update endpoints page design
+- 2cb15ddf: Renewed internalPages of navigation component.
+  Changed font size to 14px and changed icon size setting accordingly.
+- 6eb3c59d: Renewed the design of the Tabs component on the dashboard page.
+- c48eba1c: Enlarged navigation icon.
+  Added OutlineTwitter icon.
+- Updated dependencies [f8b0d18b]
+  - @viron/linter@0.0.2
+
 ## 2.3.1
 
 ### Patch Changes
