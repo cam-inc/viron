@@ -15,13 +15,13 @@ const Languages: React.FC<Props> = ({ className = '', on }) => {
 
   return (
     <>
-      <div className={className}>
+      <div className={classNames(className, 'flex gap-2')}>
         <button
           ref={menuPopover.targetRef}
-          className="flex items-center text-xs gap-1"
+          className="flex items-center text-sm gap-2"
           onClick={menuPopover.open}
         >
-          <LanguageIcon className="w-em" />
+          <LanguageIcon className="w-[1.42em] h-[1.42em]" />
           {t(`language.${currentLanguage}`)}
           <ChevronDownIcon className="w-em" />
         </button>
