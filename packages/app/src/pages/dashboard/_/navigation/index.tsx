@@ -55,10 +55,7 @@ const _Navigation: React.FC<Props> = ({ className, style }) => {
               className="space-y-4"
               on={COLOR_SYSTEM.SURFACE}
             />
-            <NavigationLanguages
-              className="mt-6 flex gap-2"
-              on={COLOR_SYSTEM.SURFACE_VARIANT}
-            />
+            <NavigationLanguages on={COLOR_SYSTEM.SURFACE_VARIANT} />
           </div>
           <NavigationVersion on={COLOR_SYSTEM.SURFACE} />
         </div>

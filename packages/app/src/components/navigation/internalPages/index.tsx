@@ -3,7 +3,6 @@ import classNames from 'classnames';
 import React from 'react';
 import { Props as BaseProps } from '~/components';
 import BarsOutLineIcon from '~/components/icon/bars/outline';
-import HomeOutlineIcon from '~/components/icon/home/outline';
 import Link from '~/components/link';
 import { INTERNAL_PAGE_PATHS } from '~/constants';
 import { useI18n, useTranslation } from '~/hooks/i18n';
@@ -15,13 +14,13 @@ const paths: {
   icon: JSX.Element;
 }[] = [
   {
-    to: INTERNAL_PAGE_PATHS.ROOT,
-    label: 'internalPagePaths.root',
-    icon: <HomeOutlineIcon className="w-[1.42em] h-[1.42em]" />,
-  },
-  {
     to: INTERNAL_PAGE_PATHS.ENDPOINTS,
     label: 'internalPagePaths.endpoints',
+    icon: <BarsOutLineIcon className="w-[1.42em] h-[1.42em]" />,
+  },
+  {
+    to: INTERNAL_PAGE_PATHS.GROUPS,
+    label: 'internalPagePaths.groups',
     icon: <BarsOutLineIcon className="w-[1.42em] h-[1.42em]" />,
   },
 ];

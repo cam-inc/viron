@@ -3,6 +3,7 @@ import { isSSR } from '~/utils';
 export const INTERNAL_PAGE_PATHS = {
   ROOT: '/',
   ENDPOINTS: '/dashboard/endpoints/',
+  GROUPS: '/dashboard/groups/',
 };
 
 export const URL = {
