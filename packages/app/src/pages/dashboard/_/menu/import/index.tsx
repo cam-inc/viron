@@ -1,8 +1,7 @@
 import React, { useCallback, useState } from 'react';
-import { SIZE as BUTTON_SIZE } from '~/components/button';
-import FilledButton from '~/components/button/filled';
+import TextButton from '~/components/button/text/on';
 import Error, { useError } from '~/components/error';
-import DownloadIcon from '~/components/icon/download/outline';
+import ImportIcon from '~/components/icon/import/outline';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
 import Modal, { useModal } from '~/portals/modal';
@@ -41,12 +40,11 @@ const Import: React.FC<Props> = ({ className = '' }) => {
 
   return (
     <>
-      <FilledButton.renewal
+      <TextButton
         className={className}
-        cs={COLOR_SYSTEM.SURFACE}
-        size={BUTTON_SIZE.SM}
+        on={COLOR_SYSTEM.SURFACE}
         label={t('importEndpoints')}
-        Icon={DownloadIcon}
+        Icon={ImportIcon}
         onClick={handleButtonClick}
       />
       <input {..._import.bind} />

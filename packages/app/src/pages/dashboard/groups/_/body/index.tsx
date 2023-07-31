@@ -9,6 +9,7 @@ import { useTranslation } from '~/hooks/i18n';
 import { Props as LayoutProps } from '~/layouts/index';
 import Modal, { useModal } from '~/portals/modal';
 import { COLOR_SYSTEM } from '~/types';
+import Menu from '../../../_/menu';
 import Tabs, { ITEM as TABS_ITEM } from '../../../_/tabs';
 import Add, { Props as AddProps } from './add/';
 import Item from './item';
@@ -36,12 +37,13 @@ const Body: React.FC<Props> = ({ className, style }) => {
         <div className="max-w-[1252px] mx-auto px-4 lg:px-8">
           {/* Head */}
           <div>
-            <div className="py-6 pl-8">
+            <div className="py-11 flex justify-between items-center">
               <Head
                 on={COLOR_SYSTEM.BACKGROUND}
                 title={<div>{t('dashboard.groups.title')}</div>}
                 description={t('dashboard.groups.description')}
               />
+              <Menu />
             </div>
             <div>
               <Tabs item={TABS_ITEM.GROUPS} />

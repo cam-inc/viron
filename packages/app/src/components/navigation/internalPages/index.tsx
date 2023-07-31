@@ -14,13 +14,8 @@ const paths: {
   icon: JSX.Element;
 }[] = [
   {
-    to: INTERNAL_PAGE_PATHS.ENDPOINTS,
-    label: 'internalPagePaths.endpoints',
-    icon: <BarsOutLineIcon className="w-[1.42em] h-[1.42em]" />,
-  },
-  {
-    to: INTERNAL_PAGE_PATHS.GROUPS,
-    label: 'internalPagePaths.groups',
+    to: INTERNAL_PAGE_PATHS.DASHBOARD,
+    label: 'internalPagePaths.dashboard',
     icon: <BarsOutLineIcon className="w-[1.42em] h-[1.42em]" />,
   },
 ];
@@ -40,9 +35,9 @@ const InternalPages: React.FC<Props> = ({ className = '', on }) => {
               'flex gap-2 text-sm items-center pl-1 py-1 rounded-lg active:opacity-50',
               {
                 [`bg-thm-on-${on}-low text-thm-on-${on}-faint hover:opacity-75 focus:outline outline-2 outline-thm-${on}`]:
-                  item.to === originalPath,
+                  originalPath.startsWith(item.to),
                 [`text-thm-on-${on}  hover:opacity-75 focus:outline outline-2 outline-thm-${on}`]:
-                  item.to !== originalPath,
+                  !originalPath.startsWith(item.to),
               }
             )}
             to={item.to}

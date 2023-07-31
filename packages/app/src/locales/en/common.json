@@ -24,11 +24,11 @@
   "groupsTabLabel": "$t(groups)",
   "dashboard": {
     "endpoints": {
-      "title": "Dashboard / $t(endpoints)",
+      "title": "Dashboard",
       "description": "This is your personal, private dashboard."
     },
     "groups": {
-      "title": "Dashboard / $t(groups)",
+      "title": "Dashboard",
       "description": "This is your personal, private dashboard."
     }
   },
@@ -61,6 +61,7 @@
   "internalPagePaths": {
     "root": "Top",
     "endpoints": "Endpoints",
-    "groups": "Groups"
+    "groups": "Groups",
+    "dashboard": "Dashboard"
   }
 }
