@@ -7,15 +7,14 @@ phases:
   pre_build:
     commands:
       - echo Installing packages...
-      - cd $CODEBUILD_SRC_DIR/packages/$PACKAGE_NAME
+      - cd ${CODEBUILD_SRC_DIR}/packages/${PACKAGE_NAME}
       - npm install --no-progress --legacy-peer-deps && npm cache verify
       - echo Setting NPM_TOKEN...
-      - echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
-      - cat ~/.npmrc
+      - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
   build:
     commands:
       - echo "Building ${PACKAGE_NAME}..."
-      - cd $CODEBUILD_SRC_DIR/packages/$PACKAGE_NAME
+      - cd ${CODEBUILD_SRC_DIR}/packages/${PACKAGE_NAME}
       - npm run build
-      - echo "Publishing $PACKAGE_NAME..."
-      # - npm publish
+      - echo "Publishing ${PACKAGE_NAME}..."
+      - npm publish
