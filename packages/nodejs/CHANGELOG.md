@@ -1,5 +1,11 @@
 # @viron/nodejs
 
+## 2.1.1
+
+### Patch Changes
+
+- set caret on mongoose version
+
 ## 2.1.0
 
 ### Minor Changes
