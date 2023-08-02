@@ -135,9 +135,9 @@ const Group: React.FC<{
   onSelect: (pageId: PageId) => void;
 }> = ({ pages, depth, partial, selectedPageId, onSelect }) => {
   const [isOpened, setIsOpened] = useState<boolean>(true);
-  function handleClick() {
+  const handleClick = () => {
     setIsOpened((currVal) => !currVal);
-  }
+  };
 
   return (
     <div>
@@ -181,9 +181,9 @@ const _Page: React.FC<{
   isSelected: boolean;
   onSelect: (pageId: PageId) => void;
 }> = ({ page, depth, isSelected, onSelect }) => {
-  function handleClick() {
+  const handleClick = () => {
     onSelect(page.id);
-  }
+  };
 
   return (
     <button
