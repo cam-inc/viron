@@ -1,17 +1,9 @@
 import classnames from 'classnames';
-import React, { useCallback, useMemo, useState } from 'react';
-import { SIZE as BUTTON_SIZE } from '~/components/button';
-import FilledButton, {
-  Props as FilledButtonProps,
-} from '~/components/button/filled';
-import TextOnButton, {
-  Props as TextOnButtonProps,
-} from '~/components/button/text/on';
+import React, { useMemo, useState } from 'react';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import FolderIcon from '~/components/icon/folder/outline';
 import FolderOpenIcon from '~/components/icon/folderOpen/outline';
-import { COLOR_SYSTEM } from '~/types';
 import { Page, PageId } from '~/types/oas';
 
 type Partial = {
@@ -143,24 +135,29 @@ const Group: React.FC<{
   onSelect: (pageId: PageId) => void;
 }> = ({ pages, depth, partial, selectedPageId, onSelect }) => {
   const [isOpened, setIsOpened] = useState<boolean>(true);
-  const handleClick = useCallback<TextOnButtonProps['onClick']>(() => {
+  function handleClick() {
     setIsOpened((currVal) => !currVal);
-  }, []);
+  }
+
   return (
     <div>
-      <div className="">
-        <TextOnButton
-          pl={`${depth * 8}px`}
-          className="block w-full"
-          on={COLOR_SYSTEM.SURFACE}
-          size={BUTTON_SIZE.XS}
-          rounded={false}
-          Icon={isOpened ? FolderOpenIcon : FolderIcon}
-          IconRight={isOpened ? ChevronDownIcon : ChevronRightIcon}
-          label={partial.group}
-          onClick={handleClick}
-        />
-      </div>
+      <button
+        className="rounded text-start py-1.5 w-full text-thm-on-surface-low text-xs flex items-center justify-between gap-1 hover:bg-thm-on-surface-faint focus:ring-4 ring-thm-on-surface-low focus:outline-none"
+        style={{ paddingInlineStart: `${depth * 8}px` }}
+        onClick={handleClick}
+      >
+        {isOpened ? (
+          <FolderOpenIcon className="w-[1.5em] h-[1.5em] flex-none" />
+        ) : (
+          <FolderIcon className="w-[1.5em] h-[1.5em] flex-none" />
+        )}
+        <span className="w-0 flex-1 truncate">{partial.group}</span>
+        {isOpened ? (
+          <ChevronDownIcon className="w-[1.5em] h-[1.5em] flex-none" />
+        ) : (
+          <ChevronRightIcon className="w-[1.5em] h-[1.5em] flex-none" />
+        )}
+      </button>
       <div
         className={classnames('mt-1', {
           hidden: !isOpened,
@@ -184,39 +181,23 @@ const _Page: React.FC<{
   isSelected: boolean;
   onSelect: (pageId: PageId) => void;
 }> = ({ page, depth, isSelected, onSelect }) => {
-  const handleClick = useCallback<
-    TextOnButtonProps['onClick'] | FilledButtonProps['onClick']
-  >(() => {
+  function handleClick() {
     onSelect(page.id);
-  }, [page, onSelect]);
+  }
 
   return (
-    <div
-      className={classnames('border-thm-on-primary', {
-        'border-r-4': isSelected,
-      })}
-    >
-      {isSelected ? (
-        <FilledButton
-          pl={`${depth * 8}px`}
-          className="block w-full"
-          cs={COLOR_SYSTEM.PRIMARY}
-          size={BUTTON_SIZE.XS}
-          rounded={false}
-          label={page.title}
-          onClick={handleClick}
-        />
-      ) : (
-        <TextOnButton
-          pl={`${depth * 8}px`}
-          className="block w-full"
-          on={COLOR_SYSTEM.SURFACE}
-          size={BUTTON_SIZE.XS}
-          rounded={false}
-          label={page.title}
-          onClick={handleClick}
-        />
+    <button
+      className={classnames(
+        'rounded text-start py-1.5 w-full text-xs focus:ring-4 ring-thm-on-surface-low focus:outline-none truncate',
+        {
+          'text-thm-on-surface-faint bg-thm-on-surface-low': isSelected,
+          'text-thm-on-surface-low hover:bg-thm-on-surface-faint': !isSelected,
+        }
       )}
-    </div>
+      style={{ paddingInlineStart: `${depth * 8}px` }}
+      onClick={handleClick}
+    >
+      {page.title}
+    </button>
   );
 };

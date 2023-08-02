@@ -8,17 +8,19 @@ export type Props = BaseProps & {
 };
 const Breadcrumb: React.FC<Props> = ({ on, list, className = '' }) => {
   return (
-    <div className={classnames(`text-thm-on-${on}`, className)}>
-      <div className="flex items-center gap-1">
-        {list.map((label) => (
-          <React.Fragment key={label}>
-            <div className="">{label}</div>
-            <div className="">
-              <ChevronRightIcon className="w-em" />
-            </div>
-          </React.Fragment>
-        ))}
-      </div>
+    <div
+      className={classnames(
+        `text-thm-${on} flex items-center gap-1`,
+        className
+      )}
+    >
+      {list.map((label) => (
+        <React.Fragment key={label}>
+          <p>{label}</p>
+
+          <ChevronRightIcon className="w-em" />
+        </React.Fragment>
+      ))}
     </div>
   );
 };

@@ -1,13 +1,12 @@
 import classnames from 'classnames';
 import React, { useCallback } from 'react';
+import ArrowLeftIcon from '~/components/icon/arrowLeft/outline';
 import Link from '~/components/link';
 import Logo from '~/components/logo';
 import Navigation, { Props as NavigationProps } from '~/components/navigation';
-import NavigationLinks from '~/components/navigation/links';
-import NavigationServices from '~/components/navigation/services';
-import NavigationVersion from '~/components/navigation/version';
 import { Props as LayoutProps } from '~/layouts';
-import { COLOR_SYSTEM } from '~/types';
+import { COLOR_SYSTEM, Endpoint } from '~/types';
+import { Document } from '~/types/oas';
 import Pages, { Props as PagesProps } from './pages';
 
 export type Props = Parameters<
@@ -16,11 +15,15 @@ export type Props = Parameters<
   pages: PagesProps['pages'];
   selectedPageId: PagesProps['selectedPageId'];
   onPageSelect: PagesProps['onSelect'];
+  document: Document;
+  endpoint: Endpoint;
 };
 const _Navigation: React.FC<Props> = ({
   pages,
   selectedPageId,
   onPageSelect,
+  document,
+  endpoint,
   className,
   closeNavigation,
 }) => {
@@ -29,28 +32,51 @@ const _Navigation: React.FC<Props> = ({
       closeNavigation();
       onPageSelect(...args);
     },
-    [onPageSelect]
+    [closeNavigation, onPageSelect]
   );
 
-  const renderHead = useCallback<NonNullable<NavigationProps['renderHead']>>(
-    () => (
-      <Link
-        to="/dashboard/endpoints"
-        className="flex justify-center items-center h-[62px]"
-      >
+  const renderHead = useCallback<
+    NonNullable<NavigationProps['renderHead']>
+  >(() => {
+    // Endpoint Info.
+    const thumbnail = document.info['x-thumbnail'] ? (
+      <img
+        className="object-contain rounded"
+        src={document.info['x-thumbnail']}
+      />
+    ) : (
+      <div className="flex items-center bg-thm-on-surface-faint rounded p-1">
         <Logo
-          className="h-8 drop-shadow-01dp"
-          left="text-thm-on-surface-high"
-          right="text-thm-on-surface"
+          left="text-thm-on-background"
+          right="text-thm-on-background-low"
         />
-      </Link>
-    ),
-    []
-  );
+      </div>
+    );
+    return (
+      <div className="m-1">
+        <Link className="group focus:outline-none" to="/dashboard/endpoints">
+          <article className="flex justify-start items-center py-3 px-3 gap-2 group-focus:ring-4 ring-thm-on-surface-low hover:bg-thm-on-surface-faint rounded">
+            <ArrowLeftIcon className="w-4 h-4 flex-none group-hover:animate-move-left-and-back group-focus:animate-move-left-and-back" />
+            <div className="flex-none w-6 h-6 flex justify-center">
+              {thumbnail}
+            </div>
+            <div className="flex-1 w-0">
+              <h1 className="text-xxs font-bold text-thm-on-surface-low truncate">
+                {endpoint.id}
+              </h1>
+              <h2 className="text-xxs text-thm-on-surface-low truncate">
+                {document.info.title}
+              </h2>
+            </div>
+          </article>
+        </Link>
+      </div>
+    );
+  }, [document.info, endpoint.id]);
 
   const renderBody = useCallback<NonNullable<NavigationProps['renderBody']>>(
     () => (
-      <div className="text-thm-on-surface border-t border-thm-on-surface-faint">
+      <div className="text-thm-on-surface mt-6 px-2">
         <Pages
           pages={pages}
           selectedPageId={selectedPageId}
@@ -61,30 +87,12 @@ const _Navigation: React.FC<Props> = ({
     [pages, selectedPageId, handlePageSelect]
   );
 
-  const renderTail = useCallback<NonNullable<NavigationProps['renderTail']>>(
-    () => (
-      <div className="px-2">
-        <div className="flex justify-center py-2">
-          <NavigationLinks on={COLOR_SYSTEM.SURFACE} />
-        </div>
-        <div className="flex justify-center py-2 border-t-2 border-thm-on-surface-faint">
-          <NavigationServices on={COLOR_SYSTEM.SURFACE} />
-        </div>
-        <div className="flex justify-center py-2 border-t-2 border-thm-on-surface-faint">
-          <NavigationVersion on={COLOR_SYSTEM.SURFACE} />
-        </div>
-      </div>
-    ),
-    []
-  );
-
   return (
     <Navigation
       on={COLOR_SYSTEM.SURFACE}
       className={classnames(className, 'h-full')}
       renderHead={renderHead}
       renderBody={renderBody}
-      renderTail={renderTail}
     />
   );
 };
