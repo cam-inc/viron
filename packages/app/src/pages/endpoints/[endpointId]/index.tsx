@@ -150,9 +150,7 @@ const EndpointPage: React.FC<Props> = ({ params }) => {
       if (!page) {
         return null;
       }
-      return (
-        <Appbar {...args} endpoint={endpoint} document={document} page={page} />
-      );
+      return <Appbar {...args} page={page} />;
     },
     [endpoint, document, isPending, error, selectedPageId]
   );
@@ -170,6 +168,8 @@ const EndpointPage: React.FC<Props> = ({ params }) => {
       return (
         <Navigation
           {...args}
+          document={document}
+          endpoint={endpoint}
           pages={document.info['x-pages']}
           selectedPageId={selectedPageId}
           onPageSelect={handlePageSelect}
