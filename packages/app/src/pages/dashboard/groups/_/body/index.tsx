@@ -54,7 +54,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
             <div className="p-4 flex justify-end">
               <OutlineButton.renewal
                 cs={COLOR_SYSTEM.PRIMARY}
-                label={t('addEndpointButtonLabel')}
+                label={t('addGroupButtonLabel')}
                 Icon={PlusIcon}
                 onClick={handleAddClick}
               />
