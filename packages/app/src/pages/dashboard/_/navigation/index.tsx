@@ -1,5 +1,6 @@
 import classnames from 'classnames';
 import React, { useCallback } from 'react';
+import Link from '~/components/link';
 import Logo from '~/components/logo';
 import Navigation, { Props as NavigationProps } from '~/components/navigation';
 import NavigationInternalPages from '~/components/navigation/internalPages';
@@ -17,14 +18,14 @@ const _Navigation: React.FC<Props> = ({ className, style }) => {
   const renderHead = useCallback<NonNullable<NavigationProps['renderHead']>>(
     function () {
       return (
-        <div className="flex items-center p-4 gap-2">
+        <Link to="/" className="flex items-center p-2.5 px-6 gap-3">
           <Logo
-            className="h-4 drop-shadow-01dp"
+            className="w-6 h-6 drop-shadow-01dp"
             left="text-thm-on-surface-high"
             right="text-thm-on-surface"
           />
-          <div className="text-thm-on-surface text-lg font-bold">viron</div>
-        </div>
+          <div className="text-thm-on-surface text-2xl font-bold">viron</div>
+        </Link>
       );
     },
     []
@@ -34,7 +35,7 @@ const _Navigation: React.FC<Props> = ({ className, style }) => {
     function () {
       return (
         <NavigationInternalPages
-          className="mx-2 space-y-1"
+          className="px-2 py-6 space-y-1"
           on={COLOR_SYSTEM.SURFACE}
         />
       );

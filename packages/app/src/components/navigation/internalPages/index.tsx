@@ -34,7 +34,7 @@ const InternalPages: React.FC<Props> = ({ className = '', on }) => {
         <li key={item.to}>
           <Link
             className={classNames(
-              'flex gap-2 text-sm items-center pl-1 py-1 rounded-lg active:opacity-50',
+              'flex gap-2 text-sm items-center p-2 rounded active:opacity-50',
               {
                 [`bg-thm-on-${on}-low text-thm-on-${on}-faint hover:opacity-75 focus:outline outline-2 outline-thm-${on}`]:
                   originalPath.startsWith(item.activeStartsWith),

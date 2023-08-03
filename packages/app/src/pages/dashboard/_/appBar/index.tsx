@@ -15,7 +15,7 @@ const Appbar: React.FC<Props> = ({ className, style, openNavigation }) => {
     <div className={className} style={style}>
       <div className="flex items-center h-full px-4">
         <TextButton
-          on={COLOR_SYSTEM.PRIMARY}
+          on={COLOR_SYSTEM.BACKGROUND}
           size={BUTTON_SIZE.XL}
           Icon={MenuAlt1Icon}
           onClick={handleNavButtonClick}
