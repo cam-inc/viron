@@ -60,6 +60,7 @@
   },
   "internalPagePaths": {
     "root": "トップ",
-    "endpoints": "ダッシュボード"
+    "endpoints": "管理画面",
+    "groups": "グループの管理"
   }
 }

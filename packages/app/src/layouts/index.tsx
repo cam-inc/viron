@@ -8,7 +8,7 @@ import { ClassName, COLOR_SYSTEM } from '~/types';
 
 const HEIGHT_SYSTEM_BAR = 8;
 const HEIGHT_APP_BAR = 64;
-const WIDTH_NAVIGATION = 160;
+const WIDTH_NAVIGATION = 260;
 
 export type Props = {
   renderAppBar?: (args: {
@@ -123,7 +123,7 @@ const Layout: React.FC<Props> = ({
                 height: `${HEIGHT_APP_BAR}px`,
               }}
               className={classnames(
-                'bg-thm-primary text-thm-on-primary shadow-01dp transform transition duration-300 ease-out',
+                'text-thm-on-primary transform transition duration-300 ease-out',
                 {
                   'pointer-events-none': !isAppBarOpened,
                   'opacity-0': !isAppBarOpened,

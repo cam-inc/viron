@@ -39,7 +39,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
   return (
     <>
       <div className={className} style={style}>
-        <div className="max-w-[1252px] mx-auto @container">
+        <div className="max-w-[1252px] mx-auto @container px-4 lg:px-8">
           {/* Head */}
           <div>
             <div className="py-6 pl-8">
@@ -55,7 +55,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
           </div>
           {/* Body */}
           <div>
-            <div className="p-4 flex justify-end border-b border-thm-on-background-slight">
+            <div className="p-4 flex justify-end">
               <OutlineButton.renewal
                 cs={COLOR_SYSTEM.PRIMARY}
                 label={t('addEndpointButtonLabel')}

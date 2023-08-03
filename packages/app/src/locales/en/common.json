@@ -60,6 +60,7 @@
   },
   "internalPagePaths": {
     "root": "Top",
-    "endpoints": "Dashboard"
+    "endpoints": "Endpoints",
+    "groups": "Groups"
   }
 }
