@@ -119,8 +119,16 @@ module.exports = {
     },
     // Utilities by a-z order.
     extend: {
+      keyframes: {
+        'move-left-and-back': {
+          '0%': { transform: 'translateX(0)' },
+          '25%': { transform: 'translateX(-6px)' },
+          '100%': { transform: 'translateX(0)' },
+        },
+      },
       animation: {
         'spin-slow': 'spin 3s linear infinite',
+        'move-left-and-back': 'move-left-and-back 2s ease-out infinite',
       },
       colors: COLORS,
       fontSize: {

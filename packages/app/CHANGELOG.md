@@ -1,5 +1,12 @@
 # @viron/app
 
+## 2.4.1
+
+### Patch Changes
+
+- 31dc9552: update design
+- b55e9ddd: Fix dashboard styles
+
 ## 2.4.0
 
 ### Minor Changes
