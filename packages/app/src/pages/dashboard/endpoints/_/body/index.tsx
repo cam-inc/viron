@@ -43,7 +43,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
         <div className="max-w-[1252px] mx-auto @container px-4 lg:px-8">
           {/* Head */}
           <div>
-            <div className="py-11 flex justify-between items-center">
+            <div className="py-6 lg:py-10 flex justify-between items-center">
               <Head
                 on={COLOR_SYSTEM.BACKGROUND}
                 title={<div>{t('dashboard.endpoints.title')}</div>}
