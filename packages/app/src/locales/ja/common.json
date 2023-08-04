@@ -61,6 +61,7 @@
   "internalPagePaths": {
     "root": "トップ",
     "endpoints": "管理画面",
-    "groups": "グループの管理"
+    "groups": "グループの管理",
+    "dashboard": "ダッシュボード"
   }
 }

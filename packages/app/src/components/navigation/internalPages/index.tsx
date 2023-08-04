@@ -10,17 +10,14 @@ import { Pathname, URL as _URL } from '~/types';
 
 const paths: {
   to: Pathname | _URL;
+  activeStartsWith: Pathname | _URL;
   label: string;
   icon: JSX.Element;
 }[] = [
   {
     to: INTERNAL_PAGE_PATHS.ENDPOINTS,
-    label: 'internalPagePaths.endpoints',
-    icon: <BarsOutLineIcon className="w-[1.42em] h-[1.42em]" />,
-  },
-  {
-    to: INTERNAL_PAGE_PATHS.GROUPS,
-    label: 'internalPagePaths.groups',
+    activeStartsWith: INTERNAL_PAGE_PATHS.DASHBOARD,
+    label: 'internalPagePaths.dashboard',
     icon: <BarsOutLineIcon className="w-[1.42em] h-[1.42em]" />,
   },
 ];
@@ -37,12 +34,12 @@ const InternalPages: React.FC<Props> = ({ className = '', on }) => {
         <li key={item.to}>
           <Link
             className={classNames(
-              'flex gap-2 text-sm items-center pl-1 py-1 rounded-lg active:opacity-50',
+              'flex gap-2 text-sm items-center p-2 rounded active:opacity-50',
               {
                 [`bg-thm-on-${on}-low text-thm-on-${on}-faint hover:opacity-75 focus:outline outline-2 outline-thm-${on}`]:
-                  item.to === originalPath,
+                  originalPath.startsWith(item.activeStartsWith),
                 [`text-thm-on-${on}  hover:opacity-75 focus:outline outline-2 outline-thm-${on}`]:
-                  item.to !== originalPath,
+                  !originalPath.startsWith(item.activeStartsWith),
               }
             )}
             to={item.to}

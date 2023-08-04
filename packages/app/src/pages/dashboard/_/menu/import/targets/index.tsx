@@ -6,8 +6,8 @@ import FilledButton, {
 } from '~/components/button/filled';
 import Head from '~/components/head';
 import ArrowCircleDownIcon from '~/components/icon/arrowCircleDown/outline';
-import ColorSwatchIcon from '~/components/icon/colorSwatch/outline';
 import CheckCircleIcon from '~/components/icon/checkCircle/outline';
+import ColorSwatchIcon from '~/components/icon/colorSwatch/outline';
 import ExclamationIcon from '~/components/icon/exclamation/outline';
 import Spinner from '~/components/spinner';
 import { BaseError } from '~/errors';
@@ -18,7 +18,7 @@ export type Props = {
   endpointList: Endpoint[];
   endpointGroupList: EndpointGroup[];
 };
-const Targets: React.FC<Props> = ({ endpointList, endpointGroupList }) => {
+const Targets: React.FC<Props> = ({ endpointList }) => {
   return (
     <div>
       <Head
