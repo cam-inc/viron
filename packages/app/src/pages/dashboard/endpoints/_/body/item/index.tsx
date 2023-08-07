@@ -95,10 +95,10 @@ const Item: React.FC<Props> = ({ endpoint }) => {
 
   return (
     <article
-      className={classNames('px-5 border rounded-2xl h-full', {
-        'border-thm-on-background-low hover:bg-thm-on-background-faint py-6':
+      className={classNames('pt-6 px-5 border rounded-2xl h-full', {
+        'border-thm-on-background-low hover:bg-thm-on-background-faint pb-6':
           !error,
-        'bg-thm-surface border-transparent py-4': !!error,
+        'bg-thm-surface border-transparent pb-4': !!error,
       })}
     >
       {content}
