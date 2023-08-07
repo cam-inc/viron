@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import { Props as BaseProps } from '~/components';
 import GithubIcon from '~/components/icon/github/solid';
-import TwitterIcon from '~/components/icon/twitter/outline';
 import Link from '~/components/link';
 import { URL } from '~/constants';
 import { useTranslation } from '~/hooks/i18n';
@@ -15,12 +14,6 @@ type ServiceType = {
   isComingSoon?: boolean;
 };
 const services: ServiceType[] = [
-  {
-    i18nKey: 'service.twitter',
-    to: URL.TWITTER,
-    icon: <TwitterIcon className="w-[1.42em] h-[1.42em]" />,
-    isComingSoon: true,
-  },
   {
     i18nKey: 'service.github',
     to: URL.GITHUB,

@@ -70,7 +70,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
                 {listByGroup.map((item) => (
                   <li
                     key={item.group.id}
-                    className="py-2 border-b border-thm-on-background-faint"
+                    className="py-1 border-b border-thm-on-background-faint"
                   >
                     <Group group={item.group} list={item.list} />
                   </li>
@@ -78,7 +78,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
               </ul>
             )}
             {!!listUngrouped.length && (
-              <ul className="grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 mt-2 p-2">
+              <ul className="grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 mt-2 py-2">
                 {listUngrouped.map((item) => (
                   <li key={item.id}>
                     <Item endpoint={item} />
@@ -103,34 +103,38 @@ type GroupProps = {
 };
 const Group: React.FC<GroupProps> = ({ group, list }) => {
   const [isOpened, setIsOpened] = useState<boolean>(!!list.length);
-  const handleToggleClick = useCallback<TextButtonProps['onClick']>(() => {
-    if (!list.length) {
-      return;
-    }
+  const handleToggleClick = () => {
     setIsOpened((currVal) => !currVal);
-  }, [list]);
+  };
+
+  const ToggleIcon = isOpened ? ChevronDownIcon : ChevronRightIcon;
 
   return (
-    <div className="border-l-2 border-thm-background hover:border-thm-on-background-low">
+    <div>
       {/* Head */}
-      <div className="px-2 flex items-center gap-2">
-        <TextButton
-          on={COLOR_SYSTEM.SURFACE}
-          label={`${group.name}(${list.length})`}
-          Icon={isOpened ? ChevronDownIcon : ChevronRightIcon}
-          onClick={handleToggleClick}
-        />
-        {group.description && (
-          <div className="text-xxs text-thm-on-background-low truncate">
-            {group.description}
-          </div>
-        )}
-      </div>
+      <button
+        className="flex gap-1 w-full hover:bg-thm-on-background-faint py-2 rounded"
+        onClick={handleToggleClick}
+      >
+        <span className="p-0.5">
+          <ToggleIcon className="w-4 h-4" />
+        </span>
+        <span className="text-start">
+          <span className="block text-sm text-thm-on-background font-bold">
+            {group.name}
+          </span>
+          {group.description && (
+            <span className="block text-sm text-thm-on-background-low truncate">
+              {group.description}
+            </span>
+          )}
+        </span>
+      </button>
       {/* Body */}
 
       <ul
         className={classnames(
-          'grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 mt-2 p-2',
+          'grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 mt-2 py-2',
           {
             hidden: !isOpened,
           }
