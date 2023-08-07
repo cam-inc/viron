@@ -1,5 +1,16 @@
 # @viron/app
 
+## 2.5.0
+
+### Minor Changes
+
+- adf683f4: Move import & export endpoints button to menu
+
+### Patch Changes
+
+- 184c3c33: - Fix: Pinned panels overlapping sidebars
+  - Fix: Scrolling overlaps breadcrumbs UI and Table
+
 ## 2.4.1
 
 ### Patch Changes
