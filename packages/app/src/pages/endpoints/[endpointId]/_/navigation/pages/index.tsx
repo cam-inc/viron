@@ -158,7 +158,7 @@ const Group: React.FC<{
       </button>
       <div
         className={classnames(
-          'ml-3 pt-1 border-l border-thm-on-surface-slight pl-1',
+          'ml-3 border-l border-thm-on-surface-slight pl-1',
           {
             hidden: !isOpened,
           }
