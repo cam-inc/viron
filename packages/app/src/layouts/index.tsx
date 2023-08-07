@@ -150,7 +150,7 @@ const Layout: React.FC<Props> = ({
               top: `${HEIGHT_SYSTEM_BAR}px`,
               width: `${WIDTH_NAVIGATION}px`,
             }}
-            className="fixed z-layout-navigation left-0 bottom-0 bg-thm-surface text-thm-on-surface shadow-01dp border-r-2 border-thm-on-surface-faint overflow-y-scroll overscroll-y-contain"
+            className="fixed z-layout-navigation left-0 bottom-0 bg-thm-surface text-thm-on-surface border-r-1 border-thm-on-surface-faint overflow-y-scroll overscroll-y-contain"
           >
             <ErrorBoundary on={COLOR_SYSTEM.SURFACE}>
               {renderNavigation({
@@ -166,13 +166,10 @@ const Layout: React.FC<Props> = ({
         {/* region: Sub Body */}
         {renderSubBody && (
           <div
-            className={classnames(
-              'fixed z-layout-subbody right-0 bottom-0 h-[50vh] bg-thm-background text-thm-on-background shadow-01dp border-t-2 border-thm-on-background-slight overflow-y-scroll overscroll-y-contain',
-              {
-                'left-[160px]': lg && renderNavigation,
-                'left-0': !(lg && renderNavigation),
-              }
-            )}
+            className="fixed z-layout-subbody right-0 bottom-0 h-[50vh] bg-thm-background text-thm-on-background shadow-01dp border-t-2 border-thm-on-background-slight overflow-y-scroll overscroll-y-contain"
+            style={{
+              left: lg && renderNavigation ? `${WIDTH_NAVIGATION}px` : '0',
+            }}
           >
             <ErrorBoundary on={COLOR_SYSTEM.BACKGROUND}>
               {renderSubBody({

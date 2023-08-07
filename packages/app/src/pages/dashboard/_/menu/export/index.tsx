@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
 import { SIZE as BUTTON_SIZE } from '~/components/button';
-import FilledButton, {
-  Props as FilledButtonProps,
-} from '~/components/button/filled';
+import TextButton, {
+  Props as TextButtonProps,
+} from '~/components/button/text/on';
 import Error, { useError } from '~/components/error';
-import UploadIcon from '~/components/icon/upload/outline';
+import ExportIcon from '~/components/icon/export/outline';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
 import { ClassName, COLOR_SYSTEM } from '~/types';
@@ -17,19 +17,19 @@ const Export: React.FC<Props> = ({ className = '' }) => {
   const { export: _export } = useEndpoint();
   const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
 
-  const handleClick = useCallback<FilledButtonProps['onClick']>(() => {
+  const handleClick = useCallback<TextButtonProps['onClick']>(() => {
     const result = _export();
     error.setError(result.error);
-  }, [_export, error.setError]);
+  }, [_export, error]);
 
   return (
     <>
-      <FilledButton.renewal
+      <TextButton
         className={className}
-        cs={COLOR_SYSTEM.SURFACE}
+        on={COLOR_SYSTEM.SURFACE}
         size={BUTTON_SIZE.SM}
         label={t('exportEndpoints')}
-        Icon={UploadIcon}
+        Icon={ExportIcon}
         onClick={handleClick}
       />
       <Error {...error.bind} />
