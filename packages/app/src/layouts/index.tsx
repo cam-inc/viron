@@ -166,13 +166,10 @@ const Layout: React.FC<Props> = ({
         {/* region: Sub Body */}
         {renderSubBody && (
           <div
-            className={classnames(
-              'fixed z-layout-subbody right-0 bottom-0 h-[50vh] bg-thm-background text-thm-on-background shadow-01dp border-t-2 border-thm-on-background-slight overflow-y-scroll overscroll-y-contain',
-              {
-                'left-[160px]': lg && renderNavigation,
-                'left-0': !(lg && renderNavigation),
-              }
-            )}
+            className="fixed z-layout-subbody right-0 bottom-0 h-[50vh] bg-thm-background text-thm-on-background shadow-01dp border-t-2 border-thm-on-background-slight overflow-y-scroll overscroll-y-contain"
+            style={{
+              left: lg && renderNavigation ? `${WIDTH_NAVIGATION}px` : '0',
+            }}
           >
             <ErrorBoundary on={COLOR_SYSTEM.BACKGROUND}>
               {renderSubBody({
