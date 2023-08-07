@@ -76,7 +76,7 @@ const _Pages: React.FC<Props> = ({ pages, selectedPageId, onSelect }) => {
   return (
     <GroupOrPage
       pages={pages}
-      depth={1}
+      depth={0}
       list={tree.children}
       selectedPageId={selectedPageId}
       onSelect={onSelect}
@@ -101,7 +101,6 @@ const GroupOrPage: React.FC<{
           content = (
             <_Page
               page={page}
-              depth={depth}
               isSelected={item === selectedPageId}
               onSelect={onSelect}
             />
@@ -118,7 +117,7 @@ const GroupOrPage: React.FC<{
           );
         }
         return (
-          <li key={idx} className="mt-1">
+          <li className="pt-1" key={idx}>
             {content}
           </li>
         );
@@ -142,26 +141,28 @@ const Group: React.FC<{
   return (
     <div>
       <button
-        className="rounded text-start py-1.5 w-full text-thm-on-surface-low text-xs flex items-center justify-between gap-1 hover:bg-thm-on-surface-faint focus:ring-4 ring-thm-on-surface-low focus:outline-none"
-        style={{ paddingInlineStart: `${depth * 8}px` }}
+        className="rounded text-start p-1.5 w-full text-thm-on-surface-low text-xs flex items-center justify-between gap-1 hover:bg-thm-on-surface-faint focus-visible:ring-2 ring-thm-on-surface-low focus:outline-none"
         onClick={handleClick}
       >
+        {isOpened ? (
+          <ChevronDownIcon className="w-[1.25em] h-[1.25em] flex-none" />
+        ) : (
+          <ChevronRightIcon className="w-[1.25em] h-[1.25em] flex-none" />
+        )}
         {isOpened ? (
           <FolderOpenIcon className="w-[1.5em] h-[1.5em] flex-none" />
         ) : (
           <FolderIcon className="w-[1.5em] h-[1.5em] flex-none" />
         )}
-        <span className="w-0 flex-1 truncate">{partial.group}</span>
-        {isOpened ? (
-          <ChevronDownIcon className="w-[1.5em] h-[1.5em] flex-none" />
-        ) : (
-          <ChevronRightIcon className="w-[1.5em] h-[1.5em] flex-none" />
-        )}
+        <span className="w-0 flex-1 truncate font-bold">{partial.group}</span>
       </button>
       <div
-        className={classnames('mt-1', {
-          hidden: !isOpened,
-        })}
+        className={classnames(
+          'ml-3 pt-1 border-l border-thm-on-surface-slight pl-1',
+          {
+            hidden: !isOpened,
+          }
+        )}
       >
         <GroupOrPage
           pages={pages}
@@ -177,10 +178,9 @@ const Group: React.FC<{
 
 const _Page: React.FC<{
   page: Page;
-  depth: number;
   isSelected: boolean;
   onSelect: (pageId: PageId) => void;
-}> = ({ page, depth, isSelected, onSelect }) => {
+}> = ({ page, isSelected, onSelect }) => {
   const handleClick = () => {
     onSelect(page.id);
   };
@@ -188,13 +188,12 @@ const _Page: React.FC<{
   return (
     <button
       className={classnames(
-        'rounded text-start py-1.5 w-full text-xs focus:ring-4 ring-thm-on-surface-low focus:outline-none truncate',
+        'rounded text-start py-1.5 px-3 w-full text-xs focus-visible:ring-2 ring-thm-on-surface-low focus:outline-none truncate',
         {
           'text-thm-on-surface-faint bg-thm-on-surface-low': isSelected,
           'text-thm-on-surface-low hover:bg-thm-on-surface-faint': !isSelected,
         }
       )}
-      style={{ paddingInlineStart: `${depth * 8}px` }}
       onClick={handleClick}
     >
       {page.title}
