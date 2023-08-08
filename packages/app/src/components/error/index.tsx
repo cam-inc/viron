@@ -160,7 +160,7 @@ const _ErrorRenewal: React.FC<Props> = ({ className = '', error }) => {
   return (
     <div
       className={classnames(
-        `flex items-center gap-2 text-xs text-thm-on-background bg-thm-on-surface-faint py-2 px-4 rounded-lg`,
+        'flex items-center gap-2 text-xs text-thm-on-background bg-thm-on-surface-faint py-2 px-4 rounded-lg',
         className
       )}
     >
