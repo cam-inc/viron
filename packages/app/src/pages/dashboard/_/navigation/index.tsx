@@ -19,7 +19,11 @@ const _Navigation: React.FC<Props> = ({ className, style }) => {
     function () {
       return (
         <Link to="/" className="flex items-center m-1 p-1.5 px-5 gap-3">
-          <Logo.renewal className="w-6 h-6" />
+          <Logo
+            className="w-6 h-6"
+            left="text-thm-on-surface-high"
+            right="text-thm-on-surface"
+          />
           <div className="text-thm-on-surface-low text-2xl font-bold">
             viron
           </div>

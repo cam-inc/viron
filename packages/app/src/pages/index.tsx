@@ -37,7 +37,11 @@ const HomePage: React.FC<Props> = () => {
     ({ className, style, minHeight }) => {
       const poster = (
         <div className="bg-thm-background text-thm-on-background flex flex-col items-center justify-center">
-          <Logo.renewal className="w-24" />
+          <Logo
+            className="w-24"
+            left="text-thm-on-background-high"
+            right="text-thm-on-background"
+          />
           <div className="text-2xl mt-8 font-bold mb-2 text-thm-on-background-high">
             {t('catchphrase')}
           </div>

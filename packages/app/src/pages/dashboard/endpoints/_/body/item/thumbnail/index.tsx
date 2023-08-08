@@ -14,7 +14,10 @@ const Thumbnail: React.FC<Props> = ({ document, className }) => {
     if (!document?.info['x-thumbnail']) {
       return (
         <div className="h-full flex items-center">
-          <Logo.renewal className="h-full" />
+          <Logo
+            left="text-thm-on-background"
+            right="text-thm-on-background-low"
+          />
         </div>
       );
     }
