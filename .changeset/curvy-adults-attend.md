@@ -2,4 +2,4 @@
 "@viron/app": patch
 ---
 
-Change Root & Dashboard styles'
+Change Root & Dashboard styles
