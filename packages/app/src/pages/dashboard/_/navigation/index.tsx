@@ -18,13 +18,15 @@ const _Navigation: React.FC<Props> = ({ className, style }) => {
   const renderHead = useCallback<NonNullable<NavigationProps['renderHead']>>(
     function () {
       return (
-        <Link to="/" className="flex items-center p-2.5 px-6 gap-3">
+        <Link to="/" className="flex items-center m-1 p-1.5 px-5 gap-3">
           <Logo
-            className="w-6 h-6 drop-shadow-01dp"
+            className="w-6 h-6"
             left="text-thm-on-surface-high"
             right="text-thm-on-surface"
           />
-          <div className="text-thm-on-surface text-2xl font-bold">viron</div>
+          <div className="text-thm-on-surface-low text-2xl font-bold">
+            viron
+          </div>
         </Link>
       );
     },
@@ -46,7 +48,7 @@ const _Navigation: React.FC<Props> = ({ className, style }) => {
   const renderTail = useCallback<NonNullable<NavigationProps['renderTail']>>(
     function () {
       return (
-        <div className="my-4 ml-3">
+        <div className="my-4 mx-3">
           <div className="mb-6 space-y-4">
             <NavigationLinks.renewal
               className="space-y-4"
