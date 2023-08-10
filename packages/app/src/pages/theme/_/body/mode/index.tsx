@@ -11,15 +11,16 @@ const _Mode: React.FC<Props> = ({ title, mode }) => {
     <div>
       <div className="text-[#fff] text-xxs mb-1">{title}</div>
       <div className="grid grid-cols-3 gap-1 rounded overflow-hidden">
-        <Chip
-          title="Primary"
-          ground={mode.primary}
-          on={mode.onPrimary}
-          onHigh={mode.onPrimaryHigh}
-          onLow={mode.onPrimaryLow}
-          onSlight={mode.onPrimarySlight}
-          onFaint={mode.onPrimaryFaint}
-        >
+        <div>
+          <Chip
+            title="Primary"
+            ground={mode.primary}
+            on={mode.onPrimary}
+            onHigh={mode.onPrimaryHigh}
+            onLow={mode.onPrimaryLow}
+            onSlight={mode.onPrimarySlight}
+            onFaint={mode.onPrimaryFaint}
+          />
           <Chip
             title="Container"
             ground={mode.primaryContainer}
@@ -29,16 +30,17 @@ const _Mode: React.FC<Props> = ({ title, mode }) => {
             onSlight={mode.onPrimaryContainerSlight}
             onFaint={mode.onPrimaryContainerFaint}
           />
-        </Chip>
-        <Chip
-          title="Secondary"
-          ground={mode.secondary}
-          on={mode.onSecondary}
-          onHigh={mode.onSecondaryHigh}
-          onLow={mode.onSecondaryLow}
-          onSlight={mode.onSecondarySlight}
-          onFaint={mode.onSecondaryFaint}
-        >
+        </div>
+        <div>
+          <Chip
+            title="Secondary"
+            ground={mode.secondary}
+            on={mode.onSecondary}
+            onHigh={mode.onSecondaryHigh}
+            onLow={mode.onSecondaryLow}
+            onSlight={mode.onSecondarySlight}
+            onFaint={mode.onSecondaryFaint}
+          />
           <Chip
             title="Container"
             ground={mode.secondaryContainer}
@@ -48,16 +50,17 @@ const _Mode: React.FC<Props> = ({ title, mode }) => {
             onSlight={mode.onSecondaryContainerSlight}
             onFaint={mode.onSecondaryContainerFaint}
           />
-        </Chip>
-        <Chip
-          title="Tertiary"
-          ground={mode.tertiary}
-          on={mode.onTertiary}
-          onHigh={mode.onTertiaryHigh}
-          onLow={mode.onTertiaryLow}
-          onSlight={mode.onTertiarySlight}
-          onFaint={mode.onTertiaryFaint}
-        >
+        </div>
+        <div>
+          <Chip
+            title="Tertiary"
+            ground={mode.tertiary}
+            on={mode.onTertiary}
+            onHigh={mode.onTertiaryHigh}
+            onLow={mode.onTertiaryLow}
+            onSlight={mode.onTertiarySlight}
+            onFaint={mode.onTertiaryFaint}
+          />
           <Chip
             title="Container"
             ground={mode.tertiaryContainer}
@@ -67,16 +70,17 @@ const _Mode: React.FC<Props> = ({ title, mode }) => {
             onSlight={mode.onTertiaryContainerSlight}
             onFaint={mode.onTertiaryContainerFaint}
           />
-        </Chip>
-        <Chip
-          title="Error"
-          ground={mode.error}
-          on={mode.onError}
-          onHigh={mode.onErrorHigh}
-          onLow={mode.onErrorLow}
-          onSlight={mode.onErrorSlight}
-          onFaint={mode.onErrorFaint}
-        >
+        </div>
+        <div>
+          <Chip
+            title="Error"
+            ground={mode.error}
+            on={mode.onError}
+            onHigh={mode.onErrorHigh}
+            onLow={mode.onErrorLow}
+            onSlight={mode.onErrorSlight}
+            onFaint={mode.onErrorFaint}
+          />
           <Chip
             title="Error Container"
             ground={mode.errorContainer}
@@ -86,7 +90,7 @@ const _Mode: React.FC<Props> = ({ title, mode }) => {
             onSlight={mode.onErrorContainerSlight}
             onFaint={mode.onErrorContainerFaint}
           />
-        </Chip>
+        </div>
         <Chip
           title="Background"
           ground={mode.background}
