@@ -1,5 +1,15 @@
 # @viron/app
 
+## 2.6.0
+
+### Minor Changes
+
+- 498c4912: - Update: add file tree
+
+### Patch Changes
+
+- b1b7d901: Change Root & Dashboard styles
+
 ## 2.5.0
 
 ### Minor Changes
