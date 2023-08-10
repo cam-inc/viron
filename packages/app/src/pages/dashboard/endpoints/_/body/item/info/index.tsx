@@ -10,10 +10,10 @@ import TagIcon from '~/components/icon/tag/outline';
 import License from '~/components/license';
 import Link from '~/components/link';
 import Server from '~/components/server';
+import { useTranslation } from '~/hooks/i18n';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document } from '~/types/oas';
 import Thumbnail from '../thumbnail';
-import { useTranslation } from '~/hooks/i18n';
 
 type Props = {
   endpoint: Endpoint;
@@ -37,7 +37,11 @@ const Info: React.FC<Props> = ({ endpoint, document }) => {
       <div>
         <div className="flex gap-4 items-center">
           <div className="flex-none">
-            <Thumbnail endpoint={endpoint} document={document} />
+            <Thumbnail
+              className="w-12 h-12"
+              endpoint={endpoint}
+              document={document}
+            />
           </div>
           <div className="flex-1">
             <div className="text-xxs text-thm-on-surface-low">

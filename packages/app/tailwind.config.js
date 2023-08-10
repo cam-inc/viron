@@ -67,7 +67,7 @@ const COLORS = {
   'thm-on-surface-variant-low': 'var(--thm-on-surface-variant-low)',
   'thm-on-surface-variant-slight': 'var(--thm-on-surface-variant-slight)',
   'thm-on-surface-variant-faint': 'var(--thm-on-surface-variant-faint)',
-  'thm-outline': 'var(--thm-surface-outline)',
+  'thm-outline': 'var(--thm-outline)',
 };
 
 module.exports = {
