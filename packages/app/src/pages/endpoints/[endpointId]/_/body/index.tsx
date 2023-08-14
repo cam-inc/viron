@@ -5,14 +5,14 @@ import Head from '~/components/head';
 import { Props as LayoutProps } from '~/layouts';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document, Page, ContentId } from '~/types/oas';
-import Content, * as content from '../content';
+import Content, { Props as ContentProps } from '../content';
 
 export type Props = Parameters<LayoutProps['renderBody']>[0] & {
   endpoint: Endpoint;
   document: Document;
   page: Page;
   pinnedContentIds: ContentId[];
-} & Pick<content.Props, 'onPin' | 'onUnpin'>;
+} & Pick<ContentProps, 'onPin' | 'onUnpin'>;
 
 const Body: React.FC<Props> = ({
   className,
