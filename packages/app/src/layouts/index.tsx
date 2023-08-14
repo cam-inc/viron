@@ -7,7 +7,7 @@ import { useAppScreenGlobalStateValue } from '~/store';
 import { ClassName, COLOR_SYSTEM } from '~/types';
 
 const HEIGHT_SYSTEM_BAR = 8;
-const HEIGHT_APP_BAR = 64;
+const HEIGHT_APP_BAR = 48;
 const WIDTH_NAVIGATION = 260;
 
 export type Props = {
