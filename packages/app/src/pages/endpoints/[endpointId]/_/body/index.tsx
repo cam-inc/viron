@@ -1,7 +1,7 @@
+import classNames from 'classnames';
 import React from 'react';
 import CommonMark from '~/components/commonMark';
 import Head from '~/components/head';
-import DocumentTextIcon from '~/components/icon/documentText/outline';
 import { Props as LayoutProps } from '~/layouts';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document, Page, ContentId } from '~/types/oas';
@@ -24,28 +24,22 @@ const Body: React.FC<Props> = ({
   pinnedContentIds,
 }) => {
   return (
-    <div className={className}>
-      <div className="p-4 border-b-4 border-thm-on-background-slight">
-        <Head
-          on={COLOR_SYSTEM.BACKGROUND}
-          title={
-            <div className="flex items-center gap-2">
-              <DocumentTextIcon className="w-em" />
-              <div>{page.title}</div>
-            </div>
-          }
-          description={
-            page.description ? (
-              <CommonMark
-                on={COLOR_SYSTEM.BACKGROUND}
-                data={page.description}
-              />
-            ) : undefined
-          }
-        />
-      </div>
+    <div className={classNames('mx-10 mt-6', className)}>
+      <Head
+        on={COLOR_SYSTEM.BACKGROUND}
+        title={
+          <div className="flex items-center gap-2">
+            <div>{page.title}</div>
+          </div>
+        }
+        description={
+          page.description ? (
+            <CommonMark on={COLOR_SYSTEM.BACKGROUND} data={page.description} />
+          ) : undefined
+        }
+      />
       <div
-        className="p-4"
+        className="mt-10"
         style={{
           display: 'grid',
           gridGap: '8px',

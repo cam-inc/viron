@@ -10,7 +10,7 @@ const Breadcrumb: React.FC<Props> = ({ on, list, className = '' }) => {
   return (
     <div
       className={classnames(
-        `text-thm-${on} flex items-center gap-1`,
+        `text-thm-on-${on} flex items-center gap-1`,
         className
       )}
     >
@@ -18,7 +18,7 @@ const Breadcrumb: React.FC<Props> = ({ on, list, className = '' }) => {
         <React.Fragment key={label}>
           <p>{label}</p>
 
-          <ChevronRightIcon className="w-em" />
+          <ChevronRightIcon className={`w-em text-thm-on-${on}-low`} />
         </React.Fragment>
       ))}
     </div>

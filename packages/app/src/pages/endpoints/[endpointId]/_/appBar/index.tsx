@@ -36,14 +36,10 @@ const Appbar: React.FC<Props> = ({
     }
     return page.group.split('/');
   }, [page.group]);
-  const pagePopover = usePopover<HTMLDivElement>();
-  const handlePageClick = useCallback<TextOnButtonProps['onClick']>(() => {
-    pagePopover.open();
-  }, [pagePopover]);
 
   return (
     <div style={style} className={className}>
-      <div className="flex gap-2 items-center h-full px-4 bg-thm-background">
+      <div className="flex gap-2 items-center h-full mx-10 bg-thm-background">
         {!lg && (
           <div className="flex-none">
             <TextOnButton
@@ -54,37 +50,18 @@ const Appbar: React.FC<Props> = ({
             />
           </div>
         )}
-        <div className="flex-none" ref={pagePopover.targetRef}>
-          <TextOnButton on={COLOR_SYSTEM.PRIMARY} onClick={handlePageClick}>
-            <div className="flex gap-1">
-              {!!breadcrumbList.length && (
-                <Breadcrumb
-                  className="text-xxs"
-                  on={COLOR_SYSTEM.PRIMARY}
-                  list={breadcrumbList}
-                />
-              )}
-              <div className="text-xs text-thm-primary">{page.title}</div>
-            </div>
-          </TextOnButton>
-        </div>
-        {/* Page Popover */}
-        <Popover {...pagePopover.bind}>
-          <div className="flex flex-col gap-1 text-thm-on-surface whitespace-nowrap">
-            {page.group && (
-              <div className="text-xxs text-thm-on-surface-low">
-                {page.group}
-              </div>
+        <div className="flex-none">
+          <div className="flex gap-1 items-center">
+            {!!breadcrumbList.length && (
+              <Breadcrumb
+                className="text-xxs"
+                on={COLOR_SYSTEM.BACKGROUND}
+                list={breadcrumbList}
+              />
             )}
-            <div className="text-xxs">{page.id}</div>
-            <div className="text-base text-thm-on-surface-high font-bold">
-              {page.title}
-            </div>
-            {page.description && (
-              <CommonMark on={COLOR_SYSTEM.SURFACE} data={page.description} />
-            )}
+            <div className="text-xxs text-thm-on-background">{page.title}</div>
           </div>
-        </Popover>
+        </div>
       </div>
     </div>
   );
