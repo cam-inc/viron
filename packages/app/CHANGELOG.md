@@ -1,5 +1,12 @@
 # @viron/app
 
+## 2.6.1
+
+### Patch Changes
+
+- 4669657f: update endpoints title design
+- feb1427a: Change color tone.
+
 ## 2.6.0
 
 ### Minor Changes
