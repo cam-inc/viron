@@ -61,7 +61,7 @@ const Head: React.FC<Props> = ({
     console.log(error);
   }, []);
 
-  const handleOpenerClick = useCallback<TextOnButtonProps['onClick']>(() => {
+  const handleOpenerClick = useCallback(() => {
     if (isOpened) {
       onClose();
     } else {
@@ -93,22 +93,22 @@ const Head: React.FC<Props> = ({
     <>
       <div className={className}>
         <div className="flex items-center gap-2">
-          <div className="flex-none">
-            <TextOnButton
-              on={COLOR_SYSTEM.SURFACE}
-              size={BUTTON_SIZE.BASE}
-              Icon={isOpened ? ChevronDownIcon : ChevronRightIcon}
-              label={content.title}
-              onClick={handleOpenerClick}
-            />
-          </div>
+          <button
+            onClick={handleOpenerClick}
+            className="flex items-center gap-1 text-sm font-bold focus-visible:ring-2 ring-thm-on-surface-low focus:outline-none rounded"
+          >
+            <span className="w-[1.2em] text-thm-on-background-low">
+              {isOpened ? <ChevronDownIcon /> : <ChevronRightIcon />}
+            </span>
+            <span className="text-thm-on-background">{content.title}</span>
+          </button>
           <div className="flex-1 min-w-0" />
           {!!siblings.length && (
             <div className="flex-none">
               <div className="flex items-center gap-2">
                 <div ref={popoverSiblings.targetRef}>
                   <TextOnButton
-                    on={COLOR_SYSTEM.SURFACE}
+                    on={COLOR_SYSTEM.BACKGROUND}
                     Icon={DotsCircleHorizontalIcon}
                     onClick={handleSiblingsButtonClick}
                   />

@@ -62,9 +62,7 @@ const Table: React.FC<Props> = ({
     <div className={className}>
       <div className="overflow-x-auto overscroll-x-contain">
         <table className="min-w-full border-collapse">
-          <thead
-            className={classnames('border-b-2', `border-thm-on-${on}-faint`)}
-          >
+          <thead className={`border-b border-thm-on-${on}-slight`}>
             <Tr on={on} isHead>
               {columns.map((column) => (
                 <React.Fragment key={column.key}>
@@ -80,7 +78,7 @@ const Table: React.FC<Props> = ({
               {renderActions && <Th on={on} isSticky />}
             </Tr>
           </thead>
-          <tbody>
+          <tbody className={`divide-y divide-thm-on-${on}-slight`}>
             {dataSource.map((data, idx) => (
               <React.Fragment key={idx}>
                 <Tr on={on} data={data} onClick={handleRowClick}>
@@ -128,8 +126,9 @@ const Tr: React.FC<TrProps> = ({
   }, [data, onClick]);
   return (
     <tr
-      className={classnames(`border-b border-thm-on-${on}-faint`, {
-        [`hover:bg-thm-on-${on}-faint`]: !isHead,
+      className={classnames({
+        [`hover:bg-thm-on-${on}-faint rounded-lg`]: !isHead,
+        [`bg-thm-on-${on}-faint`]: isHead,
       })}
       onClick={handleClick}
     >
@@ -148,7 +147,7 @@ const Th: React.FC<ThProps> = ({ on, isSticky = false, children }) => {
   }
   return (
     <th
-      className={classnames(`text-xs text-left text-thm-on-${on}-high`, {
+      className={classnames(`text-xs text-left text-thm-on-${on}-low`, {
         'p-2': !isSticky,
         'pr-2 py-2 pl-4 sticky right-0': isSticky,
       })}
@@ -181,26 +180,23 @@ const ThTitle: React.FC<ThTitleProp> = ({ on, column, onClick }) => {
   return (
     <>
       <div className="flex items-center" onClick={handleClick}>
-        <div className="flex-none mr-1">
-          <div
-            className={classnames({
+        <div className="flex-none mr-1.5">
+          <ChevronUpIcon
+            className={classnames('w-em', {
               [`text-thm-on-${on}`]: column.sort === SORT.ASC,
-              [`text-thm-on-${on}-slight`]: column.sort !== SORT.ASC,
+              [`text-thm-on-${on}-low`]: column.sort !== SORT.ASC,
             })}
-          >
-            <ChevronUpIcon className="w-em" />
-          </div>
-          <div
-            className={classnames({
+          />
+          <ChevronDownIcon
+            className={classnames('w-em', {
               [`text-thm-on-${on}`]: column.sort === SORT.DESC,
-              [`text-thm-on-${on}-slight`]: column.sort !== SORT.DESC,
+              [`text-thm-on-${on}-low`]: column.sort !== SORT.DESC,
             })}
-          >
-            <ChevronDownIcon className="w-em" />
-          </div>
+          />
         </div>
         <div className="flex-1 min-w-0 font-bold">
           <span
+            className="cursor-pointer"
             ref={popover.targetRef}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -230,7 +226,7 @@ const Td: React.FC<BaseProps & { isSticky?: boolean }> = ({
   return (
     <td
       className={classnames('p-2', {
-        'p-2': !isSticky,
+        'p-2 py-4': !isSticky,
         'pr-2 py-2 pl-4 sticky right-0': isSticky,
       })}
       style={style}

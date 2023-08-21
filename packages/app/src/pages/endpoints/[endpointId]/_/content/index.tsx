@@ -40,10 +40,10 @@ const _Content: React.FC<Props> = ({
   return (
     <div
       id={content.id}
-      className="bg-thm-surface text-thm-on-surface border border-thm-on-surface-faint rounded"
+      className="border border-thm-on-background-low rounded-lg"
     >
       <Head
-        className="p-2"
+        className="py-2 px-3 text-thm-on-background bg-thm-on-background-slight rounded-t-lg"
         endpoint={endpoint}
         document={document}
         content={content}
@@ -57,7 +57,7 @@ const _Content: React.FC<Props> = ({
         onUnpin={onUnpin}
       />
       <Body
-        className={classnames('p-2 border-t border-thm-on-surface-faint', {
+        className={classnames({
           hidden: !isOpened,
         })}
         endpoint={endpoint}
@@ -67,7 +67,7 @@ const _Content: React.FC<Props> = ({
         descendants={descendants}
       />
       <Tail
-        className={classnames('p-2 border-t border-thm-on-surface-faint', {
+        className={classnames('p-2 border-t border-thm-on-background-slight', {
           hidden: !isOpened,
         })}
         document={document}
