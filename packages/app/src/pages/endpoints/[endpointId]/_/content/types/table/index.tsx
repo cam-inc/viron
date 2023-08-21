@@ -110,7 +110,7 @@ const ContentTable: React.FC<Props> = ({
   return (
     <>
       <Table
-        on={COLOR_SYSTEM.SURFACE}
+        on={COLOR_SYSTEM.BACKGROUND}
         columns={columns}
         dataSource={dataSource}
         renderActions={descendants.length ? renderActions : undefined}

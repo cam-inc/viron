@@ -38,11 +38,12 @@ const Cell: React.FC<Props> = ({ on, schema, value }) => {
 
   return (
     <>
-      <div className={classnames(`text-xxs text-thm-on-${on}-slight flex`)}>
-        <div>[{schema.type}]</div>
-        {schema.format && <div>[{schema.format}]</div>}
-      </div>
-      <div>{content}</div>
+      {schema.format && (
+        <div className={classnames(`text-xxs text-thm-on-${on}-slight`)}>
+          [{schema.format}]
+        </div>
+      )}
+      <div className="text-thm-on-${on} text-xs">{content}</div>
     </>
   );
 };
