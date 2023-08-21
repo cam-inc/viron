@@ -73,21 +73,23 @@ const Body: React.FC<Props> = ({ className, style }) => {
                 ))}
               </ul>
             )}
-            <div className="flex flex-col justify-center items-center py-30 gap-6">
-              <EndpointsEmptyIcon
-                className="w-[182px] text-thm-on-background-slight"
-                on={COLOR_SYSTEM.BACKGROUND}
-              />
-              <p className="text-center text-thm-on-background-low">
-                <Trans
-                  t={t}
-                  i18nKey="dashboard.endpoints.emptyMessage"
-                  components={{
-                    br: <br />,
-                  }}
+            {!listByGroup.length && !listUngrouped.length && (
+              <div className="flex flex-col justify-center items-center py-30 gap-6">
+                <EndpointsEmptyIcon
+                  className="w-[182px] text-thm-on-background-slight"
+                  on={COLOR_SYSTEM.BACKGROUND}
                 />
-              </p>
-            </div>
+                <p className="text-center text-thm-on-background-low">
+                  <Trans
+                    t={t}
+                    i18nKey="dashboard.endpoints.emptyMessage"
+                    components={{
+                      br: <br />,
+                    }}
+                  />
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
