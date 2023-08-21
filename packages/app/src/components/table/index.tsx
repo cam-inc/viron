@@ -148,7 +148,7 @@ const Th: React.FC<ThProps> = ({ on, isSticky = false, children }) => {
   return (
     <th
       className={classnames(`text-xs text-left text-thm-on-${on}-low`, {
-        'p-2': !isSticky,
+        'p-2 first:pl-4': !isSticky,
         'pr-2 py-2 pl-4 sticky right-0': isSticky,
       })}
       style={style}
@@ -225,7 +225,7 @@ const Td: React.FC<BaseProps & { isSticky?: boolean }> = ({
   }
   return (
     <td
-      className={classnames('p-2', {
+      className={classnames('p-2 first:pl-4', {
         'p-2 py-4': !isSticky,
         'pr-2 py-2 pl-4 sticky right-0': isSticky,
       })}
