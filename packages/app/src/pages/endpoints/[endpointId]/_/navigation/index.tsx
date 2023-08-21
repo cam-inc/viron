@@ -45,12 +45,11 @@ const _Navigation: React.FC<Props> = ({
         src={document.info['x-thumbnail']}
       />
     ) : (
-      <div className="flex items-center bg-thm-on-surface-faint rounded p-1">
-        <Logo
-          left="text-thm-on-background"
-          right="text-thm-on-background-low"
-        />
-      </div>
+      <Logo
+        className="w-6 h-6"
+        left="text-thm-on-background"
+        right="text-thm-on-background-low"
+      />
     );
     return (
       <div className="m-1">
