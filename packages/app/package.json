@@ -49,6 +49,7 @@
     ]
   },
   "dependencies": {
+    "@ark-ui/react": "^0.13.1",
     "@editorjs/editorjs": "^2.22.1",
     "@heroicons/react": "^1.0.5",
     "@hookform/resolvers": "^2.0.0",
