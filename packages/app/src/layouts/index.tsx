@@ -1,6 +1,5 @@
 import { Splitter, SplitterPanel, SplitterResizeTrigger } from '@ark-ui/react';
 import classNames from 'classnames';
-import classnames from 'classnames';
 import _ from 'lodash';
 import React, { CSSProperties, useCallback, useEffect, useState } from 'react';
 import ErrorBoundary from '~/components/errorBoundary';
@@ -168,7 +167,7 @@ const Layout: React.FC<Props> = ({
                       style={{
                         height: `${HEIGHT_APP_BAR}px`,
                       }}
-                      className={classnames(
+                      className={classNames(
                         'text-thm-on-primary transform transition duration-300 ease-out',
                         {
                           'pointer-events-none': !isAppBarOpened,
