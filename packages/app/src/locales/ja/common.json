@@ -25,7 +25,8 @@
   "dashboard": {
     "endpoints": {
       "title": "ダッシュボード",
-      "description": "追加された$t(endpoint)を一覧表示します"
+      "description": "追加された$t(endpoint)を一覧表示します",
+      "emptyMessage": "管理画面はまだありません<br>$t(addEndpointButtonLabel)ボタンから追加できます"
     },
     "groups": {
       "title": "ダッシュボード",

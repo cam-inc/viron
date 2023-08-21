@@ -25,7 +25,8 @@
   "dashboard": {
     "endpoints": {
       "title": "Dashboard",
-      "description": "This is your personal, private dashboard."
+      "description": "This is your personal, private dashboard.",
+      "emptyMessage": "There is no endpoints yet.<br>You can add one from the $t(addEndpointButtonLabel) button."
     },
     "groups": {
       "title": "Dashboard",
