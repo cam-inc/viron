@@ -1,23 +1,19 @@
 import classnames from 'classnames';
-import React, { useCallback, useState } from 'react';
-import OutlineButton, {
-  Props as OutlineButtonProps,
-} from '~/components/button/outline';
-import TextButton, {
-  Props as TextButtonProps,
-} from '~/components/button/text/on';
+import React, { useState } from 'react';
+import OutlineButton from '~/components/button/outline';
+import EndpointsEmptyIcon from '~/components/endpoinitsEmptyIcon';
 import Head from '~/components/head';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import PlusIcon from '~/components/icon/plus/outline';
 import { useEndpoint } from '~/hooks/endpoint';
-import { useTranslation } from '~/hooks/i18n';
+import { Trans, useTranslation } from '~/hooks/i18n';
 import { Props as LayoutProps } from '~/layouts/';
 import Modal, { useModal } from '~/portals/modal';
 import { COLOR_SYSTEM, Endpoint, EndpointGroup } from '~/types';
 import Menu from '../../../_/menu';
 import Tabs, { ITEM as TABS_ITEM } from '../../../_/tabs';
-import Add, { Props as AddProps } from './add/';
+import Add from './add/';
 import Item from './item/';
 
 export type Props = Parameters<LayoutProps['renderBody']>[0];
@@ -27,15 +23,6 @@ const Body: React.FC<Props> = ({ className, style }) => {
 
   // Add modal.
   const modal = useModal();
-  const handleAddClick = useCallback<OutlineButtonProps['onClick']>(() => {
-    modal.open();
-  }, [modal.open]);
-  const handleAddAdd = useCallback<AddProps['onAdd']>(() => {
-    modal.close();
-  }, [modal.close]);
-  const handleAddCancel = useCallback<AddProps['onCancel']>(() => {
-    modal.close();
-  }, [modal.close]);
 
   return (
     <>
@@ -62,7 +49,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
                 cs={COLOR_SYSTEM.PRIMARY}
                 label={t('addEndpointButtonLabel')}
                 Icon={PlusIcon}
-                onClick={handleAddClick}
+                onClick={modal.open}
               />
             </div>
             {!!listByGroup.length && (
@@ -86,11 +73,26 @@ const Body: React.FC<Props> = ({ className, style }) => {
                 ))}
               </ul>
             )}
+            <div className="flex flex-col justify-center items-center py-30 gap-6">
+              <EndpointsEmptyIcon
+                className="w-[182px] text-thm-on-background-slight"
+                on={COLOR_SYSTEM.BACKGROUND}
+              />
+              <p className="text-center text-thm-on-background-low">
+                <Trans
+                  t={t}
+                  i18nKey="dashboard.endpoints.emptyMessage"
+                  components={{
+                    br: <br />,
+                  }}
+                />
+              </p>
+            </div>
           </div>
         </div>
       </div>
       <Modal {...modal.bind}>
-        <Add onAdd={handleAddAdd} onCancel={handleAddCancel} />
+        <Add onAdd={modal.close} onCancel={modal.close} />
       </Modal>
     </>
   );
