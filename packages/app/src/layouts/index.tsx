@@ -10,7 +10,6 @@ import { ClassName, COLOR_SYSTEM } from '~/types';
 
 const HEIGHT_SYSTEM_BAR = 8;
 const HEIGHT_APP_BAR = 48;
-const WIDTH_NAVIGATION = 260;
 
 export type Props = {
   renderAppBar?: (args: {
@@ -41,20 +40,6 @@ export type Props = {
   }) => JSX.Element | null;
 };
 
-// const Events = () => (
-//   <Splitter
-//     defaultSize={[
-//       { id: 'a', size: 50 },
-//       { id: 'b', size: 50 },
-//     ]}
-//     onResizeStart={(details) => console.log('onResizeStart', details)}
-//     onResizeEnd={(details) => console.log('onResizeEnd', details)}
-//   >
-//     <SplitterPanel id="a">A</SplitterPanel>
-//     <SplitterResizeTrigger id="a:b" />
-//     <SplitterPanel id="b">B</SplitterPanel>
-//   </Splitter>
-// );
 const Layout: React.FC<Props> = ({
   renderAppBar,
   renderNavigation,
@@ -62,10 +47,15 @@ const Layout: React.FC<Props> = ({
   renderSubBody,
 }) => {
   const [isAppBarOpened, setIsAppBarOpened] = useState<boolean>(true);
+  const bodyRef = React.useRef<HTMLDivElement>(null);
   // Toggle app bar open status according to window.scrollY value.
   useEffect(() => {
+    const bodyElement = bodyRef.current;
+    if (!bodyElement) {
+      return;
+    }
     let isTicking = false;
-    let prevScrollY = window.scrollY;
+    let prevScrollTop = bodyElement.scrollTop;
     const handleScroll = () => {
       if (isTicking) {
         return;
@@ -73,9 +63,9 @@ const Layout: React.FC<Props> = ({
       isTicking = true;
       window.requestAnimationFrame(() => {
         let isToOpen = false;
-        const currentScrollY = window.scrollY;
+        const currentScrollTop = bodyElement.scrollTop;
         // to close when scrolled downward and to open when upward.
-        if (prevScrollY < currentScrollY) {
+        if (prevScrollTop < currentScrollTop) {
           isToOpen = false;
         } else {
           isToOpen = true;
@@ -85,20 +75,20 @@ const Layout: React.FC<Props> = ({
         } else {
           // some amount of scroll required to close.
           const threshold = HEIGHT_APP_BAR;
-          if (threshold < currentScrollY) {
+          if (threshold < currentScrollTop) {
             setIsAppBarOpened(false);
           }
         }
-        prevScrollY = currentScrollY;
+        prevScrollTop = currentScrollTop;
         isTicking = false;
       });
     };
     const debouncedHandleScroll = _.debounce(handleScroll, 100);
-    document.addEventListener('scroll', debouncedHandleScroll, {
+    bodyElement.addEventListener('scroll', debouncedHandleScroll, {
       passive: true,
     });
     return function cleanup() {
-      document.removeEventListener('scroll', debouncedHandleScroll);
+      bodyElement.removeEventListener('scroll', debouncedHandleScroll);
     };
   }, []);
 
@@ -106,14 +96,13 @@ const Layout: React.FC<Props> = ({
   const screen = useAppScreenGlobalStateValue();
   const { lg, height } = screen;
   const drawer = useDrawer({ position: 'left' });
+  const { open, close } = drawer;
   const openNavigation = useCallback(() => {
-    drawer.open();
-  }, [drawer.open]);
+    open();
+  }, [open]);
   const closeNavigation = useCallback(() => {
-    drawer.close();
-  }, [drawer.close]);
-
-  const HIDE = false;
+    close();
+  }, [close]);
 
   return (
     <>
@@ -131,7 +120,7 @@ const Layout: React.FC<Props> = ({
         <Splitter
           defaultSize={[
             { id: 'navigation', size: 20 },
-            { id: 'body', size: 80 },
+            { id: 'body', size: 80, minSize: 10 },
           ]}
         >
           {/* region: Navigation */}
@@ -154,93 +143,109 @@ const Layout: React.FC<Props> = ({
               </SplitterPanel>
               <SplitterResizeTrigger
                 id="navigation:body"
-                className="hover:bg-thm-on-secondary w-2"
+                className="hover:bg-thm-on-secondary w-2 bg-thm-surface"
               />
             </>
           )}
-          <SplitterPanel id="body" className="">
-            {/* region: App Bar */}
-            {renderAppBar && (
-              <div
-                style={{
-                  top: `${HEIGHT_SYSTEM_BAR}px`,
-                }}
-                className="fixed z-layout-appbar h-0 w-full"
-              >
+          <SplitterPanel id="body">
+            <Splitter
+              orientation="vertical"
+              defaultSize={[
+                { id: 'appBarAndBody', size: 50, minSize: 10 },
+                { id: 'subBody', size: 50 },
+              ]}
+            >
+              <SplitterPanel id="appBarAndBody" className="relative">
+                {/* region: App Bar */}
+                {renderAppBar && (
+                  <div
+                    style={{
+                      top: `${HEIGHT_SYSTEM_BAR}px`,
+                    }}
+                    className="fixed z-layout-appbar h-0 w-full"
+                  >
+                    <div
+                      style={{
+                        height: `${HEIGHT_APP_BAR}px`,
+                      }}
+                      className={classnames(
+                        'text-thm-on-primary transform transition duration-300 ease-out',
+                        {
+                          'pointer-events-none': !isAppBarOpened,
+                          'opacity-0': !isAppBarOpened,
+                          '-translate-y-4': !isAppBarOpened,
+                        }
+                      )}
+                    >
+                      <ErrorBoundary on={COLOR_SYSTEM.PRIMARY}>
+                        {renderAppBar({
+                          className:
+                            'h-full overflow-x-auto overscroll-x-contain overflow-y-hidden',
+                          style: {},
+                          openNavigation,
+                          closeNavigation,
+                        })}
+                      </ErrorBoundary>
+                    </div>
+                  </div>
+                )}
+                {/* region: Body */}
                 <div
+                  ref={bodyRef}
                   style={{
-                    height: `${HEIGHT_APP_BAR}px`,
+                    paddingTop: renderAppBar
+                      ? `${HEIGHT_SYSTEM_BAR + HEIGHT_APP_BAR}px`
+                      : `${HEIGHT_SYSTEM_BAR}px`,
                   }}
-                  className={classnames(
-                    'text-thm-on-primary transform transition duration-300 ease-out',
-                    {
-                      'pointer-events-none': !isAppBarOpened,
-                      'opacity-0': !isAppBarOpened,
-                      '-translate-y-4': !isAppBarOpened,
-                    }
+                  className={classNames(
+                    'absolute inset-0 overflow-y-scroll overscroll-y-contain'
                   )}
                 >
-                  <ErrorBoundary on={COLOR_SYSTEM.PRIMARY}>
-                    {renderAppBar({
-                      className:
-                        'h-full overflow-x-auto overscroll-x-contain overflow-y-hidden',
-                      style: {},
+                  <ErrorBoundary on={COLOR_SYSTEM.BACKGROUND}>
+                    {renderBody({
+                      className: 'relative',
+                      style: {
+                        minHeight: `${
+                          height -
+                          (renderAppBar
+                            ? HEIGHT_SYSTEM_BAR + HEIGHT_APP_BAR
+                            : HEIGHT_SYSTEM_BAR)
+                        }px`,
+                      },
                       openNavigation,
                       closeNavigation,
+                      minHeight:
+                        height -
+                        (renderAppBar
+                          ? HEIGHT_SYSTEM_BAR + HEIGHT_APP_BAR
+                          : HEIGHT_SYSTEM_BAR),
                     })}
                   </ErrorBoundary>
                 </div>
-              </div>
-            )}
-            {/* region: Body */}
-            <div
-              style={{
-                paddingTop: renderAppBar
-                  ? `${HEIGHT_SYSTEM_BAR + HEIGHT_APP_BAR}px`
-                  : `${HEIGHT_SYSTEM_BAR}px`,
-              }}
-              className={classNames(
-                'pb-10 overflow-y-scroll overscroll-y-contain',
-                {
-                  'h-screen': !renderSubBody,
-                  'h-[50vh]': renderSubBody,
-                }
+              </SplitterPanel>
+              {/* region: Sub Body */}
+              {renderSubBody && (
+                <>
+                  <SplitterResizeTrigger
+                    id="appBarAndBody:subBody"
+                    className="hover:bg-thm-on-secondary h-2 bg-thm-on-background-slight"
+                  />
+                  <SplitterPanel
+                    id="subBody"
+                    className="bg-thm-background text-thm-on-background shadow-01dp overflow-y-scroll overscroll-y-contain"
+                  >
+                    <ErrorBoundary on={COLOR_SYSTEM.BACKGROUND}>
+                      {renderSubBody({
+                        className: '',
+                        style: {},
+                        openNavigation,
+                        closeNavigation,
+                      })}
+                    </ErrorBoundary>
+                  </SplitterPanel>
+                </>
               )}
-            >
-              <ErrorBoundary on={COLOR_SYSTEM.BACKGROUND}>
-                {renderBody({
-                  className: 'relative',
-                  style: {
-                    minHeight: `${
-                      height -
-                      (renderAppBar
-                        ? HEIGHT_SYSTEM_BAR + HEIGHT_APP_BAR
-                        : HEIGHT_SYSTEM_BAR)
-                    }px`,
-                  },
-                  openNavigation,
-                  closeNavigation,
-                  minHeight:
-                    height -
-                    (renderAppBar
-                      ? HEIGHT_SYSTEM_BAR + HEIGHT_APP_BAR
-                      : HEIGHT_SYSTEM_BAR),
-                })}
-              </ErrorBoundary>
-            </div>
-            {/* region: Sub Body */}
-            {renderSubBody && (
-              <div className="h-[50vh] bg-thm-background text-thm-on-background shadow-01dp border-t-2 border-thm-on-background-slight overflow-y-scroll overscroll-y-contain">
-                <ErrorBoundary on={COLOR_SYSTEM.BACKGROUND}>
-                  {renderSubBody({
-                    className: '',
-                    style: {},
-                    openNavigation,
-                    closeNavigation,
-                  })}
-                </ErrorBoundary>
-              </div>
-            )}
+            </Splitter>
           </SplitterPanel>
         </Splitter>
       </div>
