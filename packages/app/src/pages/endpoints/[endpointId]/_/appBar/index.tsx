@@ -4,10 +4,8 @@ import { SIZE as BUTTON_SIZE } from '~/components/button';
 import TextOnButton, {
   Props as TextOnButtonProps,
 } from '~/components/button/text/on';
-import CommonMark from '~/components/commonMark';
 import MenuAlt1Icon from '~/components/icon/menuAlt1/outline';
 import { Props as LayoutProps } from '~/layouts';
-import Popover, { usePopover } from '~/portals/popover';
 import { useAppScreenGlobalStateValue } from '~/store';
 import { COLOR_SYSTEM } from '~/types';
 import { Page } from '~/types/oas';
@@ -39,7 +37,7 @@ const Appbar: React.FC<Props> = ({
 
   return (
     <div style={style} className={className}>
-      <div className="flex gap-2 items-center h-full mx-10 bg-thm-background">
+      <div className="flex gap-2 items-center h-full px-10 bg-thm-background">
         {!lg && (
           <div className="flex-none">
             <TextOnButton

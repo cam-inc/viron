@@ -24,7 +24,7 @@ const Body: React.FC<Props> = ({
   pinnedContentIds,
 }) => {
   return (
-    <div className={classNames('mx-10 mt-6', className)}>
+    <div className={classNames('mx-10 py-6', className)}>
       <Head
         on={COLOR_SYSTEM.BACKGROUND}
         title={
