@@ -2,6 +2,7 @@ import classnames from 'classnames';
 import React, { useMemo } from 'react';
 import { FieldError } from 'react-hook-form';
 import { Props as BaseProps } from '~/components/';
+import { useTranslation } from '~/hooks/i18n';
 import { ClassName } from '~/types';
 
 type Bind = {
@@ -21,7 +22,7 @@ type Props = BaseProps & {
   ) => React.ReactElement<JSX.IntrinsicElements['input'], 'input'>;
 };
 
-const Textinput: React.FC<Props> = ({
+const Textinput: React.FC<Props> & { renewal: React.FC<Props> } = ({
   on,
   className = '',
   type = 'text',
@@ -53,4 +54,47 @@ const Textinput: React.FC<Props> = ({
     </div>
   );
 };
+
+const Renewal: React.FC<Props> = ({
+  on,
+  className = '',
+  type = 'text',
+  label,
+  description,
+  error,
+  autocompleteId,
+  render,
+}) => {
+  const { t } = useTranslation();
+  const id = useMemo<string>(() => `text-input-${Math.random()}`, []);
+  const bind: Bind = {
+    type,
+    id,
+    className: `block w-full h-10 px-3 border rounded-lg border-thm-on-${on}-low bg-thm-${on} text-thm-on-${on} outline-thm-outline`,
+  };
+  if (autocompleteId) {
+    bind.list = autocompleteId;
+  }
+  return (
+    <div className={classnames(`text-thm-on-${on}`, className)}>
+      {(!!label || !!description) && (
+        <div className="space-y-1 mb-3">
+          {label && (
+            <label htmlFor={id} className="text-sm font-bold block">
+              {label}
+            </label>
+          )}
+          {!!description && <p>{description}</p>}
+        </div>
+      )}
+      {render(bind)}
+      {!!error && (
+        <p className="text-xxs">{t(`validation.${error.message}`)}</p>
+      )}
+    </div>
+  );
+};
+
+Textinput.renewal = Renewal;
+
 export default Textinput;

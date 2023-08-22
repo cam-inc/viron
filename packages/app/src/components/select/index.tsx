@@ -13,6 +13,7 @@ export type Props<T = unknown> = BaseProps & {
   Option: React.FC<{ className: ClassName; data: T }>;
   OptionBlank?: React.FC<{ className: ClassName }>;
   label?: string;
+  description?: string;
 };
 const _Select = function <T = unknown>({
   on,
@@ -48,4 +49,47 @@ const _Select = function <T = unknown>({
     </div>
   );
 };
+
+const Renewal = function <T = unknown>({
+  on,
+  list,
+  Select,
+  Option,
+  OptionBlank,
+  label,
+  description,
+}: React.PropsWithChildren<Props<T>>): JSX.Element {
+  const id = useMemo<string>(() => `select-${Math.random()}`, []);
+
+  return (
+    <div className={`text-thm-on-${on}`}>
+      {(!!label || !!description) && (
+        <div className="space-y-1 mb-3">
+          {label && (
+            <label htmlFor={id} className="text-sm font-bold block">
+              {label}
+            </label>
+          )}
+          {!!description && (
+            <p className={`text-xs text-thm-on-${on}-low`}>{description}</p>
+          )}
+        </div>
+      )}
+      <Select
+        id={id}
+        className={`block w-full h-10 px-3 border rounded-lg border-thm-on-${on}-low bg-thm-${on} text-thm-on-${on} outline-thm-outline`}
+      >
+        {OptionBlank && <OptionBlank className="p-1" />}
+        {list.map((item, idx) => (
+          <React.Fragment key={idx}>
+            <Option className="p-1" data={item} />
+          </React.Fragment>
+        ))}
+      </Select>
+    </div>
+  );
+};
+
+_Select.renewal = Renewal;
+
 export default _Select;
