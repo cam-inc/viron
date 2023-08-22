@@ -15,6 +15,7 @@ export type Props<T = unknown> = BaseProps & {
   label?: string;
   description?: string;
 };
+
 const _Select = function <T = unknown>({
   on,
   list,
@@ -50,6 +51,19 @@ const _Select = function <T = unknown>({
   );
 };
 
+type RenewalProps<T = unknown> = BaseProps & {
+  list: T[];
+  Select: React.FC<{
+    id: string;
+    className: ClassName;
+    children: React.ReactNode;
+  }>;
+  Option: React.FC<{ className: ClassName; data: T }>;
+  OptionBlank?: React.FC<{ className: ClassName }>;
+  label: string;
+  description?: string;
+};
+
 const Renewal = function <T = unknown>({
   on,
   list,
@@ -58,23 +72,19 @@ const Renewal = function <T = unknown>({
   OptionBlank,
   label,
   description,
-}: React.PropsWithChildren<Props<T>>): JSX.Element {
+}: React.PropsWithChildren<RenewalProps<T>>): JSX.Element {
   const id = useMemo<string>(() => `select-${Math.random()}`, []);
 
   return (
     <div className={`text-thm-on-${on}`}>
-      {(!!label || !!description) && (
-        <div className="space-y-1 mb-3">
-          {label && (
-            <label htmlFor={id} className="text-sm font-bold block">
-              {label}
-            </label>
-          )}
-          {!!description && (
-            <p className={`text-xs text-thm-on-${on}-low`}>{description}</p>
-          )}
-        </div>
-      )}
+      <div className="space-y-1 mb-3">
+        <label htmlFor={id} className="text-sm font-bold block">
+          {label}
+        </label>
+        {!!description && (
+          <p className={`text-xs text-thm-on-${on}-low`}>{description}</p>
+        )}
+      </div>
       <Select
         id={id}
         className={`block w-full h-10 px-3 border rounded-lg border-thm-on-${on}-low bg-thm-${on} text-thm-on-${on} outline-thm-outline`}
@@ -82,7 +92,6 @@ const Renewal = function <T = unknown>({
         {OptionBlank && <OptionBlank className="p-1" />}
         {list.map((item, idx) => (
           <Option key={idx} className="p-1" data={item} />
-
         ))}
       </Select>
     </div>

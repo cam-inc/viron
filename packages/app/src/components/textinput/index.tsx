@@ -21,8 +21,18 @@ type Props = BaseProps & {
     bind: Bind
   ) => React.ReactElement<JSX.IntrinsicElements['input'], 'input'>;
 };
+type RenewalProps = BaseProps & {
+  type?: React.InputHTMLAttributes<HTMLInputElement>['type'];
+  label: string;
+  description?: string;
+  error?: FieldError;
+  autocompleteId?: string;
+  render: (
+    bind: Bind
+  ) => React.ReactElement<JSX.IntrinsicElements['input'], 'input'>;
+};
 
-const Textinput: React.FC<Props> & { renewal: React.FC<Props> } = ({
+const Textinput: React.FC<Props> & { renewal: React.FC<RenewalProps> } = ({
   on,
   className = '',
   type = 'text',
@@ -55,7 +65,7 @@ const Textinput: React.FC<Props> & { renewal: React.FC<Props> } = ({
   );
 };
 
-const Renewal: React.FC<Props> = ({
+const Renewal: React.FC<RenewalProps> = ({
   on,
   className = '',
   type = 'text',
@@ -77,16 +87,12 @@ const Renewal: React.FC<Props> = ({
   }
   return (
     <div className={classnames(`text-thm-on-${on}`, className)}>
-      {(!!label || !!description) && (
-        <div className="space-y-1 mb-3">
-          {label && (
-            <label htmlFor={id} className="text-sm font-bold block">
-              {label}
-            </label>
-          )}
-          {!!description && <p>{description}</p>}
-        </div>
-      )}
+      <div className="space-y-1 mb-3">
+        <label htmlFor={id} className="text-sm font-bold block">
+          {label}
+        </label>
+        {!!description && <p>{description}</p>}
+      </div>
       {render(bind)}
       {!!error && (
         <p className="text-xxs">{t(`validation.${error.message}`)}</p>
