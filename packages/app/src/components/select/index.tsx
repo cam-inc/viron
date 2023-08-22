@@ -81,9 +81,8 @@ const Renewal = function <T = unknown>({
       >
         {OptionBlank && <OptionBlank className="p-1" />}
         {list.map((item, idx) => (
-          <React.Fragment key={idx}>
-            <Option className="p-1" data={item} />
-          </React.Fragment>
+          <Option key={idx} className="p-1" data={item} />
+
         ))}
       </Select>
     </div>
