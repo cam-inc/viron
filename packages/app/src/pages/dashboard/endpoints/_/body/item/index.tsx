@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import IconButton from '~/components/button/icon/on';
 import OutlineOnButton, {
   Props as OutlineOnButtonProps,
 } from '~/components/button/outline/on';
@@ -164,13 +165,12 @@ const _Item: React.FC<{
           {/* Popover icon */}
           <div className="flex-none">
             <div ref={menuPopover.targetRef}>
-              {/* TODO: Add this as component*/}
-              <button
-                className="p-1 hover:bg-thm-on-background-slight text-2xl rounded text-bg-thm-on-background"
+              <IconButton
+                on={COLOR_SYSTEM.BACKGROUND}
                 onClick={handleMenuClick}
               >
                 <MoreIcon />
-              </button>
+              </IconButton>
             </div>
           </div>
         </div>

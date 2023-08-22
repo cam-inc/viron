@@ -44,8 +44,11 @@
   "addEndpoint": {
     "title": "Create an $t(endpoint)",
     "idInputLabel": "ID",
+    "idInputPlaceholder": "Demo",
     "urlInputLabel": "URL",
+    "urlInputPlaceholder": "https://demo.viron.plus",
     "groupInputLabel": "$t(group)",
+    "groupInputDescription": "You can add the $t(endpoint) to any group. Groups can be added from the dashboard.",
     "addButtonLabel": "Create",
     "cancelButtonLabel": "Cancel"
   },

@@ -13,7 +13,9 @@ export type Props<T = unknown> = BaseProps & {
   Option: React.FC<{ className: ClassName; data: T }>;
   OptionBlank?: React.FC<{ className: ClassName }>;
   label?: string;
+  description?: string;
 };
+
 const _Select = function <T = unknown>({
   on,
   list,
@@ -48,4 +50,54 @@ const _Select = function <T = unknown>({
     </div>
   );
 };
+
+type RenewalProps<T = unknown> = BaseProps & {
+  list: T[];
+  Select: React.FC<{
+    id: string;
+    className: ClassName;
+    children: React.ReactNode;
+  }>;
+  Option: React.FC<{ className: ClassName; data: T }>;
+  OptionBlank?: React.FC<{ className: ClassName }>;
+  label: string;
+  description?: string;
+};
+
+const Renewal = function <T = unknown>({
+  on,
+  list,
+  Select,
+  Option,
+  OptionBlank,
+  label,
+  description,
+}: React.PropsWithChildren<RenewalProps<T>>): JSX.Element {
+  const id = useMemo<string>(() => `select-${Math.random()}`, []);
+
+  return (
+    <div className={`text-thm-on-${on}`}>
+      <div className="space-y-1 mb-3">
+        <label htmlFor={id} className="text-sm font-bold block">
+          {label}
+        </label>
+        {!!description && (
+          <p className={`text-xs text-thm-on-${on}-low`}>{description}</p>
+        )}
+      </div>
+      <Select
+        id={id}
+        className={`block w-full h-10 px-3 border rounded-lg border-thm-on-${on}-low bg-thm-${on} text-thm-on-${on} outline-thm-outline`}
+      >
+        {OptionBlank && <OptionBlank className="p-1" />}
+        {list.map((item, idx) => (
+          <Option key={idx} className="p-1" data={item} />
+        ))}
+      </Select>
+    </div>
+  );
+};
+
+_Select.renewal = Renewal;
+
 export default _Select;
