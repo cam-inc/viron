@@ -13,6 +13,7 @@ const IconButton = function <T = null>({
   data,
   onClick,
   children,
+  rounded = true,
 }: React.PropsWithChildren<Props<T>>): JSX.Element {
   const handleClick = useCallback(() => {
     onClick(data as T);
@@ -24,7 +25,8 @@ const IconButton = function <T = null>({
         `flex items-center justify-center disabled:pointer-events-none disabled:opacity-60 transition-color hover:bg-thm-on-${on}-slight active:bg-thm-on-${on}-low outline-thm-outline`,
         className,
         {
-          'h-11 w-11 text-xl rounded': size === SIZE.BASE,
+          rounded: rounded,
+          'h-11 w-11 text-xl': size === SIZE.BASE,
         }
       )}
       type={type}
