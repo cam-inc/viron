@@ -3,10 +3,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { SIZE as BUTTON_SIZE } from '~/components/button';
-import FilledButton, {
-  Props as FilledButtonProps,
-} from '~/components/button/filled';
-import TextButton from '~/components/button/text/on';
+import Button, { Props as ButtonProps } from '~/components/button';
 import Head from '~/components/head';
 import Select from '~/components/select';
 import Textinput from '~/components/textinput';
@@ -67,7 +64,7 @@ const AddEndpoint: React.FC<Props> = ({ className = '', onAdd, onCancel }) => {
     [_handleSubmit, connect, addEndpoint, clearErrors, onAdd, setError]
   );
 
-  const handleCreateClick = useCallback<FilledButtonProps['onClick']>(() => {
+  const handleCreateClick = useCallback<ButtonProps['onClick']>(() => {
     // nothing to do...
   }, []);
 
@@ -133,13 +130,13 @@ const AddEndpoint: React.FC<Props> = ({ className = '', onAdd, onCancel }) => {
           />
         </div>
         <div className="flex justify-end gap-4">
-          <TextButton
+          <Button
+            variant="text"
             on={COLOR_SYSTEM.SURFACE}
-            size={BUTTON_SIZE.BASE}
             label={t('addEndpoint.cancelButtonLabel')}
             onClick={onCancel}
           />
-          <FilledButton.renewal
+          <Button
             type="submit"
             cs={COLOR_SYSTEM.PRIMARY}
             label={t('addEndpoint.addButtonLabel')}

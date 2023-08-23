@@ -1,9 +1,7 @@
 import classnames from 'classnames';
 import React, { useCallback, useState } from 'react';
 import { SIZE as BUTTON_SIZE } from '~/components/button';
-import FilledButton, {
-  Props as FilledButtonProps,
-} from '~/components/button/filled';
+import Button, { Props as ButtonProps } from '~/components/button';
 import Head from '~/components/head';
 import ArrowCircleDownIcon from '~/components/icon/arrowCircleDown/outline';
 import CheckCircleIcon from '~/components/icon/checkCircle/outline';
@@ -54,9 +52,7 @@ const Target: React.FC<{
   const [error, setError] = useState<BaseError | null>(null);
   const { connect, addEndpoint } = useEndpoint();
 
-  const handleImportClick = useCallback<
-    FilledButtonProps['onClick']
-  >(async () => {
+  const handleImportClick = useCallback<ButtonProps['onClick']>(async () => {
     if (isPending || isDone) {
       return;
     }
@@ -104,7 +100,7 @@ const Target: React.FC<{
             {isPending ? (
               <Spinner className="w-4" on={COLOR_SYSTEM.SURFACE} />
             ) : (
-              <FilledButton
+              <Button
                 cs={COLOR_SYSTEM.PRIMARY}
                 label="Import"
                 Icon={ArrowCircleDownIcon}

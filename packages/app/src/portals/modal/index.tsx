@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import IconButton from '~/components/button/icon/on';
+import IconButton from '~/components/button/icon';
 import CloseIcon from '~/components/icon/close/fill';
 import Portal, { TARGET } from '~/portals';
 import { COLOR_SYSTEM } from '~/types';

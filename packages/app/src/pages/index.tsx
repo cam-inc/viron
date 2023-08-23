@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import { PageProps } from 'gatsby';
 import { graphql } from 'gatsby';
 import React, { useCallback } from 'react';
-import FilledButton from '~/components/button/filled';
+import Button from '~/components/button';
 import CheckCircleIcon from '~/components/icon/checkCircle/solid';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ExternalLinkIcon from '~/components/icon/externalLink/outline';
@@ -42,6 +42,68 @@ const HomePage: React.FC<Props> = () => {
             left="text-thm-on-background-high"
             right="text-thm-on-background"
           />
+          <div className="bg-thm-background p-10 space-y-2">
+            <Button
+              cs={COLOR_SYSTEM.PRIMARY}
+              className="w-80"
+              Icon={ExternalLinkIcon}
+              label="ddd"
+              onClick={() => {
+                //
+              }}
+            />
+            <Button
+              variant="outlined"
+              cs={COLOR_SYSTEM.PRIMARY}
+              className="w-80"
+              Icon={ExternalLinkIcon}
+              label="ddd"
+              onClick={() => {
+                //
+              }}
+            />
+            <Button
+              variant="text"
+              cs={COLOR_SYSTEM.PRIMARY}
+              className="w-80"
+              Icon={ExternalLinkIcon}
+              label="ddd"
+              onClick={() => {
+                //
+              }}
+            />
+          </div>
+          <div className="bg-thm-primary p-10 space-y-2">
+            <Button
+              className="w-80"
+              Icon={ExternalLinkIcon}
+              on={COLOR_SYSTEM.PRIMARY}
+              label="ddd"
+              onClick={() => {
+                //
+              }}
+            />
+            <Button
+              variant="outlined"
+              className="w-80"
+              Icon={ExternalLinkIcon}
+              on={COLOR_SYSTEM.PRIMARY}
+              label="ddd"
+              onClick={() => {
+                //
+              }}
+            />
+            <Button
+              variant="text"
+              className="w-80"
+              Icon={ExternalLinkIcon}
+              on={COLOR_SYSTEM.PRIMARY}
+              label="ddd"
+              onClick={() => {
+                //
+              }}
+            />
+          </div>
           <div className="text-2xl mt-8 font-bold mb-2 text-thm-on-background-high">
             {t('catchphrase')}
           </div>
@@ -57,7 +119,7 @@ const HomePage: React.FC<Props> = () => {
         <article className="lg:max-w-[400px] px-10 mx-auto">
           <h1 className="text-lg font-bold mb-4">{t('welcomeMessage')}</h1>
           <p className="mb-6 text-sm leading-relaxed">{t('description')}</p>
-          <FilledButton.renewal
+          <Button
             className="w-full"
             cs={COLOR_SYSTEM.PRIMARY}
             label={t('startButtonLabel')}

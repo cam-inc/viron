@@ -1,8 +1,6 @@
 import { PlusIcon } from '@heroicons/react/outline';
 import React, { useCallback } from 'react';
-import OutlineButton, {
-  Props as OutlineButtonProps,
-} from '~/components/button/outline';
+import Button, { Props as ButtonProps } from '~/components/button';
 import Head from '~/components/head';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
@@ -21,7 +19,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
 
   // Add modal.
   const modal = useModal();
-  const handleAddClick = useCallback<OutlineButtonProps['onClick']>(() => {
+  const handleAddClick = useCallback<ButtonProps['onClick']>(() => {
     modal.open();
   }, [modal.open]);
   const handleAddAdd = useCallback<AddProps['onAdd']>(() => {
@@ -52,7 +50,8 @@ const Body: React.FC<Props> = ({ className, style }) => {
           {/* Body */}
           <div className="">
             <div className="p-4 flex justify-end">
-              <OutlineButton.renewal
+              <Button
+                variant="outlined"
                 cs={COLOR_SYSTEM.PRIMARY}
                 label={t('addGroupButtonLabel')}
                 Icon={PlusIcon}

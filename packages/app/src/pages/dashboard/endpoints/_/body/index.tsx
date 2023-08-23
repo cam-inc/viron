@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import React, { useState } from 'react';
-import OutlineButton from '~/components/button/outline';
+import Button from '~/components/button';
 import EndpointsEmptyIcon from '~/components/endpoinitsEmptyIcon';
 import Head from '~/components/head';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
@@ -45,7 +45,8 @@ const Body: React.FC<Props> = ({ className, style }) => {
           {/* Body */}
           <div>
             <div className="p-4 flex justify-end">
-              <OutlineButton.renewal
+              <Button
+                variant="outlined"
                 cs={COLOR_SYSTEM.PRIMARY}
                 label={t('addEndpointButtonLabel')}
                 Icon={PlusIcon}

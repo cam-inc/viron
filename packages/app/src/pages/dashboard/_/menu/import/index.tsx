@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import TextButton from '~/components/button/text/on';
+import Button from '~/components/button';
 import Error, { useError } from '~/components/error';
 import ImportIcon from '~/components/icon/import/outline';
 import { useEndpoint } from '~/hooks/endpoint';
@@ -40,7 +40,8 @@ const Import: React.FC<Props> = ({ className = '' }) => {
 
   return (
     <>
-      <TextButton
+      <Button
+        variant="text"
         className={className}
         on={COLOR_SYSTEM.SURFACE}
         label={t('importEndpoints')}
