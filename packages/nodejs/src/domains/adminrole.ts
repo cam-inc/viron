@@ -175,8 +175,19 @@ export const updatePermissionsForRole = async (
     ({ resourceId, permission }): Policy =>
       genPolicy(roleId, resourceId, permission)
   );
+  const userIds = await listUsers(roleId);
+  const repository = repositoryContainer.getAdminUserRepository();
+  const adminUsers = await repository.find({ userIds });
   await removeRole(roleId);
   await Promise.all(policies.map((policy) => casbin.addPolicy(...policy)));
+  //ロールを削除するとユーザーのロールも削除されるので、再度ロールを付与する
+  if (adminUsers.length > 0) {
+    await Promise.all(
+      adminUsers.map((adminUser) => {
+        updateRolesForUser(adminUser.id, [roleId]);
+      })
+    );
+  }
   return true;
 };
 
