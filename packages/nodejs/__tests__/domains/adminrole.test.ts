@@ -1,4 +1,5 @@
 import assert from 'assert';
+import sinon from 'sinon';
 import { Enforcer } from 'casbin';
 import {
   addRoleForUser,
@@ -18,22 +19,35 @@ import {
   updateRolesForUser,
 } from '../../src/domains/adminrole';
 import { VironOpenAPIObject } from '../../src/domains/oas';
-import { repositoryContainer } from '../../src/repositories';
+import { Repository, repositoryContainer } from '../../src/repositories';
 import {
   ADMIN_ROLE,
   API_METHOD,
+  AUTH_TYPE,
   OAS_X_PAGES,
   PERMISSION,
   X_PAGE_CONTENT_TYPE,
 } from '../../src/constants';
 import { roleIdAlreadyExists } from '../../src/errors';
 import { mongooseAdapter } from '../fixtures/setup_repositories';
+import {
+  AdminUser,
+  AdminUserCreateAttributes,
+  AdminUserUpdateAttributes,
+} from '../../src/domains/adminuser';
 
 describe('domains/adminrole', () => {
+  const sandbox = sinon.createSandbox();
   let casbin: Enforcer;
   let oas: VironOpenAPIObject;
+  let repository: Repository<
+    AdminUser,
+    AdminUserCreateAttributes,
+    AdminUserUpdateAttributes
+  >;
 
   beforeAll(() => {
+    repository = repositoryContainer.getAdminUserRepository();
     casbin = repositoryContainer.getCasbin();
     oas = {
       openapi: '3.0.2',
@@ -99,6 +113,7 @@ describe('domains/adminrole', () => {
       casbin.addPolicy('director', 'news', PERMISSION.READ),
       casbin.addPolicy('director', 'news', PERMISSION.WRITE),
     ]);
+    sandbox.restore();
   });
 
   afterEach(async () => {
@@ -247,6 +262,54 @@ describe('domains/adminrole', () => {
       assert.strictEqual(result, true);
 
       const actual = await listPolicies('editor');
+      assert.strictEqual(actual.length, 2);
+      assert(
+        actual.every((a) => {
+          if (a.resourceId !== 'news') {
+            return false;
+          }
+          return (
+            a.permission === PERMISSION.READ ||
+            a.permission === PERMISSION.WRITE
+          );
+        })
+      );
+    });
+    it('Succeed to update permissions for role if targe role user exist', async () => {
+      const userId = '1';
+      await casbin.addRoleForUser(userId, 'editor');
+
+      sandbox.stub(repository, 'find').resolves([
+        {
+          id: '1',
+          email: 'foo@example.com',
+          authType: AUTH_TYPE.EMAIL,
+          salt: 'xxxxxxxxxx',
+          password: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          googleOAuth2AccessToken: null,
+          googleOAuth2ExpiryDate: null,
+          googleOAuth2IdToken: null,
+          googleOAuth2RefreshToken: null,
+          googleOAuth2TokenType: null,
+        },
+      ]);
+
+      const result = await updatePermissionsForRole('editor', [
+        {
+          resourceId: 'news',
+          permission: PERMISSION.READ,
+        },
+        {
+          resourceId: 'news',
+          permission: PERMISSION.WRITE,
+        },
+      ]);
+
+      assert.strictEqual(result, true);
+      const actual = await listPolicies('editor');
+
       assert.strictEqual(actual.length, 2);
       assert(
         actual.every((a) => {
