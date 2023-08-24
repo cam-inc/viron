@@ -1,12 +1,7 @@
 import { AiFillPushpin } from '@react-icons/all-files/ai/AiFillPushpin';
 import { AiOutlinePushpin } from '@react-icons/all-files/ai/AiOutlinePushpin';
 import React, { useCallback } from 'react';
-import FilledButton, {
-  Props as FilledButtonProps,
-} from '~/components/button/filled';
-import TextOnButton, {
-  Props as TextOnButtonProps,
-} from '~/components/button/text/on';
+import Button, { Props as ButtonProps } from '~/components/button';
 import Popover, { usePopover } from '~/portals/popover';
 import { COLOR_SYSTEM } from '~/types';
 
@@ -16,7 +11,7 @@ export type Props = {
 };
 const Pin: React.FC<Props> = ({ isActive, onClick }) => {
   const handleButtonClick = useCallback<
-    TextOnButtonProps['onClick'] | FilledButtonProps['onClick']
+    ButtonProps['onClick'] | ButtonProps['onClick']
   >(() => {
     onClick();
   }, [onClick]);
@@ -37,13 +32,14 @@ const Pin: React.FC<Props> = ({ isActive, onClick }) => {
         onMouseLeave={handleMouseLeave}
       >
         {isActive ? (
-          <FilledButton
+          <Button
             cs={COLOR_SYSTEM.PRIMARY}
             Icon={AiFillPushpin}
             onClick={handleButtonClick}
           />
         ) : (
-          <TextOnButton
+          <Button
+            variant="text"
             on={COLOR_SYSTEM.SURFACE}
             Icon={AiOutlinePushpin}
             onClick={handleButtonClick}

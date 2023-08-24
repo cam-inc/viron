@@ -2,12 +2,7 @@ import classnames from 'classnames';
 import _ from 'lodash';
 import React, { useCallback, useMemo } from 'react';
 import { Props as BaseProps } from '~/components';
-import FilledButton, {
-  Props as FilledButtonProps,
-} from '~/components/button/filled';
-import TextOnButton, {
-  Props as TextOnButtonProps,
-} from '~/components/button/text/on';
+import Button, { Props as ButtonProps } from '~/components/button';
 import ChevronDoubleLeftIcon from '~/components/icon/chevronDoubleLeft/outline';
 import ChevronDoubleRightIcon from '~/components/icon/chevronDoubleRight/outline';
 import ChevronLeftIcon from '~/components/icon/chevronLeft/outline';
@@ -26,11 +21,11 @@ const Pagination: React.FC<Props> = ({
   max,
   onRequestChange,
 }) => {
-  const handleFirstClick = useCallback<TextOnButtonProps['onClick']>(() => {
+  const handleFirstClick = useCallback<ButtonProps['onClick']>(() => {
     onRequestChange(1);
   }, [onRequestChange]);
 
-  const handlePrevClick = useCallback<TextOnButtonProps['onClick']>(() => {
+  const handlePrevClick = useCallback<ButtonProps['onClick']>(() => {
     let num: number = current - 1;
     if (num < 1) {
       num = 1;
@@ -38,7 +33,7 @@ const Pagination: React.FC<Props> = ({
     onRequestChange(num);
   }, [current, onRequestChange]);
 
-  const handleNextClick = useCallback<TextOnButtonProps['onClick']>(() => {
+  const handleNextClick = useCallback<ButtonProps['onClick']>(() => {
     let num: number = current + 1;
     if (max < num) {
       num = max;
@@ -46,12 +41,12 @@ const Pagination: React.FC<Props> = ({
     onRequestChange(num);
   }, [current, max, onRequestChange]);
 
-  const handleLastClick = useCallback<TextOnButtonProps['onClick']>(() => {
+  const handleLastClick = useCallback<ButtonProps['onClick']>(() => {
     onRequestChange(max);
   }, [max, onRequestChange]);
 
   const handlePageClick = useCallback<
-    TextOnButtonProps<number>['onClick'] | FilledButtonProps<number>['onClick']
+    ButtonProps<number>['onClick'] | ButtonProps<number>['onClick']
   >(
     (page) => {
       onRequestChange(page);
@@ -75,14 +70,16 @@ const Pagination: React.FC<Props> = ({
     <div className={classnames(`text-thm-on-${on}`, className)}>
       <div className="flex items-center">
         <div className="flex-none mr-2 last:mr-0">
-          <TextOnButton
+          <Button
+            variant="text"
             on={on}
             Icon={ChevronDoubleLeftIcon}
             onClick={handleFirstClick}
           />
         </div>
         <div className="flex-none mr-2 last:mr-0">
-          <TextOnButton
+          <Button
+            variant="text"
             on={on}
             Icon={ChevronLeftIcon}
             onClick={handlePrevClick}
@@ -91,14 +88,15 @@ const Pagination: React.FC<Props> = ({
         {pages.map((page) => (
           <div key={page} className="flex-none mr-2 last:mr-0">
             {page === current ? (
-              <FilledButton<number>
+              <Button<number>
                 cs={COLOR_SYSTEM.PRIMARY}
                 data={page}
                 label={page.toString()}
                 onClick={handlePageClick}
               />
             ) : (
-              <TextOnButton<number>
+              <Button<number>
+                variant="text"
                 on={on}
                 data={page}
                 label={page.toString()}
@@ -108,14 +106,16 @@ const Pagination: React.FC<Props> = ({
           </div>
         ))}
         <div className="flex-none mr-2 last:mr-0">
-          <TextOnButton
+          <Button
+            variant="text"
             on={on}
             Icon={ChevronRightIcon}
             onClick={handleNextClick}
           />
         </div>
         <div className="flex-none mr-2 last:mr-0">
-          <TextOnButton
+          <Button
+            variant="text"
             on={on}
             Icon={ChevronDoubleRightIcon}
             onClick={handleLastClick}

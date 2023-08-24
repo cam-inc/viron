@@ -8,9 +8,7 @@ import { BiSticker } from '@react-icons/all-files/bi/BiSticker';
 import { BiTestTube } from '@react-icons/all-files/bi/BiTestTube';
 import { BiTrash } from '@react-icons/all-files/bi/BiTrash';
 import React, { useCallback, useMemo } from 'react';
-import TextOnButton, {
-  Props as TextOnButtonProps,
-} from '~/components/button/text/on';
+import Button, { Props as ButtonProps } from '~/components/button';
 import { COLOR_SYSTEM } from '~/types';
 import { METHOD, Request } from '~/types/oas';
 
@@ -40,7 +38,7 @@ const Action: React.FC<Props> = ({ request, onClick }) => {
     }
   }, [request]);
 
-  const handleClick = useCallback<TextOnButtonProps['onClick']>(() => {
+  const handleClick = useCallback<ButtonProps['onClick']>(() => {
     onClick();
   }, [onClick]);
 
@@ -53,7 +51,8 @@ const Action: React.FC<Props> = ({ request, onClick }) => {
   }, [request]);
 
   return (
-    <TextOnButton
+    <Button
+      variant="text"
       on={COLOR_SYSTEM.SURFACE}
       Icon={Icon}
       label={label}

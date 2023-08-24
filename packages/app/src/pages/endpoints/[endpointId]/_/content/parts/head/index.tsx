@@ -1,11 +1,8 @@
 import React, { useCallback } from 'react';
-import { SIZE as BUTTON_SIZE } from '~/components/button';
-import TextOnButton, {
-  Props as TextOnButtonProps,
-} from '~/components/button/text/on';
-import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/outline';
+import Button, { Props as ButtonProps } from '~/components/button';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
+import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/outline';
 import Popover, { usePopover } from '~/portals/popover';
 import { useAppScreenGlobalStateValue } from '~/store';
 import { ClassName, COLOR_SYSTEM, Endpoint } from '~/types';
@@ -13,8 +10,8 @@ import { Document, Content, ContentId } from '~/types/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
 import { UseSiblingsReturn } from '../../hooks/useSiblings';
 import Filter from '../filter/index';
-import Refresh from '../refresh/index';
 import Pin from '../pin/index';
+import Refresh from '../refresh/index';
 import Search from '../search/index';
 import Sibling, { Props as SiblingProps } from '../sibling/index';
 
@@ -78,9 +75,7 @@ const Head: React.FC<Props> = ({
   }, [content, isPinned, onPin, onUnpin]);
 
   const popoverSiblings = usePopover<HTMLDivElement>();
-  const handleSiblingsButtonClick = useCallback<
-    TextOnButtonProps['onClick']
-  >(() => {
+  const handleSiblingsButtonClick = useCallback<ButtonProps['onClick']>(() => {
     popoverSiblings.open();
   }, [popoverSiblings]);
   const handleSiblingClick = useCallback<
@@ -107,7 +102,8 @@ const Head: React.FC<Props> = ({
             <div className="flex-none">
               <div className="flex items-center gap-2">
                 <div ref={popoverSiblings.targetRef}>
-                  <TextOnButton
+                  <Button
+                    variant="text"
                     on={COLOR_SYSTEM.BACKGROUND}
                     Icon={DotsCircleHorizontalIcon}
                     onClick={handleSiblingsButtonClick}

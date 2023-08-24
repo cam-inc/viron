@@ -1,8 +1,6 @@
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useState } from 'react';
-import FilledButton, {
-  Props as FilledButtonProps,
-} from '~/components/button/filled';
+import Button, { Props as ButtonProps } from '~/components/button';
 import Error from '~/components/error';
 import Spinner from '~/components/spinner';
 import { BaseError } from '~/errors/index';
@@ -55,7 +53,7 @@ const Body: React.FC<Props> = ({ style, className = '', search }) => {
     f();
   }, []);
 
-  const handleButtonClick = useCallback<FilledButtonProps['onClick']>(() => {
+  const handleButtonClick = useCallback<ButtonProps['onClick']>(() => {
     navigate('/dashboard/endpoints');
   }, [navigate]);
 
@@ -84,7 +82,7 @@ const Body: React.FC<Props> = ({ style, className = '', search }) => {
       <div className="p-4">
         <div>
           Have completed importing an endpoint successfully.{' '}
-          <FilledButton
+          <Button
             cs={COLOR_SYSTEM.PRIMARY}
             label="Go back to the dashboard"
             onClick={handleButtonClick}

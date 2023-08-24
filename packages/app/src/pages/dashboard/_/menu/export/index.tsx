@@ -1,8 +1,6 @@
 import React, { useCallback } from 'react';
 import { SIZE as BUTTON_SIZE } from '~/components/button';
-import TextButton, {
-  Props as TextButtonProps,
-} from '~/components/button/text/on';
+import Button, { Props as ButtonProps } from '~/components/button';
 import Error, { useError } from '~/components/error';
 import ExportIcon from '~/components/icon/export/outline';
 import { useEndpoint } from '~/hooks/endpoint';
@@ -17,14 +15,15 @@ const Export: React.FC<Props> = ({ className = '' }) => {
   const { export: _export } = useEndpoint();
   const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
 
-  const handleClick = useCallback<TextButtonProps['onClick']>(() => {
+  const handleClick = useCallback<ButtonProps['onClick']>(() => {
     const result = _export();
     error.setError(result.error);
   }, [_export, error]);
 
   return (
     <>
-      <TextButton
+      <Button
+        variant="text"
         className={className}
         on={COLOR_SYSTEM.SURFACE}
         size={BUTTON_SIZE.SM}

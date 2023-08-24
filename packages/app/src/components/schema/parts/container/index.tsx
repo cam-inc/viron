@@ -2,14 +2,12 @@ import classnames from 'classnames';
 import React, { useCallback, useMemo, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Props as BaseProps } from '~/components';
-import TextOnButton, {
-  Props as TextOnButtonProps,
-} from '~/components/button/text/on';
-import BulbSolidIcon from '~/components/icon/bulb/solid';
+import Button, { Props as ButtonProps } from '~/components/button';
 import BulbOutlineIcon from '~/components/icon/bulb/outline';
+import BulbSolidIcon from '~/components/icon/bulb/solid';
+import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import InformationCircleIcon from '~/components/icon/informationCircle/outline';
-import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import { Schema } from '~/types/oas';
 import { UseActiveReturn, useError } from '../../hooks';
 import Info from '../../parts/info';
@@ -42,20 +40,20 @@ const Container: React.FC<Props> = ({
     return splitted[splitted.length - 1];
   }, [name]);
   const [isOpened, setIsOpened] = useState<boolean>(isActive);
-  const handleArrowClick = useCallback<TextOnButtonProps['onClick']>(() => {
+  const handleArrowClick = useCallback<ButtonProps['onClick']>(() => {
     if (!isActive) {
       return;
     }
     setIsOpened(!isOpened);
   }, [isOpened, isActive]);
 
-  const handleBulbClick = useCallback<TextOnButtonProps['onClick']>(() => {
+  const handleBulbClick = useCallback<ButtonProps['onClick']>(() => {
     switchActive();
     setIsOpened(!isActive);
   }, [switchActive, isActive]);
 
   const [isInfoOpened, setIsInfoOpened] = useState<boolean>(false);
-  const handleInfoClick = useCallback<TextOnButtonProps['onClick']>(() => {
+  const handleInfoClick = useCallback<ButtonProps['onClick']>(() => {
     setIsInfoOpened(!isInfoOpened);
     // open body element when changing to true.
     if (!isInfoOpened) {
@@ -69,7 +67,8 @@ const Container: React.FC<Props> = ({
       //return <AiFillBulb className="inline" />;
     }
     return (
-      <TextOnButton
+      <Button
+        variant="text"
         on={on}
         Icon={isActive ? BulbSolidIcon : BulbOutlineIcon}
         onClick={handleBulbClick}
@@ -79,7 +78,8 @@ const Container: React.FC<Props> = ({
 
   const arrowIcon = useMemo<JSX.Element>(
     () => (
-      <TextOnButton
+      <Button
+        variant="text"
         on={on}
         Icon={isOpened ? ChevronDownIcon : ChevronRightIcon}
         onClick={handleArrowClick}
@@ -102,7 +102,8 @@ const Container: React.FC<Props> = ({
         {renderHeadItem?.()}
         {activeIcon}
         {isActive && (
-          <TextOnButton
+          <Button
+            variant="text"
             on={on}
             Icon={InformationCircleIcon}
             onClick={handleInfoClick}

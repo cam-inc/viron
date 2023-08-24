@@ -1,7 +1,5 @@
 import React, { useCallback } from 'react';
-import TextOnButton, {
-  Props as TextOnButtonProps,
-} from '~/components/button/text/on';
+import Button, { Props as ButtonProps } from '~/components/button';
 import RefreshIcon from '~/components/icon/refresh/outline';
 import Popover, { usePopover } from '~/portals/popover';
 import { COLOR_SYSTEM } from '~/types';
@@ -11,7 +9,7 @@ export type Props = {
   base: UseBaseReturn;
 };
 const Refresh: React.FC<Props> = ({ base }) => {
-  const handleButtonClick = useCallback<TextOnButtonProps['onClick']>(() => {
+  const handleButtonClick = useCallback<ButtonProps['onClick']>(() => {
     base.refresh();
   }, [base]);
 
@@ -30,7 +28,8 @@ const Refresh: React.FC<Props> = ({ base }) => {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <TextOnButton
+        <Button
+          variant="text"
           on={COLOR_SYSTEM.SURFACE}
           Icon={RefreshIcon}
           onClick={handleButtonClick}

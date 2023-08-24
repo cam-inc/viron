@@ -1,8 +1,6 @@
 import qrcode from 'qrcode';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import FilledButton, {
-  Props as FilledButtonProps,
-} from '~/components/button/filled';
+import Button, { Props as ButtonProps } from '~/components/button';
 import Error from '~/components/error';
 import Head from '~/components/head';
 import ClipboardCopyIcon from '~/components/icon/clipboardCopy/outline';
@@ -37,7 +35,7 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
     setData(data);
   }, [endpoint]);
 
-  const handleCopyClick = useCallback<FilledButtonProps['onClick']>(() => {
+  const handleCopyClick = useCallback<ButtonProps['onClick']>(() => {
     globalThis.navigator.clipboard.writeText(data);
   }, [data]);
 
@@ -62,7 +60,7 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
         <canvas ref={canvasRef} />
       </div>
       <div className="mt-4 pt-4 flex flex-col items-end gap-2 border-t border-dotted border-thm-on-surface-slight">
-        <FilledButton
+        <Button
           cs={COLOR_SYSTEM.PRIMARY}
           Icon={ClipboardCopyIcon}
           label={t('endpointQRCodeShare.copyUrlButtonLabel')}
