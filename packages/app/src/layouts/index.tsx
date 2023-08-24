@@ -47,7 +47,8 @@ const Layout: React.FC<Props> = ({
 }) => {
   const [isAppBarOpened, setIsAppBarOpened] = useState<boolean>(true);
   const bodyRef = React.useRef<HTMLDivElement>(null);
-  // Toggle app bar open status according to window.scrollY value.
+
+  // Toggle app bar open status according to bodyElement.scrollTop value.
   useEffect(() => {
     const bodyElement = bodyRef.current;
     if (!bodyElement) {
@@ -117,6 +118,7 @@ const Layout: React.FC<Props> = ({
           className="fixed z-layout-systembar top-0 right-0 left-0 bg-thm-secondary text-thm-on-secondary shadow-01dp"
         />
         <Splitter
+          className="min-h-screen"
           defaultSize={[
             { id: 'navigation', size: 20 },
             { id: 'body', size: 80, minSize: 10 },
