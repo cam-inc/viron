@@ -39,7 +39,7 @@ export type Props<T = null> = BaseButtonProps<T> & {
   IconRight?: React.FC<React.ComponentProps<'svg'>>;
 };
 
-const FilledButton = function <T = null>({
+const Button = function <T = null>({
   cs,
   on,
   variant = 'filled',
@@ -102,4 +102,4 @@ const FilledButton = function <T = null>({
   );
 };
 
-export default FilledButton;
+export default Button;
