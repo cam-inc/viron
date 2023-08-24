@@ -35,7 +35,7 @@ const Appbar: React.FC<Props> = ({
 
   return (
     <div style={style} className={className}>
-      <div className="flex gap-2 items-center h-full mx-10 bg-thm-background">
+      <div className="flex gap-2 items-center h-full px-10 bg-thm-background">
         {!lg && (
           <div className="flex-none">
             <Button
