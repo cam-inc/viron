@@ -1,5 +1,19 @@
 # @viron/app
 
+## 2.7.0
+
+### Minor Changes
+
+- 89d500f7: Update add endpoint modal design
+
+### Patch Changes
+
+- 96908ed7: update table design
+- 5500b377: Fix typo
+- 257ef59e: No endpoinits display.
+- 723420e5: Fix endpoints empty display
+- d9f2cf55: Fix button style and refactor.
+
 ## 2.6.1
 
 ### Patch Changes
