@@ -1,6 +1,6 @@
 {
   "name": "@viron/app",
-  "version": "2.6.1",
+  "version": "2.7.0",
   "engines": {
     "node": ">=18.14.0",
     "npm": ">=9.3.1"
