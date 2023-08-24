@@ -42,68 +42,6 @@ const HomePage: React.FC<Props> = () => {
             left="text-thm-on-background-high"
             right="text-thm-on-background"
           />
-          <div className="bg-thm-background p-10 space-y-2">
-            <Button
-              cs={COLOR_SYSTEM.PRIMARY}
-              className="w-80"
-              Icon={ExternalLinkIcon}
-              label="ddd"
-              onClick={() => {
-                //
-              }}
-            />
-            <Button
-              variant="outlined"
-              cs={COLOR_SYSTEM.PRIMARY}
-              className="w-80"
-              Icon={ExternalLinkIcon}
-              label="ddd"
-              onClick={() => {
-                //
-              }}
-            />
-            <Button
-              variant="text"
-              cs={COLOR_SYSTEM.PRIMARY}
-              className="w-80"
-              Icon={ExternalLinkIcon}
-              label="ddd"
-              onClick={() => {
-                //
-              }}
-            />
-          </div>
-          <div className="bg-thm-primary p-10 space-y-2">
-            <Button
-              className="w-80"
-              Icon={ExternalLinkIcon}
-              on={COLOR_SYSTEM.PRIMARY}
-              label="ddd"
-              onClick={() => {
-                //
-              }}
-            />
-            <Button
-              variant="outlined"
-              className="w-80"
-              Icon={ExternalLinkIcon}
-              on={COLOR_SYSTEM.PRIMARY}
-              label="ddd"
-              onClick={() => {
-                //
-              }}
-            />
-            <Button
-              variant="text"
-              className="w-80"
-              Icon={ExternalLinkIcon}
-              on={COLOR_SYSTEM.PRIMARY}
-              label="ddd"
-              onClick={() => {
-                //
-              }}
-            />
-          </div>
           <div className="text-2xl mt-8 font-bold mb-2 text-thm-on-background-high">
             {t('catchphrase')}
           </div>
