@@ -43,9 +43,12 @@
   "email": "Email",
   "addEndpoint": {
     "title": "$t(endpoint)の追加",
-    "idInputLabel": "タイトルの入力",
-    "urlInputLabel": "URLの指定",
+    "idInputLabel": "タイトル",
+    "idInputPlaceholder": "Demo",
+    "urlInputLabel": "URL",
+    "urlInputPlaceholder": "https://demo.viron.plus",
     "groupInputLabel": "Groupの追加",
+    "groupInputDescription": "管理画面を任意のグループに追加できます。グループの追加はダッシュボードから行えます。",
     "addButtonLabel": "追加する",
     "cancelButtonLabel": "キャンセル"
   },

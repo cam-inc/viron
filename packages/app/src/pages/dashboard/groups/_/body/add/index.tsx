@@ -2,12 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import FilledButton, {
-  Props as FilledButtonProps,
-} from '~/components/button/filled';
-import OutlineButton, {
-  Props as OutlineButtonProps,
-} from '~/components/button/outline/on';
+import Button, { Props as ButtonProps } from '~/components/button';
 import Head from '~/components/head';
 import Textinput from '~/components/textinput';
 import { useEndpoint } from '~/hooks/endpoint';
@@ -55,10 +50,10 @@ const Add: React.FC<Props> = ({ onAdd, onCancel }) => {
     [_handleSubmit, addGroup, setError, clearErrors, onAdd]
   );
 
-  const handleCancelClick = useCallback<OutlineButtonProps['onClick']>(() => {
+  const handleCancelClick = useCallback<ButtonProps['onClick']>(() => {
     onCancel();
   }, [onCancel]);
-  const handleAddClick = useCallback<FilledButtonProps['onClick']>(() => {
+  const handleAddClick = useCallback<ButtonProps['onClick']>(() => {
     // Do nothing.
   }, []);
 
@@ -96,12 +91,13 @@ const Add: React.FC<Props> = ({ onAdd, onCancel }) => {
           />
         </div>
         <div className="flex justify-end gap-2">
-          <OutlineButton
-            cs={COLOR_SYSTEM.SURFACE}
+          <Button
+            variant="outlined"
+            on={COLOR_SYSTEM.SURFACE}
             label="Cancel"
             onClick={handleCancelClick}
           />
-          <FilledButton
+          <Button
             type="submit"
             cs={COLOR_SYSTEM.PRIMARY}
             label="Add"

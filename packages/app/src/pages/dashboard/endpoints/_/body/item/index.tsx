@@ -1,11 +1,7 @@
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import OutlineOnButton, {
-  Props as OutlineOnButtonProps,
-} from '~/components/button/outline/on';
-import TextButton, {
-  Props as TextButtonProps,
-} from '~/components/button/text/on';
+import Button, { Props as ButtonProps } from '~/components/button';
+import IconButton from '~/components/button/icon';
 import Error from '~/components/error/';
 import InformationCircleIcon from '~/components/icon/informationCircle/outline';
 import MoreIcon from '~/components/icon/more/outline';
@@ -125,22 +121,22 @@ const _Item: React.FC<{
     menuPopover.open();
   }, [menuPopover]);
 
-  const handleInfoClick = useCallback<TextButtonProps['onClick']>(() => {
+  const handleInfoClick = useCallback<ButtonProps['onClick']>(() => {
     menuPopover.close();
     infoModal.open();
   }, [menuPopover, infoModal]);
 
-  const handleQrcodeClick = useCallback<TextButtonProps['onClick']>(() => {
+  const handleQrcodeClick = useCallback<ButtonProps['onClick']>(() => {
     menuPopover.close();
     qrcodeModal.open();
   }, [menuPopover, qrcodeModal]);
 
-  const handleRemoveClick = useCallback<TextButtonProps['onClick']>(() => {
+  const handleRemoveClick = useCallback<ButtonProps['onClick']>(() => {
     menuPopover.close();
     removeEndpoint(endpoint.id);
   }, [endpoint, removeEndpoint, menuPopover]);
 
-  const handleEnterClick = useCallback<OutlineOnButtonProps['onClick']>(() => {
+  const handleEnterClick = useCallback<ButtonProps['onClick']>(() => {
     navigate(endpoint);
   }, [endpoint, navigate]);
 
@@ -164,13 +160,12 @@ const _Item: React.FC<{
           {/* Popover icon */}
           <div className="flex-none">
             <div ref={menuPopover.targetRef}>
-              {/* TODO: Add this as component*/}
-              <button
-                className="p-1 hover:bg-thm-on-background-slight text-2xl rounded text-bg-thm-on-background"
+              <IconButton
+                on={COLOR_SYSTEM.BACKGROUND}
                 onClick={handleMenuClick}
               >
                 <MoreIcon />
-              </button>
+              </IconButton>
             </div>
           </div>
         </div>
@@ -187,9 +182,9 @@ const _Item: React.FC<{
           <div className="flex items-center gap-2 justify-end">
             {document ? (
               <>
-                <OutlineOnButton.renewal
+                <Button
                   className="grow max-w-50%"
-                  cs={COLOR_SYSTEM.BACKGROUND}
+                  cs={COLOR_SYSTEM.PRIMARY}
                   IconRight={TerminalIcon}
                   label={t('enterEndpoint')}
                   onClick={handleEnterClick}
@@ -216,7 +211,8 @@ const _Item: React.FC<{
       {/* Menu */}
       <Popover {...menuPopover.bind}>
         <div>
-          <TextButton
+          <Button
+            variant="text"
             on={COLOR_SYSTEM.SURFACE}
             Icon={InformationCircleIcon}
             label={t('endpointInformationButtonLabel')}
@@ -224,7 +220,8 @@ const _Item: React.FC<{
           />
         </div>
         <div>
-          <TextButton
+          <Button
+            variant="text"
             on={COLOR_SYSTEM.SURFACE}
             Icon={QrcodeIcon}
             label={t('endpointQRCodeShareButtonLabel')}
@@ -232,7 +229,8 @@ const _Item: React.FC<{
           />
         </div>
         <div>
-          <TextButton
+          <Button
+            variant="text"
             on={COLOR_SYSTEM.SURFACE}
             Icon={TrashIcon}
             label={t('removeEndpointButtonLabel')}

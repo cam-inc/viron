@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import { PageProps } from 'gatsby';
 import { graphql } from 'gatsby';
 import React, { useCallback } from 'react';
-import FilledButton from '~/components/button/filled';
+import Button from '~/components/button';
 import CheckCircleIcon from '~/components/icon/checkCircle/solid';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ExternalLinkIcon from '~/components/icon/externalLink/outline';
@@ -57,7 +57,7 @@ const HomePage: React.FC<Props> = () => {
         <article className="lg:max-w-[400px] px-10 mx-auto">
           <h1 className="text-lg font-bold mb-4">{t('welcomeMessage')}</h1>
           <p className="mb-6 text-sm leading-relaxed">{t('description')}</p>
-          <FilledButton.renewal
+          <Button
             className="w-full"
             cs={COLOR_SYSTEM.PRIMARY}
             label={t('startButtonLabel')}

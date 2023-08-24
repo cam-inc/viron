@@ -1,7 +1,5 @@
 import React, { useCallback } from 'react';
-import TextOnButton, {
-  Props as TextOnButtonProps,
-} from '~/components/button/text/on';
+import Button, { Props as ButtonProps } from '~/components/button';
 import SearchIcon from '~/components/icon/search/outline';
 import Request from '~/components/request';
 import Drawer, { useDrawer } from '~/portals/drawer';
@@ -17,7 +15,7 @@ export type Props = {
 };
 const Search: React.FC<Props> = ({ endpoint, document, base }) => {
   const drawer = useDrawer();
-  const handleButtonClick = useCallback<TextOnButtonProps['onClick']>(() => {
+  const handleButtonClick = useCallback<ButtonProps['onClick']>(() => {
     drawer.open();
   }, [drawer]);
 
@@ -44,7 +42,8 @@ const Search: React.FC<Props> = ({ endpoint, document, base }) => {
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <TextOnButton
+        <Button
+          variant="text"
           on={COLOR_SYSTEM.SURFACE}
           Icon={SearchIcon}
           onClick={handleButtonClick}
