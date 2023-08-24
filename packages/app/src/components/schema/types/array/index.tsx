@@ -2,9 +2,7 @@ import _ from 'lodash';
 import React, { useCallback, useEffect } from 'react';
 import { Validate } from 'react-hook-form';
 import { SIZE as BUTTON_SIZE } from '~/components/button';
-import TextOnButton, {
-  Props as TextOnButtonProps,
-} from '~/components/button/text/on';
+import Button, { Props as ButtonProps } from '~/components/button';
 import MinusIcon from '~/components/icon/minusCircle/outline';
 import PlusIcon from '~/components/icon/plusCircle/outline';
 import _Schema from '~/components/schema';
@@ -72,17 +70,17 @@ const SchemaOfTypeArray: React.FC<Props> = ({
     setError,
   ]);
 
-  const handleAppendClick = useCallback<TextOnButtonProps['onClick']>(() => {
+  const handleAppendClick = useCallback<ButtonProps['onClick']>(() => {
     const defaultValue = getDefaultValue(schema.items as Schema);
     setValue(name, [...(data || []), defaultValue]);
   }, [setValue, name, JSON.stringify(data)]);
 
-  const handlePrependClick = useCallback<TextOnButtonProps['onClick']>(() => {
+  const handlePrependClick = useCallback<ButtonProps['onClick']>(() => {
     const defaultValue = getDefaultValue(schema.items as Schema);
     setValue(name, [defaultValue, ...(data || [])]);
   }, [setValue, name, JSON.stringify(data)]);
 
-  const handleRemoveClick = useCallback<TextOnButtonProps<number>['onClick']>(
+  const handleRemoveClick = useCallback<ButtonProps<number>['onClick']>(
     (from) => {
       const newData = [...(data || [])];
       newData.splice(from, 1);
@@ -91,7 +89,7 @@ const SchemaOfTypeArray: React.FC<Props> = ({
     [setValue, name, JSON.stringify(data)]
   );
 
-  const handleInsertClick = useCallback<TextOnButtonProps<number>['onClick']>(
+  const handleInsertClick = useCallback<ButtonProps<number>['onClick']>(
     (to) => {
       const defaultValue = getDefaultValue(schema.items as Schema);
       const newData = [...(data || [])];
@@ -104,7 +102,8 @@ const SchemaOfTypeArray: React.FC<Props> = ({
   return (
     <div className="space-y-2">
       {!!(data || []).length && (
-        <TextOnButton
+        <Button
+          variant="text"
           on={on}
           size={BUTTON_SIZE.XS}
           Icon={PlusIcon}
@@ -134,7 +133,8 @@ const SchemaOfTypeArray: React.FC<Props> = ({
             isDeepActive={isDeepActive}
             activeRef={activeRef}
             renderHeadItem={() => (
-              <TextOnButton<number>
+              <Button<number>
+                variant="text"
                 className="block"
                 on={on}
                 size={BUTTON_SIZE.XS}
@@ -146,7 +146,8 @@ const SchemaOfTypeArray: React.FC<Props> = ({
             )}
           />
           {index < (data || []).length - 1 && (
-            <TextOnButton<number>
+            <Button<number>
+              variant="text"
               className="block"
               on={on}
               size={BUTTON_SIZE.XS}
@@ -158,7 +159,8 @@ const SchemaOfTypeArray: React.FC<Props> = ({
           )}
         </React.Fragment>
       ))}
-      <TextOnButton
+      <Button
+        variant="text"
         className="block"
         on={on}
         size={BUTTON_SIZE.XS}

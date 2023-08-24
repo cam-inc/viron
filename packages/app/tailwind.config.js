@@ -103,6 +103,7 @@ module.exports = {
       'group-hover:ring',
       'group-active:ring',
       'group-focus:ring',
+      'divide',
     ];
 
     const safelist = [];

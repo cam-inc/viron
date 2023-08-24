@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { SIZE as BUTTON_SIZE } from '~/components/button';
-import TextButton from '~/components/button/text/on';
+import Button from '~/components/button';
 import MenuAlt1Icon from '~/components/icon/menuAlt1/outline';
 import { Props as LayoutProps } from '~/layouts';
 import { useAppScreenGlobalStateValue } from '~/store';
@@ -18,7 +18,8 @@ const AppBar: React.FC<Props> = ({ className = '', openNavigation }) => {
       <div className="flex justify-center items-center h-full px-4">
         <div className="flex-none">
           {!lg && (
-            <TextButton
+            <Button
+              variant="text"
               on={COLOR_SYSTEM.PRIMARY}
               size={BUTTON_SIZE.XL}
               Icon={MenuAlt1Icon}

@@ -1,8 +1,6 @@
 import _ from 'lodash';
 import React, { useCallback, useMemo } from 'react';
-import OutlineOnButton, {
-  Props as OutlineOnButtonProps,
-} from '~/components/button/outline/on';
+import Button, { Props as ButtonProps } from '~/components/button';
 import Error from '~/components/error';
 import LogoutIcon from '~/components/icon/logout/outline';
 import Request from '~/components/request';
@@ -26,7 +24,7 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
   );
 
   const drawer = useDrawer();
-  const handleClick = useCallback<OutlineOnButtonProps['onClick']>(() => {
+  const handleClick = useCallback<ButtonProps['onClick']>(() => {
     drawer.open();
   }, [drawer]);
 
@@ -51,9 +49,10 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
 
   return (
     <>
-      <OutlineOnButton.renewal
+      <Button
+        variant="outlined"
         className="grow max-w-50%"
-        cs={COLOR_SYSTEM.BACKGROUND}
+        on={COLOR_SYSTEM.BACKGROUND}
         IconRight={LogoutIcon}
         label={t('signout')}
         onClick={handleClick}

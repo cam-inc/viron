@@ -3,12 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Props as BaseProps } from '~/components';
 import { SIZE as BUTTON_SIZE } from '~/components/button';
-import FilledButton, {
-  Props as FilledButtonProps,
-} from '~/components/button/filled';
-import TextOnButton, {
-  Props as TextOnButtonProps,
-} from '~/components/button/text/on';
+import Button, { Props as ButtonProps } from '~/components/button';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import Operation from '~/components/operation';
@@ -68,12 +63,12 @@ const _Request: React.FC<Props> = ({
   // Common head open status.
   const [isCommonHeadOpened, setIsCommonHeadOpened] = useState<boolean>(true);
   const handleCommonHeadOpenerClick = useCallback<
-    TextOnButtonProps['onClick']
+    ButtonProps['onClick']
   >(() => {
     setIsCommonHeadOpened((currVal) => !currVal);
   }, []);
 
-  const handleSubmitClick = useCallback<FilledButtonProps['onClick']>(() => {
+  const handleSubmitClick = useCallback<ButtonProps['onClick']>(() => {
     // Do nothing.
   }, []);
 
@@ -92,7 +87,8 @@ const _Request: React.FC<Props> = ({
         >
           <div className={`flex-none bg-on-thm-${on}-faint`}>
             <div className="flex items-center h-[22px]">
-              <TextOnButton
+              <Button
+                variant="text"
                 on={on}
                 Icon={isCommonHeadOpened ? ChevronDownIcon : ChevronRightIcon}
                 onClick={handleCommonHeadOpenerClick}
@@ -191,7 +187,7 @@ const _Request: React.FC<Props> = ({
         <div
           className={`flex-none p-2 border-t-2 border-thm-on-${on}-faint flex justify-end gap-2`}
         >
-          <FilledButton
+          <Button
             type="submit"
             cs={COLOR_SYSTEM.PRIMARY}
             size={BUTTON_SIZE.BASE}

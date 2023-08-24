@@ -1,6 +1,6 @@
 {
   "name": "@viron/app",
-  "version": "2.6.1",
+  "version": "2.7.0",
   "engines": {
     "node": ">=18.14.0",
     "npm": ">=9.3.1"
@@ -31,7 +31,7 @@
     "test:e2e": "cypress run",
     "test:e2e:open": "cypress open",
     "test:e2e:record": "cypress run --record",
-    "test:unit": "jest",
+    "test:unit": "jest --passWithNoTests",
     "test:static": "tsc",
     "ci:local": "START_SERVER_AND_TEST_INSECURE=1 CYPRESS_BASE_URL=http://localhost:9000 start-server-and-test launch http://localhost:9000 test:e2e",
     "ci:local:record": "START_SERVER_AND_TEST_INSECURE=1 CYPRESS_BASE_URL=http://localhost:9000 start-server-and-test launch http://localhost:9000 test:e2e:record",

@@ -1,10 +1,5 @@
 import React, { useCallback } from 'react';
-import FilledButton, {
-  Props as FilledButtonProps,
-} from '~/components/button/filled';
-import TextOnButton, {
-  Props as TextOnButtonProps,
-} from '~/components/button/text/on';
+import Button, { Props as ButtonProps } from '~/components/button';
 import Head from '~/components/head';
 import BulbOutlineIcon from '~/components/icon/bulb/outline';
 import BulbSolidIcon from '~/components/icon/bulb/solid';
@@ -32,12 +27,12 @@ const Filter: React.FC<Props> = ({ base }) => {
 
   const drawer = useDrawer();
   const handleButtonClick = useCallback<
-    TextOnButtonProps['onClick'] | FilledButtonProps['onClick']
+    ButtonProps['onClick'] | ButtonProps['onClick']
   >(() => {
     drawer.open();
   }, [drawer]);
 
-  const handleItemClick = useCallback<TextOnButtonProps<string>['onClick']>(
+  const handleItemClick = useCallback<ButtonProps<string>['onClick']>(
     (key) => {
       if (!base.filter.enabled) {
         return;
@@ -63,13 +58,14 @@ const Filter: React.FC<Props> = ({ base }) => {
         onMouseLeave={handleMouseLeave}
       >
         {base.filter.filtered ? (
-          <FilledButton
+          <Button
             cs={COLOR_SYSTEM.PRIMARY}
             Icon={FilterSolidIcon}
             onClick={handleButtonClick}
           />
         ) : (
-          <TextOnButton
+          <Button
+            variant="text"
             on={COLOR_SYSTEM.SURFACE}
             Icon={FilterOutlineIcon}
             onClick={handleButtonClick}
@@ -92,7 +88,8 @@ const Filter: React.FC<Props> = ({ base }) => {
               <ul className="space-y-2">
                 {base.filter.list.map((item) => (
                   <li key={item.key}>
-                    <TextOnButton<string>
+                    <Button<string>
+                      variant="text"
                       className="block w-full"
                       on={COLOR_SYSTEM.SURFACE}
                       data={item.key}
@@ -107,7 +104,7 @@ const Filter: React.FC<Props> = ({ base }) => {
           </div>
           {/* Tail */}
           <div className="flex-none flex justify-end p-2 border-t-2 border-thm-on-surface-faint">
-            <FilledButton
+            <Button
               cs={COLOR_SYSTEM.PRIMARY}
               label="Apply"
               onClick={handleApplyClick}

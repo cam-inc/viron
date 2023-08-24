@@ -3,12 +3,7 @@ import React, { useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { SIZE as BUTTON_SIZE } from '~/components/button';
-import FilledButton, {
-  Props as FilledButtonProps,
-} from '~/components/button/filled';
-import OutlineButton, {
-  Props as OutlineButtonProps,
-} from '~/components/button/outline/on';
+import Button, { Props as ButtonProps } from '~/components/button';
 import Head from '~/components/head';
 import Select from '~/components/select';
 import Textinput from '~/components/textinput';
@@ -66,41 +61,53 @@ const AddEndpoint: React.FC<Props> = ({ className = '', onAdd, onCancel }) => {
         clearErrors();
         onAdd();
       }),
-    [setError, clearErrors, onAdd, connect, addEndpoint]
+    [_handleSubmit, connect, addEndpoint, clearErrors, onAdd, setError]
   );
 
-  const handleCreateClick = useCallback<FilledButtonProps['onClick']>(() => {
+  const handleCreateClick = useCallback<ButtonProps['onClick']>(() => {
     // nothing to do...
   }, []);
-  const handleCancelClick = useCallback<OutlineButtonProps['onClick']>(() => {
-    onCancel();
-  }, [onCancel]);
 
   return (
     <div className={className}>
       <form className="space-y-8" onSubmit={handleSubmit}>
-        <div>
-          <Head on={COLOR_SYSTEM.SURFACE} title={t('addEndpoint.title')} />
-        </div>
+        <Head
+          className="pb-3 mb-8 border-b border-thm-on-surface-faint"
+          on={COLOR_SYSTEM.SURFACE}
+          title={t('addEndpoint.title')}
+        />
         <div>{formState.errors.manual?.message}</div>
-        <div className="space-y-4">
-          <Textinput
+        <div className="space-y-8">
+          <Textinput.renewal
             type="text"
             label={t('addEndpoint.idInputLabel')}
             on={COLOR_SYSTEM.SURFACE}
             error={formState.errors.id}
-            render={(bind) => <input {...bind} {...register('id')} />}
+            render={(bind) => (
+              <input
+                placeholder={t('addEndpoint.idInputPlaceholder')}
+                {...bind}
+                {...register('id')}
+              />
+            )}
           />
-          <Textinput
+          <Textinput.renewal
             type="text"
             label={t('addEndpoint.urlInputLabel')}
             on={COLOR_SYSTEM.SURFACE}
-            error={formState.errors.id}
-            render={(bind) => <input {...bind} {...register('url')} />}
+            error={formState.errors.url}
+            render={(bind) => (
+              <input
+                placeholder={t('addEndpoint.urlInputPlaceholder')}
+                {...bind}
+                {...register('url')}
+              />
+            )}
           />
-          <Select<EndpointGroup>
+          <Select.renewal<EndpointGroup>
             on={COLOR_SYSTEM.SURFACE}
             label={t('addEndpoint.groupInputLabel')}
+            description={t('addEndpoint.groupInputDescription')}
             list={groupList}
             Select={({ id, className, children }) => (
               <select
@@ -122,17 +129,16 @@ const AddEndpoint: React.FC<Props> = ({ className = '', onAdd, onCancel }) => {
             )}
           />
         </div>
-        <div className="flex justify-end gap-2">
-          <OutlineButton
-            cs={COLOR_SYSTEM.SURFACE}
-            size={BUTTON_SIZE.BASE}
+        <div className="flex justify-end gap-4">
+          <Button
+            variant="text"
+            on={COLOR_SYSTEM.SURFACE}
             label={t('addEndpoint.cancelButtonLabel')}
-            onClick={handleCancelClick}
+            onClick={onCancel}
           />
-          <FilledButton
+          <Button
             type="submit"
             cs={COLOR_SYSTEM.PRIMARY}
-            size={BUTTON_SIZE.BASE}
             label={t('addEndpoint.addButtonLabel')}
             onClick={handleCreateClick}
           />

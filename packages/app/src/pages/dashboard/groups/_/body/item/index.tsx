@@ -1,21 +1,9 @@
 import React, { useCallback } from 'react';
-import OutlineOnButton, {
-  Props as OutlineOnButtonProps,
-} from '~/components/button/outline/on';
-import FilledButton, {
-  Props as FilledButtonProps,
-} from '~/components/button/filled';
-import FilledOnButton, {
-  Props as FilledOnButtonProps,
-} from '~/components/button/filled/on';
-import TextButton, {
-  Props as TextButtonProps,
-} from '~/components/button/text/on';
+import Button, { Props as ButtonProps } from '~/components/button';
 import Head from '~/components/head';
 import ArrowDownIcon from '~/components/icon/arrowCircleDown/outline';
 import ArrowUpIcon from '~/components/icon/arrowCircleUp/outline';
 import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/outline';
-import PencilIcon from '~/components/icon/pencil/outline';
 import TrashIcon from '~/components/icon/trash/outline';
 import { useEndpoint } from '~/hooks/endpoint';
 import Modal, { useModal } from '~/portals/modal';
@@ -29,27 +17,23 @@ const Item: React.FC<Props> = ({ group }) => {
   const { removeGroup, ascendGroup, descendGroup } = useEndpoint();
 
   const menuPopover = usePopover<HTMLDivElement>();
-  const handleMenuClick = useCallback<TextButtonProps['onClick']>(() => {
+  const handleMenuClick = useCallback<ButtonProps['onClick']>(() => {
     menuPopover.open();
   }, [menuPopover]);
 
-  const handleUpClick = useCallback<TextButtonProps['onClick']>(() => {
+  const handleUpClick = useCallback<ButtonProps['onClick']>(() => {
     ascendGroup(group.id);
     menuPopover.close();
   }, [group, ascendGroup, menuPopover]);
 
-  const handleDownClick = useCallback<TextButtonProps['onClick']>(() => {
+  const handleDownClick = useCallback<ButtonProps['onClick']>(() => {
     descendGroup(group.id);
     menuPopover.close();
   }, [group, descendGroup, menuPopover]);
 
-  const handleEditClick = useCallback<FilledOnButtonProps['onClick']>(() => {
-    // TODO
-  }, []);
-
   const removeConfirmationModal = useModal();
 
-  const handleRemoveClick = useCallback<FilledOnButtonProps['onClick']>(() => {
+  const handleRemoveClick = useCallback<ButtonProps['onClick']>(() => {
     removeConfirmationModal.open();
   }, [removeConfirmationModal]);
 
@@ -82,7 +66,8 @@ const Item: React.FC<Props> = ({ group }) => {
         </div>
         <div className="flex-none flex items-center gap-2">
           <div ref={menuPopover.targetRef}>
-            <TextButton
+            <Button
+              variant="text"
               on={COLOR_SYSTEM.BACKGROUND}
               Icon={DotsCircleHorizontalIcon}
               label="Menu"
@@ -91,14 +76,14 @@ const Item: React.FC<Props> = ({ group }) => {
           </div>
           {/*
              TODO: 編集機能。
-          <FilledOnButton
+          <OnButton
             on={COLOR_SYSTEM.BACKGROUND}
             label="Edit"
             Icon={PencilIcon}
             onClick={handleEditClick}
           />
        */}
-          <FilledOnButton
+          <Button
             on={COLOR_SYSTEM.BACKGROUND}
             label="Remove"
             Icon={TrashIcon}
@@ -107,13 +92,15 @@ const Item: React.FC<Props> = ({ group }) => {
         </div>
       </div>
       <Popover {...menuPopover.bind}>
-        <TextButton
+        <Button
+          variant="text"
           on={COLOR_SYSTEM.BACKGROUND}
           label="Move Up"
           Icon={ArrowUpIcon}
           onClick={handleUpClick}
         />
-        <TextButton
+        <Button
+          variant="text"
           on={COLOR_SYSTEM.BACKGROUND}
           label="Move Down"
           Icon={ArrowDownIcon}
@@ -139,11 +126,11 @@ const RemoveConfirmation: React.FC<RemoveConfirmationProps> = ({
   onRequestCancel,
   onRequestRemove,
 }) => {
-  const handleCancelClick = useCallback<OutlineOnButtonProps['onClick']>(() => {
+  const handleCancelClick = useCallback<ButtonProps['onClick']>(() => {
     onRequestCancel();
   }, [onRequestCancel]);
 
-  const handleRemoveClick = useCallback<FilledButtonProps['onClick']>(() => {
+  const handleRemoveClick = useCallback<ButtonProps['onClick']>(() => {
     onRequestRemove();
   }, [onRequestRemove]);
 
@@ -155,12 +142,13 @@ const RemoveConfirmation: React.FC<RemoveConfirmationProps> = ({
         description="Really want to remove it? The endpoints in the group will remain ungrouped."
       />
       <div className="flex justify-end gap-2">
-        <OutlineOnButton
-          cs={COLOR_SYSTEM.SURFACE}
+        <Button
+          variant="outlined"
+          on={COLOR_SYSTEM.SURFACE}
           label="Cancel"
           onClick={handleCancelClick}
         />
-        <FilledButton
+        <Button
           cs={COLOR_SYSTEM.PRIMARY}
           label="Remove"
           onClick={handleRemoveClick}

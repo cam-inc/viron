@@ -1,13 +1,9 @@
 import React, { useCallback, useMemo } from 'react';
 import Breadcrumb, { Props as BreadcrumbProps } from '~/components/breadcrumb';
 import { SIZE as BUTTON_SIZE } from '~/components/button';
-import TextOnButton, {
-  Props as TextOnButtonProps,
-} from '~/components/button/text/on';
-import CommonMark from '~/components/commonMark';
+import Button, { Props as ButtonProps } from '~/components/button';
 import MenuAlt1Icon from '~/components/icon/menuAlt1/outline';
 import { Props as LayoutProps } from '~/layouts';
-import Popover, { usePopover } from '~/portals/popover';
 import { useAppScreenGlobalStateValue } from '~/store';
 import { COLOR_SYSTEM } from '~/types';
 import { Page } from '~/types/oas';
@@ -25,7 +21,7 @@ const Appbar: React.FC<Props> = ({
   const { lg } = screen;
 
   // Navigation Opener.
-  const handleNavButtonClick = useCallback<TextOnButtonProps['onClick']>(() => {
+  const handleNavButtonClick = useCallback<ButtonProps['onClick']>(() => {
     openNavigation();
   }, [openNavigation]);
 
@@ -42,7 +38,8 @@ const Appbar: React.FC<Props> = ({
       <div className="flex gap-2 items-center h-full mx-10 bg-thm-background">
         {!lg && (
           <div className="flex-none">
-            <TextOnButton
+            <Button
+              variant="text"
               on={COLOR_SYSTEM.PRIMARY}
               size={BUTTON_SIZE.XL}
               Icon={MenuAlt1Icon}

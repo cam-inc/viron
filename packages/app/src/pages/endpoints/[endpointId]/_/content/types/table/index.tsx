@@ -1,7 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import TextButton, {
-  Props as TextButtonProps,
-} from '~/components/button/text/on';
+import Button, { Props as ButtonProps } from '~/components/button';
 import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/outline';
 import Table, { Props as TableProps } from '~/components/table';
 import Popover, { usePopover } from '~/portals/popover';
@@ -110,7 +108,7 @@ const ContentTable: React.FC<Props> = ({
   return (
     <>
       <Table
-        on={COLOR_SYSTEM.SURFACE}
+        on={COLOR_SYSTEM.BACKGROUND}
         columns={columns}
         dataSource={dataSource}
         renderActions={descendants.length ? renderActions : undefined}
@@ -138,7 +136,7 @@ const Operations: React.FC<OperationsProps> = ({
   onOperationFail,
 }) => {
   const popover = usePopover<HTMLDivElement>();
-  const handleButtonClick = useCallback<TextButtonProps['onClick']>(() => {
+  const handleButtonClick = useCallback<ButtonProps['onClick']>(() => {
     popover.open();
   }, [popover]);
   const handleDescendantClick = useCallback<
@@ -150,7 +148,8 @@ const Operations: React.FC<OperationsProps> = ({
   return (
     <>
       <div ref={popover.targetRef}>
-        <TextButton
+        <Button
+          variant="text"
           on={COLOR_SYSTEM.SURFACE}
           Icon={DotsCircleHorizontalIcon}
           onClick={handleButtonClick}
