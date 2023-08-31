@@ -56,7 +56,7 @@ const Body: React.FC<Props> = ({
           onChange={handleTabsChange}
         />
       </div>
-      <div className="p-4 flex-1 min-h-0 overflow-y-scroll overscroll-y-contain">
+      <div className="mx-10 py-6 flex-1 min-h-0 overflow-y-scroll overscroll-y-contain">
         {selectedContent && (
           <_Content
             endpoint={endpoint}

@@ -1,5 +1,11 @@
 # @viron/app
 
+## 2.8.0
+
+### Minor Changes
+
+- 7b319ade: split layout view
+
 ## 2.7.0
 
 ### Minor Changes
