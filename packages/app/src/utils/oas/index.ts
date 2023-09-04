@@ -786,6 +786,10 @@ export const mergeTableSortRequestValue = (
         break;
     }
   }
+  // HOTFIX: 空の配列をふくまないようにする
+  if (!requestValue.parameters?.sort.length) {
+    delete requestValue.parameters?.sort;
+  }
   // TODO: requestBodyにも対応すること。
   return requestValue;
 };

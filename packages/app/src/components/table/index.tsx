@@ -4,6 +4,7 @@ import { Props as BaseProps } from '~/components';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronUpIcon from '~/components/icon/chevronUp/outline';
 import Popover, { usePopover } from '~/portals/popover';
+import { useAppScreenGlobalStateValue } from '~/store';
 import { TableColumn, Sort, SORT } from '~/types/oas';
 import Cell from './cell';
 
@@ -27,30 +28,6 @@ const Table: React.FC<Props> = ({
   onRowClick,
   onRequestSortChange,
 }) => {
-  const handleColumnHeadClick = useCallback<
-    NonNullable<ThTitleProp['onClick']>
-  >(
-    (column) => {
-      if (!column.isSortable) {
-        return;
-      }
-      let sort: Sort;
-      switch (column.sort) {
-        case SORT.ASC:
-          sort = SORT.DESC;
-          break;
-        case SORT.DESC:
-          sort = SORT.NONE;
-          break;
-        case SORT.NONE:
-          sort = SORT.ASC;
-          break;
-      }
-      onRequestSortChange?.(column.key, sort);
-    },
-    [onRequestSortChange]
-  );
-
   const handleRowClick = useCallback<NonNullable<TrProps['onClick']>>(
     (data) => {
       onRowClick?.(data);
@@ -64,17 +41,37 @@ const Table: React.FC<Props> = ({
         <table className="min-w-full border-collapse">
           <thead className={`border-b border-thm-on-${on}-slight`}>
             <Tr on={on} isHead>
-              {columns.map((column) => (
-                <React.Fragment key={column.key}>
-                  <Th on={on}>
-                    <ThTitle
-                      on={on}
-                      column={column}
-                      onClick={handleColumnHeadClick}
-                    />
-                  </Th>
-                </React.Fragment>
-              ))}
+              {columns.map((column) => {
+                return (
+                  <React.Fragment key={column.key}>
+                    <Th on={on}>
+                      {column.isSortable ? (
+                        <button
+                          onClick={() => {
+                            let sort: Sort;
+                            switch (column.sort) {
+                              case SORT.ASC:
+                                sort = SORT.DESC;
+                                break;
+                              case SORT.DESC:
+                                sort = SORT.NONE;
+                                break;
+                              case SORT.NONE:
+                                sort = SORT.ASC;
+                                break;
+                            }
+                            onRequestSortChange?.(column.key, sort);
+                          }}
+                        >
+                          <ThTitle on={on} column={column} />
+                        </button>
+                      ) : (
+                        <ThTitle on={on} column={column} />
+                      )}
+                    </Th>
+                  </React.Fragment>
+                );
+              })}
               {renderActions && <Th on={on} isSticky />}
             </Tr>
           </thead>
@@ -160,14 +157,12 @@ const Th: React.FC<ThProps> = ({ on, isSticky = false, children }) => {
 
 type ThTitleProp = BaseProps & {
   column: TableColumn;
-  onClick?: (column: TableColumn) => void;
 };
-const ThTitle: React.FC<ThTitleProp> = ({ on, column, onClick }) => {
-  const handleClick = useCallback(() => {
-    onClick?.(column);
-  }, [column, onClick]);
-
+const ThTitle: React.FC<ThTitleProp> = ({ on, column }) => {
   const popover = usePopover<HTMLDivElement>();
+
+  const screen = useAppScreenGlobalStateValue();
+  const { lg } = screen;
   const handleMouseEnter = useCallback(() => {
     if (column.schema.description) {
       popover.open();
@@ -179,24 +174,9 @@ const ThTitle: React.FC<ThTitleProp> = ({ on, column, onClick }) => {
 
   return (
     <>
-      <div className="flex items-center" onClick={handleClick}>
-        <div className="flex-none mr-1.5">
-          <ChevronUpIcon
-            className={classnames('w-em', {
-              [`text-thm-on-${on}`]: column.sort === SORT.ASC,
-              [`text-thm-on-${on}-low`]: column.sort !== SORT.ASC,
-            })}
-          />
-          <ChevronDownIcon
-            className={classnames('w-em', {
-              [`text-thm-on-${on}`]: column.sort === SORT.DESC,
-              [`text-thm-on-${on}-low`]: column.sort !== SORT.DESC,
-            })}
-          />
-        </div>
-        <div className="flex-1 min-w-0 font-bold">
+      <div className="flex items-center">
+        <div className="font-bold mr-1.5">
           <span
-            className="cursor-pointer"
             ref={popover.targetRef}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -204,12 +184,34 @@ const ThTitle: React.FC<ThTitleProp> = ({ on, column, onClick }) => {
             {column.name}
           </span>
         </div>
+        {column.isSortable && (
+          <div>
+            <ChevronUpIcon
+              className={classnames('w-em', {
+                [`text-thm-on-${on}`]: column.sort === SORT.ASC,
+                [`text-thm-on-${on}-slight`]: column.sort !== SORT.ASC,
+              })}
+            />
+            <ChevronDownIcon
+              className={classnames('w-em', {
+                [`text-thm-on-${on}`]: column.sort === SORT.DESC,
+                [`text-thm-on-${on}-slight`]: column.sort !== SORT.DESC,
+              })}
+            />
+          </div>
+        )}
       </div>
-      <Popover {...popover.bind}>
-        <div className="w-max text-thm-on-surface">
-          {column.schema.description}
-        </div>
-      </Popover>
+      {/*
+      BUG: If it is smaller than lg, the popover will repeatedly show and hide.
+      This is because as soon as Popover is displayed, it is judged to be onMouseLeave.
+      */}
+      {lg && (
+        <Popover {...popover.bind}>
+          <div className="w-max text-thm-on-surface">
+            {column.schema.description}
+          </div>
+        </Popover>
+      )}
     </>
   );
 };

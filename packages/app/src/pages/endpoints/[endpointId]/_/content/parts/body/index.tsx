@@ -1,6 +1,7 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import Error from '~/components/error';
 import Spinner from '~/components/spinner';
+import { Props as TableProps } from '~/components/table';
 import { ClassName, COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document, Content, CONTENT_TYPE } from '~/types/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
@@ -36,6 +37,12 @@ const Body: React.FC<Props> = ({
     // TODO: error handling
     console.log(error);
   }, []);
+  const sortState = useState<
+    Record<
+      TableProps['columns'][number]['key'],
+      TableProps['columns'][number]['sort']
+    >
+  >({});
 
   const elm = useMemo<JSX.Element>(() => {
     if (base.isPending) {
@@ -59,16 +66,19 @@ const Body: React.FC<Props> = ({
             descendants={descendants}
             onDescendantOperationSuccess={handleDescendantOperationSuccess}
             onDescendantOperationFail={handleDescendantOperationFail}
+            sortState={sortState}
           />
         );
     }
   }, [
-    document,
-    content,
     base,
+    content,
+    document,
+    endpoint,
     descendants,
     handleDescendantOperationSuccess,
     handleDescendantOperationFail,
+    sortState,
   ]);
 
   return <div className={className}>{elm}</div>;
