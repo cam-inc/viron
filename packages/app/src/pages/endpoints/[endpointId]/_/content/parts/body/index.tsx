@@ -37,6 +37,10 @@ const Body: React.FC<Props> = ({
     // TODO: error handling
     console.log(error);
   }, []);
+
+  // HOTFIX: TableContent 内部でStateを持つと、sort の値を変更した際に
+  // TableContent が unmount されて state を保持できないため、
+  // ここで State を持つ
   const sortState = useState<
     Record<
       TableProps['columns'][number]['key'],
