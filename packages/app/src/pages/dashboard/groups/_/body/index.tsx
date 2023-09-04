@@ -8,7 +8,6 @@ import { Props as LayoutProps } from '~/layouts/index';
 import Modal, { useModal } from '~/portals/modal';
 import { COLOR_SYSTEM } from '~/types';
 import Menu from '../../../_/menu';
-import Tabs, { ITEM as TABS_ITEM } from '../../../_/tabs';
 import Add, { Props as AddProps } from './add/';
 import Item from './item';
 
@@ -41,23 +40,20 @@ const Body: React.FC<Props> = ({ className, style }) => {
                 title={<div>{t('dashboard.groups.title')}</div>}
                 description={t('dashboard.groups.description')}
               />
-              <Menu />
-            </div>
-            <div>
-              <Tabs item={TABS_ITEM.GROUPS} />
+              <div className="flex items-center space-x-4">
+                <Button
+                  variant="outlined"
+                  cs={COLOR_SYSTEM.PRIMARY}
+                  label={t('addGroupButtonLabel')}
+                  Icon={PlusIcon}
+                  onClick={handleAddClick}
+                />
+                <Menu />
+              </div>
             </div>
           </div>
           {/* Body */}
           <div className="">
-            <div className="p-4 flex justify-end">
-              <Button
-                variant="outlined"
-                cs={COLOR_SYSTEM.PRIMARY}
-                label={t('addGroupButtonLabel')}
-                Icon={PlusIcon}
-                onClick={handleAddClick}
-              />
-            </div>
             <ul className="">
               {groupList.map((group) => (
                 <li

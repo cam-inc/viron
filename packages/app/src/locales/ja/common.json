@@ -21,7 +21,7 @@
   "group": "グループ",
   "groups": "グループ",
   "endpointsTabLabel": "$t(endpoints)",
-  "groupsTabLabel": "$t(groups)の管理",
+  "groupsTabLabel": "$t(groups)",
   "dashboard": {
     "endpoints": {
       "title": "ダッシュボード",
@@ -29,8 +29,8 @@
       "emptyMessage": "管理画面はまだありません<br>$t(addEndpointButtonLabel)ボタンから追加できます"
     },
     "groups": {
-      "title": "ダッシュボード",
-      "description": "追加された$t(endpoint)を一覧表示します"
+      "title": "グループ",
+      "description": "$t(endpoints)を$t(groups)にまとめることができます"
     }
   },
   "addEndpointButtonLabel": "$t(endpoint)の追加",
@@ -65,7 +65,7 @@
   "internalPagePaths": {
     "root": "トップ",
     "endpoints": "管理画面",
-    "groups": "グループの管理",
+    "groups": "グループ",
     "dashboard": "ダッシュボード"
   }
 }
