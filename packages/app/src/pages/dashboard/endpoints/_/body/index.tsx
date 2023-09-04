@@ -12,7 +12,6 @@ import { Props as LayoutProps } from '~/layouts/';
 import Modal, { useModal } from '~/portals/modal';
 import { COLOR_SYSTEM, Endpoint, EndpointGroup } from '~/types';
 import Menu from '../../../_/menu';
-import Tabs, { ITEM as TABS_ITEM } from '../../../_/tabs';
 import Add from './add/';
 import Item from './item/';
 
@@ -36,23 +35,20 @@ const Body: React.FC<Props> = ({ className, style }) => {
                 title={<div>{t('dashboard.endpoints.title')}</div>}
                 description={t('dashboard.endpoints.description')}
               />
-              <Menu />
-            </div>
-            <div>
-              <Tabs item={TABS_ITEM.ENDPOINTS} />
+              <div className="flex items-center space-x-4">
+                <Button
+                  variant="outlined"
+                  cs={COLOR_SYSTEM.PRIMARY}
+                  label={t('addEndpointButtonLabel')}
+                  Icon={PlusIcon}
+                  onClick={modal.open}
+                />
+                <Menu />
+              </div>
             </div>
           </div>
           {/* Body */}
-          <div>
-            <div className="p-4 flex justify-end">
-              <Button
-                variant="outlined"
-                cs={COLOR_SYSTEM.PRIMARY}
-                label={t('addEndpointButtonLabel')}
-                Icon={PlusIcon}
-                onClick={modal.open}
-              />
-            </div>
+          <div className="space-y-2">
             {!!listByGroup.length && (
               <ul>
                 {listByGroup.map((item) => (
@@ -66,7 +62,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
               </ul>
             )}
             {!!listUngrouped.length && (
-              <ul className="grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 mt-2 py-2">
+              <ul className="grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 py-2">
                 {listUngrouped.map((item) => (
                   <li key={item.id}>
                     <Item endpoint={item} />
