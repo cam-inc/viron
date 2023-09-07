@@ -34,17 +34,8 @@ const Cell: React.FC<Props> = ({ on, schema, value }) => {
       case 'boolean':
         return <CellForTypeBoolean on={on} schema={schema} value={value} />;
     }
-  }, [schema, value]);
+  }, [on, schema, value]);
 
-  return (
-    <>
-      {schema.format && (
-        <div className={classnames(`text-xxs text-thm-on-${on}-slight`)}>
-          [{schema.format}]
-        </div>
-      )}
-      <div className="text-thm-on-${on} text-xs">{content}</div>
-    </>
-  );
+  return <div className="text-thm-on-${on} text-xs">{content}</div>;
 };
 export default Cell;

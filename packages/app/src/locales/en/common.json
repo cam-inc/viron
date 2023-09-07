@@ -29,8 +29,8 @@
       "emptyMessage": "There are no endpoints yet.<br>You can add one from the $t(addEndpointButtonLabel) button."
     },
     "groups": {
-      "title": "Dashboard",
-      "description": "This is your personal, private dashboard."
+      "title": "$t(groups)",
+      "description": "Manage your $t(groups) here."
     }
   },
   "addEndpointButtonLabel": "Add an $t(endpoint)",

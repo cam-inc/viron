@@ -91,10 +91,9 @@ const Item: React.FC<Props> = ({ endpoint }) => {
 
   return (
     <article
-      className={classNames('pt-6 px-5 border rounded-2xl h-full', {
-        'border-thm-on-background-low hover:bg-thm-on-background-faint pb-6':
-          !error,
-        'bg-thm-surface border-transparent pb-4': !!error,
+      className={classNames('p-5 border rounded-2xl h-full', {
+        'border-thm-on-background-low hover:bg-thm-on-background-faint': !error,
+        'bg-thm-surface border-transparent': !!error,
       })}
     >
       {content}
@@ -146,7 +145,7 @@ const _Item: React.FC<{
 
   return (
     <>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col h-full">
         <div className="flex justify-between items-center gap-2.5">
           {/* thumbnail */}
           <Thumbnail
@@ -170,7 +169,7 @@ const _Item: React.FC<{
           </div>
         </div>
         {/* Info */}
-        <div className="flex flex-col">
+        <div className="flex flex-col mt-4">
           <div className="text-thm-on-background-low text-xxs break-all font-bold">
             {document?.info.title || authentication?.oas.info.title || '---'}
           </div>
@@ -178,35 +177,43 @@ const _Item: React.FC<{
             {endpoint.url}
           </div>
         </div>
-        {!!authentication && (
-          <div className="flex items-center gap-2 justify-end">
-            {document ? (
-              <>
-                <Button
-                  className="grow max-w-50%"
-                  cs={COLOR_SYSTEM.PRIMARY}
-                  IconRight={TerminalIcon}
-                  label={t('enterEndpoint')}
-                  onClick={handleEnterClick}
-                />
-                {authentication.list.find(
-                  (item) => item.type === 'signout'
-                ) && (
-                  <Signout
-                    endpoint={endpoint}
-                    authentication={authentication}
-                    onSignout={handleSignout}
+        <div className="mt-4 grow flex items-end">
+          {!!authentication && (
+            <>
+              {document ? (
+                <div className="grow gap-2 flex items-center justify-end">
+                  <Button
+                    className="grow max-w-50%"
+                    cs={COLOR_SYSTEM.PRIMARY}
+                    IconRight={TerminalIcon}
+                    label={t('enterEndpoint')}
+                    onClick={handleEnterClick}
                   />
-                )}
-              </>
-            ) : (
-              <div className="flex-1">
-                <Signin endpoint={endpoint} authentication={authentication} />
-              </div>
-            )}
-          </div>
-        )}
-        {!!error && <Error.renewal on={COLOR_SYSTEM.SURFACE} error={error} />}
+                  {authentication.list.find(
+                    (item) => item.type === 'signout'
+                  ) && (
+                    <Signout
+                      endpoint={endpoint}
+                      authentication={authentication}
+                      onSignout={handleSignout}
+                    />
+                  )}
+                </div>
+              ) : (
+                <div className="flex-1">
+                  <Signin endpoint={endpoint} authentication={authentication} />
+                </div>
+              )}
+            </>
+          )}
+          {!!error && (
+            <Error.renewal
+              className="grow"
+              on={COLOR_SYSTEM.SURFACE}
+              error={error}
+            />
+          )}
+        </div>
       </div>
       {/* Menu */}
       <Popover {...menuPopover.bind}>

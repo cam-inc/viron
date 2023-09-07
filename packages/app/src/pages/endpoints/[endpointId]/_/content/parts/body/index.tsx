@@ -1,6 +1,7 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import Error from '~/components/error';
 import Spinner from '~/components/spinner';
+import { Props as TableProps } from '~/components/table';
 import { ClassName, COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document, Content, CONTENT_TYPE } from '~/types/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
@@ -37,6 +38,16 @@ const Body: React.FC<Props> = ({
     console.log(error);
   }, []);
 
+  // HOTFIX: TableContent 内部でStateを持つと、sort の値を変更した際に
+  // TableContent が unmount されて state を保持できないため、
+  // ここで State を持つ
+  const sortState = useState<
+    Record<
+      TableProps['columns'][number]['key'],
+      TableProps['columns'][number]['sort']
+    >
+  >({});
+
   const elm = useMemo<JSX.Element>(() => {
     if (base.isPending) {
       return <Spinner className="w-4" on={COLOR_SYSTEM.SURFACE} />;
@@ -59,16 +70,19 @@ const Body: React.FC<Props> = ({
             descendants={descendants}
             onDescendantOperationSuccess={handleDescendantOperationSuccess}
             onDescendantOperationFail={handleDescendantOperationFail}
+            sortState={sortState}
           />
         );
     }
   }, [
-    document,
-    content,
     base,
+    content,
+    document,
+    endpoint,
     descendants,
     handleDescendantOperationSuccess,
     handleDescendantOperationFail,
+    sortState,
   ]);
 
   return <div className={className}>{elm}</div>;
