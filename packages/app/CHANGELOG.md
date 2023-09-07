@@ -1,5 +1,15 @@
 # @viron/app
 
+## 2.9.0
+
+### Minor Changes
+
+- d6b10fb4: Move dashbotd tabs to navigation bar.
+
+### Patch Changes
+
+- ff48cdc2: Fixed a bug in sort.
+
 ## 2.8.0
 
 ### Minor Changes
