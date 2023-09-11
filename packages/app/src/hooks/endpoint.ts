@@ -59,6 +59,7 @@ import {
 
 export type UseEndpointReturn = {
   list: Endpoint[];
+  setList: React.Dispatch<React.SetStateAction<Endpoint[]>>;
   listByGroup: {
     group: EndpointGroup;
     list: Endpoint[];
@@ -186,7 +187,6 @@ export type UseEndpointReturn = {
   descendGroup: (endpointGroupId: EndpointGroupID) => {
     error: EndpointGroupError | null;
   };
-  sortListUngrouped: (sortedEndpointIds: EndpointID[]) => Endpoint[];
   import: {
     execute: (
       cb: (
@@ -772,23 +772,6 @@ export const useEndpoint = (): UseEndpointReturn => {
     [setEndpointGroupList]
   );
 
-  const sortListUngrouped = useCallback<UseEndpointReturn['sortListUngrouped']>(
-    (sortedEndpointIds) => {
-      const newListUnGrouped = sortedEndpointIds.reduce((acc, id) => {
-        const item = endpointListUngrouped.find((item) => item.id === id);
-        if (item) {
-          acc.push(item);
-        }
-        return acc;
-      }, [] as Endpoint[]);
-      const listGrouped = endpointListByGroup.flatMap(({ list }) => list);
-      const newEndpointList = [...listGrouped, ...newListUnGrouped];
-      setEndpointList(newEndpointList);
-      return newEndpointList;
-    },
-    [endpointListByGroup, endpointListUngrouped, setEndpointList]
-  );
-
   const importInputElmRef: UseEndpointReturn['import']['bind']['ref'] =
     useRef(null);
   const _import = useMemo<UseEndpointReturn['import']>(() => {
@@ -897,6 +880,7 @@ export const useEndpoint = (): UseEndpointReturn => {
       listByGroup: endpointListByGroup,
       listUngrouped: endpointListUngrouped,
       groupList: endpointGroupList,
+      setList: setEndpointList,
       connect,
       fetchDocument,
       navigate,
@@ -912,13 +896,13 @@ export const useEndpoint = (): UseEndpointReturn => {
       descendGroup,
       import: _import,
       export: _export,
-      sortListUngrouped,
     }),
     [
       endpointList,
       endpointListByGroup,
       endpointListUngrouped,
       endpointGroupList,
+      setEndpointList,
       connect,
       fetchDocument,
       navigate,
@@ -934,7 +918,6 @@ export const useEndpoint = (): UseEndpointReturn => {
       descendGroup,
       _import,
       _export,
-      sortListUngrouped,
     ]
   );
   return ret;

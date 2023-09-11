@@ -19,8 +19,7 @@ import Item from './item/';
 export type Props = Parameters<LayoutProps['renderBody']>[0];
 const Body: React.FC<Props> = ({ className, style }) => {
   const { t } = useTranslation();
-  const { listByGroup, listUngrouped, sortListUngrouped } = useEndpoint();
-
+  const { listByGroup, listUngrouped, setList } = useEndpoint();
   // Add modal.
   const modal = useModal();
 
@@ -32,15 +31,20 @@ const Body: React.FC<Props> = ({ className, style }) => {
       return;
     }
     const idArray = sortable.current.toArray();
-    sortListUngrouped(idArray);
-  }, [sortListUngrouped]);
+    const newListUnGrouped = idArray.reduce((acc, id) => {
+      const item = listUngrouped.find((item) => item.id === id);
+      if (item) {
+        acc.push(item);
+      }
+      return acc;
+    }, [] as Endpoint[]);
+    const listGrouped = listByGroup.flatMap(({ list }) => list);
+    setList([...listGrouped, ...newListUnGrouped]);
+  }, [listByGroup, listUngrouped, setList]);
 
   useEffect(() => {
     if (!listUngroupedRef.current) {
       return;
-    }
-    if (sortable.current) {
-      sortable.current.destroy();
     }
     sortable.current = Sortable.create(listUngroupedRef.current, {
       animation: 300,
@@ -48,7 +52,12 @@ const Body: React.FC<Props> = ({ className, style }) => {
       ghostClass: 'opacity-0',
       onSort,
     });
-  }, [listUngrouped, onSort]);
+    return () => {
+      if (sortable.current) {
+        sortable.current.destroy();
+      }
+    };
+  }, [onSort]);
 
   return (
     <>
@@ -91,10 +100,11 @@ const Body: React.FC<Props> = ({ className, style }) => {
             {!!listUngrouped.length && (
               <ul
                 ref={listUngroupedRef}
+                id="list"
                 className="grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 py-2"
               >
                 {listUngrouped.map((item) => (
-                  <li className="cursor-grab" key={item.id} data-id={item.id}>
+                  <li key={item.id} data-id={item.id}>
                     <Item endpoint={item} />
                   </li>
                 ))}
