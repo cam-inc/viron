@@ -1,5 +1,6 @@
 import classnames from 'classnames';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import Sortable from 'sortablejs';
 import Button from '~/components/button';
 import EndpointsEmptyIcon from '~/components/endpoinitsEmptyIcon';
 import Head from '~/components/head';
@@ -18,10 +19,36 @@ import Item from './item/';
 export type Props = Parameters<LayoutProps['renderBody']>[0];
 const Body: React.FC<Props> = ({ className, style }) => {
   const { t } = useTranslation();
-  const { listByGroup, listUngrouped } = useEndpoint();
+  const { listByGroup, listUngrouped, sortListUngrouped } = useEndpoint();
 
   // Add modal.
   const modal = useModal();
+
+  const sortable = useRef<Sortable | null>(null);
+  const listUngroupedRef = React.useRef<HTMLUListElement>(null);
+
+  const onSort = useCallback(() => {
+    if (!sortable.current) {
+      return;
+    }
+    const idArray = sortable.current.toArray();
+    sortListUngrouped(idArray);
+  }, [sortListUngrouped]);
+
+  useEffect(() => {
+    if (!listUngroupedRef.current) {
+      return;
+    }
+    if (sortable.current) {
+      sortable.current.destroy();
+    }
+    sortable.current = Sortable.create(listUngroupedRef.current, {
+      animation: 300,
+      easing: 'cubic-bezier(1, 0, 0, 1)',
+      ghostClass: 'opacity-0',
+      onSort,
+    });
+  }, [listUngrouped, onSort]);
 
   return (
     <>
@@ -62,9 +89,12 @@ const Body: React.FC<Props> = ({ className, style }) => {
               </ul>
             )}
             {!!listUngrouped.length && (
-              <ul className="grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 py-2">
+              <ul
+                ref={listUngroupedRef}
+                className="grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 py-2"
+              >
                 {listUngrouped.map((item) => (
-                  <li key={item.id}>
+                  <li className="cursor-grab" key={item.id} data-id={item.id}>
                     <Item endpoint={item} />
                   </li>
                 ))}
