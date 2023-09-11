@@ -59,6 +59,7 @@ import {
 
 export type UseEndpointReturn = {
   list: Endpoint[];
+  setList: React.Dispatch<React.SetStateAction<Endpoint[]>>;
   listByGroup: {
     group: EndpointGroup;
     list: Endpoint[];
@@ -879,6 +880,7 @@ export const useEndpoint = (): UseEndpointReturn => {
       listByGroup: endpointListByGroup,
       listUngrouped: endpointListUngrouped,
       groupList: endpointGroupList,
+      setList: setEndpointList,
       connect,
       fetchDocument,
       navigate,
@@ -900,6 +902,7 @@ export const useEndpoint = (): UseEndpointReturn => {
       endpointListByGroup,
       endpointListUngrouped,
       endpointGroupList,
+      setEndpointList,
       connect,
       fetchDocument,
       navigate,
