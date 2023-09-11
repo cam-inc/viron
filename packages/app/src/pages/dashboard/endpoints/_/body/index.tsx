@@ -102,7 +102,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
                 className="grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 py-2"
               >
                 {listUngrouped.map((item) => (
-                  <li key={item.id} data-id={item.id}>
+                  <li className="cursor-grab" key={item.id} data-id={item.id}>
                     <Item endpoint={item} />
                   </li>
                 ))}
