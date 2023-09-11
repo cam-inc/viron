@@ -48,6 +48,8 @@ const Body: React.FC<Props> = ({ className, style }) => {
       animation: 300,
       easing: 'cubic-bezier(1, 0, 0, 1)',
       ghostClass: 'opacity-0',
+      delayOnTouchOnly: true,
+      delay: 200,
       onSort,
     });
     return () => {
