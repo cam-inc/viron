@@ -31,13 +31,11 @@ const Body: React.FC<Props> = ({ className, style }) => {
       return;
     }
     const idArray = sortable.current.toArray();
-    const newListUnGrouped = idArray.reduce((acc, id) => {
-      const item = listUngrouped.find((item) => item.id === id);
-      if (item) {
-        acc.push(item);
-      }
-      return acc;
-    }, [] as Endpoint[]);
+    const newListUnGrouped = idArray.map((id) => {
+      // idArray is created from listUngrouped. So, the following line is safe.
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return listUngrouped.find((item) => item.id === id)!;
+    });
     const listGrouped = listByGroup.flatMap(({ list }) => list);
     setList([...listGrouped, ...newListUnGrouped]);
   }, [listByGroup, listUngrouped, setList]);
