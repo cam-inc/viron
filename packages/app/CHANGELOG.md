@@ -1,5 +1,11 @@
 # @viron/app
 
+## 2.10.0
+
+### Minor Changes
+
+- 91492fc4: Enabled to sort endpoint list
+
 ## 2.9.0
 
 ### Minor Changes
