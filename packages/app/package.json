@@ -1,6 +1,6 @@
 {
   "name": "@viron/app",
-  "version": "2.9.0",
+  "version": "2.10.0",
   "engines": {
     "node": ">=18.14.0",
     "npm": ">=9.3.1"
@@ -91,6 +91,7 @@
     "react-i18next": "^12.3.1",
     "react-test-renderer": "^18.2.0",
     "recoil": "^0.7.7",
+    "sortablejs": "^1.15.0",
     "store2": "^2.12.0",
     "swr": "^1.1.0",
     "tailwindcss": "^3.3.2",
@@ -113,6 +114,7 @@
     "@types/react-dom": "^18.0.10",
     "@types/react-test-renderer": "^17.0.1",
     "@types/recoil": "^0.0.1",
+    "@types/sortablejs": "^1.15.2",
     "@types/tailwindcss": "^2.0.6",
     "@typescript-eslint/eslint-plugin": "^5.59.8",
     "@typescript-eslint/parser": "^5.59.8",
