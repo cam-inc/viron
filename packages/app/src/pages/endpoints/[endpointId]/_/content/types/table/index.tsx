@@ -3,19 +3,14 @@ import { Props as BaseProps } from '~/components';
 import Button, { Props as ButtonProps } from '~/components/button';
 import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/outline';
 import Table, { Props as TableProps } from '~/components/table';
+import XIcon from '~/components/icon/xIcon/outline';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import ClipboardCopyIcon from '~/components/icon/clipboardCopy/outline';
+import { Data } from '~/components/table';
 import Popover, { usePopover } from '~/portals/popover';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
-import {
-  Document,
-  Content,
-  SORT,
-  Sort,
-  TableColumn,
-  Schema,
-} from '~/types/oas';
+import { Document, Content, SORT, Sort, TableColumn } from '~/types/oas';
 import {
   extractTableColumns,
   getTableRows,
@@ -24,8 +19,6 @@ import {
 import { UseBaseReturn } from '../../hooks/useBase';
 import { UseDescendantsReturn } from '../../hooks/useDescendants';
 import Descendant, { Props as DescendantProps } from '../../parts/descendant';
-import { XIcon } from '@heroicons/react/outline';
-import { Data } from '~/components/table';
 import Drawer, { useDrawer } from '~/portals/drawer';
 
 type Props = {
