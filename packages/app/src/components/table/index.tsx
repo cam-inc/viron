@@ -126,6 +126,7 @@ const Tr: React.FC<TrProps> = ({
       className={classnames({
         [`hover:bg-thm-on-${on}-faint rounded-lg`]: !isHead,
         [`bg-thm-on-${on}-faint`]: isHead,
+        'cursor-pointer': !!onClick,
       })}
       onClick={handleClick}
     >
