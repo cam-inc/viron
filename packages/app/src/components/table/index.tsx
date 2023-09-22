@@ -46,70 +46,72 @@ const Table: React.FC<Props> = ({
   );
 
   return (
-    <div className={className}>
-      <div className="overflow-x-auto overscroll-x-contain">
-        <table className="min-w-full border-collapse">
-          <thead className={`border-b border-thm-on-${on}-slight`}>
-            <Tr on={on} isHead>
-              {columns.map((column) => {
-                return (
-                  <React.Fragment key={column.key}>
-                    <Th on={on}>
-                      {column.isSortable ? (
-                        <button
-                          onClick={() => {
-                            let sort: Sort;
-                            switch (column.sort) {
-                              case SORT.ASC:
-                                sort = SORT.DESC;
-                                break;
-                              case SORT.DESC:
-                                sort = SORT.NONE;
-                                break;
-                              case SORT.NONE:
-                                sort = SORT.ASC;
-                                break;
-                            }
-                            onRequestSortChange?.(column.key, sort);
-                          }}
-                        >
-                          <ThTitle on={on} column={column} />
-                        </button>
-                      ) : (
-                        <ThTitle on={on} column={column} />
-                      )}
-                    </Th>
-                  </React.Fragment>
-                );
-              })}
-              {renderActions && <Th on={on} isSticky />}
-            </Tr>
-          </thead>
-          <tbody className={`divide-y divide-thm-on-${on}-slight`}>
-            {dataSource.map((data, idx) => (
-              <React.Fragment key={idx}>
-                <Tr on={on} data={data} onClick={handleRowClick}>
-                  {columns.map((column) => (
+    <>
+      <div className={className}>
+        <div className="overflow-x-auto overscroll-x-contain">
+          <table className="min-w-full border-collapse">
+            <thead className={`border-b border-thm-on-${on}-slight`}>
+              <Tr on={on} isHead>
+                {columns.map((column) => {
+                  return (
                     <React.Fragment key={column.key}>
-                      <Td on={on}>
-                        <Cell
-                          on={on}
-                          schema={column.schema}
-                          value={data[column.key]}
-                        />
-                      </Td>
+                      <Th on={on}>
+                        {column.isSortable ? (
+                          <button
+                            onClick={() => {
+                              let sort: Sort;
+                              switch (column.sort) {
+                                case SORT.ASC:
+                                  sort = SORT.DESC;
+                                  break;
+                                case SORT.DESC:
+                                  sort = SORT.NONE;
+                                  break;
+                                case SORT.NONE:
+                                  sort = SORT.ASC;
+                                  break;
+                              }
+                              onRequestSortChange?.(column.key, sort);
+                            }}
+                          >
+                            <ThTitle on={on} column={column} />
+                          </button>
+                        ) : (
+                          <ThTitle on={on} column={column} />
+                        )}
+                      </Th>
                     </React.Fragment>
-                  ))}
-                  {renderActions && (
-                    <Td on={on} isSticky>
-                      {renderActions(data)}
-                    </Td>
-                  )}
-                </Tr>
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
+                  );
+                })}
+                {renderActions && <Th on={on} isSticky />}
+              </Tr>
+            </thead>
+            <tbody className={`divide-y divide-thm-on-${on}-slight`}>
+              {dataSource.map((data, idx) => (
+                <React.Fragment key={idx}>
+                  <Tr on={on} data={data} onClick={handleRowClick}>
+                    {columns.map((column) => (
+                      <React.Fragment key={column.key}>
+                        <Td on={on}>
+                          <Cell
+                            on={on}
+                            schema={column.schema}
+                            value={data[column.key]}
+                          />
+                        </Td>
+                      </React.Fragment>
+                    ))}
+                    {renderActions && (
+                      <Td on={on} isSticky>
+                        {renderActions(data)}
+                      </Td>
+                    )}
+                  </Tr>
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
       {selectedRowData && (
         <Drawer {...drawer.bind}>
@@ -121,7 +123,7 @@ const Table: React.FC<Props> = ({
           />
         </Drawer>
       )}
-    </div>
+    </>
   );
 };
 export default Table;
