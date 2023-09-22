@@ -1,13 +1,13 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Props as BaseProps } from '~/components';
 import Button, { Props as ButtonProps } from '~/components/button';
-import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/outline';
-import Table, { Props as TableProps } from '~/components/table';
-import XIcon from '~/components/icon/xIcon/outline';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import ClipboardCopyIcon from '~/components/icon/clipboardCopy/outline';
-import { Data } from '~/components/table';
+import CloseIcon from '~/components/icon/close/fill';
+import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/outline';
+import Table, { Props as TableProps } from '~/components/table';
+import Drawer, { useDrawer } from '~/portals/drawer';
 import Popover, { usePopover } from '~/portals/popover';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document, Content, SORT, Sort, TableColumn } from '~/types/oas';
@@ -19,7 +19,6 @@ import {
 import { UseBaseReturn } from '../../hooks/useBase';
 import { UseDescendantsReturn } from '../../hooks/useDescendants';
 import Descendant, { Props as DescendantProps } from '../../parts/descendant';
-import Drawer, { useDrawer } from '~/portals/drawer';
 
 type Props = {
   endpoint: Endpoint;
@@ -34,6 +33,11 @@ type Props = {
     React.Dispatch<React.SetStateAction<Record<string, Sort>>>
   ];
 };
+
+type Value = any;
+type Key = string;
+type ObjectData = Record<Key, Value>;
+
 const ContentTable: React.FC<Props> = ({
   endpoint,
   document,
@@ -112,17 +116,14 @@ const ContentTable: React.FC<Props> = ({
     [document, base, sorts]
   );
 
-  const [rowObject, setRowObject] = useState<Data>();
-  const onRowClick = useCallback(
-    (data: Data) => {
+  const [selectedRowData, setSelectedRowData] = useState<ObjectData>();
+  const handleRowClick = useCallback(
+    (data: ObjectData) => {
       drawer.open();
-      setRowObject(data);
+      setSelectedRowData(data);
     },
     [drawer]
   );
-  const closeDrawer = () => {
-    drawer.close();
-  };
 
   return (
     <>
@@ -132,15 +133,15 @@ const ContentTable: React.FC<Props> = ({
         dataSource={dataSource}
         renderActions={descendants.length ? renderActions : undefined}
         onRequestSortChange={handleRequestSortChange}
-        onRowClick={onRowClick}
+        onRowClick={handleRowClick}
       />
-      {rowObject && (
+      {selectedRowData && (
         <Drawer {...drawer.bind}>
           <RowObject
             on={COLOR_SYSTEM.BACKGROUND}
-            rowObject={rowObject}
+            rowObject={selectedRowData}
             columns={columns}
-            close={closeDrawer}
+            close={drawer.close}
           />
         </Drawer>
       )}
@@ -207,48 +208,46 @@ const Operations: React.FC<OperationsProps> = ({
 };
 
 const RowObject: React.FC<
-  BaseProps & { rowObject: Data; columns: TableColumn[]; close: () => void }
+  BaseProps & {
+    rowObject: ObjectData;
+    columns: TableColumn[];
+    close: () => void;
+  }
 > = ({ on, rowObject, columns, close }) => {
   return (
-    <div className="flex flex-col h-full w-full">
-      <div className="px-10 pt-10">
-        <div className="text-right">
-          <Button
-            variant="text"
-            on={COLOR_SYSTEM.SURFACE}
-            Icon={XIcon}
-            onClick={close}
-          />
-        </div>
+    <div className="px-10 py-10 flex flex-col h-full w-full">
+      <div>
+        <Button
+          className="flex mr-0 ml-auto"
+          variant="text"
+          on={COLOR_SYSTEM.SURFACE}
+          Icon={CloseIcon}
+          onClick={close}
+        />
       </div>
-      <div className="px-10 pb-10 grow overflow-scroll">
-        <div>
-          {Object.keys(rowObject).map((objectKey, index) => (
-            <div className="mt-10">
-              <Container
-                on={on}
-                columns={columns}
-                rowObject={rowObject}
-                objectKey={objectKey}
-                index={index}
-              />
-            </div>
-          ))}
-        </div>
+      <div className="grow overflow-scroll space-y-10">
+        {Object.keys(rowObject).map((objectKey, index) => (
+          <Accordion
+            key={index}
+            on={on}
+            columns={columns}
+            selectedRowData={rowObject}
+            objectKey={objectKey}
+          />
+        ))}
       </div>
     </div>
   );
 };
 
-const Container: React.FC<
+const Accordion: React.FC<
   BaseProps & {
     columns: TableColumn[];
-    rowObject: Data;
-    index: number;
+    selectedRowData: ObjectData;
     objectKey: string;
   }
-> = ({ on, columns, rowObject, index, objectKey }) => {
-  const schema = (data: TableColumn[] | Data, objectKey: string) => {
+> = ({ on, columns, selectedRowData, objectKey }) => {
+  const schema = (data: TableColumn[] | ObjectData, objectKey: string) => {
     if (Array.isArray(data)) {
       const schema = data.find((column) => column.key === objectKey)?.schema;
       return schema;
@@ -281,8 +280,8 @@ const Container: React.FC<
   );
 
   const handleCopyClick = useCallback<ButtonProps['onClick']>(() => {
-    globalThis.navigator.clipboard.writeText(rowObject[objectKey]);
-  }, [rowObject[objectKey]]);
+    globalThis.navigator.clipboard.writeText(selectedRowData[objectKey]);
+  }, [selectedRowData, objectKey]);
 
   const displayValue = (data: any) => {
     switch (typeof data) {
@@ -302,7 +301,7 @@ const Container: React.FC<
   };
 
   return (
-    <div key={index}>
+    <div>
       <div className="flex-none inline-flex items-center gap-1 whitespace-nowrap">
         {arrowIcon}
         <div className="text-sm">
@@ -316,20 +315,22 @@ const Container: React.FC<
       </div>
       {isOpened && (
         <div className="ml-5 pl-4 border-l border-thm-on-surface-slight">
-          {typeof rowObject[objectKey] === 'object' ? (
-            Object.keys(rowObject[objectKey]).map((childObjectKey, index) => (
-              <Container
-                on={on}
-                columns={schema(columns, objectKey)}
-                rowObject={rowObject[objectKey]}
-                objectKey={childObjectKey}
-                index={index}
-              />
-            ))
+          {typeof selectedRowData[objectKey] === 'object' ? (
+            Object.keys(selectedRowData[objectKey]).map(
+              (childObjectKey, index) => (
+                <Accordion
+                  key={index}
+                  on={on}
+                  columns={schema(columns, objectKey)}
+                  selectedRowData={selectedRowData[objectKey]}
+                  objectKey={childObjectKey}
+                />
+              )
+            )
           ) : (
             <div className="bg-thm-on-background-slight rounded-lg px-2.5 p-3 inline-flex items-center whitespace-nowrap mr-5">
               <span className="mr-2 text-xs">
-                {displayValue(rowObject[objectKey])}
+                {displayValue(selectedRowData[objectKey])}
               </span>
               <Button
                 size="sm"
