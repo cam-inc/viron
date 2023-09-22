@@ -40,7 +40,7 @@ const Accordion: React.FC<
 
   return (
     <div>
-      <div className="flex-none inline-flex items-center gap-1 whitespace-nowrap">
+      <div className="inline-flex items-center gap-1 whitespace-nowrap">
         <Button
           variant="text"
           on={on}
