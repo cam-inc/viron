@@ -27,7 +27,6 @@ type Props = {
     React.Dispatch<React.SetStateAction<Record<string, Sort>>>
   ];
 };
-
 const ContentTable: React.FC<Props> = ({
   endpoint,
   document,
@@ -106,13 +105,15 @@ const ContentTable: React.FC<Props> = ({
   );
 
   return (
-    <Table
-      on={COLOR_SYSTEM.BACKGROUND}
-      columns={columns}
-      dataSource={dataSource}
-      renderActions={descendants.length ? renderActions : undefined}
-      onRequestSortChange={handleRequestSortChange}
-    />
+    <>
+      <Table
+        on={COLOR_SYSTEM.BACKGROUND}
+        columns={columns}
+        dataSource={dataSource}
+        renderActions={descendants.length ? renderActions : undefined}
+        onRequestSortChange={handleRequestSortChange}
+      />
+    </>
   );
 };
 export default ContentTable;
