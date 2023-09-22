@@ -1,10 +1,16 @@
 import classnames from 'classnames';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import { Props as BaseProps } from '~/components';
+import Button, { Props as ButtonProps } from '~/components/button';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
+import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import ChevronUpIcon from '~/components/icon/chevronUp/outline';
+import ClipboardCopyIcon from '~/components/icon/clipboardCopy/outline';
+import CloseIcon from '~/components/icon/close/fill';
+import Drawer, { useDrawer } from '~/portals/drawer';
 import Popover, { usePopover } from '~/portals/popover';
 import { useAppScreenGlobalStateValue } from '~/store';
+import { COLOR_SYSTEM } from '~/types';
 import { TableColumn, Sort, SORT } from '~/types/oas';
 import Cell from './cell';
 
@@ -28,11 +34,15 @@ const Table: React.FC<Props> = ({
   onRowClick,
   onRequestSortChange,
 }) => {
+  const drawer = useDrawer();
+  const [selectedRowData, setSelectedRowData] = useState<Data>();
   const handleRowClick = useCallback<NonNullable<TrProps['onClick']>>(
     (data) => {
       onRowClick?.(data);
+      setSelectedRowData(data);
+      drawer.open();
     },
-    [onRowClick]
+    [onRowClick, drawer]
   );
 
   return (
@@ -101,6 +111,16 @@ const Table: React.FC<Props> = ({
           </tbody>
         </table>
       </div>
+      {selectedRowData && (
+        <Drawer {...drawer.bind}>
+          <RowObject
+            on={COLOR_SYSTEM.BACKGROUND}
+            rowObject={selectedRowData}
+            columns={columns}
+            close={drawer.close}
+          />
+        </Drawer>
+      )}
     </div>
   );
 };
@@ -236,5 +256,129 @@ const Td: React.FC<BaseProps & { isSticky?: boolean }> = ({
     >
       {children}
     </td>
+  );
+};
+
+const RowObject: React.FC<
+  BaseProps & {
+    rowObject: Data;
+    columns: TableColumn[];
+    close: () => void;
+  }
+> = ({ on, rowObject, columns, close }) => {
+  return (
+    <div className="px-10 py-10 flex flex-col h-full w-full">
+      <div>
+        <Button
+          className="flex mr-0 ml-auto"
+          variant="text"
+          on={COLOR_SYSTEM.SURFACE}
+          Icon={CloseIcon}
+          onClick={close}
+        />
+      </div>
+      <div className="grow overflow-scroll space-y-10">
+        {Object.keys(rowObject).map((objectKey, index) => (
+          <Accordion
+            key={index}
+            on={on}
+            schema={columns.find((column) => column.key === objectKey)?.schema}
+            selectedRowData={rowObject}
+            objectKey={objectKey}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const Accordion: React.FC<
+  BaseProps & {
+    schema: TableColumn['schema'] | undefined;
+    selectedRowData: Data;
+    objectKey: string;
+  }
+> = ({ on, schema, selectedRowData, objectKey }) => {
+  const [isOpened, setIsOpened] = useState<boolean>(true);
+  const handleArrowClick = useCallback<ButtonProps['onClick']>(() => {
+    setIsOpened(!isOpened);
+  }, [isOpened]);
+  const arrowIcon = useMemo<JSX.Element>(
+    () => (
+      <Button
+        variant="text"
+        on={on}
+        Icon={isOpened ? ChevronDownIcon : ChevronRightIcon}
+        onClick={handleArrowClick}
+      />
+    ),
+    [on, isOpened, handleArrowClick]
+  );
+
+  const handleCopyClick = useCallback<ButtonProps['onClick']>(() => {
+    globalThis.navigator.clipboard.writeText(selectedRowData[objectKey]);
+  }, [selectedRowData, objectKey]);
+
+  const displayValue = (data: any) => {
+    switch (typeof data) {
+      case 'string' || 'number':
+        return data;
+      case 'boolean':
+        if (data === true) {
+          const value = 'TRUE';
+          return value;
+        } else {
+          const value = 'FALSE';
+          return value;
+        }
+      default:
+        return data;
+    }
+  };
+
+  return (
+    <div>
+      <div className="flex-none inline-flex items-center gap-1 whitespace-nowrap">
+        {arrowIcon}
+        <div className="text-sm">
+          <span className="font-bold">{objectKey}</span>
+          {schema?.description && (
+            <span className="ml-2 text-thm-on-surface-low">
+              {schema.description}
+            </span>
+          )}
+        </div>
+      </div>
+      {isOpened && (
+        <div className="ml-5 pl-4 border-l border-thm-on-surface-slight">
+          {typeof selectedRowData[objectKey] === 'object' ? (
+            Object.keys(selectedRowData[objectKey]).map(
+              (childObjectKey, index) => (
+                <Accordion
+                  key={index}
+                  on={on}
+                  schema={schema?.properties?.[childObjectKey]}
+                  selectedRowData={selectedRowData[objectKey]}
+                  objectKey={childObjectKey}
+                />
+              )
+            )
+          ) : (
+            <div className="bg-thm-on-background-slight rounded-lg px-2.5 p-3 inline-flex items-center whitespace-nowrap mr-5">
+              <span className="mr-2 text-xs">
+                {displayValue(selectedRowData[objectKey])}
+              </span>
+              <Button
+                size="sm"
+                variant="text"
+                on={on}
+                Icon={ClipboardCopyIcon}
+                onClick={handleCopyClick}
+              />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 };
