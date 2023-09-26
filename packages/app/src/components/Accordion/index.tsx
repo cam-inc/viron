@@ -23,8 +23,10 @@ const Accordion: React.FC<
 
   const displayValue = (data: any) => {
     switch (typeof data) {
-      case 'string' || 'number':
+      case 'string':
         return data;
+      case 'number':
+        return data.toLocaleString();
       case 'boolean':
         if (data === true) {
           const value = 'TRUE';
@@ -47,7 +49,7 @@ const Accordion: React.FC<
           Icon={isOpened ? ChevronDownIcon : ChevronRightIcon}
           onClick={handleArrowClick}
         />
-        <div className="text-sm">
+        <div className={`text-sm text-thm-on-${on}`}>
           <span className="font-bold">{objectKey}</span>
           {schema?.description && (
             <span className="ml-2 text-thm-on-surface-low">
@@ -58,7 +60,7 @@ const Accordion: React.FC<
       </div>
       {isOpened && (
         <div className="ml-5 pl-4 border-l border-thm-on-surface-slight">
-          {typeof data[objectKey] === 'object' ? (
+          {data[objectKey] && typeof data[objectKey] === 'object' ? (
             Object.keys(data[objectKey]).map((childObjectKey, index) => (
               <Accordion
                 key={index}
@@ -70,7 +72,7 @@ const Accordion: React.FC<
             ))
           ) : (
             <div className="bg-thm-on-background-slight rounded-lg px-2.5 p-3 inline-flex items-center whitespace-nowrap mr-5">
-              <span className="mr-2 text-xs">
+              <span className={`mr-2 text-xs text-thm-on-${on}`}>
                 {displayValue(data[objectKey])}
               </span>
               <Button
