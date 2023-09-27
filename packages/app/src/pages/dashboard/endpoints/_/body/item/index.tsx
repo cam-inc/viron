@@ -262,17 +262,15 @@ const SkeltonItem: React.FC<BaseProps> = ({ on }) => {
     <div className="flex flex-col h-full animate-pulse">
       <div className="flex justify-between items-center gap-2.5">
         <div className={`w-10 h-10 bg-thm-on-${on}-slight rounded`} />
-        <div className={`w-full h-6 flex-1 bg-gray-200 rounded-full`} />
+        <div className={`w-full h-6 flex-1 bg-gray-200 rounded`} />
       </div>
       <div className="flex flex-col mt-4">
-        <div className={`w-full h-4 bg-thm-on-${on}-slight rounded-full`} />
-        <div
-          className={`w-full h-4 mt-1 bg-thm-on-${on}-slight rounded-full`}
-        />
+        <div className={`w-full h-4 bg-thm-on-${on}-slight rounded`} />
+        <div className={`w-full h-4 mt-1 bg-thm-on-${on}-slight rounded`} />
       </div>
-      <div className="mt-4 grow flex items-end justify-end gap-2">
-        <div className={`w-1/2 h-8 rounded-full bg-thm-on-${on}-slight`} />
-        <div className={`w-1/2 h-8 rounded-full bg-thm-on-${on}-slight`} />
+      <div className="mt-4 flex gap-2">
+        <div className={`w-full h-8 rounded-full bg-thm-on-${on}-slight`} />
+        <div className={`w-full h-8 rounded-full bg-thm-on-${on}-slight`} />
       </div>
     </div>
   );
