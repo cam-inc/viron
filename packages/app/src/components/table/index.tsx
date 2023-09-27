@@ -307,22 +307,14 @@ const Accordion: React.FC<
     globalThis.navigator.clipboard.writeText(data[objectKey]);
   }, [data, objectKey]);
 
-  const displayValue = (data: any) => {
-    switch (typeof data) {
+  const displayValue = (value: string | number | boolean) => {
+    switch (typeof value) {
       case 'string':
-        return data;
+        return value;
       case 'number':
-        return data.toLocaleString();
+        return value.toLocaleString();
       case 'boolean':
-        if (data === true) {
-          const value = 'TRUE';
-          return value;
-        } else {
-          const value = 'FALSE';
-          return value;
-        }
-      default:
-        return data;
+        return String(value).toUpperCase();
     }
   };
 
