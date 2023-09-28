@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Props as BaseProps } from '~/components';
+import Skelton from '~/components/Skelton';
 import Button, { Props as ButtonProps } from '~/components/button';
 import IconButton from '~/components/button/icon';
 import Error from '~/components/error/';
@@ -259,18 +260,18 @@ const _Item: React.FC<{
 
 const SkeltonItem: React.FC<BaseProps> = ({ on }) => {
   return (
-    <div className="flex flex-col h-full animate-pulse">
+    <div className="flex flex-col h-full">
       <div className="flex justify-between items-center gap-2.5">
-        <div className={`w-10 h-10 bg-thm-on-${on}-slight rounded`} />
-        <div className={`w-full h-6 flex-1 bg-gray-200 rounded`} />
+        <Skelton className="w-10 h-10" on={on} variant="rounded" />
+        <Skelton className="text-base w-full flex-1" on={on} variant="text" />
       </div>
-      <div className="flex flex-col mt-4">
-        <div className={`w-full h-4 bg-thm-on-${on}-slight rounded`} />
-        <div className={`w-full h-4 mt-1 bg-thm-on-${on}-slight rounded`} />
+      <div className="flex flex-col mt-4 space-y-1">
+        <Skelton className="text-xxs" on={on} variant="text" />
+        <Skelton className="text-xxs" on={on} variant="text" />
       </div>
       <div className="mt-4 flex gap-2">
-        <div className={`w-full h-8 rounded-full bg-thm-on-${on}-slight`} />
-        <div className={`w-full h-8 rounded-full bg-thm-on-${on}-slight`} />
+        <Skelton className="w-full h-8" on={on} variant="circular" />
+        <Skelton className="w-full h-8" on={on} variant="circular" />
       </div>
     </div>
   );
