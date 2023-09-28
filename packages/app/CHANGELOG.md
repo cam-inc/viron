@@ -1,5 +1,15 @@
 # @viron/app
 
+## 2.11.0
+
+### Minor Changes
+
+- 4ee6af83: added single display
+
+### Patch Changes
+
+- 44ddd2d5: update pending dashboard item
+
 ## 2.10.0
 
 ### Minor Changes
