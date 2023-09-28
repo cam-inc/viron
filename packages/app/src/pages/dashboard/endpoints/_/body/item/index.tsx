@@ -1,5 +1,7 @@
 import classNames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Props as BaseProps } from '~/components';
+import Skelton from '~/components/Skelton';
 import Button, { Props as ButtonProps } from '~/components/button';
 import IconButton from '~/components/button/icon';
 import Error from '~/components/error/';
@@ -8,7 +10,6 @@ import MoreIcon from '~/components/icon/more/outline';
 import QrcodeIcon from '~/components/icon/qrcode/outline';
 import TerminalIcon from '~/components/icon/terminal/outline';
 import TrashIcon from '~/components/icon/trash/outline';
-import Spinner from '~/components/spinner';
 import { BaseError } from '~/errors';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
@@ -68,7 +69,7 @@ const Item: React.FC<Props> = ({ endpoint }) => {
 
   const content = useMemo<JSX.Element | null>(() => {
     if (isPending) {
-      return <Spinner className="w-4" on={COLOR_SYSTEM.BACKGROUND} />;
+      return <SkeltonItem on={COLOR_SYSTEM.BACKGROUND} />;
     }
 
     return (
@@ -254,5 +255,24 @@ const _Item: React.FC<{
         <Qrcode endpoint={endpoint} />
       </Modal>
     </>
+  );
+};
+
+const SkeltonItem: React.FC<BaseProps> = ({ on }) => {
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex justify-between items-center gap-2.5">
+        <Skelton className="w-10 h-10" on={on} variant="rounded" />
+        <Skelton className="text-base w-full flex-1" on={on} variant="text" />
+      </div>
+      <div className="flex flex-col mt-4 space-y-1">
+        <Skelton className="text-xxs" on={on} variant="text" />
+        <Skelton className="text-xxs" on={on} variant="text" />
+      </div>
+      <div className="mt-4 flex gap-2">
+        <Skelton className="w-full h-8" on={on} variant="circular" />
+        <Skelton className="w-full h-8" on={on} variant="circular" />
+      </div>
+    </div>
   );
 };
