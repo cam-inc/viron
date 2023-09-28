@@ -12,10 +12,12 @@ const Skelton: React.FC<BaseProps & { variant: variant }> = ({
   return (
     <div
       className={classnames(
-        variant === 'circular' && 'rounded-full',
-        variant === 'rounded' && 'rounded',
-        // For variant="text", adjust the height via font-size
-        variant === 'text' && "h-auto rounded before:content-['\\00a0']",
+        {
+          'rounded-full': variant === 'circular',
+          rounded: variant === 'rounded',
+          // For variant="text", adjust the height via font-size
+          "h-auto rounded before:content-['\\00a0']": variant === 'text',
+        },
         `bg-thm-on-${on}-slight animate-pulse`,
         className
       )}
