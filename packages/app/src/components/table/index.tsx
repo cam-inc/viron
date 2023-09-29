@@ -102,7 +102,7 @@ const Table: React.FC<Props> = ({
                       </React.Fragment>
                     ))}
                     {renderActions && (
-                      <Td on={on} isSticky>
+                      <Td on={on} isSticky onClick={(e) => e.stopPropagation()}>
                         {renderActions(data)}
                       </Td>
                     )}
@@ -239,17 +239,16 @@ const ThTitle: React.FC<ThTitleProp> = ({ on, column }) => {
   );
 };
 
-const Td: React.FC<BaseProps & { isSticky?: boolean }> = ({
-  on,
-  isSticky = false,
-  children,
-}) => {
+const Td: React.FC<
+  BaseProps & { isSticky?: boolean; onClick?: (e: React.MouseEvent) => void }
+> = ({ on, isSticky = false, children, onClick }) => {
   const style: React.CSSProperties = {};
   if (isSticky) {
     style.background = `linear-gradient(to right, rgba(0,0,0,0) 0, var(--thm-${on}) 8px, var(--thm-${on}) 100%)`;
   }
   return (
     <td
+      onClick={onClick}
       className={classnames('p-2 first:pl-4', {
         'p-2 py-4': !isSticky,
         'pr-2 py-2 pl-4 sticky right-0': isSticky,
