@@ -21,7 +21,10 @@ export type BaseButtonProps<T = null> = Pick<
     size?: Size;
     data?: T;
     rounded?: boolean;
-    onClick: (data: T) => void;
+    onClick: (
+      data: T,
+      event?: React.MouseEvent<HTMLButtonElement, MouseEvent>
+    ) => void;
   };
 
 export const SIZE = {
@@ -78,7 +81,7 @@ const Button = function <T = null>({
       )}
       type={type}
       disabled={disabled}
-      onClick={() => onClick(data as T)}
+      onClick={(event) => onClick(data as T, event)}
     >
       <span className="relative h-full flex items-center gap-1 px-3.5">
         <span

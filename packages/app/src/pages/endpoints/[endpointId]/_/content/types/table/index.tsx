@@ -135,9 +135,13 @@ const Operations: React.FC<OperationsProps> = ({
   onOperationFail,
 }) => {
   const popover = usePopover<HTMLDivElement>();
-  const handleButtonClick = useCallback<ButtonProps['onClick']>(() => {
-    popover.open();
-  }, [popover]);
+  const handleButtonClick = useCallback<ButtonProps['onClick']>(
+    (_, event) => {
+      event?.stopPropagation();
+      popover.open();
+    },
+    [popover]
+  );
   const handleDescendantClick = useCallback<
     NonNullable<DescendantProps['onClick']>
   >(() => {
