@@ -1,5 +1,12 @@
 # @viron/app
 
+## 2.11.1
+
+### Patch Changes
+
+- 0c7dc666: Added `uri` data type to Content Table
+- 6bec5dd7: add stopPropagation to sticky td tag
+
 ## 2.11.0
 
 ### Minor Changes
