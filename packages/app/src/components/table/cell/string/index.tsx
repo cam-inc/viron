@@ -10,6 +10,17 @@ export type Props = BaseProps & {
 const CellForTypeString: React.FC<Props> = ({ on, schema, value }) => {
   const content = useMemo<JSX.Element>(() => {
     switch (schema.format) {
+      case 'uri':
+        return (
+          <a
+            className={classnames(`text-sm text-thm-on-${on} underline`)}
+            href={value}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {value}
+          </a>
+        );
       case 'uri-image':
         return <img className="block" src={value} />;
       default:
