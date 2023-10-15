@@ -257,7 +257,7 @@ export const useAutocomplete = function <T>(
   );
 
   const id = useMemo<UseAutocompleteReturn<T>['id']>(function () {
-    return `autocomplete-${Date.now().toString()}`;
+    return `autocomplete-${Math.random()}`;
   }, []);
 
   return {
