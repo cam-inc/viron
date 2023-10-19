@@ -1,5 +1,11 @@
 # @viron/app
 
+## 2.11.2
+
+### Patch Changes
+
+- 9dadda7e: Fixed to randomly generate autocompleteId to avoid duplication.
+
 ## 2.11.1
 
 ### Patch Changes
