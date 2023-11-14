@@ -9,6 +9,5 @@ export const s3Client = new S3({
     accessKeyId: AWSS3Config.accessKeyId,
     secretAccessKey: AWSS3Config.secretAccessKey,
   },
-
   region: AWSS3Config.region,
 });
