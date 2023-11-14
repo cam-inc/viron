@@ -18,7 +18,7 @@
     "mime-types": "^2.1.31",
     "mongoose": "6.1.8",
     "multer": "^1.4.3",
-    "multer-s3": "^2.9.0",
+    "multer-s3": "^3.0.1",
     "mysql2": "^2.2.5",
     "pino": "^7.6.4",
     "pino-http": "^6.6.0",
