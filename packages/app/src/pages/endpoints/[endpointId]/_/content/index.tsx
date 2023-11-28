@@ -40,7 +40,7 @@ const _Content: React.FC<Props> = ({
   return (
     <div
       id={content.id}
-      className="border border-thm-on-background-low rounded-lg"
+      className="border border-thm-on-background-low rounded-lg overflow-hidden"
     >
       <Head
         className="py-2 px-3 text-thm-on-background bg-thm-on-background-slight rounded-t-lg"
