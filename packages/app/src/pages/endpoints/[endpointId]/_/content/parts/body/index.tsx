@@ -50,7 +50,11 @@ const Body: React.FC<Props> = ({
 
   const elm = useMemo<JSX.Element>(() => {
     if (base.isPending) {
-      return <Spinner className="w-4" on={COLOR_SYSTEM.SURFACE} />;
+      return (
+        <div className="p-10 flex items-center justify-center">
+          <Spinner className="w-4" on={COLOR_SYSTEM.SURFACE} />
+        </div>
+      );
     }
     if (base.error) {
       return <Error on={COLOR_SYSTEM.SURFACE} error={base.error} />;
