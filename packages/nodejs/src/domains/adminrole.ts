@@ -83,7 +83,7 @@ const parsePolicy = (policy: Policy): ParsedPolicy => {
 // casbinインスタンスとDBの差異を解消するために同期する
 const sync = async (now = Date.now()): Promise<void> => {
   const casbin = repositoryContainer.getCasbin();
-  if (repositoryContainer.casbinSyncedTime + CASBIN_SYNC_INTERVAL_MSEC > now) {
+  if (repositoryContainer.casbinSyncedTime + CASBIN_SYNC_INTERVAL_MSEC < now) {
     await casbin.loadPolicy();
     repositoryContainer.casbinSyncedTime = now;
   }
