@@ -1,5 +1,12 @@
 # @viron/app
 
+## 2.11.3
+
+### Patch Changes
+
+- 8cf4cc5f: Place a spinner to reduces strange rattling.
+- d10ff970: The borders of the content container are completely clipped.
+
 ## 2.11.2
 
 ### Patch Changes
