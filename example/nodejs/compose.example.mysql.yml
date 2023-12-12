@@ -1,10 +1,10 @@
-
 version: '3.8'
 
 services:
-
   example:
-    build: .
+    build:
+      context: './'
+      dockerfile: ./Dockerfile.example
     restart: always
     depends_on:
       - mysql
@@ -14,11 +14,13 @@ services:
     environment:
       - MODE=mysql
     env_file:
-      - .env
+      - ./.env
     volumes:
-      - $PWD/package.json:/example/nodejs/package.json
-      - $PWD/src:/example/nodejs/src
-      - $PWD/cert:/example/nodejs/cert
+      - ./package.json:/example/nodejs/package.json
+      - ./src:/example/nodejs/src
+      - ./cert:/example/nodejs/cert
+      # - ../../packages/nodejs:/viron/packages/nodejs
+      # - ../../packages/linter:/viron/packages/linter
     command: npm run dev
 
   mysql:
@@ -27,7 +29,7 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - $PWD/data/mysql/db:/var/lib/mysql
+      - ./data/mysql/db:/var/lib/mysql
     env_file: mysql.env
     command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --default-authentication-plugin=mysql_native_password
     networks:

@@ -1,9 +1,10 @@
 version: '3.8'
 
 services:
-
   example:
-    build: .
+    build:
+      context: './'
+      dockerfile: ./Dockerfile.example
     restart: always
     depends_on:
       - mongo
@@ -13,11 +14,13 @@ services:
     environment:
       - MODE=mongo
     env_file:
-      - .env
-    volumes:
-      - $PWD/package.json:/example/nodejs/package.json
-      - $PWD/src:/example/nodejs/src
-      - $PWD/cert:/example/nodejs/cert
+      - ./.env
+    # volumes:
+    #   - ./package.json:/viron/package.json
+    #   - ./src:/viron/src
+    #   - ./cert:/viron/cert
+    #   - ../../packages/nodejs:/viron/packages/nodejs
+    #   - ../../packages/linter:/viron/packages/linter
     command: npm run dev
 
   mongo:
@@ -26,7 +29,7 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - $PWD/data/mongo/db:/data/db
+      - ./data/mongo/db:/data/db
     env_file: mongo.env
     networks:
       default:
