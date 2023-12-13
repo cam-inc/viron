@@ -88,7 +88,12 @@ const Body: React.FC<Props> = ({ className = '', search }) => {
 
   if (isPending) {
     return (
-      <div className={classnames('p-4', className)}>
+      <div
+        className={classnames(
+          'p-4 flex justify-center items-center h-full',
+          className
+        )}
+      >
         <Spinner className="w-8" on={COLOR_SYSTEM.BACKGROUND} />
       </div>
     );
