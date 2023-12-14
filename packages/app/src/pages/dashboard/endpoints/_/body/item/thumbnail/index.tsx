@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import Logo from '~/components/logo';
 import { Endpoint } from '~/types';
 import { Document } from '~/types/oas';
@@ -10,8 +10,9 @@ type Props = {
   className?: string;
 };
 const Thumbnail: React.FC<Props> = ({ document, className }) => {
+  const [thumbnail, setThumbnail] = useState(document?.info['x-thumbnail']);
   const elm = useMemo<JSX.Element>(() => {
-    if (!document?.info['x-thumbnail']) {
+    if (!thumbnail) {
       return (
         <div className="h-full flex items-center">
           <Logo
@@ -24,10 +25,14 @@ const Thumbnail: React.FC<Props> = ({ document, className }) => {
     return (
       <img
         className="block h-full bg-cover bg-center"
-        src={document.info['x-thumbnail']}
+        src={thumbnail}
+        alt=""
+        onError={() => {
+          setThumbnail(undefined);
+        }}
       />
     );
-  }, [document]);
+  }, [thumbnail]);
 
   return (
     <div className={classNames(className, 'rounded overflow-hidden')}>

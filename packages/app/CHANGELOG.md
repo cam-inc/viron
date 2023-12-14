@@ -1,5 +1,12 @@
 # @viron/app
 
+## 2.11.4
+
+### Patch Changes
+
+- 4204d2d2: Move spinner to the center to natural position.
+- 77798b09: Hide broken x-thumbnail if error was thrown.
+
 ## 2.11.3
 
 ### Patch Changes
