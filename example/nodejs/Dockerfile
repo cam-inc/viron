@@ -6,11 +6,11 @@ ENV HOME /example/nodejs
 WORKDIR $HOME
 
 # Copy source files
-COPY package.json ${HOME}/package.json
-COPY src ${HOME}/src
-COPY tsconfig.json ${HOME}/tsconfig.json
-COPY tsconfig.production.json ${HOME}/tsconfig.production.json
-COPY cert ${HOME}/cert
+COPY --chown=node:node package.json ${HOME}/package.json
+COPY --chown=node:node src ${HOME}/src
+COPY --chown=node:node tsconfig.json ${HOME}/tsconfig.json
+COPY --chown=node:node tsconfig.production.json ${HOME}/tsconfig.production.json
+COPY --chown=node:node cert ${HOME}/cert
 
 # Setup project
 RUN npm install --no-progress --legacy-peer-deps && npm cache verify
