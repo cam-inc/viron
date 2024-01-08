@@ -13,7 +13,7 @@ COPY tsconfig.production.json ${HOME}/tsconfig.production.json
 COPY cert ${HOME}/cert
 
 # Setup project
-RUN npm install --no-progress && npm cache verify
+RUN npm install --no-progress --legacy-peer-deps && npm cache verify
 RUN npm run build
 
 EXPOSE 3000
