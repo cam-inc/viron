@@ -1,10 +1,8 @@
 ARG DOCKER_PROXY_HOST="docker.io"
 FROM ${DOCKER_PROXY_HOST}/node:16
 
-RUN mkdir -p /example/nodejs
-RUN chown -R root:root /example/nodejs
+USER node
 ENV HOME /example/nodejs
-USER root
 WORKDIR $HOME
 
 # Copy source files
@@ -19,6 +17,6 @@ RUN npm install --no-progress && npm cache verify
 RUN npm run build
 
 EXPOSE 3000
-USER node
+
 ENTRYPOINT ["npm"]
 CMD ["start"]
