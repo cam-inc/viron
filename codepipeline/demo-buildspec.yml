@@ -2,14 +2,10 @@ version: 0.2
 run-as: root
 
 phases:
-  install:
-    runtime-versions:
-      docker: 18
-
   pre_build:
     commands:
       - echo Login to ECR.
-      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION  | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
       - docker pull $REPOSITORY_URI:latest || true
       - docker login $DOCKER_PROXY_HOST -u $DOCKER_USER_NAME -p $DOCKER_PASSWORD
   build:
