@@ -36,7 +36,7 @@ const _Select = function <T = unknown>({
       <Select
         id={id}
         className={classnames(
-          'block w-full p-1 border rounded focus:outline-none focus:ring-2',
+          'block w-full p-3 border rounded-lg focus:outline-none focus:ring-2',
           `border-thm-on-${on}-low bg-thm-${on} text-thm-on-${on} hover:bg-thm-on-${on}-faint focus:bg-thm-on-${on}-faint focus:text-thm-on-${on} focus:ring-thm-on-${on}`
         )}
       >
