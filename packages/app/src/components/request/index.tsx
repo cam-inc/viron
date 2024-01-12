@@ -9,6 +9,7 @@ import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import Operation from '~/components/operation';
 import Schema from '~/components/schema';
 import { useEliminate } from '~/components/schema/hooks';
+import { useTranslation } from '~/hooks/i18n';
 import { COLOR_SYSTEM, Endpoint } from '~/types/index';
 import {
   Document,
@@ -51,6 +52,7 @@ const _Request: React.FC<Props> = ({
     defaultValues,
   });
   const { ref, execute } = useEliminate();
+  const { t } = useTranslation();
   const _handleSubmit = useMemo(
     () =>
       handleSubmit((data) => {
@@ -191,7 +193,7 @@ const _Request: React.FC<Props> = ({
             type="submit"
             cs={COLOR_SYSTEM.PRIMARY}
             size={BUTTON_SIZE.BASE}
-            label="Submit"
+            label={t('submitButtonLabel')}
             onClick={handleSubmitClick}
           />
         </div>
