@@ -9,6 +9,7 @@ import { BiTestTube } from '@react-icons/all-files/bi/BiTestTube';
 import { BiTrash } from '@react-icons/all-files/bi/BiTrash';
 import React, { useCallback, useMemo } from 'react';
 import Button, { Props as ButtonProps } from '~/components/button';
+import { useI18n } from '~/hooks/i18n';
 import { COLOR_SYSTEM } from '~/types';
 import { METHOD, Request } from '~/types/oas';
 
@@ -42,10 +43,22 @@ const Action: React.FC<Props> = ({ request, onClick }) => {
     onClick();
   }, [onClick]);
 
+  const { language } = useI18n();
+
   const label = useMemo<string>(() => {
     const { operation } = request;
-    if (operation.summary) {
-      return operation.summary;
+    switch (language) {
+      case 'en':
+        if (operation.summary) {
+          return operation.summary;
+        }
+        break;
+      case 'ja':
+        if (operation.description) {
+          return operation.description;
+        } else if (operation.summary) {
+          return operation.summary;
+        }
     }
     return operation.operationId || request.method;
   }, [request]);
