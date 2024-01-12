@@ -78,5 +78,10 @@
     "endpoints": "管理画面",
     "groups": "グループ",
     "dashboard": "ダッシュボード"
-  }
+  },
+  "prependButtonLabel":"先頭に追加",
+  "insertButtonLabel":"挿入",
+  "appendButtonLabel":"追加",
+  "removeButtonLabel":"削除",
+  "submitButtonLabel":"更新"
 }
