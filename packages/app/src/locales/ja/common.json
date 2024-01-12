@@ -20,6 +20,17 @@
   "endpoints": "管理画面",
   "group": "グループ",
   "groups": "グループ",
+  "createGroup":{
+    "head":{
+      "title":"グループの作成",
+      "description":"エンドポイントをグループで管理します"
+    },
+    "idFormLabel":"ID",
+    "nameFormLabel":"グループ名",
+    "descriptionFormLabel":"説明",
+    "addButtonLabel":"追加",
+    "cancelButtonLabel":"キャンセル"
+  },
   "endpointsTabLabel": "$t(endpoints)",
   "groupsTabLabel": "$t(groups)",
   "dashboard": {
