@@ -66,7 +66,7 @@ const Add: React.FC<Props> = ({ onAdd, onCancel }) => {
           <Head
             on={COLOR_SYSTEM.SURFACE}
             title={t('createGroup.head.title')}
-            description={t('createGroup.head.description')} //エンドポイントをグループで管理します。
+            description={t('createGroup.head.description')}
           />
         </div>
         <div className="space-y-4">
