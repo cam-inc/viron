@@ -98,7 +98,7 @@ const Button = function <T = null>({
           )}
         />
         {Icon && <Icon className="flex-none w-[1.2em]" />}
-        {label && <span className="flex-1 truncate text-left">{label}</span>}
+        {label && <span className="flex-1 truncate">{label}</span>}
         {IconRight && <IconRight className="flex-none w-[1.2em]" />}
       </span>
     </button>
