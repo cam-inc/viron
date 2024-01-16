@@ -1,5 +1,14 @@
 # @viron/app
 
+## 2.11.5
+
+### Patch Changes
+
+- 3c66431c: align the label inside the button to the left
+- 1d4039dc: align the label inside the button to the left
+- 9d73d6a5: fixed localization leaks
+- e7ec4bef: add padding to input form
+
 ## 2.11.4
 
 ### Patch Changes

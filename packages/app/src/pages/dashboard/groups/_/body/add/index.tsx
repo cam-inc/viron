@@ -6,6 +6,7 @@ import Button, { Props as ButtonProps } from '~/components/button';
 import Head from '~/components/head';
 import Textinput from '~/components/textinput';
 import { useEndpoint } from '~/hooks/endpoint';
+import { useTranslation } from '~/hooks/i18n';
 import { COLOR_SYSTEM, EndpointGroup } from '~/types';
 
 export type Props = {
@@ -14,6 +15,7 @@ export type Props = {
 };
 const Add: React.FC<Props> = ({ onAdd, onCancel }) => {
   const { addGroup } = useEndpoint();
+  const { t } = useTranslation();
 
   const schema = useMemo(
     () =>
@@ -63,28 +65,28 @@ const Add: React.FC<Props> = ({ onAdd, onCancel }) => {
         <div>
           <Head
             on={COLOR_SYSTEM.SURFACE}
-            title="Create a Group"
-            description="Manage endpoints in groups."
+            title={t('createGroup.head.title')}
+            description={t('createGroup.head.description')}
           />
         </div>
         <div className="space-y-4">
           <Textinput
             type="text"
-            label="ID"
+            label={t('createGroup.idFormLabel')}
             on={COLOR_SYSTEM.SURFACE}
             error={formState.errors.id}
             render={(bind) => <input {...bind} {...register('id')} />}
           />
           <Textinput
             type="text"
-            label="Name"
+            label={t('createGroup.nameFormLabel')}
             on={COLOR_SYSTEM.SURFACE}
             error={formState.errors.name}
             render={(bind) => <input {...bind} {...register('name')} />}
           />
           <Textinput
             type="text"
-            label="Description"
+            label={t('createGroup.descriptionFormLabel')}
             on={COLOR_SYSTEM.SURFACE}
             error={formState.errors.description}
             render={(bind) => <input {...bind} {...register('description')} />}
@@ -94,13 +96,13 @@ const Add: React.FC<Props> = ({ onAdd, onCancel }) => {
           <Button
             variant="outlined"
             on={COLOR_SYSTEM.SURFACE}
-            label="Cancel"
+            label={t('createGroup.cancelButtonLabel')}
             onClick={handleCancelClick}
           />
           <Button
             type="submit"
             cs={COLOR_SYSTEM.PRIMARY}
-            label="Add"
+            label={t('createGroup.addButtonLabel')}
             onClick={handleAddClick}
           />
         </div>

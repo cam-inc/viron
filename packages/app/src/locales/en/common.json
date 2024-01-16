@@ -20,6 +20,17 @@
   "endpoints": "Endpoints",
   "group": "Group",
   "groups": "Groups",
+  "createGroup":{
+    "head":{
+      "title":"Create a Group",
+      "description":"Manage endpoints in groups"
+    },
+    "idFormLabel":"ID",
+    "nameFormLabel":"Name",
+    "descriptionFormLabel":"description",
+    "addButtonLabel":"Add",
+    "cancelButtonLabel":"Cancel"
+  },
   "endpointsTabLabel": "$t(endpoints)",
   "groupsTabLabel": "$t(groups)",
   "dashboard": {
@@ -67,5 +78,10 @@
     "endpoints": "Endpoints",
     "groups": "Groups",
     "dashboard": "Dashboard"
-  }
+  },
+  "prependButtonLabel":"Prepend",
+  "insertButtonLabel":"Insert",
+  "appendButtonLabel":"Append",
+  "removeButtonLabel":"Remove",
+  "submitButtonLabel":"Submit"
 }

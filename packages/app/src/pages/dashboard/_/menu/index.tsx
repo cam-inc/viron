@@ -26,12 +26,12 @@ const Menu: React.FC<Props> = ({ className }) => {
       </div>
       {/* Menu */}
       <Popover.renewal {...menuPopover.bind}>
-        <ul className="flex flex-col gap-2">
+        <ul className="space-y-2">
           <li>
-            <Import className="w-full" />
+            <Import />
           </li>
           <li>
-            <Export className="w-full" />
+            <Export />
           </li>
         </ul>
       </Popover.renewal>

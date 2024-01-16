@@ -11,6 +11,7 @@ import { getDefaultValue } from '~/utils/oas';
 import { getRegisterOptions } from '~/utils/oas/v8n';
 import { useNameForError } from '../../hooks';
 import { Props } from '../../index';
+import { useTranslation } from '~/hooks/i18n';
 
 // Functions like `append` from useFieldArray accepts argument of type object only.
 // Use `setValue` to append data of type other than object.
@@ -35,6 +36,8 @@ const SchemaOfTypeArray: React.FC<Props> = ({
 }) => {
   const data: any[] | undefined = getValues(name);
   const nameForError = useNameForError({ schema, name });
+  const { t } = useTranslation();
+
   useEffect(() => {
     if (!isDeepActive) {
       clearErrors(nameForError);
@@ -107,7 +110,7 @@ const SchemaOfTypeArray: React.FC<Props> = ({
           on={on}
           size={BUTTON_SIZE.XS}
           Icon={PlusIcon}
-          label="Prepend"
+          label={t('prependButtonLabel')}
           onClick={handlePrependClick}
         />
       )}
@@ -140,7 +143,7 @@ const SchemaOfTypeArray: React.FC<Props> = ({
                 size={BUTTON_SIZE.XS}
                 data={index}
                 Icon={MinusIcon}
-                label="Remove"
+                label={t('removeButtonLabel')}
                 onClick={handleRemoveClick}
               />
             )}
@@ -153,7 +156,7 @@ const SchemaOfTypeArray: React.FC<Props> = ({
               size={BUTTON_SIZE.XS}
               data={index + 1}
               Icon={PlusIcon}
-              label="Insert"
+              label={t('insertButtonLabel')}
               onClick={handleInsertClick}
             />
           )}
@@ -165,7 +168,7 @@ const SchemaOfTypeArray: React.FC<Props> = ({
         on={on}
         size={BUTTON_SIZE.XS}
         Icon={PlusIcon}
-        label="Append"
+        label={t('appendButtonLabel')}
         onClick={handleAppendClick}
       />
     </div>

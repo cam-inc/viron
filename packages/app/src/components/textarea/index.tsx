@@ -26,7 +26,7 @@ const Textarea: React.FC<Props> = ({
 }) => {
   const bind: Bind = {
     className: classnames(
-      'block w-full p-1 border rounded focus:outline-none focus:ring-2',
+      'block w-full p-3 border rounded focus:outline-none focus:ring-2',
       `border-thm-on-${on}-faint bg-thm-${on} text-thm-on-${on} focus:bg-thm-on-${on}-faint focus:text-thm-on-${on}  focus:ring-thm-on-${on}`
     ),
   };
