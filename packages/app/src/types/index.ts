@@ -31,6 +31,7 @@ export type EndpointGroup = {
   name: string;
   description?: string;
   priority?: number;
+  isOpenToggle?: boolean;
 };
 
 export type EndpointID = string;

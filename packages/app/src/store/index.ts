@@ -102,3 +102,6 @@ export const useEndpointGroupListItemGlobalStateValue = (
 export const useEndpointGroupListItemGlobalStateSet = (
   params: Parameters<typeof endpointGroupListItemSelector>[0]
 ) => useGlobalStateSet(endpointGroupListItemSelector(params));
+
+export const useEndpointGroupToggleState = () =>
+  useGlobalState(endpointGroupListAtom);

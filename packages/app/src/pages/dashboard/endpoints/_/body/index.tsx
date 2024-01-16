@@ -7,7 +7,7 @@ import Head from '~/components/head';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import PlusIcon from '~/components/icon/plus/outline';
-import { useEndpoint } from '~/hooks/endpoint';
+import { useEndpoint, useEndpointGroupToggle } from '~/hooks/endpoint';
 import { Trans, useTranslation } from '~/hooks/i18n';
 import { Props as LayoutProps } from '~/layouts/';
 import Modal, { useModal } from '~/portals/modal';
@@ -143,12 +143,12 @@ type GroupProps = {
   list: Endpoint[];
 };
 const Group: React.FC<GroupProps> = ({ group, list }) => {
-  const [isOpened, setIsOpened] = useState<boolean>(!!list.length);
+  const { isOpenToggle, setIsOpenToggle } = useEndpointGroupToggle(group.id);
   const handleToggleClick = () => {
-    setIsOpened((currVal) => !currVal);
+    setIsOpenToggle();
   };
 
-  const ToggleIcon = isOpened ? ChevronDownIcon : ChevronRightIcon;
+  const ToggleIcon = isOpenToggle ? ChevronDownIcon : ChevronRightIcon;
 
   return (
     <div>
@@ -177,7 +177,7 @@ const Group: React.FC<GroupProps> = ({ group, list }) => {
         className={classnames(
           'grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 mt-2 py-2',
           {
-            hidden: !isOpened,
+            hidden: !isOpenToggle,
           }
         )}
       >
