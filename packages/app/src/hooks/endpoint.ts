@@ -927,10 +927,8 @@ export const useEndpoint = (): UseEndpointReturn => {
 export const useEndpointGroupToggle = (id: string) => {
   const [endpointGroups, setEndpointGroups] = useEndpointGroupToggleState();
 
-  const endpointGroup = endpointGroups.find((group) => group.id === id);
-  const isOpenToggle = endpointGroup
-    ? endpointGroup.isOpenToggle ?? false
-    : false;
+  const isOpenToggle =
+    endpointGroups.find((group) => group.id === id)?.isOpenToggle ?? false;
 
   const setIsOpenToggle = () => {
     setEndpointGroups((groups) => {
