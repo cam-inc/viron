@@ -16,12 +16,12 @@
     "test": "echo TEST"
   },
   "dependencies": {
-    "@docusaurus/core": "2.0.0-beta.17",
-    "@docusaurus/preset-classic": "2.0.0-beta.17",
-    "@mdx-js/react": "^1.6.21",
-    "clsx": "^1.1.1",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "@docusaurus/core": "3.1.0",
+    "@docusaurus/preset-classic": "3.1.0",
+    "@mdx-js/react": "3.0.0",
+    "clsx": "2.1.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
   },
   "browserslist": {
     "production": [
@@ -36,7 +36,7 @@
     ]
   },
   "engines": {
-    "node": ">=15.13.0",
-    "npm": ">=7.9.0"
+    "node": ">=18.14.0",
+    "npm": ">=9.3.1"
   }
 }
