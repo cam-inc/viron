@@ -83,5 +83,13 @@
   "insertButtonLabel":"Insert",
   "appendButtonLabel":"Append",
   "removeButtonLabel":"Remove",
-  "submitButtonLabel":"Submit"
+  "submitButtonLabel":"Submit",
+  "cancelButtonLabel":"Cancel",
+  "moveUpButtonLabel":"Move Up",
+  "moveDownButtonLabel":"Move Down",
+  "menuButtonLabel":"Menu",
+  "removeModal":{
+    "title":"Remove a Group",
+    "description":"Really want to remove it? The endpoints in the group will remain ungrouped."
+  }
 }
