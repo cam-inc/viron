@@ -31,6 +31,7 @@ export type EndpointGroup = {
   name: string;
   description?: string;
   priority?: number;
+  isOpen?: boolean;
 };
 
 export type EndpointID = string;

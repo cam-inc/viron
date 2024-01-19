@@ -28,6 +28,7 @@ import {
   useEndpointListUngroupedGlobalStateValue,
   useEndpointGroupListGlobalStateSet,
   useEndpointGroupListSortedGlobalStateValue,
+  useEndpointGroupListGlobalState,
 } from '~/store';
 import {
   Endpoint,
@@ -921,4 +922,20 @@ export const useEndpoint = (): UseEndpointReturn => {
     ]
   );
   return ret;
+};
+
+export const useEndpointGroupToggle = (id: string) => {
+  const [endpointGroups, setEndpointGroups] = useEndpointGroupListGlobalState();
+  const endpointGroup = endpointGroups.find((group) => group.id === id);
+  const isOpen = endpointGroup?.isOpen ?? false;
+
+  const toggle = () => {
+    setEndpointGroups((groups) => {
+      return groups.map((group) => {
+        return group.id === id ? { ...group, isOpen: !isOpen } : group;
+      });
+    });
+  };
+
+  return { isOpen, toggle };
 };
