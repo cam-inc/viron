@@ -143,10 +143,7 @@ type GroupProps = {
   list: Endpoint[];
 };
 const Group: React.FC<GroupProps> = ({ group, list }) => {
-  const { isOpen, setIsOpenToggle } = useEndpointGroupToggle(group.id);
-  const handleToggleClick = () => {
-    setIsOpenToggle();
-  };
+  const { isOpen, toggle } = useEndpointGroupToggle(group.id);
 
   const ToggleIcon = isOpen ? ChevronDownIcon : ChevronRightIcon;
 
@@ -155,7 +152,7 @@ const Group: React.FC<GroupProps> = ({ group, list }) => {
       {/* Head */}
       <button
         className="flex gap-1 w-full hover:bg-thm-on-background-faint py-2 rounded"
-        onClick={handleToggleClick}
+        onClick={toggle}
       >
         <span className="p-0.5">
           <ToggleIcon className="w-4 h-4" />

@@ -926,25 +926,16 @@ export const useEndpoint = (): UseEndpointReturn => {
 
 export const useEndpointGroupToggle = (id: string) => {
   const [endpointGroups, setEndpointGroups] = useEndpointGroupListGlobalState();
+  const endpointGroup = endpointGroups.find((group) => group.id === id);
+  const isOpen = endpointGroup?.isOpen ?? false;
 
-  const isOpen =
-    endpointGroups.find((group) => group.id === id)?.isOpenToggle ?? false;
-
-  const setIsOpenToggle = () => {
+  const toggle = () => {
     setEndpointGroups((groups) => {
-      const index = groups.findIndex((group) => group.id === id);
-
-      if (index === -1) {
-        return groups;
-      }
-
-      return groups.map((group, i) =>
-        i === index
-          ? { ...group, isOpenToggle: group.isOpenToggle !== true }
-          : group
-      );
+      return groups.map((group) => {
+        return group.id === id ? { ...group, isOpen: !isOpen } : group;
+      });
     });
   };
 
-  return { isOpen, setIsOpenToggle };
+  return { isOpen, toggle };
 };
