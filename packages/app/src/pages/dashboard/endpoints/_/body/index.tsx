@@ -143,12 +143,12 @@ type GroupProps = {
   list: Endpoint[];
 };
 const Group: React.FC<GroupProps> = ({ group, list }) => {
-  const { isOpenToggle, setIsOpenToggle } = useEndpointGroupToggle(group.id);
+  const { isOpen, setIsOpenToggle } = useEndpointGroupToggle(group.id);
   const handleToggleClick = () => {
     setIsOpenToggle();
   };
 
-  const ToggleIcon = isOpenToggle ? ChevronDownIcon : ChevronRightIcon;
+  const ToggleIcon = isOpen ? ChevronDownIcon : ChevronRightIcon;
 
   return (
     <div>
@@ -177,7 +177,7 @@ const Group: React.FC<GroupProps> = ({ group, list }) => {
         className={classnames(
           'grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 mt-2 py-2',
           {
-            hidden: !isOpenToggle,
+            hidden: !isOpen,
           }
         )}
       >
