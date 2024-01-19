@@ -159,5 +159,5 @@ For **Example Response**,
 Visit the Viron endpoint page and select `Page Two`, and you will see the users' table.
 
 :::note
-Visit documentations for [content](/docs/Advanced-Guides/contet) and [content-table](/docs/Advanced-Guides/content-table) for detail.
+Visit documentations for [content](/docs/Advanced-Guides/content) and [content-table](/docs/Advanced-Guides/content-table) for detail.
 :::
