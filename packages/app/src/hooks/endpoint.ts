@@ -28,7 +28,7 @@ import {
   useEndpointListUngroupedGlobalStateValue,
   useEndpointGroupListGlobalStateSet,
   useEndpointGroupListSortedGlobalStateValue,
-  useEndpointGroupToggleState,
+  useEndpointGroupListGlobalState,
 } from '~/store';
 import {
   Endpoint,
@@ -925,7 +925,7 @@ export const useEndpoint = (): UseEndpointReturn => {
 };
 
 export const useEndpointGroupToggle = (id: string) => {
-  const [endpointGroups, setEndpointGroups] = useEndpointGroupToggleState();
+  const [endpointGroups, setEndpointGroups] = useEndpointGroupListGlobalState();
 
   const isOpenToggle =
     endpointGroups.find((group) => group.id === id)?.isOpenToggle ?? false;
