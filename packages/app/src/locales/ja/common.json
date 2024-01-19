@@ -83,5 +83,13 @@
   "insertButtonLabel":"挿入",
   "appendButtonLabel":"追加",
   "removeButtonLabel":"削除",
-  "submitButtonLabel":"更新"
+  "submitButtonLabel":"更新",
+  "cancelButtonLabel":"キャンセル",
+  "moveUpButtonLabel":"上に移動",
+  "moveDownButtonLabel":"下に移動",
+  "menuButtonLabel":"メニュー",
+  "removeModal":{
+    "title":"グループを削除する",
+    "description":"本当に削除しますか? グループ内のエンドポイントはグループ化されないままになります。"
+  }
 }

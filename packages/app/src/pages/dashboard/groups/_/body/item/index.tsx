@@ -6,6 +6,7 @@ import ArrowUpIcon from '~/components/icon/arrowCircleUp/outline';
 import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/outline';
 import TrashIcon from '~/components/icon/trash/outline';
 import { useEndpoint } from '~/hooks/endpoint';
+import { useTranslation } from '~/hooks/i18n';
 import Modal, { useModal } from '~/portals/modal';
 import Popover, { usePopover } from '~/portals/popover';
 import { COLOR_SYSTEM, EndpointGroup } from '~/types';
@@ -15,6 +16,7 @@ export type Props = {
 };
 const Item: React.FC<Props> = ({ group }) => {
   const { removeGroup, ascendGroup, descendGroup } = useEndpoint();
+  const { t } = useTranslation();
 
   const menuPopover = usePopover<HTMLDivElement>();
   const handleMenuClick = useCallback<ButtonProps['onClick']>(() => {
@@ -70,7 +72,7 @@ const Item: React.FC<Props> = ({ group }) => {
               variant="text"
               on={COLOR_SYSTEM.BACKGROUND}
               Icon={DotsCircleHorizontalIcon}
-              label="Menu"
+              label={t('menuButtonLabel')}
               onClick={handleMenuClick}
             />
           </div>
@@ -85,7 +87,7 @@ const Item: React.FC<Props> = ({ group }) => {
        */}
           <Button
             on={COLOR_SYSTEM.BACKGROUND}
-            label="Remove"
+            label={t('removeButtonLabel')}
             Icon={TrashIcon}
             onClick={handleRemoveClick}
           />
@@ -95,14 +97,14 @@ const Item: React.FC<Props> = ({ group }) => {
         <Button
           variant="text"
           on={COLOR_SYSTEM.BACKGROUND}
-          label="Move Up"
+          label={t('moveUpButtonLabel')}
           Icon={ArrowUpIcon}
           onClick={handleUpClick}
         />
         <Button
           variant="text"
           on={COLOR_SYSTEM.BACKGROUND}
-          label="Move Down"
+          label={t('moveDownButtonLabel')}
           Icon={ArrowDownIcon}
           onClick={handleDownClick}
         />
@@ -126,6 +128,8 @@ const RemoveConfirmation: React.FC<RemoveConfirmationProps> = ({
   onRequestCancel,
   onRequestRemove,
 }) => {
+  const { t } = useTranslation();
+
   const handleCancelClick = useCallback<ButtonProps['onClick']>(() => {
     onRequestCancel();
   }, [onRequestCancel]);
@@ -138,19 +142,19 @@ const RemoveConfirmation: React.FC<RemoveConfirmationProps> = ({
     <div className="space-y-8">
       <Head
         on={COLOR_SYSTEM.SURFACE}
-        title="Remove a Group"
-        description="Really want to remove it? The endpoints in the group will remain ungrouped."
+        title={t('removeModal.title')}
+        description={t('removeModal.description')}
       />
       <div className="flex justify-end gap-2">
         <Button
           variant="outlined"
           on={COLOR_SYSTEM.SURFACE}
-          label="Cancel"
+          label={t('cancelButtonLabel')}
           onClick={handleCancelClick}
         />
         <Button
           cs={COLOR_SYSTEM.PRIMARY}
-          label="Remove"
+          label={t('removeButtonLabel')}
           onClick={handleRemoveClick}
         />
       </div>
