@@ -1,5 +1,11 @@
 # @viron/website
 
+## 0.4.0
+
+### Minor Changes
+
+- 5a2036e8: update docusaurus v3
+
 ## 0.3.1
 
 ### Patch Changes
