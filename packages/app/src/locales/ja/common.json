@@ -63,6 +63,16 @@
     "addButtonLabel": "追加する",
     "cancelButtonLabel": "キャンセル"
   },
+  "editEndpoint":{
+    "title": "$t(endpoint)の編集",
+    "idInputLabel": "タイトル",
+    "urlInputLabel": "URL",
+    "groupInputLabel": "グループへ追加",
+    "groupInputDescription": "管理画面を任意のグループに追加できます。グループの追加はダッシュボードから行えます。",
+    "updateButtonLabel": "更新する",
+    "cancelButtonLabel": "キャンセル"
+  },
+  "endpointEditButtonLabel":"編集",
   "endpointInformationButtonLabel": "詳細情報",
   "endpointQRCodeShareButtonLabel": "QRコードの共有",
   "removeEndpointButtonLabel": "削除",

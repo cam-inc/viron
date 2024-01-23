@@ -22,6 +22,8 @@ import Qrcode from './qrcode';
 import Signin from './signin/';
 import Signout, { Props as SignoutProps } from './signout/';
 import Thumbnail from './thumbnail/';
+import PencilIcon from '~/components/icon/pencil/outline';
+import EditEndpoint from './edit';
 
 export type Props = {
   endpoint: Endpoint;
@@ -114,12 +116,19 @@ const _Item: React.FC<{
   const { navigate, removeEndpoint } = useEndpoint();
 
   const menuPopover = usePopover<HTMLDivElement>();
+
+  const editModal = useModal();
   const infoModal = useModal();
   const qrcodeModal = useModal();
 
   const handleMenuClick = useCallback(() => {
     menuPopover.open();
   }, [menuPopover]);
+
+  const handleEditClick = useCallback<ButtonProps['onClick']>(() => {
+    menuPopover.close();
+    editModal.open();
+  }, [menuPopover, editModal]);
 
   const handleInfoClick = useCallback<ButtonProps['onClick']>(() => {
     menuPopover.close();
@@ -222,6 +231,15 @@ const _Item: React.FC<{
           <Button
             variant="text"
             on={COLOR_SYSTEM.SURFACE}
+            Icon={PencilIcon}
+            label={t('endpointEditButtonLabel')}
+            onClick={handleEditClick}
+          />
+        </div>
+        <div>
+          <Button
+            variant="text"
+            on={COLOR_SYSTEM.SURFACE}
             Icon={InformationCircleIcon}
             label={t('endpointInformationButtonLabel')}
             onClick={handleInfoClick}
@@ -246,6 +264,14 @@ const _Item: React.FC<{
           />
         </div>
       </Popover>
+      {/* Edit */}
+      <Modal {...editModal.bind}>
+        <EditEndpoint
+          onAdd={editModal.close}
+          onCancel={editModal.close}
+          endpoint={endpoint}
+        />
+      </Modal>
       {/* Info */}
       <Modal {...infoModal.bind}>
         <Info endpoint={endpoint} document={document || undefined} />
