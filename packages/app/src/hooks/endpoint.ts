@@ -19,7 +19,7 @@ import {
   OASError,
   UnexpectedError,
   getHTTPError,
-  EndpointUndefindedError,
+  EndpointUndefinedError,
 } from '~/errors';
 import { useI18n } from '~/hooks/i18n';
 import { remove, KEY, set } from '~/storage';
@@ -389,7 +389,7 @@ export const useEndpoint = (): UseEndpointReturn => {
       const index = endpointList.findIndex((item) => item.id === currentId);
       if (index === -1) {
         return {
-          error: new EndpointUndefindedError(),
+          error: new EndpointUndefinedError(),
         };
       }
 
