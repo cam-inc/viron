@@ -13,18 +13,12 @@ import { ClassName, COLOR_SYSTEM, Endpoint, EndpointGroup } from '~/types';
 import { endpointId, url } from '~/utils/v8n';
 
 export type Props = {
-  className?: ClassName;
   onAdd: () => void;
   onCancel: () => void;
   endpoint: Endpoint;
 };
 
-const EditEndpoint: React.FC<Props> = ({
-  className = '',
-  onAdd,
-  onCancel,
-  endpoint,
-}) => {
+const EditEndpoint: React.FC<Props> = ({ onAdd, onCancel, endpoint }) => {
   const { t } = useTranslation();
   const { groupList, connect, editEndpoint } = useEndpoint();
 
@@ -81,7 +75,7 @@ const EditEndpoint: React.FC<Props> = ({
   }, []);
 
   return (
-    <div className={className}>
+    <div>
       <form className="space-y-8" onSubmit={handleSubmit}>
         <Head
           className="pb-3 mb-8 border-b border-thm-on-surface-faint"
