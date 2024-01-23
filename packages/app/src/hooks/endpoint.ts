@@ -19,6 +19,7 @@ import {
   OASError,
   UnexpectedError,
   getHTTPError,
+  EndpointUndefindedError,
 } from '~/errors';
 import { useI18n } from '~/hooks/i18n';
 import { remove, KEY, set } from '~/storage';
@@ -165,6 +166,18 @@ export type UseEndpointReturn = {
         >;
       };
   addEndpoint: (
+    endpoint: Endpoint,
+    options?: { resolveDuplication: boolean }
+  ) => Promise<
+    | {
+        error: BaseError;
+      }
+    | {
+        error: null;
+      }
+  >;
+  editEndpoint: (
+    currentId: string,
     endpoint: Endpoint,
     options?: { resolveDuplication: boolean }
   ) => Promise<
@@ -360,6 +373,47 @@ export const useEndpoint = (): UseEndpointReturn => {
         }
       }
       setEndpointList((currVal) => [...currVal, _endpoint]);
+      return {
+        error: null,
+      };
+    },
+    [endpointList, setEndpointList]
+  );
+
+  const editEndpoint = useCallback<UseEndpointReturn['editEndpoint']>(
+    async (
+      currentId,
+      endpoint,
+      { resolveDuplication } = { resolveDuplication: false }
+    ) => {
+      const index = endpointList.findIndex((item) => item.id === currentId);
+      if (index === -1) {
+        return {
+          error: new EndpointUndefindedError(),
+        };
+      }
+
+      const updatedEndpoint = { ...endpointList[index], ...endpoint };
+      if (
+        endpointList.some(
+          (item, idx) => item.id === updatedEndpoint.id && idx !== index
+        )
+      ) {
+        if (resolveDuplication) {
+          updatedEndpoint.id = `${updatedEndpoint.id}-${Math.random()}`;
+        } else {
+          return {
+            error: new EndpointDuplicatedError(),
+          };
+        }
+      }
+
+      setEndpointList((currVal) => [
+        ...currVal.slice(0, index),
+        updatedEndpoint,
+        ...currVal.slice(index + 1),
+      ]);
+
       return {
         error: null,
       };
@@ -890,6 +944,7 @@ export const useEndpoint = (): UseEndpointReturn => {
       prepareSigninOAuthCallback,
       prepareSignout,
       addEndpoint,
+      editEndpoint,
       removeEndpoint,
       addGroup,
       removeGroup,
@@ -912,6 +967,7 @@ export const useEndpoint = (): UseEndpointReturn => {
       prepareSigninOAuthCallback,
       prepareSignout,
       addEndpoint,
+      editEndpoint,
       removeEndpoint,
       addGroup,
       removeGroup,
