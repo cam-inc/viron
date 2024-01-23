@@ -392,7 +392,6 @@ export const useEndpoint = (): UseEndpointReturn => {
         };
       }
 
-      // const updatedEndpoint = { ...endpointList[index], ...endpoint };
       if (
         endpointList.some(
           (item, idx) => item.id === endpoint.id && idx !== index
