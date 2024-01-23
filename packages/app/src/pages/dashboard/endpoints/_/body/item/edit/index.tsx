@@ -46,6 +46,7 @@ const EditEndpoint: React.FC<Props> = ({
     watch,
   } = useForm<Pick<Endpoint, 'id' | 'url' | 'groupId'> & { manual?: string }>({
     resolver: yupResolver(schema),
+    defaultValues: endpoint,
   });
   const handleSubmit = useMemo(
     () =>
@@ -95,12 +96,7 @@ const EditEndpoint: React.FC<Props> = ({
             on={COLOR_SYSTEM.SURFACE}
             error={formState.errors.id}
             render={(bind) => (
-              <input
-                placeholder={endpoint.id}
-                defaultValue={endpoint.id}
-                {...bind}
-                {...register('id')}
-              />
+              <input placeholder={endpoint.id} {...bind} {...register('id')} />
             )}
           />
           <Textinput.renewal
@@ -111,7 +107,6 @@ const EditEndpoint: React.FC<Props> = ({
             render={(bind) => (
               <input
                 placeholder={endpoint.url}
-                defaultValue={endpoint.url}
                 {...bind}
                 {...register('url')}
               />
@@ -126,7 +121,6 @@ const EditEndpoint: React.FC<Props> = ({
               <select
                 id={id}
                 className={className}
-                defaultValue={endpoint.groupId}
                 value={watch('groupId')}
                 {...register('groupId')}
               >
