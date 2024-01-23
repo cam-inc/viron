@@ -392,14 +392,14 @@ export const useEndpoint = (): UseEndpointReturn => {
         };
       }
 
-      const updatedEndpoint = { ...endpointList[index], ...endpoint };
+      // const updatedEndpoint = { ...endpointList[index], ...endpoint };
       if (
         endpointList.some(
-          (item, idx) => item.id === updatedEndpoint.id && idx !== index
+          (item, idx) => item.id === endpoint.id && idx !== index
         )
       ) {
         if (resolveDuplication) {
-          updatedEndpoint.id = `${updatedEndpoint.id}-${Math.random()}`;
+          endpoint.id = `${endpoint.id}-${Math.random()}`;
         } else {
           return {
             error: new EndpointDuplicatedError(),
@@ -409,7 +409,7 @@ export const useEndpoint = (): UseEndpointReturn => {
 
       setEndpointList((currVal) => [
         ...currVal.slice(0, index),
-        updatedEndpoint,
+        endpoint,
         ...currVal.slice(index + 1),
       ]);
 
