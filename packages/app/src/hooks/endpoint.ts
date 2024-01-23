@@ -180,14 +180,13 @@ export type UseEndpointReturn = {
     currentId: string,
     endpoint: Endpoint,
     options?: { resolveDuplication: boolean }
-  ) => Promise<
+  ) =>
     | {
         error: BaseError;
       }
     | {
         error: null;
-      }
-  >;
+      };
   removeEndpoint: (endpointId: EndpointID) => void;
   addGroup: (endpointGroup: EndpointGroup) => {
     error: EndpointGroupError | null;
@@ -381,7 +380,7 @@ export const useEndpoint = (): UseEndpointReturn => {
   );
 
   const editEndpoint = useCallback<UseEndpointReturn['editEndpoint']>(
-    async (
+    (
       currentId,
       endpoint,
       { resolveDuplication } = { resolveDuplication: false }

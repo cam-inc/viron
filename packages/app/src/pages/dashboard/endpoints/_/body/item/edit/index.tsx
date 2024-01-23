@@ -61,7 +61,7 @@ const EditEndpoint: React.FC<Props> = ({
         }
 
         //古いIDを第一引数に入力
-        const updation = await editEndpoint(endpoint.id, data);
+        const updation = editEndpoint(endpoint.id, data);
         if (updation.error) {
           setError('manual', {
             type: 'manual',
