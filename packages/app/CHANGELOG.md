@@ -1,5 +1,16 @@
 # @viron/app
 
+## 2.12.0
+
+### Minor Changes
+
+- 432e1773: retains group toggle open status
+- c4320f59: ability to modify endpoints
+
+### Patch Changes
+
+- a61140ed: Fixed missing localization on Groups page
+
 ## 2.11.5
 
 ### Patch Changes
