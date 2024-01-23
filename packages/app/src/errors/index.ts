@@ -86,9 +86,9 @@ export class EndpointDuplicatedError extends EndpointError {
   name = 'Endpoint Duplicated Error';
 }
 
-export class EndpointUndefindedError extends EndpointError {
+export class EndpointUndefinedError extends EndpointError {
   code = '#endpointDuplicated';
-  name = 'Endpoint Undefinded Error';
+  name = 'Endpoint Undefined Error';
 }
 
 export class EndpointExportError extends EndpointError {
