@@ -87,7 +87,7 @@ export class EndpointDuplicatedError extends EndpointError {
 }
 
 export class EndpointUndefinedError extends EndpointError {
-  code = '#endpointDuplicated';
+  code = '#endpointUndefined';
   name = 'Endpoint Undefined Error';
 }
 
