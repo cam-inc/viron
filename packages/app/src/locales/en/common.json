@@ -63,6 +63,16 @@
     "addButtonLabel": "Create",
     "cancelButtonLabel": "Cancel"
   },
+  "editEndpoint":{
+    "title": "Edit an $t(endpoint)",
+    "idInputLabel": "ID",
+    "urlInputLabel": "URL",
+    "groupInputLabel": "$t(group)",
+    "groupInputDescription": "You can add the $t(endpoint) to any group. Groups can be added from the dashboard.",
+    "updateButtonLabel": "Update",
+    "cancelButtonLabel": "Cancel"
+  },
+  "endpointEditButtonLabel":"Edit",
   "endpointInformationButtonLabel": "Information",
   "endpointQRCodeShareButtonLabel": "QR Code",
   "removeEndpointButtonLabel": "Remove",
@@ -83,5 +93,13 @@
   "insertButtonLabel":"Insert",
   "appendButtonLabel":"Append",
   "removeButtonLabel":"Remove",
-  "submitButtonLabel":"Submit"
+  "submitButtonLabel":"Submit",
+  "cancelButtonLabel":"Cancel",
+  "moveUpButtonLabel":"Move Up",
+  "moveDownButtonLabel":"Move Down",
+  "menuButtonLabel":"Menu",
+  "removeModal":{
+    "title":"Remove a Group",
+    "description":"Really want to remove it? The endpoints in the group will remain ungrouped."
+  }
 }

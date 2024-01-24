@@ -104,5 +104,5 @@ For **Example Response**,
 Visit the Viron endpoint page and select `Page One`, and you will see the DAU number.
 
 :::note
-Visit documentations for [content](/docs/Advanced-Guides/contet) and [content-number](/docs/Advanced-Guides/content-number) for detail.
+Visit documentations for [content](/docs/Advanced-Guides/content) and [content-number](/docs/Advanced-Guides/content-number) for detail.
 :::

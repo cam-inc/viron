@@ -1,35 +1,32 @@
 // @see: https://docusaurus.io/docs/docusaurus.config.js
 module.exports = {
-  title: 'VIRON',
-  tagline: 'The Magic to Turn OAS into GUI.',
-  url: process.env.VIRON_WEBSITE_URL || 'https://discovery.viron.plus',
-  baseUrl: '/',
-  favicon: 'img/favicon.ico',
+  title: "VIRON",
+  tagline: "The Magic to Turn OAS into GUI.",
+  url: process.env.VIRON_WEBSITE_URL || "https://discovery.viron.plus",
+  baseUrl: "/",
+  favicon: "img/favicon.ico",
   i18n: {
-    defaultLocale: 'en',
-    locales: ['en', 'ja'],
+    defaultLocale: "en",
+    locales: ["en", "ja"],
   },
-  onBrokenLinks: 'warn',
-  onBrokenMarkdownLinks: 'warn',
-  onDuplicateRoutes: 'warn',
-  organizationName: 'CAM, Inc.',
-  projectName: 'viron',
+  organizationName: "CAM, Inc.",
+  projectName: "viron",
   themeConfig: {
     colorMode: {
-      defaultMode: 'dark',
+      defaultMode: "dark",
       disableSwitch: true,
     },
     navbar: {
-      title: 'Viron',
+      title: "Viron",
       logo: {
-        alt: 'VIRON',
-        src: 'img/logo.svg',
+        alt: "VIRON",
+        src: "img/logo.svg",
       },
       items: [
         {
-          to: 'docs/introduction',
-          label: 'Docs',
-          position: 'left',
+          to: "docs/introduction",
+          label: "Docs",
+          position: "left",
         },
         /*
         {
@@ -39,20 +36,20 @@ module.exports = {
         },
         */
         {
-          href: 'https://github.com/cam-inc/viron',
-          label: 'GitHub',
-          position: 'right',
+          href: "https://github.com/cam-inc/viron",
+          label: "GitHub",
+          position: "right",
         },
         {
-          type: 'localeDropdown',
-          position: 'right',
+          type: "localeDropdown",
+          position: "right",
         },
       ],
     },
     footer: {
       links: [
         {
-          title: 'Resources',
+          title: "Resources",
           items: [
             /*
             {
@@ -61,50 +58,50 @@ module.exports = {
             },
             */
             {
-              label: 'Documentation',
-              to: 'docs/introduction',
+              label: "Documentation",
+              to: "docs/introduction",
             },
             {
-              label: 'Introduction',
-              to: 'docs/introduction',
+              label: "Introduction",
+              to: "docs/introduction",
             },
             {
-              label: 'Quick Start',
-              to: 'docs/Getting-Started/quick-start',
-            },
-          ],
-        },
-        {
-          title: 'Community',
-          items: [
-            {
-              label: 'GitHub',
-              href: 'https://github.com/cam-inc/viron',
-            },
-            {
-              label: 'Issues',
-              href: 'https://github.com/cam-inc/viron/issues',
-            },
-            {
-              label: 'Contributing',
-              href: 'https://github.com/cam-inc/viron/blob/develop/CONTRIBUTING.md',
-            },
-            {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/viron',
+              label: "Quick Start",
+              to: "docs/Getting-Started/quick-start",
             },
           ],
         },
         {
-          title: 'Legal',
+          title: "Community",
           items: [
             {
-              label: 'Code of Conduct',
-              href: 'https://github.com/cam-inc/viron/blob/develop/CODE_OF_CONDUCT.md',
+              label: "GitHub",
+              href: "https://github.com/cam-inc/viron",
             },
             {
-              label: 'License',
-              href: 'https://github.com/cam-inc/viron/blob/develop/LICENSE',
+              label: "Issues",
+              href: "https://github.com/cam-inc/viron/issues",
+            },
+            {
+              label: "Contributing",
+              href: "https://github.com/cam-inc/viron/blob/develop/CONTRIBUTING.md",
+            },
+            {
+              label: "Stack Overflow",
+              href: "https://stackoverflow.com/questions/tagged/viron",
+            },
+          ],
+        },
+        {
+          title: "Legal",
+          items: [
+            {
+              label: "Code of Conduct",
+              href: "https://github.com/cam-inc/viron/blob/develop/CODE_OF_CONDUCT.md",
+            },
+            {
+              label: "License",
+              href: "https://github.com/cam-inc/viron/blob/develop/LICENSE",
             },
           ],
         },
@@ -114,18 +111,18 @@ module.exports = {
   },
   presets: [
     [
-      '@docusaurus/preset-classic',
+      "@docusaurus/preset-classic",
       {
         docs: {
-          sidebarPath: require.resolve('./sidebars.js'),
+          sidebarPath: require.resolve("./sidebars.js"),
         },
         blog: {
           showReadingTime: true,
         },
         theme: {
-          customCss: require.resolve('./src/css/custom.css'),
+          customCss: require.resolve("./src/css/custom.css"),
         },
       },
     ],
   ],
-};
+}
