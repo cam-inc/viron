@@ -145,6 +145,42 @@ type GroupProps = {
 const Group: React.FC<GroupProps> = ({ group, list }) => {
   const { isOpen, toggle } = useEndpointGroupToggle(group.id);
 
+  const sortable = React.useRef<Sortable | null>(null);
+  const listRef = React.useRef<HTMLUListElement>(null);
+
+  const onSort = useCallback(() => {
+    if (!sortable.current) {
+      return;
+    }
+    const newOrder = sortable.current.toArray();
+    const newList = newOrder?.map((id) => {
+      return list.find((item) => item.id === id)!;
+    });
+
+    // 新しい順序に基づいてlocalstrageのリストを更新する機能を実装
+  }, [list]);
+
+  useEffect(() => {
+    if (!listRef.current) {
+      return;
+    }
+
+    sortable.current = Sortable.create(listRef.current, {
+      animation: 300,
+      easing: 'cubic-bezier(1, 0, 0, 1)',
+      ghostClass: 'opacity-0',
+      delayOnTouchOnly: true,
+      delay: 200,
+      onSort,
+    });
+
+    return () => {
+      if (sortable.current) {
+        sortable.current.destroy();
+      }
+    };
+  }, []);
+
   const ToggleIcon = isOpen ? ChevronDownIcon : ChevronRightIcon;
 
   return (
@@ -169,8 +205,9 @@ const Group: React.FC<GroupProps> = ({ group, list }) => {
         </span>
       </button>
       {/* Body */}
-
       <ul
+        ref={listRef}
+        id={'list'}
         className={classnames(
           'grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 mt-2 py-2',
           {
@@ -179,7 +216,7 @@ const Group: React.FC<GroupProps> = ({ group, list }) => {
         )}
       >
         {list.map((item) => (
-          <li key={item.id}>
+          <li key={item.id} data-id={item.id}>
             <Item endpoint={item} />
           </li>
         ))}
