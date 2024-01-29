@@ -144,6 +144,7 @@ type GroupProps = {
 };
 const Group: React.FC<GroupProps> = ({ group, list }) => {
   const { isOpen, toggle } = useEndpointGroupToggle(group.id);
+  const { listByGroup, listUngrouped, setList } = useEndpoint();
 
   const sortable = React.useRef<Sortable | null>(null);
   const listRef = React.useRef<HTMLUListElement>(null);
@@ -157,7 +158,10 @@ const Group: React.FC<GroupProps> = ({ group, list }) => {
       return list.find((item) => item.id === id)!;
     });
 
-    // 新しい順序に基づいてlocalstrageのリストを更新する機能を実装
+    const otherGroupList = listByGroup
+      .filter((groupItem) => groupItem.group.id !== group.id)
+      .flatMap((groupItem) => groupItem.list);
+    setList([...newList, ...otherGroupList, ...listUngrouped]);
   }, [list]);
 
   useEffect(() => {
