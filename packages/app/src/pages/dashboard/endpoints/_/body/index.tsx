@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Sortable from 'sortablejs';
 import Button from '~/components/button';
 import EndpointsEmptyIcon from '~/components/endpoinitsEmptyIcon';
@@ -16,35 +16,53 @@ import Menu from '../../../_/menu';
 import Add from './add/';
 import Item from './item/';
 
-export type Props = Parameters<LayoutProps['renderBody']>[0];
-const Body: React.FC<Props> = ({ className, style }) => {
-  const { t } = useTranslation();
+const UN_GROUP_ID = '-';
+
+const useEndpointDnD = ({ groupId }: { groupId: string }) => {
   const { listByGroup, listUngrouped, setList } = useEndpoint();
-  // Add modal.
-  const modal = useModal();
-
   const sortable = useRef<Sortable | null>(null);
-  const listUngroupedRef = React.useRef<HTMLUListElement>(null);
-
-  const onSort = useCallback(() => {
-    if (!sortable.current) {
-      return;
-    }
-    const idArray = sortable.current.toArray();
-    const newListUnGrouped = idArray.map((id) => {
-      // idArray is created from listUngrouped. So, the following line is safe.
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return listUngrouped.find((item) => item.id === id)!;
-    });
-    const listGrouped = listByGroup.flatMap(({ list }) => list);
-    setList([...listGrouped, ...newListUnGrouped]);
-  }, [listByGroup, listUngrouped, setList]);
+  const listRef = React.useRef<HTMLUListElement>(null);
 
   useEffect(() => {
-    if (!listUngroupedRef.current) {
+    if (!listRef.current) {
       return;
     }
-    sortable.current = Sortable.create(listUngroupedRef.current, {
+
+    const onSort = () => {
+      if (!sortable.current) {
+        return;
+      }
+      const idArray = sortable.current.toArray();
+
+      if (groupId === UN_GROUP_ID) {
+        // UnGroup
+        const newListUnGrouped = idArray.map((id) => {
+          // idArray is created from listUngrouped. So, the following line is safe.
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          return listUngrouped.find((item) => item.id === id)!;
+        });
+        const listGrouped = listByGroup.flatMap(({ list }) => list);
+        setList([...listGrouped, ...newListUnGrouped]);
+      } else {
+        // Group
+        const listBeforeSort = listByGroup.find(
+          (item) => item.group.id === groupId
+        )?.list;
+        if (typeof listBeforeSort === 'undefined') {
+          return;
+        }
+        const newListGrouped = idArray.map((id) => {
+          return listBeforeSort.find((item) => item.id === id)!;
+        });
+
+        const otherGroupList = listByGroup
+          .filter((groupItem) => groupItem.group.id !== groupId)
+          .flatMap((groupItem) => groupItem.list);
+        setList([...newListGrouped, ...otherGroupList, ...listUngrouped]);
+      }
+    };
+
+    sortable.current = Sortable.create(listRef.current, {
       animation: 300,
       easing: 'cubic-bezier(1, 0, 0, 1)',
       ghostClass: 'opacity-0',
@@ -57,7 +75,16 @@ const Body: React.FC<Props> = ({ className, style }) => {
         sortable.current.destroy();
       }
     };
-  }, [onSort]);
+  }, [listByGroup, listUngrouped, setList]);
+  return listRef;
+};
+
+export type Props = Parameters<LayoutProps['renderBody']>[0];
+const Body: React.FC<Props> = ({ className, style }) => {
+  const { t } = useTranslation();
+  const { listByGroup, listUngrouped } = useEndpoint();
+  // Add modal.
+  const modal = useModal();
 
   return (
     <>
@@ -97,19 +124,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
                 ))}
               </ul>
             )}
-            {!!listUngrouped.length && (
-              <ul
-                ref={listUngroupedRef}
-                id="list"
-                className="grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 py-2"
-              >
-                {listUngrouped.map((item) => (
-                  <li className="cursor-grab" key={item.id} data-id={item.id}>
-                    <Item endpoint={item} />
-                  </li>
-                ))}
-              </ul>
-            )}
+            {!!listUngrouped.length && <UnGroup list={listUngrouped} />}
             {!listByGroup.length && !listUngrouped.length && (
               <div className="flex flex-col justify-center items-center py-30 gap-6">
                 <EndpointsEmptyIcon
@@ -144,46 +159,7 @@ type GroupProps = {
 };
 const Group: React.FC<GroupProps> = ({ group, list }) => {
   const { isOpen, toggle } = useEndpointGroupToggle(group.id);
-  const { listByGroup, listUngrouped, setList } = useEndpoint();
-
-  const sortable = React.useRef<Sortable | null>(null);
-  const listRef = React.useRef<HTMLUListElement>(null);
-
-  const onSort = useCallback(() => {
-    if (!sortable.current) {
-      return;
-    }
-    const newOrder = sortable.current.toArray();
-    const newList = newOrder?.map((id) => {
-      return list.find((item) => item.id === id)!;
-    });
-
-    const otherGroupList = listByGroup
-      .filter((groupItem) => groupItem.group.id !== group.id)
-      .flatMap((groupItem) => groupItem.list);
-    setList([...newList, ...otherGroupList, ...listUngrouped]);
-  }, [list]);
-
-  useEffect(() => {
-    if (!listRef.current) {
-      return;
-    }
-
-    sortable.current = Sortable.create(listRef.current, {
-      animation: 300,
-      easing: 'cubic-bezier(1, 0, 0, 1)',
-      ghostClass: 'opacity-0',
-      delayOnTouchOnly: true,
-      delay: 200,
-      onSort,
-    });
-
-    return () => {
-      if (sortable.current) {
-        sortable.current.destroy();
-      }
-    };
-  }, []);
+  const listRef = useEndpointDnD({ groupId: group.id });
 
   const ToggleIcon = isOpen ? ChevronDownIcon : ChevronRightIcon;
 
@@ -220,11 +196,31 @@ const Group: React.FC<GroupProps> = ({ group, list }) => {
         )}
       >
         {list.map((item) => (
-          <li key={item.id} data-id={item.id}>
+          <li key={item.id} data-id={item.id} className="cursor-grab">
             <Item endpoint={item} />
           </li>
         ))}
       </ul>
     </div>
+  );
+};
+
+type UnGroupProps = {
+  list: Endpoint[];
+};
+const UnGroup: React.FC<UnGroupProps> = ({ list }) => {
+  const listRef = useEndpointDnD({ groupId: UN_GROUP_ID });
+
+  return (
+    <ul
+      ref={listRef}
+      className="grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 py-2"
+    >
+      {list.map((item) => (
+        <li key={item.id} data-id={item.id} className="cursor-grab">
+          <Item endpoint={item} />
+        </li>
+      ))}
+    </ul>
   );
 };
