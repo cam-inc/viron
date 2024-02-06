@@ -1,5 +1,11 @@
 # @viron/nodejs
 
+## 2.1.2
+
+### Patch Changes
+
+- bug-fix domains/adminrole.ts sync method interval
+
 ## 2.1.1
 
 ### Patch Changes
