@@ -1,5 +1,11 @@
 # @viron/app
 
+## 2.13.0
+
+### Minor Changes
+
+- d97e721a: implement DnD for each group
+
 ## 2.12.0
 
 ### Minor Changes
