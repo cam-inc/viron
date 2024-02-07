@@ -7,13 +7,10 @@ phases:
   pre_build:
     commands:
       - echo Installing and building linter packages...
-      - cd $CODEBUILD_SRC_DIR/packages/linter
       - npm install --no-progress --legacy-peer-deps && npm cache verify
-      - npm run build
-      - echo Installing and building nodejs packages...
-      - cd ../../
+      - npm run build -w packages/linter
+      - echo Installing nodejs packages...
       - cd ${CODEBUILD_SRC_DIR}/packages/nodejs
-      - npm install --no-progress --legacy-peer-deps && npm cache verify
       - echo Setting NPM_TOKEN...
       - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
   build:
