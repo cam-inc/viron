@@ -285,3 +285,5 @@ export const HTTP_STATUS = {
 export type HTTPStatus = (typeof HTTP_STATUS)[keyof typeof HTTP_STATUS];
 export type HTTPStatusCode =
   (typeof HTTP_STATUS)[keyof typeof HTTP_STATUS]['code'];
+
+export const UN_GROUP_ID = '-' as const;

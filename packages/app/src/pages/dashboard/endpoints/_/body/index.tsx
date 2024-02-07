@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import React, { useEffect, useRef } from 'react';
+import React, { PropsWithChildren, useEffect, useRef } from 'react';
 import Sortable from 'sortablejs';
 import Button from '~/components/button';
 import EndpointsEmptyIcon from '~/components/endpoinitsEmptyIcon';
@@ -7,6 +7,7 @@ import Head from '~/components/head';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import PlusIcon from '~/components/icon/plus/outline';
+import { UN_GROUP_ID } from '~/constants';
 import { useEndpoint, useEndpointGroupToggle } from '~/hooks/endpoint';
 import { Trans, useTranslation } from '~/hooks/i18n';
 import { Props as LayoutProps } from '~/layouts/';
@@ -15,69 +16,6 @@ import { COLOR_SYSTEM, Endpoint, EndpointGroup } from '~/types';
 import Menu from '../../../_/menu';
 import Add from './add/';
 import Item from './item/';
-
-const UN_GROUP_ID = '-';
-
-const useEndpointDnD = ({ groupId }: { groupId: string }) => {
-  const { listByGroup, listUngrouped, setList } = useEndpoint();
-  const sortable = useRef<Sortable | null>(null);
-  const listRef = React.useRef<HTMLUListElement>(null);
-
-  useEffect(() => {
-    if (!listRef.current) {
-      return;
-    }
-
-    const onSort = () => {
-      if (!sortable.current) {
-        return;
-      }
-      const idArray = sortable.current.toArray();
-
-      if (groupId === UN_GROUP_ID) {
-        // UnGroup
-        const newListUnGrouped = idArray.map((id) => {
-          // idArray is created from listUngrouped. So, the following line is safe.
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          return listUngrouped.find((item) => item.id === id)!;
-        });
-        const listGrouped = listByGroup.flatMap(({ list }) => list);
-        setList([...listGrouped, ...newListUnGrouped]);
-      } else {
-        // Group
-        const listBeforeSort = listByGroup.find(
-          (item) => item.group.id === groupId
-        )?.list;
-        if (typeof listBeforeSort === 'undefined') {
-          return;
-        }
-        const newListGrouped = idArray.map((id) => {
-          return listBeforeSort.find((item) => item.id === id)!;
-        });
-
-        const otherGroupList = listByGroup
-          .filter((groupItem) => groupItem.group.id !== groupId)
-          .flatMap((groupItem) => groupItem.list);
-        setList([...newListGrouped, ...otherGroupList, ...listUngrouped]);
-      }
-    };
-
-    sortable.current = Sortable.create(listRef.current, {
-      animation: 300,
-      easing: 'cubic-bezier(1, 0, 0, 1)',
-      ghostClass: 'opacity-0',
-      delayOnTouchOnly: true,
-      delay: 200,
-      onSort,
-    });
-    return () => {
-      if (sortable.current) {
-        sortable.current.destroy();
-      }
-    };
-  }, [listByGroup, listUngrouped, setList]);
-  return listRef;
-};
 
 export type Props = Parameters<LayoutProps['renderBody']>[0];
 const Body: React.FC<Props> = ({ className, style }) => {
@@ -119,12 +57,16 @@ const Body: React.FC<Props> = ({ className, style }) => {
                     key={item.group.id}
                     className="py-1 border-b border-thm-on-background-faint"
                   >
-                    <Group group={item.group} list={item.list} />
+                    <GroupAccordion group={item.group}>
+                      <EndpointList list={item.list} groupId={item.group.id} />
+                    </GroupAccordion>
                   </li>
                 ))}
               </ul>
             )}
-            {!!listUngrouped.length && <UnGroup list={listUngrouped} />}
+            {!!listUngrouped.length && (
+              <EndpointList list={listUngrouped} groupId={UN_GROUP_ID} />
+            )}
             {!listByGroup.length && !listUngrouped.length && (
               <div className="flex flex-col justify-center items-center py-30 gap-6">
                 <EndpointsEmptyIcon
@@ -153,14 +95,11 @@ const Body: React.FC<Props> = ({ className, style }) => {
 };
 export default Body;
 
-type GroupProps = {
+type GroupAccordionProps = PropsWithChildren<{
   group: EndpointGroup;
-  list: Endpoint[];
-};
-const Group: React.FC<GroupProps> = ({ group, list }) => {
+}>;
+const GroupAccordion: React.FC<GroupAccordionProps> = ({ group, children }) => {
   const { isOpen, toggle } = useEndpointGroupToggle(group.id);
-  const listRef = useEndpointDnD({ groupId: group.id });
-
   const ToggleIcon = isOpen ? ChevronDownIcon : ChevronRightIcon;
 
   return (
@@ -185,36 +124,94 @@ const Group: React.FC<GroupProps> = ({ group, list }) => {
         </span>
       </button>
       {/* Body */}
-      <ul
-        ref={listRef}
-        id={'list'}
-        className={classnames(
-          'grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 mt-2 py-2',
-          {
-            hidden: !isOpen,
-          }
-        )}
+      <div
+        className={classnames('mt-2', {
+          hidden: !isOpen,
+        })}
       >
-        {list.map((item) => (
-          <li key={item.id} data-id={item.id} className="cursor-grab">
-            <Item endpoint={item} />
-          </li>
-        ))}
-      </ul>
+        {children}
+      </div>
     </div>
   );
 };
 
-type UnGroupProps = {
+type EndpointListProps = {
+  groupId: string;
+  className?: string;
   list: Endpoint[];
 };
-const UnGroup: React.FC<UnGroupProps> = ({ list }) => {
-  const listRef = useEndpointDnD({ groupId: UN_GROUP_ID });
+
+const EndpointList: React.FC<EndpointListProps> = ({
+  groupId,
+  className,
+  list,
+}) => {
+  const { listByGroup, listUngrouped, setList } = useEndpoint();
+  const sortable = useRef<Sortable | null>(null);
+  const ref = React.useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    if (!ref.current) {
+      return;
+    }
+
+    const onSort = () => {
+      if (!sortable.current) {
+        return;
+      }
+      const idArray = sortable.current.toArray();
+      const targetList =
+        groupId === UN_GROUP_ID
+          ? listUngrouped
+          : listByGroup.find((item) => item.group.id === groupId)?.list;
+
+      if (typeof targetList === 'undefined') {
+        return;
+      }
+
+      const sortedTargetList = idArray.map(
+        // idArray is created from listUngrouped. So, the following line is safe.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        (id) => targetList.find((item) => item.id === id)!
+      );
+
+      let newList: Endpoint[];
+      if (groupId === UN_GROUP_ID) {
+        const groupList = listByGroup.flatMap(({ list }) => list);
+        // add group list
+        newList = sortedTargetList.concat(groupList);
+      } else {
+        const otherGroupList = listByGroup
+          .filter((groupItem) => groupItem.group.id !== groupId)
+          .flatMap((groupItem) => groupItem.list);
+        // add other group list and ungrouped list.
+        newList = sortedTargetList.concat(otherGroupList).concat(listUngrouped);
+      }
+      setList(newList);
+    };
+
+    sortable.current = Sortable.create(ref.current, {
+      animation: 300,
+      easing: 'cubic-bezier(1, 0, 0, 1)',
+      ghostClass: 'opacity-0',
+      delayOnTouchOnly: true,
+      delay: 200,
+      onSort,
+    });
+    return () => {
+      if (sortable.current) {
+        sortable.current.destroy();
+      }
+    };
+  }, [groupId, listByGroup, listUngrouped, setList]);
 
   return (
     <ul
-      ref={listRef}
-      className="grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 py-2"
+      ref={ref}
+      className={classnames(
+        'grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 py-2',
+        className
+      )}
     >
       {list.map((item) => (
         <li key={item.id} data-id={item.id} className="cursor-grab">
