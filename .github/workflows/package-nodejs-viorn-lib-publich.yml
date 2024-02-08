@@ -1,12 +1,14 @@
 name: NodeJs Viron/lib Package CI
 
 on:
-  push:
-    branches:
-      - develop
-    paths:
-      - "packages/nodejs/**"
-      - "package.json"
+  pull_request:
+    types: [synchronize]
+  # push:
+  #   branches:
+  #     - develop
+  #   paths:
+  #     - "packages/nodejs/**"
+  #     - "package.json"
 
 jobs:
   build-and-publish:
@@ -21,19 +23,16 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - name: Install dependencies
+      - name: Install dependencies and Build
         run: |
           echo "Installing packages..."
           npm install --no-progress --legacy-peer-deps
           npm run build -w packages/linter
-          cd packages/nodejs
-          npm cache verify
+          npm run build -w packages/nodejs
       - name: Set NPM_TOKEN
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-      - name: Build and Publish
+      - name: Publish
         run: |
-          echo "Building..."
-          npm run build
           echo "Publishing..."
           npm publish
         env:
