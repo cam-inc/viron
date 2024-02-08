@@ -1,6 +1,9 @@
 name: NodeJs Viron/lib Package CI
 
 on:
+  # for debug
+  pull_request:
+    types: [opened]
   push:
     branches:
       - develop
