@@ -1,15 +1,12 @@
 name: NodeJs Viron/lib Package CI
 
 on:
-  # for debug
-  issue_comment:
-    types: [edited]
-  # push:
-  #   branches:
-  #     - develop
-  #   paths:
-  #     - "packages/nodejs/**"
-  #     - "package.json"
+  push:
+    branches:
+      - develop
+    paths:
+      - "packages/nodejs/**"
+      - "package.json"
 
 jobs:
   build-and-publish:
