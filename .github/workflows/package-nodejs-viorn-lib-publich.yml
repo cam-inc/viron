@@ -1,14 +1,12 @@
 name: NodeJs Viron/lib Package CI
 
 on:
-  pull_request:
-    types: [synchronize]
-  # push:
-  #   branches:
-  #     - develop
-  #   paths:
-  #     - "packages/nodejs/**"
-  #     - "package.json"
+  push:
+    branches:
+      - develop
+    paths:
+      - "packages/nodejs/**"
+      - "package.json"
 
 jobs:
   build-and-publish:
