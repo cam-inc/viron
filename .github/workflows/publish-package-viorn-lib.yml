@@ -1,4 +1,4 @@
-name: NodeJs Viron/lib Package CI
+name: Publish NPM Package - Viron/lib
 
 on:
   push:
@@ -6,7 +6,6 @@ on:
       - develop
     paths:
       - "packages/nodejs/**"
-      - "package.json"
 
 jobs:
   build-and-publish:
@@ -24,7 +23,7 @@ jobs:
       - name: Install dependencies and Build
         run: |
           echo "Installing packages..."
-          npm install --no-progress
+          npm ci
           npm run build -w packages/linter
           npm run build -w packages/nodejs
       - name: Set NPM_TOKEN
