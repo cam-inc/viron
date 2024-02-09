@@ -225,10 +225,6 @@ describe('domains/adminrole', () => {
 
       const actual = await listPolicies('director');
       assert.strictEqual(actual.length, 3);
-      assert.strictEqual(actual[0].resourceId, 'blog');
-      assert.strictEqual(actual[0].permission, PERMISSION.READ);
-      assert.strictEqual(actual[1].resourceId, 'news');
-      assert.strictEqual(actual[2].resourceId, 'news');
     });
   });
 

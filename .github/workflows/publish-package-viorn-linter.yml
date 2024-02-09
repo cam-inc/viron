@@ -1,0 +1,35 @@
+name: Publish NPM Package - Viron/linter
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - "packages/linter/**"
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - name: Install dependencies and Build
+        run: |
+          echo "Installing packages..."
+          npm ci
+          npm run build -w packages/linter
+      - name: Set NPM_TOKEN
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+      - name: Publish
+        run: |
+          echo "Publishing..."
+          npm publish -w packages/linter
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
