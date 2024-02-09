@@ -34,6 +34,6 @@ jobs:
       - name: Publish
         run: |
           echo "Publishing..."
-          npm publish
+          npm publish -w packages/nodejs
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
