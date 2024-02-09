@@ -1,5 +1,11 @@
 # @viron/nodejs
 
+## 2.2.0
+
+### Minor Changes
+
+- move cicd to github action and fix dependencies and test
+
 ## 2.1.2
 
 ### Patch Changes
