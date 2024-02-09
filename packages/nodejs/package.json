@@ -1,6 +1,6 @@
 {
   "name": "@viron/lib",
-  "version": "2.1.2-alpha.0",
+  "version": "2.1.2-alpha.1",
   "scripts": {
     "build": "npm run clean && tsc --project tsconfig.json && cp -fr src/openapi dist/",
     "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
@@ -21,7 +21,7 @@
   ],
   "dependencies": {
     "@apidevtools/json-schema-ref-parser": "^11.1.0",
-    "@viron/linter": "^0.0.2",
+    "@viron/linter": "*",
     "casbin": "^5.6.1",
     "casbin-mongoose-adapter": "^5.3.0",
     "casbin-sequelize-adapter": "^2.2.0",
