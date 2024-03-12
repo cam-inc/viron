@@ -38,7 +38,7 @@
     "@types/jest": "^29.5.3",
     "@types/mime-types": "^2.1.0",
     "@types/multer": "^1.4.7",
-    "@types/multer-s3": "^2.7.10",
+    "@types/multer-s3": "^3.0.3",
     "@types/node": "^14.18.9",
     "@types/pino-http": "^5.4.0",
     "@types/supertest": "^2.0.10",
