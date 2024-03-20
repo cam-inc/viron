@@ -35,10 +35,8 @@ require (
 	github.com/volatiletech/strmangle v0.0.1
 	github.com/xeipuuv/gojsonschema v1.2.0
 	go.mongodb.org/mongo-driver v1.7.1
-	golang.org/x/crypto v0.0.0-20220513210258-46612604a0f9
-	golang.org/x/net v0.0.0-20220513224357-95641704303c // indirect
+	golang.org/x/crypto v0.17.0
 	golang.org/x/oauth2 v0.0.0-20210819190943-2bc19b11175f
-	golang.org/x/sys v0.0.0-20220513210249-45d2b4557a2a // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
 	google.golang.org/api v0.56.0
 	google.golang.org/protobuf v1.28.0 // indirect
