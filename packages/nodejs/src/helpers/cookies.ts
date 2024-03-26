@@ -24,6 +24,9 @@ export const genCookie = (
   if (!opts.sameSite) {
     opts.sameSite = 'none';
   }
+  if (opts.partitioned === undefined) {
+    opts.partitioned = true;
+  }
   return serialize(key, value, opts);
 };
 
