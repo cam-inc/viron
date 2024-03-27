@@ -1,5 +1,11 @@
 # @viron/nodejs
 
+## 2.3.0
+
+### Minor Changes
+
+- 0a02d69d: Set partitioned cookie attributes as default
+
 ## 2.2.0
 
 ### Minor Changes
