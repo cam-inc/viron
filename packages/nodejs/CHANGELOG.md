@@ -1,5 +1,11 @@
 # @viron/nodejs
 
+## 2.3.1
+
+### Patch Changes
+
+- a70f57be: Set the partition option to false as the default.
+
 ## 2.3.0
 
 ### Minor Changes
