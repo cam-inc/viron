@@ -24,9 +24,10 @@ export const genCookie = (
   if (!opts.sameSite) {
     opts.sameSite = 'none';
   }
-  if (opts.partitioned === undefined) {
-    opts.partitioned = true;
-  }
+  // TODO: Set to true by default after all 3pcd support is complete
+  // if (opts.partitioned === undefined) {
+  //   opts.partitioned = true;
+  // }
   return serialize(key, value, opts);
 };
 
