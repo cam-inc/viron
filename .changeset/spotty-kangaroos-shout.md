@@ -2,4 +2,4 @@
 "@viron/lib": patch
 ---
 
-Set patition option is false by default
+Set the partition option to false as the default.
