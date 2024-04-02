@@ -1,5 +1,11 @@
 # @viron/app
 
+## 2.13.2
+
+### Patch Changes
+
+- 125e0090: Fixed to randomly generate fileReader id to avoid duplication.
+
 ## 2.13.1
 
 ### Patch Changes
