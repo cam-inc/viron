@@ -470,7 +470,7 @@ export const useEndpoint = (): UseEndpointReturn => {
       }
       if (!response.ok) {
         return {
-          error: getHTTPError(response.status as HTTPStatusCode),
+          error: await getHTTPError(response),
         };
       }
       return {
@@ -615,7 +615,7 @@ export const useEndpoint = (): UseEndpointReturn => {
       }
       if (!response.ok) {
         return {
-          error: getHTTPError(response.status as HTTPStatusCode),
+          error: await getHTTPError(response),
         };
       }
       return {
@@ -682,7 +682,7 @@ export const useEndpoint = (): UseEndpointReturn => {
         }
         if (!response.ok) {
           return {
-            error: getHTTPError(response.status as HTTPStatusCode),
+            error: await getHTTPError(response),
           };
         }
         return {

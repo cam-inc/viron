@@ -1,8 +1,10 @@
 import React, { useCallback } from 'react';
 import Button, { Props as ButtonProps } from '~/components/button';
+import Error, { useError } from '~/components/error';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/outline';
+import { BaseError } from '~/errors/index';
 import Popover, { usePopover } from '~/portals/popover';
 import { useAppScreenGlobalStateValue } from '~/store';
 import { ClassName, COLOR_SYSTEM, Endpoint } from '~/types';
@@ -44,19 +46,21 @@ const Head: React.FC<Props> = ({
   className = '',
 }) => {
   const { lg } = useAppScreenGlobalStateValue();
+  const error = useError({
+    on: COLOR_SYSTEM.SURFACE,
+    withModal: true,
+  });
 
-  const handleSiblingOperationSuccess = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (data: any) => {
-      base.refresh();
+  const handleSiblingOperationSuccess = useCallback(() => {
+    base.refresh();
+  }, [base]);
+
+  const handleSiblingOperationFail = useCallback(
+    (err: BaseError) => {
+      error.setError(err);
     },
-    [base]
+    [error]
   );
-
-  const handleSiblingOperationFail = useCallback((error: Error) => {
-    // TODO: error handling
-    console.log(error);
-  }, []);
 
   const handleOpenerClick = useCallback(() => {
     if (isOpened) {
@@ -148,6 +152,7 @@ const Head: React.FC<Props> = ({
           </div>
         ))}
       </Popover>
+      <Error.modal {...error.bind} />
     </>
   );
 };

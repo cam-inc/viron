@@ -31,7 +31,7 @@ const Export: React.FC<Props> = ({ className = '' }) => {
         Icon={ExportIcon}
         onClick={handleClick}
       />
-      <Error {...error.bind} />
+      <Error.modal {...error.bind} />
     </>
   );
 };

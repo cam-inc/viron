@@ -55,7 +55,7 @@ const Import: React.FC<Props> = ({ className = '' }) => {
           endpointGroupList={distribution.endpointGroupList || []}
         />
       </Modal>
-      <Error {...error.bind} />
+      <Error.modal {...error.bind} />
     </>
   );
 };

@@ -39,38 +39,37 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
     globalThis.navigator.clipboard.writeText(data);
   }, [data]);
 
-  if (error) {
-    return <Error on={COLOR_SYSTEM.SURFACE} error={error} />;
-  }
-
   return (
-    <div className="text-thm-on-surface">
-      <div className="pb-4 mb-4 border-b border-thm-on-surface-slight">
-        <Head
-          on={COLOR_SYSTEM.SURFACE}
-          title={
-            <div className="flex items-center gap-2">
-              <QrcodeIcon className="w-em" />
-              <div>{t('endpointQRCodeShare.title')}</div>
-            </div>
-          }
-        />
-      </div>
-      <div className="flex justify-center">
-        <canvas ref={canvasRef} />
-      </div>
-      <div className="mt-4 pt-4 flex flex-col items-end gap-2 border-t border-dotted border-thm-on-surface-slight">
-        <Button
-          cs={COLOR_SYSTEM.PRIMARY}
-          Icon={ClipboardCopyIcon}
-          label={t('endpointQRCodeShare.copyUrlButtonLabel')}
-          onClick={handleCopyClick}
-        />
-        <div className="text-thm-on-surface-low text-xxs text-right max-w-[380px] break-all">
-          {data}
+    <>
+      <div className="text-thm-on-surface">
+        <div className="pb-4 mb-4 border-b border-thm-on-surface-slight">
+          <Head
+            on={COLOR_SYSTEM.SURFACE}
+            title={
+              <div className="flex items-center gap-2">
+                <QrcodeIcon className="w-em" />
+                <div>{t('endpointQRCodeShare.title')}</div>
+              </div>
+            }
+          />
+        </div>
+        <div className="flex justify-center">
+          <canvas ref={canvasRef} />
+        </div>
+        <div className="mt-4 pt-4 flex flex-col items-end gap-2 border-t border-dotted border-thm-on-surface-slight">
+          <Button
+            cs={COLOR_SYSTEM.PRIMARY}
+            Icon={ClipboardCopyIcon}
+            label={t('endpointQRCodeShare.copyUrlButtonLabel')}
+            onClick={handleCopyClick}
+          />
+          <div className="text-thm-on-surface-low text-xxs text-right max-w-[380px] break-all">
+            {data}
+          </div>
         </div>
       </div>
-    </div>
+      {!!error && <Error.modal on={COLOR_SYSTEM.SURFACE} error={error} />}
+    </>
   );
 };
 

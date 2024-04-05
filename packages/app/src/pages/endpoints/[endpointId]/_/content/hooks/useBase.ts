@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { HTTPStatusCode } from '~/constants';
 import { BaseError, getHTTPError, NetworkError } from '~/errors';
 import { Endpoint } from '~/types';
 import {
@@ -99,7 +98,7 @@ const useBase = (
       }
       if (!response.ok) {
         // The authorization cookie is not valid or any other reasons.
-        setError(getHTTPError(response.status as HTTPStatusCode));
+        setError(await getHTTPError(response));
         setData(null);
         setIsPending(false);
         return;
@@ -285,6 +284,6 @@ const useFilter = (
       inactivate,
       toggle,
     };
-  }, [endpoint, document, content, omitted]);
+  }, [document, content, omitted]);
   return ret;
 };

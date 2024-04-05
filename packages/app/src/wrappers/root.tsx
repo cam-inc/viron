@@ -63,7 +63,7 @@ const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
   const { launch, isLaunched, style, error } = useRoot();
   useEffect(() => {
     launch();
-  }, []);
+  }, [launch]);
 
   return (
     <>
@@ -77,7 +77,7 @@ const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
         <ProgressWrapper className="fixed inset-0 z-wrapper-progress" />
         <Splash isActive={!isLaunched} className="fixed inset-0 z-splash" />
       </div>
-      <Error {...error.bind} />
+      <Error.modal {...error.bind} />
     </>
   );
 };
@@ -174,7 +174,7 @@ const useRoot = (): UseRootReturn => {
     return () => {
       window.removeEventListener('error', handler);
     };
-  }, [error.setError]);
+  }, [error]);
 
   return {
     launch,

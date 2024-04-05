@@ -1,8 +1,7 @@
 import classnames from 'classnames';
-import _ from 'lodash';
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useState } from 'react';
-import Error from '~/components/error';
+import Error, { useError } from '~/components/error';
 import Request from '~/components/request';
 import Spinner from '~/components/spinner';
 import { BaseError } from '~/errors';
@@ -17,7 +16,7 @@ export type Props = Parameters<LayoutProps['renderBody']>[0] & {
   search: string;
 };
 const Body: React.FC<Props> = ({ className = '', search }) => {
-  const [error, setError] = useState<BaseError | null>(null);
+  const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
   const [isPending, setIsPending] = useState<boolean>(true);
   const endpoint = useEndpointListItemGlobalStateValue({
     id: get<EndpointID>(KEY.OAUTH_ENDPOINT_ID),
@@ -29,23 +28,23 @@ const Body: React.FC<Props> = ({ className = '', search }) => {
   > | null>(null);
 
   useEffect(() => {
-    setError(null);
+    error.setError(null);
     setIsPending(true);
     if (!endpoint) {
-      setError(new BaseError('Endpoint Not Found.'));
+      error.setError(new BaseError('Endpoint Not Found.'));
       setIsPending(false);
       return;
     }
     const f = async () => {
       const connection = await connect(endpoint.url);
       if (connection.error) {
-        setError(connection.error);
+        error.setError(connection.error);
         setIsPending(false);
         return;
       }
       const fetchDocumentResult = await fetchDocument(endpoint);
       if (fetchDocumentResult.error) {
-        setError(fetchDocumentResult.error);
+        error.setError(fetchDocumentResult.error);
         setIsPending(false);
         return;
       }
@@ -63,7 +62,14 @@ const Body: React.FC<Props> = ({ className = '', search }) => {
       setIsPending(false);
     };
     f();
-  }, [endpoint, connect, fetchDocument]);
+  }, [
+    endpoint,
+    connect,
+    fetchDocument,
+    error,
+    search,
+    prepareSigninOAuthCallback,
+  ]);
 
   const handleSubmit = useCallback(
     async (requestValue: RequestValue) => {
@@ -78,12 +84,12 @@ const Body: React.FC<Props> = ({ className = '', search }) => {
       }
       const result = await signinOAuthCallback.execute(requestValue);
       if (result.error) {
-        setError(result.error);
+        error.setError(result.error);
         return;
       }
       navigate(endpoint);
     },
-    [endpoint, navigate, signinOAuthCallback]
+    [endpoint, error, navigate, signinOAuthCallback]
   );
 
   if (isPending) {
@@ -97,11 +103,6 @@ const Body: React.FC<Props> = ({ className = '', search }) => {
         <Spinner className="w-8" on={COLOR_SYSTEM.BACKGROUND} />
       </div>
     );
-  }
-  if (error) {
-    <div className={classnames('p-4', className)}>
-      return <Error on={COLOR_SYSTEM.BACKGROUND} error={error} />;
-    </div>;
   }
   if (!signinOAuthCallback) {
     return null;
@@ -124,6 +125,7 @@ const Body: React.FC<Props> = ({ className = '', search }) => {
         defaultValues={signinOAuthCallback.defaultValues}
         onSubmit={handleSubmit}
       />
+      <Error.modal {...error.bind} />
     </div>
   );
 };
