@@ -1,5 +1,29 @@
 # @viron/nodejs
 
+## 2.3.1
+
+### Patch Changes
+
+- a70f57be: Set the partition option to false as the default.
+
+## 2.3.0
+
+### Minor Changes
+
+- 0a02d69d: Set partitioned cookie attributes as default
+
+## 2.2.0
+
+### Minor Changes
+
+- move cicd to github action and fix dependencies and test
+
+## 2.1.2
+
+### Patch Changes
+
+- bug-fix domains/adminrole.ts sync method interval
+
 ## 2.1.1
 
 ### Patch Changes

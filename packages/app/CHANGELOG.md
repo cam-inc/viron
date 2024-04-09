@@ -1,5 +1,23 @@
 # @viron/app
 
+## 2.13.2
+
+### Patch Changes
+
+- 125e0090: Fixed to randomly generate fileReader id to avoid duplication.
+
+## 2.13.1
+
+### Patch Changes
+
+- ea7376ce: group dnd bug fixes and refactoring
+
+## 2.13.0
+
+### Minor Changes
+
+- d97e721a: implement DnD for each group
+
 ## 2.12.0
 
 ### Minor Changes

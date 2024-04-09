@@ -6,7 +6,7 @@ export type Props = {
 } & Pick<React.InputHTMLAttributes<HTMLInputElement>, 'accept'>;
 const _FileReader: React.FC<Props> = ({ accept, onChange }) => {
   const id = useMemo(() => {
-    return `fileReader-${Date.now()}`;
+    return `fileReader-${Math.random()}`;
   }, []);
 
   const [file, setFile] = useState<File | null>(null);
