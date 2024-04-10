@@ -229,7 +229,7 @@ const _ErrorModal: React.FC<Props> = ({ className = '', on, error }) => {
           className={`flex items-center pb-3 gap-1 border-b border-thm-on-${on}-slight`}
         >
           <div className="flex-none">
-            <InformationCircleIcon className="w-6" />
+            <InformationCircleIcon className="w-6 text-thm-error" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-lg font-bold text-thm-error">{error.name}</div>
