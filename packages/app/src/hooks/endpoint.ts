@@ -2,7 +2,6 @@ import _ from 'lodash';
 import { useCallback, useMemo, useRef } from 'react';
 import {
   HTTP_STATUS,
-  HTTPStatusCode,
   ENVIRONMENTAL_VARIABLE,
   OAUTH_REDIRECT_URI,
 } from '~/constants';
@@ -350,9 +349,12 @@ export const useEndpoint = (): UseEndpointReturn => {
     []
   );
 
-  const navigate = useCallback<UseEndpointReturn['navigate']>((endpoint) => {
-    _navigate(`/endpoints/${endpoint.id}`);
-  }, []);
+  const navigate = useCallback<UseEndpointReturn['navigate']>(
+    (endpoint) => {
+      _navigate(`/endpoints/${endpoint.id}`);
+    },
+    [_navigate]
+  );
 
   const addEndpoint = useCallback<UseEndpointReturn['addEndpoint']>(
     async (

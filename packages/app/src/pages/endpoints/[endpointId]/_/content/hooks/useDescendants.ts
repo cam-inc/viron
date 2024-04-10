@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import { useMemo } from 'react';
-import { HTTPStatusCode } from '~/constants';
 import { BaseError, getHTTPError, NetworkError } from '~/errors';
 import { Endpoint } from '~/types';
 import {
@@ -29,6 +28,7 @@ export type UseDescendantsReturn = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fetch: (
     requestValue: RequestValue
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ) => Promise<{ data?: any; error?: BaseError }>;
 }[];
 // Descendant Opeartions are
