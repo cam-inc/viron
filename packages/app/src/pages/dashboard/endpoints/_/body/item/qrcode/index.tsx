@@ -39,6 +39,10 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
     globalThis.navigator.clipboard.writeText(data);
   }, [data]);
 
+  const handleErrorModalOnClose = useCallback(() => {
+    setError(null);
+  }, []);
+
   return (
     <>
       <div className="text-thm-on-surface">
@@ -68,7 +72,13 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
           </div>
         </div>
       </div>
-      {!!error && <Error.modal on={COLOR_SYSTEM.SURFACE} error={error} />}
+      {!!error && (
+        <Error.modal
+          on={COLOR_SYSTEM.SURFACE}
+          error={error}
+          onClose={handleErrorModalOnClose}
+        />
+      )}
     </>
   );
 };

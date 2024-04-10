@@ -91,6 +91,9 @@ const Body: React.FC<Props> = ({ className = '', search }) => {
     },
     [endpoint, error, navigate, signinOAuthCallback]
   );
+  const handleErrorModalOnClose = useCallback(() => {
+    error.setError(null);
+  }, [error]);
 
   if (isPending) {
     return (
@@ -125,7 +128,7 @@ const Body: React.FC<Props> = ({ className = '', search }) => {
         defaultValues={signinOAuthCallback.defaultValues}
         onSubmit={handleSubmit}
       />
-      <Error.modal {...error.bind} />
+      <Error.modal {...error.bind} onClose={handleErrorModalOnClose} />
     </div>
   );
 };

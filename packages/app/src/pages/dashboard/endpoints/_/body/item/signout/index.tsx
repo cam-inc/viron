@@ -43,6 +43,9 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
     },
     [signout, onSignout, error]
   );
+  const handleErrorModalOnClose = useCallback(() => {
+    error.setError(null);
+  }, [error]);
 
   if (signout.error) {
     return <Error on={COLOR_SYSTEM.BACKGROUND} error={signout.error} />;
@@ -69,7 +72,7 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
           onSubmit={handleSubmit}
         />
       </Drawer>
-      <Error.modal {...error.bind} />
+      <Error.modal {...error.bind} onClose={handleErrorModalOnClose} />
     </>
   );
 };

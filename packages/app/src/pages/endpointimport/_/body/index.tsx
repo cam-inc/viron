@@ -56,6 +56,9 @@ const Body: React.FC<Props> = ({ style, className = '', search }) => {
   const handleButtonClick = useCallback<ButtonProps['onClick']>(() => {
     navigate('/dashboard/endpoints');
   }, [navigate]);
+  const handleErrorModalOnClose = useCallback(() => {
+    error.setError(null);
+  }, [error]);
 
   if (isPending) {
     return (
@@ -82,7 +85,7 @@ const Body: React.FC<Props> = ({ style, className = '', search }) => {
           </div>
         </div>
       </div>
-      <Error.modal {...error.bind} />
+      <Error.modal {...error.bind} onClose={handleErrorModalOnClose} />
     </>
   );
 };

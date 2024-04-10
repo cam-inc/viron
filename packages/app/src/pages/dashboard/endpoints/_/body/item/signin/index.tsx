@@ -81,7 +81,10 @@ const OAuth: React.FC<{
   const { prepareSigninOAuth } = useEndpoint();
   const signinOAuth = useMemo<
     ReturnType<UseEndpointReturn['prepareSigninOAuth']>
-  >(() => prepareSigninOAuth(endpoint, authentication), [prepareSigninOAuth]);
+  >(
+    () => prepareSigninOAuth(endpoint, authentication),
+    [authentication, endpoint, prepareSigninOAuth]
+  );
   const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
 
   const handleSubmit = useCallback(
@@ -97,6 +100,9 @@ const OAuth: React.FC<{
     },
     [error, signinOAuth]
   );
+  const handleErrorModalOnClose = useCallback(() => {
+    error.setError(null);
+  }, [error]);
 
   if (signinOAuth.error) {
     return <Error on={COLOR_SYSTEM.BACKGROUND} error={signinOAuth.error} />;
@@ -113,7 +119,7 @@ const OAuth: React.FC<{
         request={signinOAuth.request}
         onSubmit={handleSubmit}
       />
-      <Error.modal {...error.bind} />
+      <Error.modal {...error.bind} onClose={handleErrorModalOnClose} />
     </>
   );
 };
@@ -145,6 +151,9 @@ const Email: React.FC<{
     },
     [endpoint, navigate, signinEmail, error]
   );
+  const handleErrorModalOnClose = useCallback(() => {
+    error.setError(null);
+  }, [error]);
 
   if (signinEmail.error) {
     return <Error on={COLOR_SYSTEM.BACKGROUND} error={signinEmail.error} />;
@@ -161,7 +170,7 @@ const Email: React.FC<{
         onSubmit={handleSubmit}
         className="h-full"
       />
-      <Error.modal {...error.bind} />
+      <Error.modal {...error.bind} onClose={handleErrorModalOnClose} />
     </>
   );
 };

@@ -11,6 +11,7 @@ import { error as logError, NAMESPACE } from '~/utils/logger';
 type Props = BaseProps & {
   error?: BaseError;
   withModal?: boolean;
+  onClose?: VoidFunction;
 };
 const Error: React.FC<Props> & {
   renewal: React.FC<Props>;
@@ -90,7 +91,7 @@ const Renewal: React.FC<Props> = (props) => {
 Error.renewal = Renewal;
 
 const ErrorModal: React.FC<Props> = (props) => {
-  const { error } = props;
+  const { error, onClose } = props;
 
   // log error.
   useEffect(() => {
@@ -104,7 +105,7 @@ const ErrorModal: React.FC<Props> = (props) => {
     });
   }, [error]);
 
-  const modal = useModal();
+  const modal = useModal(onClose);
   useEffect(() => {
     if (!error) {
       return;

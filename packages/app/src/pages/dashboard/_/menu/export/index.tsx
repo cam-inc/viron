@@ -19,6 +19,9 @@ const Export: React.FC<Props> = ({ className = '' }) => {
     const result = _export();
     error.setError(result.error);
   }, [_export, error]);
+  const handleErrorModalOnClose = useCallback(() => {
+    error.setError(null);
+  }, [error]);
 
   return (
     <>
@@ -31,7 +34,7 @@ const Export: React.FC<Props> = ({ className = '' }) => {
         Icon={ExportIcon}
         onClick={handleClick}
       />
-      <Error.modal {...error.bind} />
+      <Error.modal {...error.bind} onClose={handleErrorModalOnClose} />
     </>
   );
 };

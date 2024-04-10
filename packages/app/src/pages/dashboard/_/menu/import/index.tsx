@@ -37,6 +37,9 @@ const Import: React.FC<Props> = ({ className = '' }) => {
       }
     });
   }, [_import, modal, error]);
+  const handleErrorModalOnClose = useCallback(() => {
+    error.setError(null);
+  }, [error]);
 
   return (
     <>
@@ -55,7 +58,7 @@ const Import: React.FC<Props> = ({ className = '' }) => {
           endpointGroupList={distribution.endpointGroupList || []}
         />
       </Modal>
-      <Error.modal {...error.bind} />
+      <Error.modal {...error.bind} onClose={handleErrorModalOnClose} />
     </>
   );
 };
