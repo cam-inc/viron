@@ -19,7 +19,7 @@
     "mongoose": "6.1.8",
     "multer": "^1.4.3",
     "multer-s3": "^3.0.1",
-    "mysql2": "^2.2.5",
+    "mysql2": "^3.9.7",
     "pino": "^7.6.4",
     "pino-http": "^6.6.0",
     "sequelize": "^6.5.0",
