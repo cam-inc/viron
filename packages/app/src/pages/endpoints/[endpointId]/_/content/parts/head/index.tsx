@@ -87,9 +87,6 @@ const Head: React.FC<Props> = ({
   >(() => {
     popoverSiblings.hide();
   }, [popoverSiblings]);
-  const handleErrorModalOnClose = useCallback(() => {
-    error.setError(null);
-  }, [error]);
 
   return (
     <>
@@ -155,7 +152,7 @@ const Head: React.FC<Props> = ({
           </div>
         ))}
       </Popover>
-      <Error.modal {...error.bind} onClose={handleErrorModalOnClose} />
+      <Error.renewal {...error.bind} withModal={true} />
     </>
   );
 };

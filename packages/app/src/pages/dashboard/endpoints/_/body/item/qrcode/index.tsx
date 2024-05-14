@@ -73,10 +73,11 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
         </div>
       </div>
       {!!error && (
-        <Error.modal
+        <Error.renewal
           on={COLOR_SYSTEM.SURFACE}
           error={error}
-          onClose={handleErrorModalOnClose}
+          reset={handleErrorModalOnClose}
+          withModal={true}
         />
       )}
     </>

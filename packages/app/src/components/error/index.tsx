@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Props as BaseProps } from '~/components';
 import ExclamationIcon from '~/components/icon/exclamation/outline';
 import InformationCircleIcon from '~/components/icon/informationCircle/outline';
@@ -11,11 +11,10 @@ import { error as logError, NAMESPACE } from '~/utils/logger';
 type Props = BaseProps & {
   error?: BaseError;
   withModal?: boolean;
-  onClose?: VoidFunction;
+  reset?: VoidFunction;
 };
 const Error: React.FC<Props> & {
   renewal: React.FC<Props>;
-  modal: React.FC<Props>;
 } = (props) => {
   const { error, withModal = false } = props;
 
@@ -53,7 +52,7 @@ const Error: React.FC<Props> & {
 };
 
 const Renewal: React.FC<Props> = (props) => {
-  const { error, withModal = false } = props;
+  const { error, withModal = false, reset } = props;
 
   // log error.
   useEffect(() => {
@@ -67,7 +66,7 @@ const Renewal: React.FC<Props> = (props) => {
     });
   }, [error]);
 
-  const modal = useModal();
+  const modal = useModal(reset);
   useEffect(() => {
     if (!error || !withModal) {
       return;
@@ -90,38 +89,6 @@ const Renewal: React.FC<Props> = (props) => {
 
 Error.renewal = Renewal;
 
-const ErrorModal: React.FC<Props> = (props) => {
-  const { error, onClose } = props;
-
-  // log error.
-  useEffect(() => {
-    if (!error) {
-      return;
-    }
-    logError({
-      messages: [error],
-      // TODO: namespaceを変えること。
-      namespace: NAMESPACE.REACT_COMPONENT,
-    });
-  }, [error]);
-
-  const modal = useModal(onClose);
-  useEffect(() => {
-    if (!error) {
-      return;
-    }
-    modal.open();
-  }, [error, modal, modal.open]);
-
-  return (
-    <Modal {...modal.bind}>
-      <_Error.modal {...props} />
-    </Modal>
-  );
-};
-
-Error.modal = ErrorModal;
-
 export default Error;
 
 export const useError = (
@@ -132,10 +99,15 @@ export const useError = (
 } => {
   const [error, setError] = useState<BaseError | null>(null);
 
+  const reset = useCallback(() => {
+    setError(null);
+  }, []);
+
   return {
     setError,
     bind: {
       error: error as Props['error'],
+      reset,
       ...props,
     },
   };
@@ -143,7 +115,6 @@ export const useError = (
 
 const _Error: React.FC<Props> & {
   renewal: React.FC<Props>;
-  modal: React.FC<Props>;
 } = ({ className = '', on, error }) => {
   if (!error) {
     return null;
@@ -190,38 +161,11 @@ const _Error: React.FC<Props> & {
   );
 };
 
-const _ErrorRenewal: React.FC<Props> = ({ className = '', error }) => {
-  if (!error) {
-    return null;
-  }
-  return (
-    <div
-      className={classnames(
-        'flex items-center gap-2 text-xs text-thm-on-background bg-thm-on-surface-faint py-2 px-4 rounded-lg',
-        className
-      )}
-    >
-      <ExclamationIcon className="w-5 flex-none" />
-      <div className="space-y-0.5">
-        <div className="text-sm font-bold">{error.name}</div>
-        {error.message && (
-          <div className={`text-thm-on-background-low text-xs`}>
-            {error.message}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-_Error.renewal = _ErrorRenewal;
-
-const _ErrorModal: React.FC<Props> = ({ className = '', on, error }) => {
+const _ErrorRenewal: React.FC<Props> = ({ className = '', on, error }) => {
   const { t } = useTranslation();
   if (!error) {
     return null;
   }
-
   return (
     <div className={classnames(`text-xs text-thm-on-${on}`, className)}>
       <div className="flex flex-col">
@@ -259,4 +203,4 @@ const _ErrorModal: React.FC<Props> = ({ className = '', on, error }) => {
   );
 };
 
-_Error.modal = _ErrorModal;
+_Error.renewal = _ErrorRenewal;

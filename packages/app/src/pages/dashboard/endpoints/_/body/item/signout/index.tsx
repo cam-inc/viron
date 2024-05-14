@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import React, { useCallback, useMemo } from 'react';
 import Button, { Props as ButtonProps } from '~/components/button';
 import Error, { useError } from '~/components/error';
@@ -43,9 +42,6 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
     },
     [signout, onSignout, error]
   );
-  const handleErrorModalOnClose = useCallback(() => {
-    error.setError(null);
-  }, [error]);
 
   if (signout.error) {
     return <Error on={COLOR_SYSTEM.BACKGROUND} error={signout.error} />;
@@ -72,7 +68,7 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
           onSubmit={handleSubmit}
         />
       </Drawer>
-      <Error.modal {...error.bind} onClose={handleErrorModalOnClose} />
+      <Error.renewal {...error.bind} withModal={true} />
     </>
   );
 };

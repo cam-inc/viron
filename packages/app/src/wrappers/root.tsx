@@ -61,9 +61,7 @@ export default RootWrapper;
 const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
   // Entry point.
   const { launch, isLaunched, style, error } = useRoot();
-  const handleErrorModalOnClose = useCallback(() => {
-    error.setError(null);
-  }, [error]);
+
   useEffect(() => {
     launch();
   }, [launch]);
@@ -80,7 +78,7 @@ const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
         <ProgressWrapper className="fixed inset-0 z-wrapper-progress" />
         <Splash isActive={!isLaunched} className="fixed inset-0 z-splash" />
       </div>
-      <Error.modal {...error.bind} onClose={handleErrorModalOnClose} />
+      <Error.renewal {...error.bind} withModal={true} />
     </>
   );
 };
