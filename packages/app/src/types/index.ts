@@ -57,6 +57,7 @@ export type AuthConfig = {
   type: 'email' | 'oauth' | 'oauthcallback' | 'signout';
   provider: 'viron' | 'google' | 'signout';
   operationId: OperationId;
+  mode?: 'navigate' | 'cors';
   defaultParametersValue?: RequestParametersValue;
   defaultRequestBodyValue?: RequestRequestBodyValue;
 };
