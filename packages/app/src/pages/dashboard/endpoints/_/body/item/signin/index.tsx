@@ -85,6 +85,7 @@ const OAuth: React.FC<{
     [authentication, endpoint, prepareSigninOAuth]
   );
   const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
+  const setError = error.setError;
 
   const handleSubmit = useCallback(
     async (requestValue: RequestValue) => {
@@ -93,11 +94,11 @@ const OAuth: React.FC<{
       }
       const result = await signinOAuth.execute(requestValue);
       if (result.error) {
-        error.setError(result.error);
+        setError(result.error);
         return;
       }
     },
-    [error, signinOAuth]
+    [setError, signinOAuth]
   );
 
   if (signinOAuth.error) {
@@ -132,6 +133,7 @@ const Email: React.FC<{
     [authentication, endpoint, prepareSigninEmail]
   );
   const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
+  const setError = error.setError;
 
   const handleSubmit = useCallback(
     async (requestValue: RequestValue) => {
@@ -140,12 +142,12 @@ const Email: React.FC<{
       }
       const result = await signinEmail.execute(requestValue);
       if (result.error) {
-        error.setError(result.error);
+        setError(result.error);
         return;
       }
       navigate(endpoint);
     },
-    [endpoint, navigate, signinEmail, error]
+    [endpoint, navigate, signinEmail, setError]
   );
 
   if (signinEmail.error) {

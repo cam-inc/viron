@@ -16,10 +16,11 @@ const Body: React.FC<Props> = ({ style, className = '', search }) => {
   const { navigate } = useI18n();
   const { connect, addEndpoint } = useEndpoint();
   const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
+  const setError = error.setError;
   const [isPending, setIsPending] = useState<boolean>(true);
 
   useEffect(() => {
-    error.setError(null);
+    setError(null);
     setIsPending(true);
 
     const queries = parse(search);
@@ -27,7 +28,7 @@ const Body: React.FC<Props> = ({ style, className = '', search }) => {
     try {
       endpoint = JSON.parse(queries.endpoint as string) as Endpoint;
     } catch {
-      error.setError(new BaseError('Broken endpoint data.'));
+      setError(new BaseError('Broken endpoint data.'));
       setIsPending(false);
       return;
     }
@@ -35,7 +36,7 @@ const Body: React.FC<Props> = ({ style, className = '', search }) => {
     const f = async () => {
       const connection = await connect(endpoint.url);
       if (connection.error) {
-        error.setError(connection.error);
+        setError(connection.error);
         setIsPending(false);
         return;
       }
@@ -43,15 +44,15 @@ const Body: React.FC<Props> = ({ style, className = '', search }) => {
         resolveDuplication: true,
       });
       if (addition.error) {
-        error.setError(addition.error);
+        setError(addition.error);
         setIsPending(false);
         return;
       }
-      error.setError(null);
+      setError(null);
       setIsPending(false);
     };
     f();
-  }, [addEndpoint, connect, error, search]);
+  }, [addEndpoint, connect, setError, search]);
 
   const handleButtonClick = useCallback<ButtonProps['onClick']>(() => {
     navigate('/dashboard/endpoints');

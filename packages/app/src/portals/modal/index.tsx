@@ -90,7 +90,11 @@ type UseModalReturn = {
     onRequestClose: Props['onRequestClose'];
   };
 };
-export const useModal = (onClose?: VoidFunction): UseModalReturn => {
+export const useModal = ({
+  onClose,
+}: {
+  onClose?: VoidFunction;
+}): UseModalReturn => {
   const [isOpened, setIsOpened] = useState<boolean>(false);
   const handleRequestClose = useCallback(() => {
     setIsOpened(false);

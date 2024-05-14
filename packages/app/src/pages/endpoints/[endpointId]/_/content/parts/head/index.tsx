@@ -50,6 +50,7 @@ const Head: React.FC<Props> = ({
     on: COLOR_SYSTEM.SURFACE,
     withModal: true,
   });
+  const setError = error.setError;
 
   const handleSiblingOperationSuccess = useCallback(() => {
     base.refresh();
@@ -57,9 +58,9 @@ const Head: React.FC<Props> = ({
 
   const handleSiblingOperationFail = useCallback(
     (err: BaseError) => {
-      error.setError(err);
+      setError(err);
     },
-    [error]
+    [setError]
   );
 
   const handleOpenerClick = useCallback(() => {

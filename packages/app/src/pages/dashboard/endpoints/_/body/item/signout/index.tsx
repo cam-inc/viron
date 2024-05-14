@@ -22,6 +22,7 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
     [prepareSignout, endpoint, authentication]
   );
   const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
+  const setError = error.setError;
 
   const drawer = useDrawer();
   const handleClick = useCallback<ButtonProps['onClick']>(() => {
@@ -35,12 +36,12 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
       }
       const result = await signout.execute(requestValue);
       if (result.error) {
-        error.setError(result.error);
+        setError(result.error);
         return;
       }
       onSignout();
     },
-    [signout, onSignout, error]
+    [signout, onSignout, setError]
   );
 
   if (signout.error) {

@@ -30,7 +30,7 @@ const Error: React.FC<Props> & {
     });
   }, [error]);
 
-  const modal = useModal();
+  const modal = useModal({});
   useEffect(() => {
     if (!error || !withModal) {
       return;
@@ -66,7 +66,7 @@ const Renewal: React.FC<Props> = (props) => {
     });
   }, [error]);
 
-  const modal = useModal(reset);
+  const modal = useModal({ onClose: reset });
   useEffect(() => {
     if (!error || !withModal) {
       return;

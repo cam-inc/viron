@@ -13,7 +13,7 @@ type Props = {
 };
 const Import: React.FC<Props> = ({ className = '' }) => {
   const { t } = useTranslation();
-  const modal = useModal();
+  const modal = useModal({});
   const error = useError({
     on: COLOR_SYSTEM.SURFACE,
     withModal: true,

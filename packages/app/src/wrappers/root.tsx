@@ -167,15 +167,17 @@ const useRoot = (): UseRootReturn => {
     on: COLOR_SYSTEM.SURFACE,
     withModal: true,
   });
+  const setError = error.setError;
+
   useEffect(() => {
     const handler = (e: ErrorEvent) => {
-      error.setError(new UnhandledError(e.message));
+      setError(new UnhandledError(e.message));
     };
     window.addEventListener('error', handler);
     return () => {
       window.removeEventListener('error', handler);
     };
-  }, [error]);
+  }, [setError]);
 
   return {
     launch,
