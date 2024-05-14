@@ -230,6 +230,7 @@ export const useEndpoint = (): UseEndpointReturn => {
         credentials: 'include',
       })
     );
+
     // Could not establish a network connection to the endpoint.
     if (responseError) {
       return {
@@ -267,6 +268,7 @@ export const useEndpoint = (): UseEndpointReturn => {
           credentials: 'include',
         })
       );
+
       if (responseError) {
         return {
           error: new NetworkError(responseError.message),
@@ -349,12 +351,9 @@ export const useEndpoint = (): UseEndpointReturn => {
     []
   );
 
-  const navigate = useCallback<UseEndpointReturn['navigate']>(
-    (endpoint) => {
-      _navigate(`/endpoints/${endpoint.id}`);
-    },
-    [_navigate]
-  );
+  const navigate = useCallback<UseEndpointReturn['navigate']>((endpoint) => {
+    _navigate(`/endpoints/${endpoint.id}`);
+  }, []);
 
   const addEndpoint = useCallback<UseEndpointReturn['addEndpoint']>(
     async (

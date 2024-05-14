@@ -17,6 +17,7 @@ export type Props = Parameters<LayoutProps['renderBody']>[0] & {
 };
 const Body: React.FC<Props> = ({ className = '', search }) => {
   const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
+  const setError = error.setError;
   const [isPending, setIsPending] = useState<boolean>(true);
   const endpoint = useEndpointListItemGlobalStateValue({
     id: get<EndpointID>(KEY.OAUTH_ENDPOINT_ID),
@@ -28,23 +29,23 @@ const Body: React.FC<Props> = ({ className = '', search }) => {
   > | null>(null);
 
   useEffect(() => {
-    error.setError(null);
+    setError(null);
     setIsPending(true);
     if (!endpoint) {
-      error.setError(new BaseError('Endpoint Not Found.'));
+      setError(new BaseError('Endpoint Not Found.'));
       setIsPending(false);
       return;
     }
     const f = async () => {
       const connection = await connect(endpoint.url);
       if (connection.error) {
-        error.setError(connection.error);
+        setError(connection.error);
         setIsPending(false);
         return;
       }
       const fetchDocumentResult = await fetchDocument(endpoint);
       if (fetchDocumentResult.error) {
-        error.setError(fetchDocumentResult.error);
+        setError(fetchDocumentResult.error);
         setIsPending(false);
         return;
       }
@@ -66,7 +67,7 @@ const Body: React.FC<Props> = ({ className = '', search }) => {
     endpoint,
     connect,
     fetchDocument,
-    error,
+    setError,
     search,
     prepareSigninOAuthCallback,
   ]);
