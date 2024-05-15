@@ -16,20 +16,22 @@
     "en": "English",
     "ja": "日本語"
   },
+  "fetchError": "An error has occurred. <br>Please check the error details and try again, or wait for a while.",
+  "detail": "detail",
   "endpoint": "Endpoint",
   "endpoints": "Endpoints",
   "group": "Group",
   "groups": "Groups",
-  "createGroup":{
-    "head":{
-      "title":"Create a Group",
-      "description":"Manage endpoints in groups"
+  "createGroup": {
+    "head": {
+      "title": "Create a Group",
+      "description": "Manage endpoints in groups"
     },
-    "idFormLabel":"ID",
-    "nameFormLabel":"Name",
-    "descriptionFormLabel":"description",
-    "addButtonLabel":"Add",
-    "cancelButtonLabel":"Cancel"
+    "idFormLabel": "ID",
+    "nameFormLabel": "Name",
+    "descriptionFormLabel": "description",
+    "addButtonLabel": "Add",
+    "cancelButtonLabel": "Cancel"
   },
   "endpointsTabLabel": "$t(endpoints)",
   "groupsTabLabel": "$t(groups)",
@@ -63,7 +65,7 @@
     "addButtonLabel": "Create",
     "cancelButtonLabel": "Cancel"
   },
-  "editEndpoint":{
+  "editEndpoint": {
     "title": "Edit an $t(endpoint)",
     "idInputLabel": "ID",
     "urlInputLabel": "URL",
@@ -72,7 +74,7 @@
     "updateButtonLabel": "Update",
     "cancelButtonLabel": "Cancel"
   },
-  "endpointEditButtonLabel":"Edit",
+  "endpointEditButtonLabel": "Edit",
   "endpointInformationButtonLabel": "Information",
   "endpointQRCodeShareButtonLabel": "QR Code",
   "removeEndpointButtonLabel": "Remove",
@@ -89,17 +91,17 @@
     "groups": "Groups",
     "dashboard": "Dashboard"
   },
-  "prependButtonLabel":"Prepend",
-  "insertButtonLabel":"Insert",
-  "appendButtonLabel":"Append",
-  "removeButtonLabel":"Remove",
-  "submitButtonLabel":"Submit",
-  "cancelButtonLabel":"Cancel",
-  "moveUpButtonLabel":"Move Up",
-  "moveDownButtonLabel":"Move Down",
-  "menuButtonLabel":"Menu",
-  "removeModal":{
-    "title":"Remove a Group",
-    "description":"Really want to remove it? The endpoints in the group will remain ungrouped."
+  "prependButtonLabel": "Prepend",
+  "insertButtonLabel": "Insert",
+  "appendButtonLabel": "Append",
+  "removeButtonLabel": "Remove",
+  "submitButtonLabel": "Submit",
+  "cancelButtonLabel": "Cancel",
+  "moveUpButtonLabel": "Move Up",
+  "moveDownButtonLabel": "Move Down",
+  "menuButtonLabel": "Menu",
+  "removeModal": {
+    "title": "Remove a Group",
+    "description": "Really want to remove it? The endpoints in the group will remain ungrouped."
   }
 }
