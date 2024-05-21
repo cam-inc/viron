@@ -121,15 +121,17 @@ export class UnhandledError extends BaseError {
   name = 'Unhandled Error';
 }
 
-export const getHTTPError = (statusCode: HTTPStatusCode): BaseError => {
+export const getHTTPError = async (response: Response): Promise<BaseError> => {
+  const statusCode = response.status as HTTPStatusCode;
+  const cause = await response.text();
   switch (statusCode) {
     case HTTP_STATUS.BAD_REQUEST.code:
-      return new HTTP400Error();
+      return new HTTP400Error(cause);
     case HTTP_STATUS.UNAUTHORIZED.code:
-      return new HTTP401Error();
+      return new HTTP401Error(cause);
     case HTTP_STATUS.FORBIDDEN.code:
-      return new HTTP403Error();
+      return new HTTP403Error(cause);
     default:
-      return new HTTPError();
+      return new HTTPError(cause);
   }
 };

@@ -61,9 +61,10 @@ export default RootWrapper;
 const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
   // Entry point.
   const { launch, isLaunched, style, error } = useRoot();
+
   useEffect(() => {
     launch();
-  }, []);
+  }, [launch]);
 
   return (
     <>
@@ -77,7 +78,7 @@ const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
         <ProgressWrapper className="fixed inset-0 z-wrapper-progress" />
         <Splash isActive={!isLaunched} className="fixed inset-0 z-splash" />
       </div>
-      <Error {...error.bind} />
+      <Error.renewal {...error.bind} withModal={true} />
     </>
   );
 };
@@ -166,15 +167,17 @@ const useRoot = (): UseRootReturn => {
     on: COLOR_SYSTEM.SURFACE,
     withModal: true,
   });
+  const setError = error.setError;
+
   useEffect(() => {
     const handler = (e: ErrorEvent) => {
-      error.setError(new UnhandledError(e.message));
+      setError(new UnhandledError(e.message));
     };
     window.addEventListener('error', handler);
     return () => {
       window.removeEventListener('error', handler);
     };
-  }, [error.setError]);
+  }, [setError]);
 
   return {
     launch,

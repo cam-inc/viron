@@ -1,5 +1,11 @@
 # @viron/app
 
+## 2.14.0
+
+### Minor Changes
+
+- feat(app): Display details in error modal when api communication fails
+
 ## 2.13.2
 
 ### Patch Changes

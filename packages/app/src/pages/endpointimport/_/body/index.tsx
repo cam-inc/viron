@@ -1,7 +1,7 @@
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useState } from 'react';
 import Button, { Props as ButtonProps } from '~/components/button';
-import Error from '~/components/error';
+import Error, { useError } from '~/components/error';
 import Spinner from '~/components/spinner';
 import { BaseError } from '~/errors/index';
 import { useEndpoint } from '~/hooks/endpoint';
@@ -15,7 +15,8 @@ export type Props = Parameters<LayoutProps['renderBody']>[0] & {
 const Body: React.FC<Props> = ({ style, className = '', search }) => {
   const { navigate } = useI18n();
   const { connect, addEndpoint } = useEndpoint();
-  const [error, setError] = useState<BaseError | null>(null);
+  const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
+  const setError = error.setError;
   const [isPending, setIsPending] = useState<boolean>(true);
 
   useEffect(() => {
@@ -51,7 +52,7 @@ const Body: React.FC<Props> = ({ style, className = '', search }) => {
       setIsPending(false);
     };
     f();
-  }, []);
+  }, [addEndpoint, connect, setError, search]);
 
   const handleButtonClick = useCallback<ButtonProps['onClick']>(() => {
     navigate('/dashboard/endpoints');
@@ -67,30 +68,23 @@ const Body: React.FC<Props> = ({ style, className = '', search }) => {
     );
   }
 
-  if (error) {
-    return (
+  return (
+    <>
       <div style={style} className={className}>
         <div className="p-4">
-          <Error on={COLOR_SYSTEM.BACKGROUND} error={error} />;
+          <div>
+            Have completed importing an endpoint successfully.{' '}
+            <Button
+              cs={COLOR_SYSTEM.PRIMARY}
+              label="Go back to the dashboard"
+              onClick={handleButtonClick}
+            />{' '}
+            to continue.
+          </div>
         </div>
       </div>
-    );
-  }
-
-  return (
-    <div style={style} className={className}>
-      <div className="p-4">
-        <div>
-          Have completed importing an endpoint successfully.{' '}
-          <Button
-            cs={COLOR_SYSTEM.PRIMARY}
-            label="Go back to the dashboard"
-            onClick={handleButtonClick}
-          />{' '}
-          to continue.
-        </div>
-      </div>
-    </div>
+      <Error.renewal {...error.bind} withModal={true} />
+    </>
   );
 };
 export default Body;

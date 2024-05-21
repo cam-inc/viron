@@ -1,14 +1,11 @@
-import _ from 'lodash';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import Button, { Props as ButtonProps } from '~/components/button';
-import Error from '~/components/error/';
+import Error, { useError } from '~/components/error/';
 import LoginIcon from '~/components/icon/login/outline';
 import Request from '~/components/request';
-import { BaseError } from '~/errors';
 import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
 import Drawer, { useDrawer } from '~/portals/drawer';
-import Modal, { useModal } from '~/portals/modal';
 import { Authentication, AuthConfig, COLOR_SYSTEM, Endpoint } from '~/types/';
 import { RequestValue } from '~/types/oas';
 
@@ -83,7 +80,12 @@ const OAuth: React.FC<{
   const { prepareSigninOAuth } = useEndpoint();
   const signinOAuth = useMemo<
     ReturnType<UseEndpointReturn['prepareSigninOAuth']>
-  >(() => prepareSigninOAuth(endpoint, authentication), [prepareSigninOAuth]);
+  >(
+    () => prepareSigninOAuth(endpoint, authentication),
+    [authentication, endpoint, prepareSigninOAuth]
+  );
+  const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
+  const setError = error.setError;
 
   const handleSubmit = useCallback(
     async (requestValue: RequestValue) => {
@@ -92,11 +94,11 @@ const OAuth: React.FC<{
       }
       const result = await signinOAuth.execute(requestValue);
       if (result.error) {
-        // TODO: エラー表示。
+        setError(result.error);
         return;
       }
     },
-    [signinOAuth]
+    [setError, signinOAuth]
   );
 
   if (signinOAuth.error) {
@@ -104,15 +106,18 @@ const OAuth: React.FC<{
   }
 
   return (
-    <Request
-      on={COLOR_SYSTEM.SURFACE}
-      className="h-full"
-      endpoint={signinOAuth.endpoint}
-      document={signinOAuth.document}
-      defaultValues={signinOAuth.defaultValues}
-      request={signinOAuth.request}
-      onSubmit={handleSubmit}
-    />
+    <>
+      <Request
+        on={COLOR_SYSTEM.SURFACE}
+        className="h-full"
+        endpoint={signinOAuth.endpoint}
+        document={signinOAuth.document}
+        defaultValues={signinOAuth.defaultValues}
+        request={signinOAuth.request}
+        onSubmit={handleSubmit}
+      />
+      <Error.renewal {...error.bind} withModal={true} />
+    </>
   );
 };
 
@@ -123,9 +128,12 @@ const Email: React.FC<{
   const { prepareSigninEmail, navigate } = useEndpoint();
   const signinEmail = useMemo<
     ReturnType<UseEndpointReturn['prepareSigninEmail']>
-  >(() => prepareSigninEmail(endpoint, authentication), [prepareSigninEmail]);
-  const [error, setError] = useState<BaseError | null>(null);
-  const errorModal = useModal();
+  >(
+    () => prepareSigninEmail(endpoint, authentication),
+    [authentication, endpoint, prepareSigninEmail]
+  );
+  const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
+  const setError = error.setError;
 
   const handleSubmit = useCallback(
     async (requestValue: RequestValue) => {
@@ -135,12 +143,11 @@ const Email: React.FC<{
       const result = await signinEmail.execute(requestValue);
       if (result.error) {
         setError(result.error);
-        errorModal.open();
         return;
       }
       navigate(endpoint);
     },
-    [endpoint, navigate, signinEmail, errorModal]
+    [endpoint, navigate, signinEmail, setError]
   );
 
   if (signinEmail.error) {
@@ -158,9 +165,7 @@ const Email: React.FC<{
         onSubmit={handleSubmit}
         className="h-full"
       />
-      <Modal {...errorModal.bind}>
-        {error && <Error on={COLOR_SYSTEM.SURFACE} error={error} />}
-      </Modal>
+      <Error.renewal {...error.bind} withModal={true} />
     </>
   );
 };

@@ -1,7 +1,6 @@
-import _ from 'lodash';
 import React, { useCallback, useMemo } from 'react';
 import Button, { Props as ButtonProps } from '~/components/button';
-import Error from '~/components/error';
+import Error, { useError } from '~/components/error';
 import LogoutIcon from '~/components/icon/logout/outline';
 import Request from '~/components/request';
 import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
@@ -20,8 +19,10 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
   const { prepareSignout } = useEndpoint();
   const signout = useMemo<ReturnType<UseEndpointReturn['prepareSignout']>>(
     () => prepareSignout(endpoint, authentication),
-    [endpoint, authentication]
+    [prepareSignout, endpoint, authentication]
   );
+  const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
+  const setError = error.setError;
 
   const drawer = useDrawer();
   const handleClick = useCallback<ButtonProps['onClick']>(() => {
@@ -35,12 +36,12 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
       }
       const result = await signout.execute(requestValue);
       if (result.error) {
-        // TODO: エラー表示。
+        setError(result.error);
         return;
       }
       onSignout();
     },
-    [signout, onSignout]
+    [signout, onSignout, setError]
   );
 
   if (signout.error) {
@@ -68,6 +69,7 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
           onSubmit={handleSubmit}
         />
       </Drawer>
+      <Error.renewal {...error.bind} withModal={true} />
     </>
   );
 };

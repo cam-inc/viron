@@ -16,20 +16,22 @@
     "en": "English",
     "ja": "日本語"
   },
+  "fetchError": "エラーが発生しました。<br>エラー内容をご確認の上、再度お試しいただくか、しばらくお待ちください。",
+  "detail": "詳細",
   "endpoint": "管理画面",
   "endpoints": "管理画面",
   "group": "グループ",
   "groups": "グループ",
-  "createGroup":{
-    "head":{
-      "title":"グループの作成",
-      "description":"エンドポイントをグループで管理します"
+  "createGroup": {
+    "head": {
+      "title": "グループの作成",
+      "description": "エンドポイントをグループで管理します"
     },
-    "idFormLabel":"ID",
-    "nameFormLabel":"グループ名",
-    "descriptionFormLabel":"説明",
-    "addButtonLabel":"追加",
-    "cancelButtonLabel":"キャンセル"
+    "idFormLabel": "ID",
+    "nameFormLabel": "グループ名",
+    "descriptionFormLabel": "説明",
+    "addButtonLabel": "追加",
+    "cancelButtonLabel": "キャンセル"
   },
   "endpointsTabLabel": "$t(endpoints)",
   "groupsTabLabel": "$t(groups)",
@@ -63,7 +65,7 @@
     "addButtonLabel": "追加する",
     "cancelButtonLabel": "キャンセル"
   },
-  "editEndpoint":{
+  "editEndpoint": {
     "title": "$t(endpoint)の編集",
     "idInputLabel": "タイトル",
     "urlInputLabel": "URL",
@@ -72,7 +74,7 @@
     "updateButtonLabel": "更新する",
     "cancelButtonLabel": "キャンセル"
   },
-  "endpointEditButtonLabel":"編集",
+  "endpointEditButtonLabel": "編集",
   "endpointInformationButtonLabel": "詳細情報",
   "endpointQRCodeShareButtonLabel": "QRコードの共有",
   "removeEndpointButtonLabel": "削除",
@@ -89,17 +91,17 @@
     "groups": "グループ",
     "dashboard": "ダッシュボード"
   },
-  "prependButtonLabel":"先頭に追加",
-  "insertButtonLabel":"挿入",
-  "appendButtonLabel":"追加",
-  "removeButtonLabel":"削除",
-  "submitButtonLabel":"更新",
-  "cancelButtonLabel":"キャンセル",
-  "moveUpButtonLabel":"上に移動",
-  "moveDownButtonLabel":"下に移動",
-  "menuButtonLabel":"メニュー",
-  "removeModal":{
-    "title":"グループを削除する",
-    "description":"本当に削除しますか? グループ内のエンドポイントはグループ化されないままになります。"
+  "prependButtonLabel": "先頭に追加",
+  "insertButtonLabel": "挿入",
+  "appendButtonLabel": "追加",
+  "removeButtonLabel": "削除",
+  "submitButtonLabel": "更新",
+  "cancelButtonLabel": "キャンセル",
+  "moveUpButtonLabel": "上に移動",
+  "moveDownButtonLabel": "下に移動",
+  "menuButtonLabel": "メニュー",
+  "removeModal": {
+    "title": "グループを削除する",
+    "description": "本当に削除しますか? グループ内のエンドポイントはグループ化されないままになります。"
   }
 }

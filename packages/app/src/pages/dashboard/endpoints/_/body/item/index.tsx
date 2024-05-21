@@ -7,6 +7,7 @@ import IconButton from '~/components/button/icon';
 import Error from '~/components/error/';
 import InformationCircleIcon from '~/components/icon/informationCircle/outline';
 import MoreIcon from '~/components/icon/more/outline';
+import PencilIcon from '~/components/icon/pencil/outline';
 import QrcodeIcon from '~/components/icon/qrcode/outline';
 import TerminalIcon from '~/components/icon/terminal/outline';
 import TrashIcon from '~/components/icon/trash/outline';
@@ -17,13 +18,12 @@ import Modal, { useModal } from '~/portals/modal';
 import Popover, { usePopover } from '~/portals/popover';
 import { Authentication, COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document } from '~/types/oas';
+import EditEndpoint from './edit';
 import Info from './info';
 import Qrcode from './qrcode';
 import Signin from './signin/';
 import Signout, { Props as SignoutProps } from './signout/';
 import Thumbnail from './thumbnail/';
-import PencilIcon from '~/components/icon/pencil/outline';
-import EditEndpoint from './edit';
 
 export type Props = {
   endpoint: Endpoint;
@@ -117,9 +117,9 @@ const _Item: React.FC<{
 
   const menuPopover = usePopover<HTMLDivElement>();
 
-  const editModal = useModal();
-  const infoModal = useModal();
-  const qrcodeModal = useModal();
+  const editModal = useModal({});
+  const infoModal = useModal({});
+  const qrcodeModal = useModal({});
 
   const handleMenuClick = useCallback(() => {
     menuPopover.open();
