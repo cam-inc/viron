@@ -52,8 +52,8 @@ There are four types of authentication: `email`, `oauth`, `oauthcallback`, and `
 ```
 
 :::tip　
-Basically, you should set `mode: 'cors'`.
-However, if you are self-hosting viron, you can choose any mode.
+Typically, you should set mode: 'cors'.
+However, if you are self-hosting Viron, you have the flexibility to choose any mode.
 
 ### `email`
 
