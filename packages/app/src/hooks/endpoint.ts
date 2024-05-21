@@ -554,10 +554,16 @@ export const useEndpoint = (): UseEndpointReturn => {
               error: await getHTTPError(response),
             };
           }
-          globalThis.location.href = extractAuthorizationUrl(
+          const authorizationUrlResult = extractAuthorizationUrl(
             request.operation.responses,
             await response.json()
           );
+          if (authorizationUrlResult.isFailure()) {
+            return {
+              error: authorizationUrlResult.value,
+            };
+          }
+          globalThis.location.href = authorizationUrlResult.value;
         }
       } catch (e: unknown) {
         remove(KEY.OAUTH_ENDPOINT_ID);
