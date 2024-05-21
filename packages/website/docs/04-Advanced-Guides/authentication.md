@@ -44,15 +44,16 @@ There are four types of authentication: `email`, `oauth`, `oauthcallback`, and `
   "type": "email" | "oauth" | "oauthcallback" | "signout";
   "provider": string;
   "operatioId": string; // Used to determine how to send a request.
-  "mode"?: 'navigate' | 'cors'; // Use to determine how to open the Oauth endpoint. Only if type is oauth.
+  "mode"?: 'navigate' | 'cors'; // Used to determine the method of opening the Oauth endpoint. Only applicable if type is 'oauth'.
+
   "defaultParametersValue"?: any;
   "defaultRequestBodyValue"?: any;
 }
 ```
 
 :::tip　
-Basically, you should set `mode: 'cors'`.
-However, if you are self-hosting viron, you can choose any mode.
+Typically, you should set mode: 'cors'.
+However, if you are self-hosting Viron, you have the flexibility to choose any mode.
 
 ### `email`
 
