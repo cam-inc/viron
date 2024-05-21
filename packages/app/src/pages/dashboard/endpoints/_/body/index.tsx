@@ -22,7 +22,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
   const { t } = useTranslation();
   const { listByGroup, listUngrouped } = useEndpoint();
   // Add modal.
-  const modal = useModal();
+  const modal = useModal({});
 
   return (
     <>

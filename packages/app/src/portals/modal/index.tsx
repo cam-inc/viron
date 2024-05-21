@@ -61,7 +61,7 @@ const Modal: React.FC<PropsWithChildren<Props>> = ({
               }
             )}
           >
-            <div className="relative min-h-0 flex-1 bg-thm-surface shadow-01dp border border-thm-on-surface-faint px-8 pt-8 pb-10 rounded-2xl overflow-y-scroll overscroll-y-contain">
+            <div className="relative min-h-0 flex-1 bg-thm-surface shadow-01dp px-8 pt-8 pb-10 rounded-2xl overflow-y-scroll overscroll-y-contain">
               <div className="absolute top-2 right-2">
                 <IconButton
                   on={COLOR_SYSTEM.BACKGROUND}
@@ -90,17 +90,23 @@ type UseModalReturn = {
     onRequestClose: Props['onRequestClose'];
   };
 };
-export const useModal = (): UseModalReturn => {
+export const useModal = ({
+  onClose,
+}: {
+  onClose?: VoidFunction;
+}): UseModalReturn => {
   const [isOpened, setIsOpened] = useState<boolean>(false);
   const handleRequestClose = useCallback(() => {
     setIsOpened(false);
-  }, []);
+    onClose?.();
+  }, [onClose]);
   const open = useCallback(() => {
     setIsOpened(true);
   }, []);
   const close = useCallback(() => {
     setIsOpened(false);
-  }, []);
+    onClose?.();
+  }, [onClose]);
 
   const ret = useMemo<UseModalReturn>(
     () => ({

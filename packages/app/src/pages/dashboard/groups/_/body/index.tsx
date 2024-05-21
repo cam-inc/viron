@@ -17,7 +17,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
   const { groupList } = useEndpoint();
 
   // Add modal.
-  const modal = useModal();
+  const modal = useModal({});
   const handleAddClick = useCallback<ButtonProps['onClick']>(() => {
     modal.open();
   }, [modal.open]);

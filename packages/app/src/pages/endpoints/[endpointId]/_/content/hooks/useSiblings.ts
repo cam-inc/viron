@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import { useMemo } from 'react';
-import { HTTPStatusCode } from '~/constants';
 import { BaseError, getHTTPError, NetworkError } from '~/errors';
 import { Endpoint } from '~/types';
 import {
@@ -26,9 +25,9 @@ import {
 export type UseSiblingsReturn = {
   request: Request;
   defaultValues: ReturnType<typeof cleanupRequestValue>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fetch: (
     requestValue: RequestValue
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ) => Promise<{ data?: any; error?: BaseError }>;
 }[];
 // Sibling Opeartions are
@@ -142,10 +141,10 @@ const useSiblings = (
             globalThis.fetch(requestInfo, requestInit)
           );
           if (responseError) {
-            return { error: new NetworkError() };
+            return { error: new NetworkError(undefined) };
           }
           if (!response.ok) {
-            return { error: getHTTPError(response.status as HTTPStatusCode) };
+            return { error: await getHTTPError(response) };
           }
 
           const contentDisposition = response.headers.get(

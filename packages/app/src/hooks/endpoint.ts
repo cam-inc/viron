@@ -2,7 +2,6 @@ import _ from 'lodash';
 import { useCallback, useMemo, useRef } from 'react';
 import {
   HTTP_STATUS,
-  HTTPStatusCode,
   ENVIRONMENTAL_VARIABLE,
   OAUTH_REDIRECT_URI,
 } from '~/constants';
@@ -231,6 +230,7 @@ export const useEndpoint = (): UseEndpointReturn => {
         credentials: 'include',
       })
     );
+
     // Could not establish a network connection to the endpoint.
     if (responseError) {
       return {
@@ -268,6 +268,7 @@ export const useEndpoint = (): UseEndpointReturn => {
           credentials: 'include',
         })
       );
+
       if (responseError) {
         return {
           error: new NetworkError(responseError.message),
@@ -470,7 +471,7 @@ export const useEndpoint = (): UseEndpointReturn => {
       }
       if (!response.ok) {
         return {
-          error: getHTTPError(response.status as HTTPStatusCode),
+          error: await getHTTPError(response),
         };
       }
       return {
@@ -615,7 +616,7 @@ export const useEndpoint = (): UseEndpointReturn => {
       }
       if (!response.ok) {
         return {
-          error: getHTTPError(response.status as HTTPStatusCode),
+          error: await getHTTPError(response),
         };
       }
       return {
@@ -682,7 +683,7 @@ export const useEndpoint = (): UseEndpointReturn => {
         }
         if (!response.ok) {
           return {
-            error: getHTTPError(response.status as HTTPStatusCode),
+            error: await getHTTPError(response),
           };
         }
         return {

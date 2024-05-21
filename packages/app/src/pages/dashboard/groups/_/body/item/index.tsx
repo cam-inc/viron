@@ -33,7 +33,7 @@ const Item: React.FC<Props> = ({ group }) => {
     menuPopover.close();
   }, [group, descendGroup, menuPopover]);
 
-  const removeConfirmationModal = useModal();
+  const removeConfirmationModal = useModal({});
 
   const handleRemoveClick = useCallback<ButtonProps['onClick']>(() => {
     removeConfirmationModal.open();
