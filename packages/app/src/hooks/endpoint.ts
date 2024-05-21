@@ -57,6 +57,7 @@ import {
   constructRequestInit,
   constructRequestPayloads,
 } from '~/utils/oas';
+import { extractAuthorizationUrl } from '~/utils/oas/oauth';
 
 export type UseEndpointReturn = {
   list: Endpoint[];
@@ -535,7 +536,29 @@ export const useEndpoint = (): UseEndpointReturn => {
       );
       try {
         set(KEY.OAUTH_ENDPOINT_ID, endpoint.id);
-        globalThis.location.href = requestInfo.toString();
+
+        if (authConfig.mode !== 'cors') {
+          globalThis.location.href = requestInfo.toString();
+        } else {
+          const requestInit = constructRequestInit(request, requestPayloads);
+          const [response, responseError] = await promiseErrorHandler(
+            globalThis.fetch(requestInfo, requestInit)
+          );
+          if (!!responseError) {
+            return {
+              error: new NetworkError(responseError.message),
+            };
+          }
+          if (!response.ok) {
+            return {
+              error: await getHTTPError(response),
+            };
+          }
+          globalThis.location.href = extractAuthorizationUrl(
+            request.operation.responses,
+            await response.json()
+          );
+        }
       } catch (e: unknown) {
         remove(KEY.OAUTH_ENDPOINT_ID);
         let message = '';
