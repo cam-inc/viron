@@ -20,7 +20,7 @@
     "dist"
   ],
   "dependencies": {
-    "@apidevtools/json-schema-ref-parser": "^11.1.0",
+    "@apidevtools/json-schema-ref-parser": "^11.1.1",
     "@viron/linter": "*",
     "casbin": "^5.6.1",
     "casbin-mongoose-adapter": "^5.3.0",
