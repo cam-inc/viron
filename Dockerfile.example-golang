@@ -1,4 +1,4 @@
-FROM golang:1.16
+FROM golang:1.22
 
 RUN mkdir -p /viron/example/golang
 RUN mkdir -p /viron/packages/golang
