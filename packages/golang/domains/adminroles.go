@@ -14,6 +14,7 @@ import (
 	"github.com/getkin/kin-openapi/openapi3"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"net/http"
+	"regexp"
 	"time"
 )
 
@@ -256,6 +257,9 @@ func RevokePermissionForRole(roleID, resourceID string, permissions []string) bo
 
 // CreatePermissionsForRole ロールの権限を作成する
 func CreatePermissionsForRole(roleID string, permissions []*AdminRolePermission) *errors.VironError {
+	if err := ValidateRoleAndPermissions(roleID, permissions); err != nil {
+		return err
+	}
 	var policies [][]string
 	for _, permission := range permissions {
 		policies = append(policies, genPolicy(roleID, permission.ResourceID, permission.Permission))
@@ -269,6 +273,9 @@ func CreatePermissionsForRole(roleID string, permissions []*AdminRolePermission)
 
 // UpdatePermissionsForRole ロールの権限を更新する
 func UpdatePermissionsForRole(roleID string, permissions []*AdminRolePermission) *errors.VironError {
+	if err := ValidateRoleAndPermissions(roleID, permissions); err != nil {
+		return err
+	}
 	// 既存のpolicyを取得
 	oldPolices := casbinInstance.GetFilteredPolicy(0, roleID)
 	if len(oldPolices) == 0 {
@@ -467,4 +474,28 @@ func UpdateAdminRoleByID(roleID string, permissions []*AdminRolePermission) *err
 		return errors.Initialize(http.StatusInternalServerError, "roleID cannot be changed")
 	}
 	return UpdatePermissionsForRole(roleID, permissions)
+}
+func ValidateRoleAndPermissions(roleID string, permissions []*AdminRolePermission) *errors.VironError {
+	// カンマをvalidate()で除く理由
+	// casbinのpolicyに "," が存在すると、policyをloadする際に不具合が出る
+	if roleID != "" {
+		if existsCommas(roleID) {
+			return errors.Initialize(http.StatusInternalServerError, "role id cannot contain commas.")
+		}
+	}
+	for _, policy := range permissions {
+		_policy := *policy
+		if existsCommas(_policy.ResourceID) {
+			return errors.Initialize(http.StatusInternalServerError, "policy resource id cannot contain commas.")
+		}
+		if existsCommas(_policy.Permission) {
+			return errors.Initialize(http.StatusInternalServerError, "policy permission cannot contain commas.")
+		}
+	}
+	return nil
+}
+
+func existsCommas(param string) bool {
+	r := regexp.MustCompile(`,`)
+	return r.MatchString(param)
 }
