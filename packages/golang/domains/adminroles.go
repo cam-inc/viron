@@ -480,16 +480,16 @@ func ValidateRoleAndPermissions(roleID string, permissions []*AdminRolePermissio
 	// casbinのpolicyに "," が存在すると、policyをloadする際に不具合が出る
 	if roleID != "" {
 		if existsCommas(roleID) {
-			return errors.Initialize(http.StatusInternalServerError, "role id cannot contain commas.")
+			return errors.Initialize(http.StatusBadRequest, "role id cannot contain commas.")
 		}
 	}
 	for _, policy := range permissions {
 		_policy := *policy
 		if existsCommas(_policy.ResourceID) {
-			return errors.Initialize(http.StatusInternalServerError, "policy resource id cannot contain commas.")
+			return errors.Initialize(http.StatusBadRequest, "policy resource id cannot contain commas.")
 		}
 		if existsCommas(_policy.Permission) {
-			return errors.Initialize(http.StatusInternalServerError, "policy permission cannot contain commas.")
+			return errors.Initialize(http.StatusBadRequest, "policy permission cannot contain commas.")
 		}
 	}
 	return nil

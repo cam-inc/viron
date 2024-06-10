@@ -28,7 +28,7 @@ func TestValidateRoleAndPermissions(t *testing.T) {
 					Permission: "read",
 				},
 			},
-			Err: errors.Initialize(http.StatusInternalServerError, "role id cannot contain commas."),
+			Err: errors.Initialize(http.StatusBadRequest, "role id cannot contain commas."),
 		},
 		{
 			Title:  "Resource id with commas.",
@@ -39,7 +39,7 @@ func TestValidateRoleAndPermissions(t *testing.T) {
 					Permission: "read",
 				},
 			},
-			Err: errors.Initialize(http.StatusInternalServerError, "policy resource id cannot contain commas."),
+			Err: errors.Initialize(http.StatusBadRequest, "policy resource id cannot contain commas."),
 		},
 		{
 			Title:  "Permission with commas.",
@@ -50,7 +50,7 @@ func TestValidateRoleAndPermissions(t *testing.T) {
 					Permission: "read_,",
 				},
 			},
-			Err: errors.Initialize(http.StatusInternalServerError, "policy permission cannot contain commas."),
+			Err: errors.Initialize(http.StatusBadRequest, "policy permission cannot contain commas."),
 		},
 		{
 			Title:  "No commas.",
