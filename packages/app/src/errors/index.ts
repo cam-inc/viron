@@ -96,6 +96,11 @@ export class EndpointExportError extends EndpointError {
   name = 'Endpoint Export Error';
 }
 
+export class EndpointOAuthIllegalResponseError extends EndpointError {
+  code = '#endpointOAuthIllegalResponse';
+  name = 'Endpoint OAuth Illegal Response Error';
+}
+
 export class EndpointGroupError extends BaseError {
   code = '#endpointGroup';
   name = 'Endpoint Group Error';
