@@ -3,6 +3,11 @@ package domains
 import (
 	"database/sql"
 	"fmt"
+	"net/http"
+	"regexp"
+	"sort"
+	"time"
+
 	sqladapter "github.com/Blank-Xu/sql-adapter"
 	"github.com/cam-inc/viron/packages/golang/constant"
 	"github.com/cam-inc/viron/packages/golang/errors"
@@ -13,9 +18,6 @@ import (
 	mongodbadapter "github.com/casbin/mongodb-adapter/v3"
 	"github.com/getkin/kin-openapi/openapi3"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"net/http"
-	"regexp"
-	"time"
 )
 
 type (
@@ -192,6 +194,8 @@ func listRoles(userID string) []string {
 		log.Errorf("listRoles -> %+v\n", err)
 		return []string{}
 	}
+	// GetRolesForUserは順番が保証されないのでソート
+	sort.Strings(roles)
 	return roles
 }
 
