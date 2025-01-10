@@ -8,7 +8,7 @@ import { Mode, MODE } from '../constants';
 export const get = (mode: Mode): Config => {
   const mongo: MongoConfig = {
     type: 'mongo',
-    openUri: 'mongodb://mongo:27017',
+    openUri: 'mongodb://0.0.0.0:27017',
     connectOptions: {
       // MongoDB Options
       dbName: 'viron_example',
@@ -57,6 +57,13 @@ export const get = (mode: Mode): Config => {
         clientSecret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET ?? '',
         additionalScopes: [],
         userHostedDomains: ['cam-inc.co.jp', 'cyberagent.co.jp'],
+      },
+      oidc: {
+        server: 'https://federation.perman.jp',
+        clientId: process.env.OIDC_CLIENT_ID ?? '',
+        clientSecret: process.env.OIDC_CLIENT_SECRET ?? '',
+        tokenEndpoint: 'https://federation.perman.jp/api/v1/oidc/token',
+        callbackUrl: 'https://example.viron.work:3000/oidc/callback',
       },
     },
     aws: {

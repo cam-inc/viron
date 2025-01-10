@@ -53,6 +53,7 @@ components:
           enum:
             - email
             - oauth
+            - oidc
             - signout
           example: oauth
         operationId:

@@ -36,6 +36,21 @@ paths:
         204:
           description: No Content
 
+  /oidc/authorization:
+    get:
+      operationId: oidcAuthorization
+      tags:
+        - auth
+      summary: redirect to oidc idp authorization
+      description: OIDCのidp 認証画面へリダイレクトする
+      parameters:
+        - $ref: '#/components/parameters/RedirectUriQueryParam'
+      responses:
+        301:
+          description: Redirect to OIDC Authorization URL.
+      x-authconfig-default-parameters:
+        redirectUri: '${oauthRedirectURI}'
+
   /oauth2/google/authorization:
     get:
       operationId: oauth2GoogleAuthorization

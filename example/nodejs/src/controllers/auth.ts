@@ -2,6 +2,7 @@ import {
   domainsAuth,
   genAuthorizationCookie,
   genOAuthStateCookie,
+  genOidcStateCookie,
   mismatchState,
   COOKIE_KEY,
   HTTP_HEADER,
@@ -24,6 +25,54 @@ export const signinEmail = async (context: RouteContext): Promise<void> => {
   context.res.setHeader(
     HTTP_HEADER.SET_COOKIE,
     genAuthorizationCookie(token, { maxAge: ctx.config.auth.jwt.expirationSec })
+  );
+  context.res.status(204).end();
+};
+
+// OIDCの認証画面へリダイレクト
+export const oidcAuthorization = async (
+  context: RouteContext
+): Promise<void> => {
+  const { redirectUri } = context.params.query;
+  const state = domainsAuth.genOidcState();
+  const client = await domainsAuth.getOidcClient(
+    redirectUri,
+    ctx.config.auth.oidc
+  );
+  const codeVerifier = await domainsAuth.genOidcCodeVerifier();
+
+  const authorizationUrl = await domainsAuth.getOidcAuthorizationUrl(
+    client,
+    codeVerifier
+  );
+
+  context.res.setHeader(HTTP_HEADER.SET_COOKIE, genOidcStateCookie(state));
+  context.res.setHeader(HTTP_HEADER.LOCATION, authorizationUrl);
+  context.res.status(301).end();
+};
+
+// OIDCのコールバック
+export const oidcCallback = async (context: RouteContext): Promise<void> => {
+  const cookieState = context.req.cookies[COOKIE_KEY.OIDC_STATE];
+  const { state } = context.params.query;
+
+  if (!cookieState || !state || cookieState !== state) {
+    throw mismatchState();
+  }
+
+  const client = await domainsAuth.getOidcClient('', ctx.config.auth.oidc);
+  const codeVerifier = await domainsAuth.genOidcCodeVerifier();
+  const token = await domainsAuth.signinOidc(
+    client,
+    codeVerifier,
+    context.requestBody,
+    ctx.config.auth.oidc
+  );
+  context.res.setHeader(
+    HTTP_HEADER.SET_COOKIE,
+    genAuthorizationCookie(token, {
+      maxAge: ctx.config.auth.jwt.expirationSec,
+    })
   );
   context.res.status(204).end();
 };

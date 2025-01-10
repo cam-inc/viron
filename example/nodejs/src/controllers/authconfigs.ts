@@ -7,6 +7,7 @@ import {
   SIGNOUT_PATH,
   OAUTH2_GOOGLE_AUTHORIZATION_PATH,
   OAUTH2_GOOGLE_CALLBACK_PATH,
+  OIDC_AUTHORIZATION_PATH,
 } from '@viron/lib';
 import { RouteContext } from '../application';
 
@@ -34,6 +35,12 @@ export const listVironAuthconfigs = async (
       type: AUTH_CONFIG_TYPE.OAUTH_CALLBACK,
       method: API_METHOD.POST,
       path: OAUTH2_GOOGLE_CALLBACK_PATH,
+    },
+    {
+      provider: AUTH_CONFIG_PROVIDER.GOOGLE,
+      type: AUTH_CONFIG_TYPE.OIDC,
+      method: API_METHOD.GET,
+      path: OIDC_AUTHORIZATION_PATH,
     },
     {
       provider: AUTH_CONFIG_PROVIDER.SIGNOUT,

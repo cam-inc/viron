@@ -47,6 +47,13 @@ export const get = (): Config => {
         additionalScopes: [],
         userHostedDomains: ['cam-inc.co.jp', 'cyberagent.co.jp'],
       },
+      oidc: {
+        server: 'https://federation.perman.jp',
+        clientId: process.env.OIDC_CLIENT_ID ?? '',
+        clientSecret: process.env.OIDC_CLIENT_SECRET ?? '',
+        tokenEndpoint: 'https://federation.perman.jp/api/v1/oidc/token',
+        callbackUrl: 'https://example.viron.work:3000/oidc/callback',
+      },
     },
     aws: {
       s3: {
