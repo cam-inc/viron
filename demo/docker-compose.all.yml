@@ -26,13 +26,21 @@ services:
       - $PWD/public:/demo/public
       - $PWD/test:/demo/test
       - $PWD/.env:/demo/.env
-    command: npm run inspect
+      - $PWD/mysql.env:/demo/mysql.env
+      - $PWD/wait-for-it.sh:/demo/wait-for-it.sh
+    command: bash -c
+      "
+          chmod +x /demo/wait-for-it.sh && \
+          /demo/wait-for-it.sh viron.dev:3306 --timeout=60 --strict -- \
+          npm run inspect
+      "
     #command: tail -f /var/log/bootstrap.log
 
   mysql:
     # 512*1024*1024 = 536870912 Byte = 512 MB
     mem_limit: 536870912
-    image: mysql:5.6
+    image: mysql/mysql-server:8.0
+    # platform: linux/amd64
     ports:
       - 3306:3306
     volumes:
@@ -40,6 +48,11 @@ services:
     env_file:
       - ./mysql.env
     command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+    healthcheck:
+     test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost", "-u", "user", "-ppassword"]
+     interval: 10s
+     timeout: 5s
+     retries: 5
     networks:
       default:
         aliases:
