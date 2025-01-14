@@ -44,6 +44,7 @@ export const get = (mode: Mode): Config => {
         'https://localhost:8000',
         'https://viron.work',
         'https://snapshot.viron.work',
+        'https://viron.work:8000',
       ],
     },
     auth: {
@@ -64,6 +65,8 @@ export const get = (mode: Mode): Config => {
         clientSecret: process.env.OIDC_CLIENT_SECRET ?? '',
         tokenEndpoint: 'https://federation.perman.jp/api/v1/oidc/token',
         callbackUrl: 'https://example.viron.work:3000/oidc/callback',
+        discoveryUrl:
+          'https://federation.perman.jp/.well-known/openid-configuration',
       },
     },
     aws: {

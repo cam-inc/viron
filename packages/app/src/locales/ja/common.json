@@ -52,6 +52,7 @@
   "importEndpoints": "$t(endpoint)リストのインポート",
   "enterEndpoint": "管理画面",
   "signout": "サインアウト",
+  "oidc": "OIDC",
   "oAuth": "OAuth",
   "email": "Email",
   "addEndpoint": {

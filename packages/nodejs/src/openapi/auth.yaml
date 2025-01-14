@@ -49,7 +49,22 @@ paths:
         301:
           description: Redirect to OIDC Authorization URL.
       x-authconfig-default-parameters:
-        redirectUri: '${oauthRedirectURI}'
+        redirectUri: '${oidcRedirectURI}'
+
+  /oidc/callback:
+    get:
+      operationId: oidcCallback
+      tags:
+        - auth
+      summary: callback to oidc idp authorization
+      description: OIDCのidpからのコールバックを受ける
+      parameters:
+        - $ref: '#/components/parameters/CodeQueryParam'
+      responses:
+        301:
+          description: Redirect to OIDC Authorization URL.
+      x-authconfig-default-parameters:
+        redirectUri: '${oidcRedirectURI}'
 
   /oauth2/google/authorization:
     get:
@@ -93,6 +108,12 @@ components:
       schema:
         type: string
         format: uri
+      required: true
+    CodeQueryParam:
+      name: code
+      in: query
+      schema:
+        type: string
       required: true
 
   schemas:

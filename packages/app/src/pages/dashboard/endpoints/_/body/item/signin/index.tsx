@@ -15,6 +15,10 @@ export type Props = {
 };
 const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
   const { t } = useTranslation();
+  const authConfigOidc = useMemo<AuthConfig | null>(
+    () => authentication.list.find((item) => item.type === 'oidc') || null,
+    [authentication]
+  );
   const authConfigOAuth = useMemo<AuthConfig | null>(
     () => authentication.list.find((item) => item.type === 'oauth') || null,
     [authentication]
@@ -23,6 +27,11 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
     () => authentication.list.find((item) => item.type === 'email') || null,
     [authentication]
   );
+
+  const drawerOidc = useDrawer();
+  const handleOidcClick = useCallback<ButtonProps['onClick']>(() => {
+    drawerOidc.open();
+  }, [drawerOidc]);
 
   const drawerOAuth = useDrawer();
   const handleOAuthClick = useCallback<ButtonProps['onClick']>(() => {
@@ -37,6 +46,16 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
   return (
     <>
       <div className="flex items-center gap-2">
+        {authConfigOidc && (
+          <Button
+            variant="outlined"
+            className="grow max-w-50%"
+            on={COLOR_SYSTEM.BACKGROUND}
+            IconRight={LoginIcon}
+            label={t('oidc')}
+            onClick={handleOidcClick}
+          />
+        )}
         {authConfigOAuth && (
           <Button
             variant="outlined"
@@ -58,6 +77,11 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
           />
         )}
       </div>
+      <Drawer {...drawerOidc.bind}>
+        {authConfigOidc && (
+          <Oidc endpoint={endpoint} authentication={authentication} />
+        )}
+      </Drawer>
       <Drawer {...drawerOAuth.bind}>
         {authConfigOAuth && (
           <OAuth endpoint={endpoint} authentication={authentication} />
@@ -72,6 +96,54 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
   );
 };
 export default Signin;
+
+const Oidc: React.FC<{
+  endpoint: Endpoint;
+  authentication: Authentication;
+}> = ({ endpoint, authentication }) => {
+  const { prepareSigninOidc } = useEndpoint();
+  const signinOidc = useMemo<
+    ReturnType<UseEndpointReturn['prepareSigninOidc']>
+  >(
+    () => prepareSigninOidc(endpoint, authentication),
+    [authentication, endpoint, prepareSigninOidc]
+  );
+  const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
+  const setError = error.setError;
+
+  const handleSubmit = useCallback(
+    async (requestValue: RequestValue) => {
+      if (signinOidc.error) {
+        return;
+      }
+      const result = await signinOidc.execute(requestValue);
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+    },
+    [setError, signinOidc]
+  );
+
+  if (signinOidc.error) {
+    return <Error on={COLOR_SYSTEM.BACKGROUND} error={signinOidc.error} />;
+  }
+
+  return (
+    <>
+      <Request
+        on={COLOR_SYSTEM.SURFACE}
+        className="h-full"
+        endpoint={signinOidc.endpoint}
+        document={signinOidc.document}
+        defaultValues={signinOidc.defaultValues}
+        request={signinOidc.request}
+        onSubmit={handleSubmit}
+      />
+      <Error.renewal {...error.bind} withModal={true} />
+    </>
+  );
+};
 
 const OAuth: React.FC<{
   endpoint: Endpoint;

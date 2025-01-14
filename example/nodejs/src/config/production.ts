@@ -50,6 +50,8 @@ export const get = (): Config => {
         clientSecret: process.env.OIDC_CLIENT_SECRET ?? '',
         tokenEndpoint: 'https://federation.perman.jp/api/v1/oidc/token',
         callbackUrl: 'https://example.viron.work:3000/oidc/callback',
+        discoveryUrl:
+          'https://federation.perman.jp/.well-known/openid-configuration',
       },
     },
     aws: {

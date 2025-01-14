@@ -25,6 +25,10 @@ export interface AdminUser {
   googleOAuth2IdToken: string | null;
   googleOAuth2RefreshToken: string | null;
   googleOAuth2TokenType: string | null;
+  oidcAccessToken: string | null;
+  oidcExpiryDate: number | null;
+  oidcIdToken: string | null;
+  oidcTokenType: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -64,9 +68,18 @@ export interface AdminUserGoogleCreateAttributes {
   googleOAuth2TokenType: string | null;
 }
 
+export interface AdminUserOidcCreateAttributes {
+  email: string;
+  oidcAccessToken: string | null;
+  oidcExpiryDate: number | null;
+  oidcIdToken: string | null;
+  oidcTokenType: string | null;
+}
+
 export type AdminUserCreateAttributes =
   | AdminUserEmailCreateAttributes
-  | AdminUserGoogleCreateAttributes;
+  | AdminUserGoogleCreateAttributes
+  | AdminUserOidcCreateAttributes;
 
 export interface AdminUserEmailUpdateAttributes {
   password: string | null;
@@ -80,10 +93,17 @@ export interface AdminUserGoogleUpdateAttributes {
   googleOAuth2RefreshToken: string | null;
   googleOAuth2TokenType: string | null;
 }
+export interface AdminUserOidcUpdateAttributes {
+  oidcAccessToken: string | null;
+  oidcExpiryDate: number | null;
+  oidcIdToken: string | null;
+  oidcTokenType: string | null;
+}
 
 export type AdminUserUpdateAttributes =
   | AdminUserEmailUpdateAttributes
-  | AdminUserGoogleUpdateAttributes;
+  | AdminUserGoogleUpdateAttributes
+  | AdminUserOidcUpdateAttributes;
 
 export interface AdminUserView extends AdminUser {
   roleIds: string[];
@@ -105,9 +125,19 @@ export interface AdminUserGoogleCreatePayload {
   roleIds?: string[];
 }
 
+export interface AdminUserOidcCreatePayload {
+  email: string;
+  oidcAccessToken: string | null;
+  oidcExpiryDate: number | null;
+  oidcIdToken: string | null;
+  oidcTokenType: string | null;
+  roleIds?: string[];
+}
+
 export type AdminUserCreatePayload =
   | AdminUserEmailCreatePayload
-  | AdminUserGoogleCreatePayload;
+  | AdminUserGoogleCreatePayload
+  | AdminUserOidcCreatePayload;
 
 export interface AdminUserEmailUpdatePayload {
   password?: string;
@@ -123,9 +153,18 @@ export interface AdminUserGoogleUpdatePayload {
   roleIds?: string[];
 }
 
+export interface AdminUserOidcUpdatePayload {
+  oidcAccessToken: string | null;
+  oidcExpiryDate: number | null;
+  oidcIdToken: string | null;
+  oidcTokenType: string | null;
+  roleIds?: string[];
+}
+
 export type AdminUserUpdatePayload =
   | AdminUserEmailUpdatePayload
-  | AdminUserGoogleUpdatePayload;
+  | AdminUserGoogleUpdatePayload
+  | AdminUserOidcUpdatePayload;
 
 const format = (adminUser: AdminUser, roleIds?: string[]): AdminUserView => {
   return Object.assign({}, adminUser, { roleIds: roleIds ?? [] });
@@ -171,12 +210,20 @@ export const createOne = async (
       ...adminUserEmail,
       ...genPasswordHash(adminUserEmail.password),
     } as AdminUserEmailCreateAttributes;
-  } else {
-    const adminUserGoogle = adminUser as AdminUserGoogleCreatePayload;
+  } else if (authType === AUTH_TYPE.GOOGLE) {
+    const adminUserGogle = adminUser as AdminUserGoogleCreatePayload;
     obj = {
       authType: AUTH_TYPE.GOOGLE,
-      ...adminUserGoogle,
+      ...adminUserGogle,
     } as AdminUserGoogleCreateAttributes;
+  } else if (authType === AUTH_TYPE.OIDC) {
+    const adminUserOidc = adminUser as AdminUserOidcCreatePayload;
+    obj = {
+      authType: AUTH_TYPE.OIDC,
+      ...adminUserOidc,
+    } as AdminUserOidcCreateAttributes;
+  } else {
+    throw new Error('Invalid authType');
   }
   const user = await repository.createOne(obj);
 
@@ -206,9 +253,12 @@ export const updateOneById = async (
         genPasswordHash(adminUserEmail.password)
       );
     }
-  } else {
+  } else if (user.authType === AUTH_TYPE.GOOGLE) {
     const adminUserGoogle = adminUser as AdminUserGoogleUpdatePayload;
     await repository.updateOneById(id, adminUserGoogle);
+  } else if (user.authType === AUTH_TYPE.OIDC) {
+    const adminUserOidc = adminUser as AdminUserOidcUpdatePayload;
+    await repository.updateOneById(id, adminUserOidc);
   }
 
   if (roleIds?.length) {

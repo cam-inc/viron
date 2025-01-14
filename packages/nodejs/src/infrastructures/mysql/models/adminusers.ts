@@ -60,6 +60,23 @@ const schemaDefinition: ModelAttributes<AdminUserModel, AdminUser> = {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  // for oidc
+  oidcAccessToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  oidcExpiryDate: {
+    type: DataTypes.BIGINT,
+    allowNull: true,
+  },
+  oidcIdToken: {
+    type: DataTypes.STRING(2048),
+    allowNull: true,
+  },
+  oidcTokenType: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 
   createdAt: {
     type: DataTypes.DATE,
