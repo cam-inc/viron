@@ -1,4 +1,4 @@
-FROM node:9
+FROM node:22
 
 RUN mkdir -p /demo
 RUN chown -R node:node /demo
@@ -20,6 +20,9 @@ ADD fittings /demo/fittings
 ADD swagger /demo/swagger
 ADD public /demo/public
 ADD test /demo/test
+ADD wait-for-it.sh /demo/wait-for-it.sh
+ADD mysql.env /demo/mysql.env
+ADD .env /demo/.env
 
 EXPOSE 3000
 USER root
