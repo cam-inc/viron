@@ -4,7 +4,6 @@ services:
     # 512*1024*1024 = 536870912 Byte = 512 MB
     mem_limit: 536870912
     image: mysql/mysql-server:8.0
-    # platform: linux/amd64
     ports:
       - 3306:3306
     volumes:

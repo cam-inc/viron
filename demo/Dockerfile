@@ -7,22 +7,22 @@ USER node
 WORKDIR $HOME
 
 # Setup project
-COPY  --chown=node:node package.json /demo/package.json
+ADD package.json /demo/package.json
 #RUN npm install --production --no-progress && npm cache verify
 RUN npm install --no-progress && npm cache verify
 
 # Copy source files
-COPY  --chown=node:node shared /demo/shared
-COPY  --chown=node:node config /demo/config
-COPY  --chown=node:node app.js /demo/app.js
-COPY  --chown=node:node controllers /demo/controllers
-COPY  --chown=node:node fittings /demo/fittings
-COPY  --chown=node:node swagger /demo/swagger
-COPY  --chown=node:node public /demo/public
-COPY  --chown=node:node test /demo/test
-COPY  --chown=node:node wait-for-it.sh /demo/wait-for-it.sh
-COPY  --chown=node:node mysql.env /demo/mysql.env
-COPY  --chown=node:node .env /demo/.env
+ADD shared /demo/shared
+ADD config /demo/config
+ADD app.js /demo/app.js
+ADD controllers /demo/controllers
+ADD fittings /demo/fittings
+ADD swagger /demo/swagger
+ADD public /demo/public
+ADD test /demo/test
+ADD wait-for-it.sh /demo/wait-for-it.sh
+ADD mysql.env /demo/mysql.env
+ADD .env /demo/.env
 
 EXPOSE 3000
 USER root
