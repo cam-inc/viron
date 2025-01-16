@@ -69,6 +69,10 @@ const schemaDefinition: ModelAttributes<AdminUserModel, AdminUser> = {
     type: DataTypes.BIGINT,
     allowNull: true,
   },
+  oidcRefreshToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   oidcIdToken: {
     type: DataTypes.STRING(2048),
     allowNull: true,

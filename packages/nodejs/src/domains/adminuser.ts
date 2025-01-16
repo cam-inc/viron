@@ -28,6 +28,7 @@ export interface AdminUser {
   oidcAccessToken: string | null;
   oidcExpiryDate: number | null;
   oidcIdToken: string | null;
+  oidcRefreshToken: string | null;
   oidcTokenType: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -73,6 +74,7 @@ export interface AdminUserOidcCreateAttributes {
   oidcAccessToken: string | null;
   oidcExpiryDate: number | null;
   oidcIdToken: string | null;
+  oidcRefreshToken: string | null;
   oidcTokenType: string | null;
 }
 
@@ -97,6 +99,7 @@ export interface AdminUserOidcUpdateAttributes {
   oidcAccessToken: string | null;
   oidcExpiryDate: number | null;
   oidcIdToken: string | null;
+  oidcRefreshToken: string | null;
   oidcTokenType: string | null;
 }
 
@@ -130,6 +133,7 @@ export interface AdminUserOidcCreatePayload {
   oidcAccessToken: string | null;
   oidcExpiryDate: number | null;
   oidcIdToken: string | null;
+  oidcRefreshToken: string | null;
   oidcTokenType: string | null;
   roleIds?: string[];
 }
@@ -157,6 +161,7 @@ export interface AdminUserOidcUpdatePayload {
   oidcAccessToken: string | null;
   oidcExpiryDate: number | null;
   oidcIdToken: string | null;
+  oidcRefreshToken: string | null;
   oidcTokenType: string | null;
   roleIds?: string[];
 }

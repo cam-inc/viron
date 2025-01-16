@@ -41,15 +41,16 @@ export const oidcAuthorization = async (
   const codeVerifier = await domainsAuth.genOidcCodeVerifier();
 
   const authorizationUrl = await domainsAuth.getOidcAuthorizationUrl(
+    ctx.config.auth.oidc,
     client,
-    codeVerifier
+    codeVerifier,
   );
 
   console.log('codeVerifier:', codeVerifier);
 
   context.res.setHeader(
     HTTP_HEADER.SET_COOKIE,
-    genOidcStateCookie(codeVerifier)
+    genOidcStateCookie(codeVerifier, {partitioned: true, sameSite: 'none', secure: true, httpOnly: true})
   );
   context.res.setHeader(HTTP_HEADER.LOCATION, authorizationUrl);
   context.res.status(301).end();

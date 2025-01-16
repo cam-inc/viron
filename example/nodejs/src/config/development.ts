@@ -48,13 +48,13 @@ export const get = (): Config => {
         userHostedDomains: ['cam-inc.co.jp', 'cyberagent.co.jp'],
       },
       oidc: {
-        server: 'https://federation.perman.jp',
         clientId: process.env.OIDC_CLIENT_ID ?? '',
         clientSecret: process.env.OIDC_CLIENT_SECRET ?? '',
-        tokenEndpoint: 'https://federation.perman.jp/api/v1/oidc/token',
         callbackUrl: 'https://example.viron.work:3000/oidc/callback',
-        discoveryUrl:
+        configurationUrl:
           'https://federation.perman.jp/.well-known/openid-configuration',
+        additionalScopes: [],
+        userHostedDomains: ['cam-inc.co.jp', 'cyberagent.co.jp'],
       },
     },
     aws: {

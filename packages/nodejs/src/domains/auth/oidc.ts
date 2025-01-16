@@ -1,24 +1,22 @@
 import { Issuer, generators, Client, TokenSet } from 'openid-client';
 import { getDebug } from '../../logging';
 import { signJwt } from './jwt';
-const debug = getDebug('domains:auth:googleoauth2');
+const debug = getDebug('domains:auth:oidc');
 import {
   forbidden,
   invalidGoogleOAuth2Token,
   signinFailed,
 } from '../../errors';
-import { createOne, findOneByEmail } from '../adminuser';
+import { createOne, findOneByEmail, updateOneById } from '../adminuser';
 import { addRoleForUser } from '../adminrole';
 import { createFirstAdminUser } from './common';
-import { ADMIN_ROLE, AUTH_TYPE } from '../../constants';
+import { ADMIN_ROLE, AUTH_TYPE, OIDC_DEFAULT_SCOPES } from '../../constants';
 
 export interface OidcClientConfig {
-  server: string;
   clientId: string;
   clientSecret: string;
-  tokenEndpoint: string;
   callbackUrl: string;
-  discoveryUrl: string;
+  configurationUrl: string;
 }
 
 export interface OidcConfig extends OidcClientConfig {
@@ -30,20 +28,37 @@ let oidcClient: Client;
 
 export const getOidcClient = async (
   redirecturl: string,
-  oidcConfig: OidcConfig
+  config: OidcConfig
 ): Promise<Client> => {
   if (oidcClient) {
     return oidcClient;
   }
 
   // OIDCプロバイダーのIssuerを取得
-  const oidcIssuer = await Issuer.discover(oidcConfig.discoveryUrl);
-  console.log('Discovered issuer %s', oidcIssuer.issuer);
+  const issuer = await Issuer.discover(config.configurationUrl);
+  console.log('Discovered issuer %o', issuer);
+
+  // issuer.metadata.scopes_supportedでサポートされていないスコープがないかチェック
+  const scopesSupported = issuer.metadata.scopes_supported as string[];
+  if (scopesSupported) {
+    const scopes = config.additionalScopes ? OIDC_DEFAULT_SCOPES.concat(config.additionalScopes) : OIDC_DEFAULT_SCOPES;
+    for (const scope of scopes) {
+      if (!scopesSupported.includes(scope)) {
+        throw new Error(`Unsupported scope: ${scope}`);
+      }
+    }
+  } else {
+    // scopes_supportedが見つからない場合はエラー
+    console.log('client.issuer.metadata.scopes_supported is not found');
+    throw new Error('client.issuer.metadata.scopes_supported is not found');
+  }
+
+  console.log('redirecturl %s', redirecturl);
 
   // クライアントの作成
-  oidcClient = new oidcIssuer.Client({
-    client_id: oidcConfig.clientId,
-    client_secret: oidcConfig.clientSecret,
+  oidcClient = new issuer.Client({
+    client_id: config.clientId,
+    client_secret: config.clientSecret,
     redirect_uris: [redirecturl],
     response_types: ['code'],
   });
@@ -58,15 +73,21 @@ export const genOidcCodeVerifier = async (): Promise<string> => {
 
 // Oidc認可画面URLを取得
 export const getOidcAuthorizationUrl = async (
+  oidcConfig: OidcConfig,
   client: Client,
   codeVerifier: string
 ): Promise<string> => {
+
   // PKCE用のコードベリファイアを生成
   const codeChallenge = generators.codeChallenge(codeVerifier);
 
+  console.log('clinet issuer metadata %o', client.issuer.metadata.scopes_supported);
+
   // 認証URLを生成
   const authorizationUrl = client.authorizationUrl({
-    scope: 'openid email',
+    scope: oidcConfig.additionalScopes
+      ? OIDC_DEFAULT_SCOPES.concat(oidcConfig.additionalScopes).join(' ')
+      : OIDC_DEFAULT_SCOPES.join(' '),
     code_challenge: codeChallenge,
     code_challenge_method: 'S256',
   });
@@ -81,11 +102,11 @@ export const signinOidc = async (
   client: Client,
   codeVerifier: string,
   req: any,
-  // code: string,
-  // state: string,
   oidcConfig: OidcConfig
 ): Promise<string> => {
   const params = client.callbackParams(req);
+
+  // params.state = req.cookies['oidc_state'];
 
   const tokenSet = await client.callback(oidcConfig.callbackUrl, params, {
     code_verifier: codeVerifier,
@@ -96,24 +117,10 @@ export const signinOidc = async (
   console.log('Token Set:', tokenSet);
   console.log('ID Token Claims:', claims);
 
-  // Token Set: TokenSet {
-  //  access_token: '******',
-  //  expires_at: 1736836332,
-  //  id_token: '******',
-  //  token_type: 'Bearer'
-  //}
-  // ID Token Claims: {
-  //   at_hash: '*************',
-  //   aud: '************',
-  //   email: '*********@*******',
-  //   exp: 1736836332,
-  //   iat: 1736834532,
-  //   iss: 'https://example.oidc.idp.com',
-  //   scope: 'openid email',
-  //   sub: '**********'
-  // }
-
   const credentials = formatCredentials(tokenSet);
+
+  console.log('create credentials ', credentials);
+
   if (!credentials.oidcIdToken) {
     debug('signinOidc invalid authentication codeVerifier. %s', codeVerifier);
     throw invalidGoogleOAuth2Token();
@@ -166,44 +173,96 @@ export const signinOidc = async (
   return signJwt(adminUser.id);
 };
 
-// // アクセストークンの検証
-// export const verifyOidcAccessToken = async (
-//   userId: string,
-//   credentials: OidcCredentials,
-//   config: OidcConfig
-// ): Promise<boolean> => {
+// アクセストークンの検証
+export const verifyOidcAccessToken = async (
+  client: Client,
+  userId: string,
+  credentials: OidcCredentials,
+): Promise<boolean> => {
 
-//   oidcClient.refresh(credentials.oidcAccessToken);
+  // リフレッシュトークンがない場合はscope offline_accessがサポートされてないのでintrospection_endpoint or userinfo_endpointでアクセストークンの有効性を検証する
+  if (!credentials.oidcRefreshToken) {
+    debug('Access token verification without refreshtoken userId: %s', userId);
+    debug('client.issuer.metadata. %o', client.issuer.metadata);
 
-//   const client = await getGoogleOAuth2RefreshClient(config, credentials);
-//   const accessToken = await client.getAccessToken().catch((e: Error) => {
-//     debug('getAccessToken failure. userId: %s, err: %o', userId, e);
-//     return e;
-//   });
+    // introspection_endpointがある場合はアクセストークンを検証
+    if (client.issuer.metadata.introspection_endpoint) {
+      debug('Accesstoken validation if introspection_endpoint is supported userId: %s', userId);
 
-//   // client.getAccessToken内で自動でリフレッシュしてるので、`res`があればリフレッシュ済みとみなす
-//   if (accessToken instanceof Error || (accessToken.res?.status ?? 0) >= 400) {
-//     debug('AccessToken refresh failure. userId: %s', userId);
-//     return false;
-//   }
+      // アクセストークンを検証
+      const introspect = await client.introspect(credentials.oidcAccessToken!, 'access_token').catch((e: Error) => {
+        debug('introspect failure. userId: %s, err: %o', userId, e);
+        return e;
+      });
 
-//   if (!accessToken.res) {
-//     debug('AccessToken is valid. userId: %s', userId);
-//     return true;
-//   }
+      // アクセストークン検証でエラーが発生した場合
+      if (introspect instanceof Error) {
+        debug('verifyOidcAccessToken introspect invalid access token error. %s', credentials.oidcAccessToken);
+        return false;
+      }
 
-//   debug('AccessToken refresh success! userId: %s', userId);
-//   const newCredentials = formatCredentials(
-//     accessToken.res.data as Auth.Credentials
-//   );
-//   await updateOneById(userId, newCredentials);
-//   return true;
-// };
+      // アクセストークンが無効な場合
+      if (!introspect.active) {
+        debug('verifyOidcAccessToken introspect invalid access token deactive. %s', credentials.oidcAccessToken);
+        return false;
+      }
+
+      // activeが取得できた場合は有効なアクセストークン
+      debug('introspect %o', introspect);
+      return true;
+    }
+
+    // userinfo_endpointがある場合はアクセストークンを検証
+    if (client.issuer.metadata.userinfo_endpoint) {
+      debug('Accesstoken validation if userinfo_endpoint is supported userId: %s', userId);
+
+      // ユーザー情報を取得できた場合は有効なアクセストークン
+      const userInfo = await client.userinfo(credentials.oidcAccessToken!).catch((e: Error) => {
+        debug('userinfo failure. userId: %s, err: %o', userId, e);
+        return e;
+      });
+
+      // ユーザー情報取得でエラーが発生した場合
+      if (userInfo instanceof Error) {
+        debug('verifyOidcAccessToken userinfo invalid access token error. %s, %o', credentials.oidcAccessToken, userInfo);
+        return false;
+      }
+
+      // ユーザー情報が取得できなかった場合
+      if (!userInfo) {
+        debug('verifyOidcAccessToken userinfo invalid access token. %s', credentials.oidcAccessToken);
+        return false;
+      }
+
+      // emailが取得できた場合は有効なアクセストークン
+      debug('userinfo.email %o', userInfo.email);
+      return true;
+    }
+
+    // introspection_endpointとuserinfo_endpointがない場合はアクセストークンを検証できないのでエラー
+    debug('introspection_endpoint and userinfo_endpoint are not supported')
+    return false;
+  }
+
+  // リフレッシュトークンがある場合はリフレッシュトークンを使ってトークンを更新
+  const tokenset = await client.refresh(credentials.oidcRefreshToken!);
+  console.log('refresh token set:', tokenset);
+  if (!tokenset) {
+    debug('verifyOidcAccessToken invalid refresh token. %s', credentials.oidcRefreshToken);
+    return false;
+  }
+  debug('AccessToken refresh success! userId: %s', userId);
+  const newCredentials = formatCredentials(tokenset);
+  newCredentials.oidcRefreshToken = credentials.oidcRefreshToken;
+  await updateOneById(userId, newCredentials);
+  return true;
+};
 
 interface OidcCredentials {
   oidcAccessToken: string | null;
   oidcExpiryDate: number | null;
   oidcIdToken: string | null;
+  oidcRefreshToken: string | null;
   oidcTokenType: string | null;
 }
 
@@ -212,6 +271,7 @@ const formatCredentials = (credentials: TokenSet): OidcCredentials => {
     oidcAccessToken: credentials.access_token ?? null,
     oidcExpiryDate: credentials.expires_at ?? null,
     oidcIdToken: credentials.id_token ?? null,
+    oidcRefreshToken: credentials.refresh_token ?? null,
     oidcTokenType: credentials.token_type ?? null,
   };
 };

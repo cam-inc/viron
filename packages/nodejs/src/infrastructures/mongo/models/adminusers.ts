@@ -46,6 +46,9 @@ export const schemaDefinition: SchemaDefinition = {
   oidcIdToken: {
     type: Schema.Types.String,
   },
+  oidcRefreshToken: {
+    type: Schema.Types.String,
+  },
   oidcTokenType: {
     type: Schema.Types.String,
   },
