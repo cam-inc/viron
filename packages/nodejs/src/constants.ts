@@ -12,6 +12,7 @@ export const AUTH_CONFIG_TYPE = {
   OAUTH: 'oauth',
   OIDC: 'oidc',
   OAUTH_CALLBACK: 'oauthcallback',
+  OIDC_CALLBACK: 'oidccallback',
   SIGNOUT: 'signout',
 } as const;
 export type AuthConfigType =
@@ -20,6 +21,7 @@ export type AuthConfigType =
 export const AUTH_CONFIG_PROVIDER = {
   VIRON: 'viron',
   GOOGLE: 'google',
+  OIDC: 'oidc',
   SIGNOUT: 'signout',
 } as const;
 export type AuthConfigProvider =
@@ -86,6 +88,7 @@ export const EMAIL_SIGNIN_PATH = '/email/signin';
 export const OAUTH2_GOOGLE_AUTHORIZATION_PATH = '/oauth2/google/authorization';
 export const OAUTH2_GOOGLE_CALLBACK_PATH = '/oauth2/google/callback';
 export const OIDC_AUTHORIZATION_PATH = '/oidc/authorization';
+export const OIDC_CALLBACK_PATH = '/oidc/callback';
 export const SIGNOUT_PATH = '/signout';
 
 export const PERMISSION = {
@@ -130,6 +133,7 @@ export const COOKIE_KEY = {
   VIRON_AUTHORIZATION: 'viron_authorization',
   OAUTH2_STATE: 'oauth2_state',
   OIDC_STATE: 'oidc_state',
+  OIDC_CODE_VERIFIER: 'oidc_code_verifier',
 } as const;
 
 export const GOOGLE_OAUTH2_DEFAULT_SCOPES = [

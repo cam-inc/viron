@@ -67,3 +67,16 @@ export const genOidcStateCookie = (
   }
   return genCookie(COOKIE_KEY.OIDC_STATE, state, opts);
 };
+
+// OIDC PKCE用CodeVerifierのCookie文字列を生成
+export const genOidcCodeVerifierCookie = (
+  codeVerifier: string,
+  options?: CookieSerializeOptions
+): string => {
+  const opts = Object.assign({}, options);
+  if (!opts.maxAge && !opts.expires) {
+    opts.maxAge = OIDC_STATE_EXPIRATION_SEC;
+  }
+  return genCookie(COOKIE_KEY.OIDC_CODE_VERIFIER, codeVerifier, opts);
+};
+

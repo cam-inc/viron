@@ -1,4 +1,4 @@
-import { Issuer, generators, Client, TokenSet } from 'openid-client';
+import { Issuer, generators, Client, TokenSet, CallbackParamsType } from 'openid-client';
 import { getDebug } from '../../logging';
 import { signJwt } from './jwt';
 const debug = getDebug('domains:auth:oidc');
@@ -27,7 +27,7 @@ export interface OidcConfig extends OidcClientConfig {
 let oidcClient: Client;
 
 export const getOidcClient = async (
-  redirecturl: string,
+  redirectUrl: string,
   config: OidcConfig
 ): Promise<Client> => {
   if (oidcClient) {
@@ -53,13 +53,13 @@ export const getOidcClient = async (
     throw new Error('client.issuer.metadata.scopes_supported is not found');
   }
 
-  console.log('redirecturl %s', redirecturl);
+  console.log('redirectUrl %s', redirectUrl);
 
   // クライアントの作成
   oidcClient = new issuer.Client({
     client_id: config.clientId,
     client_secret: config.clientSecret,
-    redirect_uris: [redirecturl],
+    redirect_uris: [redirectUrl],
     response_types: ['code'],
   });
 
@@ -75,7 +75,8 @@ export const genOidcCodeVerifier = async (): Promise<string> => {
 export const getOidcAuthorizationUrl = async (
   oidcConfig: OidcConfig,
   client: Client,
-  codeVerifier: string
+  codeVerifier: string,
+  state: string
 ): Promise<string> => {
 
   // PKCE用のコードベリファイアを生成
@@ -90,6 +91,7 @@ export const getOidcAuthorizationUrl = async (
       : OIDC_DEFAULT_SCOPES.join(' '),
     code_challenge: codeChallenge,
     code_challenge_method: 'S256',
+    state,
   });
 
   console.log('Authorization URL:', authorizationUrl);
@@ -101,15 +103,17 @@ export const getOidcAuthorizationUrl = async (
 export const signinOidc = async (
   client: Client,
   codeVerifier: string,
-  req: any,
+  params: CallbackParamsType,
   oidcConfig: OidcConfig
 ): Promise<string> => {
-  const params = client.callbackParams(req);
 
-  // params.state = req.cookies['oidc_state'];
+  console.log('params:', params);
+  console.log('codeVerifier:', codeVerifier);
+  console.log('oidcConfig.callbackUrl:', oidcConfig.callbackUrl);
 
   const tokenSet = await client.callback(oidcConfig.callbackUrl, params, {
     code_verifier: codeVerifier,
+    state: params.state,
   });
 
   const claims = tokenSet.claims();

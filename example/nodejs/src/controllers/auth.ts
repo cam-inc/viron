@@ -3,6 +3,7 @@ import {
   genAuthorizationCookie,
   genOAuthStateCookie,
   genOidcStateCookie,
+  genOidcCodeVerifierCookie,
   mismatchState,
   COOKIE_KEY,
   HTTP_HEADER,
@@ -34,6 +35,7 @@ export const oidcAuthorization = async (
   context: RouteContext
 ): Promise<void> => {
   const { redirectUri } = context.params.query;
+  const state = domainsAuth.genState();
   const client = await domainsAuth.getOidcClient(
     redirectUri,
     ctx.config.auth.oidc
@@ -44,34 +46,38 @@ export const oidcAuthorization = async (
     ctx.config.auth.oidc,
     client,
     codeVerifier,
+    state,
   );
 
   console.log('codeVerifier:', codeVerifier);
 
-  context.res.setHeader(
-    HTTP_HEADER.SET_COOKIE,
-    genOidcStateCookie(codeVerifier, {partitioned: true, sameSite: 'none', secure: true, httpOnly: true})
-  );
+  const cookies = [
+    genOidcStateCookie(state),
+    genOidcCodeVerifierCookie(codeVerifier)
+  ];
+  context.res.setHeader(HTTP_HEADER.SET_COOKIE, cookies);
   context.res.setHeader(HTTP_HEADER.LOCATION, authorizationUrl);
   context.res.status(301).end();
 };
 
 // OIDCのコールバック
 export const oidcCallback = async (context: RouteContext): Promise<void> => {
+  const codeVerifier = context.req.cookies[COOKIE_KEY.OIDC_CODE_VERIFIER];
   const cookieState = context.req.cookies[COOKIE_KEY.OIDC_STATE];
-  // const { code } = context.params.query;
+  const { state, redirectUri } = context.requestBody;
 
-  // if (!cookieState || !state || cookieState !== state) {
-  //   throw mismatchState();
-  // }
+  if (!codeVerifier || !cookieState || !state || cookieState !== state) {
+    throw mismatchState();
+  }
 
   console.log('cookieState:', cookieState);
 
-  const client = await domainsAuth.getOidcClient('', ctx.config.auth.oidc);
+  const client = await domainsAuth.getOidcClient(redirectUri, ctx.config.auth.oidc);
+  const params = client.callbackParams(context.req);
   const token = await domainsAuth.signinOidc(
     client,
-    cookieState!,
-    context.req,
+    codeVerifier!,
+    params,
     ctx.config.auth.oidc
   );
   context.res.setHeader(
@@ -80,11 +86,8 @@ export const oidcCallback = async (context: RouteContext): Promise<void> => {
       maxAge: ctx.config.auth.jwt.expirationSec,
     })
   );
-  context.res.setHeader(
-    HTTP_HEADER.LOCATION,
-    'https://viron.work:8000/ja/endpoints/example/'
-  );
-  context.res.status(301).end();
+
+  context.res.status(204).end();
 };
 
 // GoogleOAuth2の認可画面へリダイレクト

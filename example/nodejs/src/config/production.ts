@@ -47,7 +47,7 @@ export const get = (): Config => {
       oidc: {
         clientId: process.env.OIDC_CLIENT_ID ?? '',
         clientSecret: process.env.OIDC_CLIENT_SECRET ?? '',
-        callbackUrl: 'https://example.viron.work:3000/oidc/callback',
+        callbackUrl: 'https://viron.work:8000/oidcredirect',
         configurationUrl:
           'https://federation.perman.jp/.well-known/openid-configuration',
         additionalScopes: [],

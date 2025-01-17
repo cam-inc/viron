@@ -158,6 +158,29 @@ export type UseEndpointReturn = {
             }
         >;
       };
+  prepareSigninOidcCallback: (
+    endpoint: Endpoint,
+    authentication: Authentication,
+    defaultValues?: RequestValue
+  ) =>
+    | {
+        error: BaseError;
+      }
+    | {
+        error: null;
+        endpoint: Endpoint;
+        document: Document;
+        request: Request;
+        defaultValues: RequestValue;
+        execute: (requestValue: RequestValue) => Promise<
+          | {
+              error: BaseError;
+            }
+          | {
+              error: null;
+            }
+        >;
+      };
   prepareSignout: (
     endpoint: Endpoint,
     authentication: Authentication,
@@ -723,6 +746,80 @@ export const useEndpoint = (): UseEndpointReturn => {
     };
   }, []);
 
+  const prepareSigninOidcCallback = useCallback<
+    UseEndpointReturn['prepareSigninOidcCallback']
+  >((endpoint, authentication, defaultValues = {}) => {
+    const authConfig = authentication.list.find(
+      (item) => item.type === 'oidccallback'
+    );
+    if (!authConfig) {
+      return {
+        error: new BaseError('AuthConfig for OIDC callback not found.'),
+      };
+    }
+    const getRequestResult = extractRequest(
+      authentication.oas,
+      authConfig.operationId
+    );
+    if (getRequestResult.isFailure()) {
+      return {
+        error: new OASError('Request object not found.'),
+      };
+    }
+    const request = getRequestResult.value;
+    defaultValues = _.merge(
+      {},
+      {
+        parameters: authConfig.defaultParametersValue,
+        requestBody: replaceWithEnvironmentalVariables<RequestRequestBodyValue>(
+          authConfig.defaultRequestBodyValue || {},
+          {
+            [ENVIRONMENTAL_VARIABLE.OIDC_REDIRECT_URI]: OIDC_REDIRECT_URI,
+          }
+        ),
+      },
+      cleanupRequestValue(request, defaultValues)
+    );
+    const execute = async (requestValue: RequestValue) => {
+      const requestPayloads = constructRequestPayloads(
+        request.operation,
+        requestValue
+      );
+      const requestInfo = constructRequestInfo(
+        endpoint,
+        authentication.oas,
+        request,
+        requestPayloads
+      );
+      const requestInit = constructRequestInit(request, requestPayloads);
+      const [response, responseError] = await promiseErrorHandler(
+        globalThis.fetch(requestInfo, requestInit)
+      );
+      if (!!responseError) {
+        return {
+          error: new NetworkError(responseError.message),
+        };
+      }
+      if (!response.ok) {
+        return {
+          error: await getHTTPError(response),
+        };
+      }
+      return {
+        error: null,
+      };
+    };
+    return {
+      error: null,
+      endpoint,
+      document: authentication.oas,
+      request,
+      defaultValues,
+      execute,
+    };
+  }, []);
+
+
   const prepareSignout = useCallback<UseEndpointReturn['prepareSignout']>(
     (endpoint, authentication, defaultValues = {}) => {
       const authConfig = authentication.list.find(
@@ -1030,6 +1127,7 @@ export const useEndpoint = (): UseEndpointReturn => {
       navigate,
       prepareSigninEmail,
       prepareSigninOidc,
+      prepareSigninOidcCallback,
       prepareSigninOAuth,
       prepareSigninOAuthCallback,
       prepareSignout,
@@ -1054,6 +1152,7 @@ export const useEndpoint = (): UseEndpointReturn => {
       navigate,
       prepareSigninEmail,
       prepareSigninOidc,
+      prepareSigninOidcCallback,
       prepareSigninOAuth,
       prepareSigninOAuthCallback,
       prepareSignout,

@@ -41,7 +41,7 @@ export const OIDC_REDIRECT_URI = (function () {
   if (isSSR) {
     return '';
   }
-  return `https://example.viron.work:3000/oidc/callback`;
+  return `${globalThis.location.origin}/oidcredirect`;
 })();
 
 export const HTTP_STATUS = {

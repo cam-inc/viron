@@ -62,10 +62,10 @@ export const get = (mode: Mode): Config => {
       oidc: {
         clientId: process.env.OIDC_CLIENT_ID ?? '',
         clientSecret: process.env.OIDC_CLIENT_SECRET ?? '',
-        callbackUrl: 'https://example.viron.work:3000/oidc/callback',
+        callbackUrl: 'https://viron.work:8000/oidcredirect',
         configurationUrl:
-          'https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_GYHXqf9zx',
-        additionalScopes: ['phone'],
+          'https://federation.perman.jp/.well-known/openid-configuration',
+        additionalScopes: [],
         userHostedDomains: ['cam-inc.co.jp', 'cyberagent.co.jp'],
       },
     },
