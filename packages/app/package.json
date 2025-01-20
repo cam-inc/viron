@@ -14,7 +14,7 @@
     "pre-commit": "run-s lint:staged test:static test:unit",
     "pre-push": "npm run ci:local",
     "preflight": "npm install --legacy-peer-deps",
-    "develop": "gatsby develop --https -p 8000 --cert-file ./cert/viron.crt --key-file ./cert/viron.key",
+    "develop": "gatsby develop --https -p 8000",
     "build": "gatsby build",
     "build:prefix": "gatsby build --prefix-paths",
     "serve": "gatsby serve -p 9000",

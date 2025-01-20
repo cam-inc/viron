@@ -2,27 +2,27 @@ version: '3.8'
 
 services:
 
-  # example:
-  #   build: 
-  #     context: '.'
-  #     dockerfile: Dockerfile.example-nodejs
-  #   restart: always
-  #   depends_on:
-  #     - mongo
-  #   ports:
-  #     - 3000:3000
-  #     - 9229:9229 # node-inspector
-  #   environment:
-  #     - MODE=mongo
-  #   env_file:
-  #     - $PWD/example/nodejs/.env
-  #   volumes:
-  #     - $PWD/example/nodejs/package.json:/viron/example/nodejs/package.json
-  #     - $PWD/example/nodejs/src:/viron/example/nodejs/src
-  #     - $PWD/example/nodejs/cert:/viron/example/nodejs/cert
-  #     - $PWD/packages/nodejs:/viron/packages/nodejs
-  #     - $PWD/packages/linter:/viron/packages/linter
-  #   command: npm run dev
+  example:
+    build: 
+      context: '.'
+      dockerfile: Dockerfile.example-nodejs
+    restart: always
+    depends_on:
+      - mongo
+    ports:
+      - 3000:3000
+      - 9229:9229 # node-inspector
+    environment:
+      - MODE=mongo
+    env_file:
+      - $PWD/example/nodejs/.env
+    volumes:
+      - $PWD/example/nodejs/package.json:/viron/example/nodejs/package.json
+      - $PWD/example/nodejs/src:/viron/example/nodejs/src
+      - $PWD/example/nodejs/cert:/viron/example/nodejs/cert
+      - $PWD/packages/nodejs:/viron/packages/nodejs
+      - $PWD/packages/linter:/viron/packages/linter
+    command: npm run dev
 
   mongo:
     extends:

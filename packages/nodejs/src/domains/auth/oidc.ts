@@ -24,19 +24,14 @@ export interface OidcConfig extends OidcClientConfig {
   userHostedDomains?: string[];
 }
 
-let oidcClient: Client;
-
-export const getOidcClient = async (
+// OIDCクライアントの生成
+export const genOidcClient = async (
   redirectUrl: string,
   config: OidcConfig
 ): Promise<Client> => {
-  if (oidcClient) {
-    return oidcClient;
-  }
-
   // OIDCプロバイダーのIssuerを取得
   const issuer = await Issuer.discover(config.configurationUrl);
-  console.log('Discovered issuer %o', issuer);
+  debug('Discovered issuer %o', issuer);
 
   // issuer.metadata.scopes_supportedでサポートされていないスコープがないかチェック
   const scopesSupported = issuer.metadata.scopes_supported as string[];
@@ -49,25 +44,23 @@ export const getOidcClient = async (
     }
   } else {
     // scopes_supportedが見つからない場合はエラー
-    console.log('client.issuer.metadata.scopes_supported is not found');
+    debug('client.issuer.metadata.scopes_supported is not found');
     throw new Error('client.issuer.metadata.scopes_supported is not found');
   }
 
-  console.log('redirectUrl %s', redirectUrl);
+  debug('redirectUrl %s', redirectUrl);
 
   // クライアントの作成
-  oidcClient = new issuer.Client({
+  return new issuer.Client({
     client_id: config.clientId,
     client_secret: config.clientSecret,
     redirect_uris: [redirectUrl],
     response_types: ['code'],
   });
-
-  return oidcClient;
 };
 
+// OIDC用のコードベリファイアを生成
 export const genOidcCodeVerifier = async (): Promise<string> => {
-  // PKCE用のコードベリファイアを生成
   return generators.codeVerifier();
 };
 
@@ -82,7 +75,7 @@ export const getOidcAuthorizationUrl = async (
   // PKCE用のコードベリファイアを生成
   const codeChallenge = generators.codeChallenge(codeVerifier);
 
-  console.log('clinet issuer metadata %o', client.issuer.metadata.scopes_supported);
+  debug('clinet issuer metadata %o', client.issuer.metadata.scopes_supported);
 
   // 認証URLを生成
   const authorizationUrl = client.authorizationUrl({
@@ -94,7 +87,7 @@ export const getOidcAuthorizationUrl = async (
     state,
   });
 
-  console.log('Authorization URL:', authorizationUrl);
+  debug('Authorization URL:', authorizationUrl);
 
   return authorizationUrl;
 };
@@ -107,9 +100,9 @@ export const signinOidc = async (
   oidcConfig: OidcConfig
 ): Promise<string> => {
 
-  console.log('params:', params);
-  console.log('codeVerifier:', codeVerifier);
-  console.log('oidcConfig.callbackUrl:', oidcConfig.callbackUrl);
+  debug('params:', params);
+  debug('codeVerifier:', codeVerifier);
+  debug('oidcConfig.callbackUrl:', oidcConfig.callbackUrl);
 
   const tokenSet = await client.callback(oidcConfig.callbackUrl, params, {
     code_verifier: codeVerifier,
@@ -117,13 +110,7 @@ export const signinOidc = async (
   });
 
   const claims = tokenSet.claims();
-
-  console.log('Token Set:', tokenSet);
-  console.log('ID Token Claims:', claims);
-
   const credentials = formatCredentials(tokenSet);
-
-  console.log('create credentials ', credentials);
 
   if (!credentials.oidcIdToken) {
     debug('signinOidc invalid authentication codeVerifier. %s', codeVerifier);
@@ -151,11 +138,16 @@ export const signinOidc = async (
     throw forbidden();
   }
 
+  // トークンの有効期限が切れている場合は403
   if (tokenSet.expired()) {
-    console.log('Token expired!');
+    debug('Token expired!');
+    throw forbidden();
   }
 
+  // emailでユーザーを検索
   let adminUser = await findOneByEmail(email);
+
+  // ユーザーが存在しない場合は新規作成
   if (!adminUser) {
     const firstAdminUser = await createFirstAdminUser(
       { email, ...credentials },
@@ -168,9 +160,12 @@ export const signinOidc = async (
       adminUser = await createOne({ email, ...credentials }, AUTH_TYPE.OIDC);
       await addRoleForUser(adminUser.id, ADMIN_ROLE.VIEWER);
     }
-  }
-  if (adminUser.authType !== AUTH_TYPE.OIDC) {
-    throw signinFailed();
+  } else {
+    if (adminUser.authType !== AUTH_TYPE.OIDC) {
+      throw signinFailed();
+    }
+    // 既存ユーザーの情報を更新
+    await updateOneById(adminUser.id, credentials);
   }
 
   debug('signinOidc Sign jwt for user: %s', adminUser.id);
@@ -250,7 +245,6 @@ export const verifyOidcAccessToken = async (
 
   // リフレッシュトークンがある場合はリフレッシュトークンを使ってトークンを更新
   const tokenset = await client.refresh(credentials.oidcRefreshToken!);
-  console.log('refresh token set:', tokenset);
   if (!tokenset) {
     debug('verifyOidcAccessToken invalid refresh token. %s', credentials.oidcRefreshToken);
     return false;

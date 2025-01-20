@@ -3,7 +3,7 @@ import {
   API_METHOD,
   AUTH_CONFIG_TYPE,
   AUTH_CONFIG_PROVIDER,
-  // EMAIL_SIGNIN_PATH,
+  EMAIL_SIGNIN_PATH,
   SIGNOUT_PATH,
   OAUTH2_GOOGLE_AUTHORIZATION_PATH,
   OAUTH2_GOOGLE_CALLBACK_PATH,
@@ -19,12 +19,12 @@ export const listVironAuthconfigs = async (
   context: RouteContext
 ): Promise<void> => {
   const authConfigDefinitions = [
-    // {
-    //   provider: AUTH_CONFIG_PROVIDER.VIRON,
-    //   type: AUTH_CONFIG_TYPE.EMAIL,
-    //   method: API_METHOD.POST,
-    //   path: EMAIL_SIGNIN_PATH,
-    // },
+    {
+      provider: AUTH_CONFIG_PROVIDER.VIRON,
+      type: AUTH_CONFIG_TYPE.EMAIL,
+      method: API_METHOD.POST,
+      path: EMAIL_SIGNIN_PATH,
+    },
     {
       provider: AUTH_CONFIG_PROVIDER.GOOGLE,
       type: AUTH_CONFIG_TYPE.OAUTH,

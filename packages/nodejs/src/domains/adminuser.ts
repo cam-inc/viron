@@ -264,6 +264,8 @@ export const updateOneById = async (
   } else if (user.authType === AUTH_TYPE.OIDC) {
     const adminUserOidc = adminUser as AdminUserOidcUpdatePayload;
     await repository.updateOneById(id, adminUserOidc);
+  } else {
+    throw new Error('Invalid authType');
   }
 
   if (roleIds?.length) {
