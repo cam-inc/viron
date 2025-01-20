@@ -74,7 +74,7 @@ export const genOidcCodeVerifier = async (): Promise<string> => {
 
 // Oidc認可画面URLを取得
 export const getOidcAuthorizationUrl = async (
-  oidcConfig: OidcConfig,
+  config: OidcConfig,
   client: Client,
   codeVerifier: string,
   state: string
@@ -86,8 +86,8 @@ export const getOidcAuthorizationUrl = async (
 
   // 認証URLを生成
   const authorizationUrl = client.authorizationUrl({
-    scope: oidcConfig.additionalScopes
-      ? OIDC_DEFAULT_SCOPES.concat(oidcConfig.additionalScopes).join(' ')
+    scope: config.additionalScopes
+      ? OIDC_DEFAULT_SCOPES.concat(config.additionalScopes).join(' ')
       : OIDC_DEFAULT_SCOPES.join(' '),
     code_challenge: codeChallenge,
     code_challenge_method: 'S256',
@@ -105,7 +105,7 @@ export const signinOidc = async (
   codeVerifier: string,
   redirectUri: string,
   params: CallbackParamsType,
-  oidcConfig: OidcConfig
+  config: OidcConfig
 ): Promise<string> => {
   debug('params:', params);
   debug('codeVerifier:', codeVerifier);
@@ -136,8 +136,8 @@ export const signinOidc = async (
   // emailドメインチェック
   const emailDomain = email.split('@').pop() as string;
   if (
-    oidcConfig.userHostedDomains?.length &&
-    !oidcConfig.userHostedDomains.includes(emailDomain)
+    config.userHostedDomains?.length &&
+    !config.userHostedDomains.includes(emailDomain)
   ) {
     // 許可されていないメールドメイン
     debug('signinOidc illegal user email: %s', email);
