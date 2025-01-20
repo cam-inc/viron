@@ -79,4 +79,3 @@ export const genOidcCodeVerifierCookie = (
   }
   return genCookie(COOKIE_KEY.OIDC_CODE_VERIFIER, codeVerifier, opts);
 };
-

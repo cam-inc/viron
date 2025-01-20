@@ -55,6 +55,11 @@ describe('domains/adminuser', () => {
             googleOAuth2IdToken: null,
             googleOAuth2RefreshToken: null,
             googleOAuth2TokenType: null,
+            oidcAccessToken: null,
+            oidcExpiryDate: null,
+            oidcIdToken: null,
+            oidcRefreshToken: null,
+            oidcTokenType: null,
           },
         ],
         maxPage: 1,
@@ -99,6 +104,11 @@ describe('domains/adminuser', () => {
           googleOAuth2IdToken: null,
           googleOAuth2RefreshToken: null,
           googleOAuth2TokenType: null,
+          oidcAccessToken: null,
+          oidcExpiryDate: null,
+          oidcIdToken: null,
+          oidcRefreshToken: null,
+          oidcTokenType: null,
         });
 
       const result = await createOne(data);
@@ -138,6 +148,11 @@ describe('domains/adminuser', () => {
           googleOAuth2IdToken: null,
           googleOAuth2RefreshToken: null,
           googleOAuth2TokenType: null,
+          oidcAccessToken: null,
+          oidcExpiryDate: null,
+          oidcIdToken: null,
+          oidcRefreshToken: null,
+          oidcTokenType: null,
         });
       sandbox
         .stub(domainsAdminrole, 'updateRolesForUser')
@@ -172,6 +187,11 @@ describe('domains/adminuser', () => {
         googleOAuth2IdToken: null,
         googleOAuth2RefreshToken: null,
         googleOAuth2TokenType: null,
+        oidcAccessToken: null,
+        oidcExpiryDate: null,
+        oidcIdToken: null,
+        oidcRefreshToken: null,
+        oidcTokenType: null,
       });
       sandbox
         .stub(repository, 'updateOneById')
@@ -227,6 +247,11 @@ describe('domains/adminuser', () => {
         googleOAuth2IdToken: null,
         googleOAuth2RefreshToken: null,
         googleOAuth2TokenType: null,
+        oidcAccessToken: null,
+        oidcExpiryDate: null,
+        oidcIdToken: null,
+        oidcRefreshToken: null,
+        oidcTokenType: null,
       });
       sandbox.stub(repository, 'removeOneById').withArgs(id).resolves();
       sandbox
@@ -268,6 +293,11 @@ describe('domains/adminuser', () => {
         googleOAuth2IdToken: null,
         googleOAuth2RefreshToken: null,
         googleOAuth2TokenType: null,
+        oidcAccessToken: null,
+        oidcExpiryDate: null,
+        oidcIdToken: null,
+        oidcRefreshToken: null,
+        oidcTokenType: null,
       });
       sandbox.stub(domainsAdminrole, 'listRoles').withArgs(id).resolves([]);
 
@@ -308,6 +338,11 @@ describe('domains/adminuser', () => {
           googleOAuth2IdToken: null,
           googleOAuth2RefreshToken: null,
           googleOAuth2TokenType: null,
+          oidcAccessToken: null,
+          oidcExpiryDate: null,
+          oidcIdToken: null,
+          oidcRefreshToken: null,
+          oidcTokenType: null,
         });
       sandbox.stub(domainsAdminrole, 'listRoles').withArgs(id).resolves([]);
 

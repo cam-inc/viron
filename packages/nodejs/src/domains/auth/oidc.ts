@@ -1,4 +1,10 @@
-import { Issuer, generators, Client, TokenSet, CallbackParamsType } from 'openid-client';
+import {
+  Issuer,
+  generators,
+  Client,
+  TokenSet,
+  CallbackParamsType,
+} from 'openid-client';
 import { getDebug } from '../../logging';
 import { signJwt } from './jwt';
 const debug = getDebug('domains:auth:oidc');
@@ -36,7 +42,9 @@ export const genOidcClient = async (
   // issuer.metadata.scopes_supportedでサポートされていないスコープがないかチェック
   const scopesSupported = issuer.metadata.scopes_supported as string[];
   if (scopesSupported) {
-    const scopes = config.additionalScopes ? OIDC_DEFAULT_SCOPES.concat(config.additionalScopes) : OIDC_DEFAULT_SCOPES;
+    const scopes = config.additionalScopes
+      ? OIDC_DEFAULT_SCOPES.concat(config.additionalScopes)
+      : OIDC_DEFAULT_SCOPES;
     for (const scope of scopes) {
       if (!scopesSupported.includes(scope)) {
         throw new Error(`Unsupported scope: ${scope}`);
@@ -71,7 +79,6 @@ export const getOidcAuthorizationUrl = async (
   codeVerifier: string,
   state: string
 ): Promise<string> => {
-
   // PKCE用のコードベリファイアを生成
   const codeChallenge = generators.codeChallenge(codeVerifier);
 
@@ -99,7 +106,6 @@ export const signinOidc = async (
   params: CallbackParamsType,
   oidcConfig: OidcConfig
 ): Promise<string> => {
-
   debug('params:', params);
   debug('codeVerifier:', codeVerifier);
   debug('oidcConfig.callbackUrl:', oidcConfig.callbackUrl);
@@ -128,7 +134,7 @@ export const signinOidc = async (
     throw invalidGoogleOAuth2Token();
   }
   // emailドメインチェック
-  const emailDomain = claims.email!.split('@').pop() as string;
+  const emailDomain = email.split('@').pop() as string;
   if (
     oidcConfig.userHostedDomains?.length &&
     !oidcConfig.userHostedDomains.includes(emailDomain)
@@ -176,33 +182,44 @@ export const signinOidc = async (
 export const verifyOidcAccessToken = async (
   client: Client,
   userId: string,
-  credentials: OidcCredentials,
+  credentials: OidcCredentials
 ): Promise<boolean> => {
-
   // リフレッシュトークンがない場合はscope offline_accessがサポートされてないのでintrospection_endpoint or userinfo_endpointでアクセストークンの有効性を検証する
   if (!credentials.oidcRefreshToken) {
+    const accessToken: string = credentials.oidcAccessToken ?? '';
     debug('Access token verification without refreshtoken userId: %s', userId);
     debug('client.issuer.metadata. %o', client.issuer.metadata);
 
     // introspection_endpointがある場合はアクセストークンを検証
     if (client.issuer.metadata.introspection_endpoint) {
-      debug('Accesstoken validation if introspection_endpoint is supported userId: %s', userId);
+      debug(
+        'Accesstoken validation if introspection_endpoint is supported userId: %s',
+        userId
+      );
 
       // アクセストークンを検証
-      const introspect = await client.introspect(credentials.oidcAccessToken!, 'access_token').catch((e: Error) => {
-        debug('introspect failure. userId: %s, err: %o', userId, e);
-        return e;
-      });
+      const introspect = await client
+        .introspect(accessToken, 'access_token')
+        .catch((e: Error) => {
+          debug('introspect failure. userId: %s, err: %o', userId, e);
+          return e;
+        });
 
       // アクセストークン検証でエラーが発生した場合
       if (introspect instanceof Error) {
-        debug('verifyOidcAccessToken introspect invalid access token error. %s', credentials.oidcAccessToken);
+        debug(
+          'verifyOidcAccessToken introspect invalid access token error. %s',
+          accessToken
+        );
         return false;
       }
 
       // アクセストークンが無効な場合
       if (!introspect.active) {
-        debug('verifyOidcAccessToken introspect invalid access token deactive. %s', credentials.oidcAccessToken);
+        debug(
+          'verifyOidcAccessToken introspect invalid access token deactive. %s',
+          credentials.oidcAccessToken
+        );
         return false;
       }
 
@@ -213,23 +230,33 @@ export const verifyOidcAccessToken = async (
 
     // userinfo_endpointがある場合はアクセストークンを検証
     if (client.issuer.metadata.userinfo_endpoint) {
-      debug('Accesstoken validation if userinfo_endpoint is supported userId: %s', userId);
+      debug(
+        'Accesstoken validation if userinfo_endpoint is supported userId: %s',
+        userId
+      );
 
       // ユーザー情報を取得できた場合は有効なアクセストークン
-      const userInfo = await client.userinfo(credentials.oidcAccessToken!).catch((e: Error) => {
+      const userInfo = await client.userinfo(accessToken).catch((e: Error) => {
         debug('userinfo failure. userId: %s, err: %o', userId, e);
         return e;
       });
 
       // ユーザー情報取得でエラーが発生した場合
       if (userInfo instanceof Error) {
-        debug('verifyOidcAccessToken userinfo invalid access token error. %s, %o', credentials.oidcAccessToken, userInfo);
+        debug(
+          'verifyOidcAccessToken userinfo invalid access token error. %s, %o',
+          accessToken,
+          userInfo
+        );
         return false;
       }
 
       // ユーザー情報が取得できなかった場合
       if (!userInfo) {
-        debug('verifyOidcAccessToken userinfo invalid access token. %s', credentials.oidcAccessToken);
+        debug(
+          'verifyOidcAccessToken userinfo invalid access token. %s',
+          accessToken
+        );
         return false;
       }
 
@@ -239,19 +266,20 @@ export const verifyOidcAccessToken = async (
     }
 
     // introspection_endpointとuserinfo_endpointがない場合はアクセストークンを検証できないのでエラー
-    debug('introspection_endpoint and userinfo_endpoint are not supported')
+    debug('introspection_endpoint and userinfo_endpoint are not supported');
     return false;
   }
 
   // リフレッシュトークンがある場合はリフレッシュトークンを使ってトークンを更新
-  const tokenset = await client.refresh(credentials.oidcRefreshToken!);
+  const refreshToken = credentials.oidcRefreshToken ?? '';
+  const tokenset = await client.refresh(refreshToken);
   if (!tokenset) {
-    debug('verifyOidcAccessToken invalid refresh token. %s', credentials.oidcRefreshToken);
+    debug('verifyOidcAccessToken invalid refresh token. %s', refreshToken);
     return false;
   }
   debug('AccessToken refresh success! userId: %s', userId);
   const newCredentials = formatCredentials(tokenset);
-  newCredentials.oidcRefreshToken = credentials.oidcRefreshToken;
+  newCredentials.oidcRefreshToken = refreshToken;
   await updateOneById(userId, newCredentials);
   return true;
 };

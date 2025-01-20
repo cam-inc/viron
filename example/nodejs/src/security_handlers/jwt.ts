@@ -91,14 +91,11 @@ export const jwt = async (
         }
         case AUTH_TYPE.OIDC: {
           // OIDC認証の場合はアクセストークンの検証
-          const client = await domainsAuth.genOidcClient(ctx.config.auth.oidc.callbackUrl, ctx.config.auth.oidc)
-          if (
-            await domainsAuth.verifyOidcAccessToken(
-              client,
-              userId,
-              user,
-            )
-          ) {
+          const client = await domainsAuth.genOidcClient(
+            ctx.config.auth.oidc.callbackUrl,
+            ctx.config.auth.oidc
+          );
+          if (await domainsAuth.verifyOidcAccessToken(client, userId, user)) {
             return authSuccess(user);
           }
           break;

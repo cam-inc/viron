@@ -819,7 +819,6 @@ export const useEndpoint = (): UseEndpointReturn => {
     };
   }, []);
 
-
   const prepareSignout = useCallback<UseEndpointReturn['prepareSignout']>(
     (endpoint, authentication, defaultValues = {}) => {
       const authConfig = authentication.list.find(

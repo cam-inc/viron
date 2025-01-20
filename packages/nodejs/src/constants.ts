@@ -140,10 +140,7 @@ export const GOOGLE_OAUTH2_DEFAULT_SCOPES = [
   'https://www.googleapis.com/auth/userinfo.email',
 ];
 
-export const OIDC_DEFAULT_SCOPES = [
-  'openid',
-  'email',
-];
+export const OIDC_DEFAULT_SCOPES = ['openid', 'email'];
 
 export const THEME = {
   RED: 'red',

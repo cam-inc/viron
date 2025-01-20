@@ -49,13 +49,13 @@ export const oidcAuthorization = async (
     ctx.config.auth.oidc,
     client,
     codeVerifier,
-    state,
+    state
   );
 
   // CookieにOIDCのStateとPKCE用のCodeVerifierをセット
   const cookies = [
     genOidcStateCookie(state),
-    genOidcCodeVerifierCookie(codeVerifier)
+    genOidcCodeVerifierCookie(codeVerifier),
   ];
   context.res.setHeader(HTTP_HEADER.SET_COOKIE, cookies);
   context.res.setHeader(HTTP_HEADER.LOCATION, authorizationUrl);
@@ -73,11 +73,14 @@ export const oidcCallback = async (context: RouteContext): Promise<void> => {
   }
 
   // OIDC Clientを取得
-  const client = await domainsAuth.genOidcClient(redirectUri, ctx.config.auth.oidc);
+  const client = await domainsAuth.genOidcClient(
+    redirectUri,
+    ctx.config.auth.oidc
+  );
   const params = client.callbackParams(context.req);
   const token = await domainsAuth.signinOidc(
     client,
-    codeVerifier!,
+    codeVerifier as string,
     params,
     ctx.config.auth.oidc
   );
