@@ -47,7 +47,6 @@ export const get = (): Config => {
       oidc: {
         clientId: process.env.OIDC_CLIENT_ID ?? '',
         clientSecret: process.env.OIDC_CLIENT_SECRET ?? '',
-        callbackUrl: 'https://localhost:8000/oidcredirect',
         configurationUrl:
           'https://{oidc idp host}/.well-known/openid-configuration',
         additionalScopes: [],

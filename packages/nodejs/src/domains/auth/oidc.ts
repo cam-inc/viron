@@ -21,7 +21,6 @@ import { ADMIN_ROLE, AUTH_TYPE, OIDC_DEFAULT_SCOPES } from '../../constants';
 export interface OidcClientConfig {
   clientId: string;
   clientSecret: string;
-  callbackUrl: string;
   configurationUrl: string;
 }
 
@@ -32,8 +31,8 @@ export interface OidcConfig extends OidcClientConfig {
 
 // OIDCクライアントの生成
 export const genOidcClient = async (
-  redirectUrl: string,
-  config: OidcConfig
+  config: OidcConfig,
+  redirectUri?: string
 ): Promise<Client> => {
   // OIDCプロバイダーのIssuerを取得
   const issuer = await Issuer.discover(config.configurationUrl);
@@ -56,14 +55,14 @@ export const genOidcClient = async (
     throw new Error('client.issuer.metadata.scopes_supported is not found');
   }
 
-  debug('redirectUrl %s', redirectUrl);
+  debug('redirectUri %s', redirectUri);
 
   // クライアントの作成
   return new issuer.Client({
     client_id: config.clientId,
     client_secret: config.clientSecret,
-    redirect_uris: [redirectUrl],
     response_types: ['code'],
+    ...(redirectUri && { redirect_uris: [redirectUri] }),
   });
 };
 
@@ -103,14 +102,14 @@ export const getOidcAuthorizationUrl = async (
 export const signinOidc = async (
   client: Client,
   codeVerifier: string,
+  redirectUri: string,
   params: CallbackParamsType,
   oidcConfig: OidcConfig
 ): Promise<string> => {
   debug('params:', params);
   debug('codeVerifier:', codeVerifier);
-  debug('oidcConfig.callbackUrl:', oidcConfig.callbackUrl);
 
-  const tokenSet = await client.callback(oidcConfig.callbackUrl, params, {
+  const tokenSet = await client.callback(redirectUri, params, {
     code_verifier: codeVerifier,
     state: params.state,
   });

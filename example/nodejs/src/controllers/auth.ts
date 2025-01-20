@@ -37,8 +37,8 @@ export const oidcAuthorization = async (
   const { redirectUri } = context.params.query;
   const state = domainsAuth.genState();
   const client = await domainsAuth.genOidcClient(
-    redirectUri,
-    ctx.config.auth.oidc
+    ctx.config.auth.oidc,
+    redirectUri
   );
 
   // PKCE用のCodeVerifierを生成
@@ -74,13 +74,14 @@ export const oidcCallback = async (context: RouteContext): Promise<void> => {
 
   // OIDC Clientを取得
   const client = await domainsAuth.genOidcClient(
-    redirectUri,
-    ctx.config.auth.oidc
+    ctx.config.auth.oidc,
+    redirectUri
   );
   const params = client.callbackParams(context.req);
   const token = await domainsAuth.signinOidc(
     client,
     codeVerifier as string,
+    redirectUri,
     params,
     ctx.config.auth.oidc
   );
