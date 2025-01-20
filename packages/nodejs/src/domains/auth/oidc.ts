@@ -10,8 +10,9 @@ import { signJwt } from './jwt';
 const debug = getDebug('domains:auth:oidc');
 import {
   forbidden,
-  invalidGoogleOAuth2Token,
+  invalidOidcToken,
   signinFailed,
+  unsupportedScope,
 } from '../../errors';
 import { createOne, findOneByEmail, updateOneById } from '../adminuser';
 import { addRoleForUser } from '../adminrole';
@@ -46,13 +47,13 @@ export const genOidcClient = async (
       : OIDC_DEFAULT_SCOPES;
     for (const scope of scopes) {
       if (!scopesSupported.includes(scope)) {
-        throw new Error(`Unsupported scope: ${scope}`);
+        throw unsupportedScope();
       }
     }
   } else {
     // scopes_supportedが見つからない場合はエラー
     debug('client.issuer.metadata.scopes_supported is not found');
-    throw new Error('client.issuer.metadata.scopes_supported is not found');
+    throw unsupportedScope();
   }
 
   debug('redirectUri %s', redirectUri);
@@ -119,7 +120,7 @@ export const signinOidc = async (
 
   if (!credentials.oidcIdToken) {
     debug('signinOidc invalid authentication codeVerifier. %s', codeVerifier);
-    throw invalidGoogleOAuth2Token();
+    throw invalidOidcToken();
   }
 
   // emailチェック
@@ -130,7 +131,7 @@ export const signinOidc = async (
       claims,
       tokenSet.id_token
     );
-    throw invalidGoogleOAuth2Token();
+    throw invalidOidcToken();
   }
   // emailドメインチェック
   const emailDomain = email.split('@').pop() as string;

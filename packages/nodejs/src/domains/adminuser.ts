@@ -6,7 +6,7 @@ import {
 } from '../constants';
 import { ListWithPager, genPasswordHash } from '../helpers';
 import { FindConditions, repositoryContainer } from '../repositories';
-import { adminUserNotFound } from '../errors';
+import { adminUserNotFound, invalidAuthType } from '../errors';
 import {
   listRoles,
   listUsers,
@@ -228,7 +228,7 @@ export const createOne = async (
       ...adminUserOidc,
     } as AdminUserOidcCreateAttributes;
   } else {
-    throw new Error('Invalid authType');
+    throw invalidAuthType();
   }
   const user = await repository.createOne(obj);
 
@@ -265,7 +265,7 @@ export const updateOneById = async (
     const adminUserOidc = adminUser as AdminUserOidcUpdatePayload;
     await repository.updateOneById(id, adminUserOidc);
   } else {
-    throw new Error('Invalid authType');
+    throw invalidAuthType();
   }
 
   if (roleIds?.length) {

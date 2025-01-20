@@ -74,3 +74,11 @@ export const unableToDeleteRole = (): VironError => {
 export const operationNotFound = (): VironError => {
   return new VironError('Operation Not Found.', 404);
 };
+
+export const invalidAuthType = (): VironError => {
+  return new VironError('Invalid Auth type.', 400);
+};
+
+export const unsupportedScope = (): VironError => {
+  return new VironError('Unsupported scope.', 500);
+};
