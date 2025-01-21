@@ -263,7 +263,6 @@ export const updateOneById = async (
       const adminUserEmail = adminUser as AdminUserEmailUpdatePayload;
       if (adminUserEmail.password) {
         obj = {
-          ...adminUserEmail,
           ...genPasswordHash(adminUserEmail.password),
         } as AdminUserEmailUpdateAttributes;
       }
