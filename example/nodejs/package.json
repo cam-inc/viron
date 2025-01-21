@@ -21,7 +21,7 @@
     "multer": "^1.4.3",
     "multer-s3": "^3.0.1",
     "mysql2": "^2.2.5",
-    "openid-client": "^6.1.7",
+    "openid-client": "^4.7.4",
     "pino": "^7.6.4",
     "pino-http": "^6.6.0",
     "sequelize": "^6.5.0",

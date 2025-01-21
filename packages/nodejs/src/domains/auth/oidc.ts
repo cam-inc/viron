@@ -40,20 +40,22 @@ export const genOidcClient = async (
   debug('Discovered issuer %o', issuer);
 
   // issuer.metadata.scopes_supportedでサポートされていないスコープがないかチェック
-  const scopesSupported = issuer.metadata.scopes_supported as string[];
-  if (scopesSupported) {
+  // https://openid.net/specs/openid-connect-discovery-1_0.html#IssuerDiscovery
+  // RECOMMENDED. JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this server supports. The server MUST support the openid scope value. Servers MAY choose not to advertise some supported scope values even when this parameter is used, although those defined in [OpenID.Core] SHOULD be listed, if supported.
+  // 推奨プロパティなのでない場合もある
+  const scopesSupported = issuer.metadata.scopes_supported
+    ? (issuer.metadata.scopes_supported as string[])
+    : [];
+  // scopes_supportedがある場合はチェック
+  if (scopesSupported.length > 0) {
+    // 追加スコープがある場合は追加スコープを含めてチェック
     const scopes = config.additionalScopes
       ? OIDC_DEFAULT_SCOPES.concat(config.additionalScopes)
       : OIDC_DEFAULT_SCOPES;
-    for (const scope of scopes) {
-      if (!scopesSupported.includes(scope)) {
-        throw unsupportedScope();
-      }
+    // scopes の中のどれか一つでもサポートされていない場合はエラー
+    if (scopes.some((scope) => !scopesSupported.includes(scope))) {
+      throw unsupportedScope();
     }
-  } else {
-    // scopes_supportedが見つからない場合はエラー
-    debug('client.issuer.metadata.scopes_supported is not found');
-    throw unsupportedScope();
   }
 
   debug('redirectUri %s', redirectUri);
@@ -81,8 +83,6 @@ export const getOidcAuthorizationUrl = async (
 ): Promise<string> => {
   // PKCE用のコードベリファイアを生成
   const codeChallenge = generators.codeChallenge(codeVerifier);
-
-  debug('clinet issuer metadata %o', client.issuer.metadata.scopes_supported);
 
   // 認証URLを生成
   const authorizationUrl = client.authorizationUrl({
@@ -186,7 +186,15 @@ export const verifyOidcAccessToken = async (
 ): Promise<boolean> => {
   // リフレッシュトークンがない場合はscope offline_accessがサポートされてないのでintrospection_endpoint or userinfo_endpointでアクセストークンの有効性を検証する
   if (!credentials.oidcRefreshToken) {
-    const accessToken: string = credentials.oidcAccessToken ?? '';
+    if (!credentials.oidcAccessToken) {
+      debug(
+        'verifyOidcAccessToken invalid access token. %s',
+        credentials.oidcAccessToken
+      );
+      return false;
+    }
+
+    const accessToken: string = credentials.oidcAccessToken;
     debug('Access token verification without refreshtoken userId: %s', userId);
     debug('client.issuer.metadata. %o', client.issuer.metadata);
 
@@ -271,7 +279,7 @@ export const verifyOidcAccessToken = async (
   }
 
   // リフレッシュトークンがある場合はリフレッシュトークンを使ってトークンを更新
-  const refreshToken = credentials.oidcRefreshToken ?? '';
+  const refreshToken = credentials.oidcRefreshToken;
   const tokenset = await client.refresh(refreshToken);
   if (!tokenset) {
     debug('verifyOidcAccessToken invalid refresh token. %s', refreshToken);

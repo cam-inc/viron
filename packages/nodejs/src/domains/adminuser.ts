@@ -208,27 +208,34 @@ export const createOne = async (
   const { roleIds, ...adminUser } = payload;
 
   let obj;
-  if (authType === AUTH_TYPE.EMAIL) {
-    const adminUserEmail = adminUser as AdminUserEmailCreatePayload;
-    obj = {
-      authType: AUTH_TYPE.EMAIL,
-      ...adminUserEmail,
-      ...genPasswordHash(adminUserEmail.password),
-    } as AdminUserEmailCreateAttributes;
-  } else if (authType === AUTH_TYPE.GOOGLE) {
-    const adminUserGogle = adminUser as AdminUserGoogleCreatePayload;
-    obj = {
-      authType: AUTH_TYPE.GOOGLE,
-      ...adminUserGogle,
-    } as AdminUserGoogleCreateAttributes;
-  } else if (authType === AUTH_TYPE.OIDC) {
-    const adminUserOidc = adminUser as AdminUserOidcCreatePayload;
-    obj = {
-      authType: AUTH_TYPE.OIDC,
-      ...adminUserOidc,
-    } as AdminUserOidcCreateAttributes;
-  } else {
-    throw invalidAuthType();
+  switch (authType) {
+    case AUTH_TYPE.EMAIL: {
+      const adminUserEmail = adminUser as AdminUserEmailCreatePayload;
+      obj = {
+        authType: AUTH_TYPE.EMAIL,
+        ...adminUserEmail,
+        ...genPasswordHash(adminUserEmail.password),
+      } as AdminUserEmailCreateAttributes;
+      break;
+    }
+    case AUTH_TYPE.GOOGLE: {
+      const adminUserGoogle = adminUser as AdminUserGoogleCreatePayload;
+      obj = {
+        authType: AUTH_TYPE.GOOGLE,
+        ...adminUserGoogle,
+      } as AdminUserGoogleCreateAttributes;
+      break;
+    }
+    case AUTH_TYPE.OIDC: {
+      const adminUserOidc = adminUser as AdminUserOidcCreatePayload;
+      obj = {
+        authType: AUTH_TYPE.OIDC,
+        ...adminUserOidc,
+      } as AdminUserOidcCreateAttributes;
+      break;
+    }
+    default:
+      throw invalidAuthType();
   }
   const user = await repository.createOne(obj);
 
@@ -250,22 +257,29 @@ export const updateOneById = async (
   }
 
   const { roleIds, ...adminUser } = payload;
-  if (user.authType === AUTH_TYPE.EMAIL) {
-    const adminUserEmail = adminUser as AdminUserEmailUpdatePayload;
-    if (adminUserEmail.password) {
-      await repository.updateOneById(
-        id,
-        genPasswordHash(adminUserEmail.password)
-      );
+  switch (user.authType) {
+    case AUTH_TYPE.EMAIL: {
+      const adminUserEmail = adminUser as AdminUserEmailUpdatePayload;
+      if (adminUserEmail.password) {
+        await repository.updateOneById(
+          id,
+          genPasswordHash(adminUserEmail.password)
+        );
+      }
+      break;
     }
-  } else if (user.authType === AUTH_TYPE.GOOGLE) {
-    const adminUserGoogle = adminUser as AdminUserGoogleUpdatePayload;
-    await repository.updateOneById(id, adminUserGoogle);
-  } else if (user.authType === AUTH_TYPE.OIDC) {
-    const adminUserOidc = adminUser as AdminUserOidcUpdatePayload;
-    await repository.updateOneById(id, adminUserOidc);
-  } else {
-    throw invalidAuthType();
+    case AUTH_TYPE.GOOGLE: {
+      const adminUserGoogle = adminUser as AdminUserGoogleUpdatePayload;
+      await repository.updateOneById(id, adminUserGoogle);
+      break;
+    }
+    case AUTH_TYPE.OIDC: {
+      const adminUserOidc = adminUser as AdminUserOidcUpdatePayload;
+      await repository.updateOneById(id, adminUserOidc);
+      break;
+    }
+    default:
+      throw invalidAuthType();
   }
 
   if (roleIds?.length) {

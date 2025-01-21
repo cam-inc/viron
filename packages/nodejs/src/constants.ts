@@ -126,7 +126,8 @@ export const DEFAULT_JWT_EXPIRATION_SEC = 24 * 60 * 60;
 export const DEBUG_LOG_PREFIX = '@viron/lib:';
 export const CASBIN_SYNC_INTERVAL_MSEC = 1 * 60 * 1000;
 export const OAUTH2_STATE_EXPIRATION_SEC = 10 * 60;
-export const OIDC_STATE_EXPIRATION_SEC = 10 * 60;
+export const OIDC_STATE_EXPIRATION_SEC = 1 * 60;
+export const OIDC_CODE_VERIFIER_EXPIRATION_SEC = 1 * 60;
 export const REVOKED_TOKEN_RETENTION_SEC = 30 * 24 * 60 * 60;
 
 export const COOKIE_KEY = {

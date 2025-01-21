@@ -91,6 +91,8 @@ export const oidcCallback = async (context: RouteContext): Promise<void> => {
       maxAge: ctx.config.auth.jwt.expirationSec,
     })
   );
+  context.origRes.clearCookie(COOKIE_KEY.OIDC_STATE);
+  context.origRes.clearCookie(COOKIE_KEY.OIDC_CODE_VERIFIER);
 
   context.res.status(204).end();
 };
