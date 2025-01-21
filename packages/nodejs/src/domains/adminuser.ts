@@ -257,29 +257,50 @@ export const updateOneById = async (
   }
 
   const { roleIds, ...adminUser } = payload;
+  let obj;
   switch (user.authType) {
     case AUTH_TYPE.EMAIL: {
       const adminUserEmail = adminUser as AdminUserEmailUpdatePayload;
       if (adminUserEmail.password) {
-        await repository.updateOneById(
-          id,
-          genPasswordHash(adminUserEmail.password)
-        );
+        obj = {
+          ...adminUserEmail,
+          ...genPasswordHash(adminUserEmail.password),
+        } as AdminUserEmailUpdateAttributes;
       }
       break;
     }
     case AUTH_TYPE.GOOGLE: {
       const adminUserGoogle = adminUser as AdminUserGoogleUpdatePayload;
-      await repository.updateOneById(id, adminUserGoogle);
+      if (adminUserGoogle.googleOAuth2AccessToken) {
+        obj = {
+          googleOAuth2AccessToken: adminUserGoogle.googleOAuth2AccessToken,
+          googleOAuth2ExpiryDate: adminUserGoogle.googleOAuth2ExpiryDate,
+          googleOAuth2IdToken: adminUserGoogle.googleOAuth2IdToken,
+          googleOAuth2RefreshToken: adminUserGoogle.googleOAuth2RefreshToken,
+          googleOAuth2TokenType: adminUserGoogle.googleOAuth2TokenType,
+        } as AdminUserGoogleUpdateAttributes;
+      }
       break;
     }
     case AUTH_TYPE.OIDC: {
       const adminUserOidc = adminUser as AdminUserOidcUpdatePayload;
-      await repository.updateOneById(id, adminUserOidc);
+      if (adminUserOidc.oidcAccessToken) {
+        obj = {
+          oidcAccessToken: adminUserOidc.oidcAccessToken,
+          oidcExpiryDate: adminUserOidc.oidcExpiryDate,
+          oidcIdToken: adminUserOidc.oidcIdToken,
+          oidcRefreshToken: adminUserOidc.oidcRefreshToken,
+          oidcTokenType: adminUserOidc.oidcTokenType,
+        } as AdminUserOidcUpdateAttributes;
+      }
       break;
     }
     default:
       throw invalidAuthType();
+  }
+
+  if (obj) {
+    await repository.updateOneById(id, obj);
   }
 
   if (roleIds?.length) {
