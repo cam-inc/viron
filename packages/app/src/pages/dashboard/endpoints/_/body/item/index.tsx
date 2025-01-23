@@ -94,7 +94,7 @@ const Item: React.FC<Props> = ({ endpoint }) => {
 
   return (
     <article
-      className={classNames('p-5 border rounded-2xl h-full', {
+      className={classNames('p-5 border rounded-lg h-full', {
         'bg-thm-background border-thm-on-background-low': !error,
         'bg-thm-surface border-transparent': !!error,
       })}

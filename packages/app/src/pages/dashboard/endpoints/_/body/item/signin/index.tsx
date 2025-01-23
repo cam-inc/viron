@@ -1,7 +1,9 @@
 import React, { useCallback, useMemo } from 'react';
-import Button, { Props as ButtonProps } from '~/components/button';
+import IconButton, { Props as ButtonProps } from '~/components/button/icon';
 import Error, { useError } from '~/components/error/';
-import LoginIcon from '~/components/icon/login/outline';
+import GoogleLogo from '~/components/google';
+import Key from '~/components/icon/key/outline';
+import Mail from '~/components/icon/mail/outline';
 import Request from '~/components/request';
 import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
@@ -44,55 +46,63 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
   }, [drawerEmail]);
 
   return (
-    <>
-      <div className="flex items-center gap-2">
-        {authConfigOidc && (
-          <Button
-            variant="outlined"
-            className="grow max-w-50%"
-            on={COLOR_SYSTEM.BACKGROUND}
-            IconRight={LoginIcon}
-            label={t('oidc')}
-            onClick={handleOidcClick}
-          />
-        )}
-        {authConfigOAuth && (
-          <Button
-            variant="outlined"
-            className="grow max-w-50%"
-            on={COLOR_SYSTEM.BACKGROUND}
-            IconRight={LoginIcon}
-            label={t('oAuth')}
-            onClick={handleOAuthClick}
-          />
-        )}
-        {authConfigEmail && (
-          <Button
-            variant="outlined"
-            className="grow max-w-50%"
-            on={COLOR_SYSTEM.BACKGROUND}
-            IconRight={LoginIcon}
-            label={t('email')}
-            onClick={handleEmailClick}
-          />
-        )}
-      </div>
-      <Drawer {...drawerOidc.bind}>
-        {authConfigOidc && (
-          <Oidc endpoint={endpoint} authentication={authentication} />
-        )}
-      </Drawer>
-      <Drawer {...drawerOAuth.bind}>
-        {authConfigOAuth && (
-          <OAuth endpoint={endpoint} authentication={authentication} />
-        )}
-      </Drawer>
-      <Drawer {...drawerEmail.bind}>
-        {authConfigEmail && (
-          <Email endpoint={endpoint} authentication={authentication} />
-        )}
-      </Drawer>
-    </>
+    <div className="flex justify-center items-center gap-4">
+      {authConfigEmail && (
+        <>
+          <label className="flex flex-col items-center gap-1">
+            <IconButton
+              className="border border-thm-on-background-low"
+              on={COLOR_SYSTEM.BACKGROUND}
+              onClick={handleEmailClick}
+              rounded
+            >
+              <Mail />
+            </IconButton>
+            <span className="text-xs">{t('email')}</span>
+          </label>
+          <Drawer {...drawerEmail.bind}>
+            <Email endpoint={endpoint} authentication={authentication} />
+          </Drawer>
+        </>
+      )}
+      {authConfigOAuth && (
+        <>
+          <label className="flex flex-col items-center gap-1">
+            <IconButton
+              className="border border-thm-on-background-low"
+              on={COLOR_SYSTEM.BACKGROUND}
+              onClick={handleOAuthClick}
+              rounded
+            >
+              <GoogleLogo />
+            </IconButton>
+            <span className="text-xs">{t('oAuth')}</span>
+          </label>
+          <Drawer {...drawerOAuth.bind}>
+            <OAuth endpoint={endpoint} authentication={authentication} />
+          </Drawer>
+        </>
+      )}
+      {authConfigOidc && (
+        <>
+          <label className="flex flex-col items-center gap-1">
+            <IconButton
+              className="border border-thm-on-background-low"
+              variant="outlined"
+              on={COLOR_SYSTEM.BACKGROUND}
+              onClick={handleOidcClick}
+              rounded
+            >
+              <Key />
+            </IconButton>
+            <span className="text-xs">{t('oidc')}</span>
+          </label>
+          <Drawer {...drawerOidc.bind}>
+            <Oidc endpoint={endpoint} authentication={authentication} />
+          </Drawer>
+        </>
+      )}
+    </div>
   );
 };
 export default Signin;
