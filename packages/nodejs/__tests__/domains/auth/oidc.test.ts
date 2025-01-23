@@ -1,6 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { Issuer, Client, IdTokenClaims } from 'openid-client';
+import { generators, Issuer, Client, IdTokenClaims } from 'openid-client';
 import {
   getOidcAuthorizationUrl,
   genOidcClient,
@@ -14,59 +14,45 @@ import {
   forbidden,
   signinFailed,
 } from '../../../src/errors';
-import {
-  AdminUser,
-  AdminUserCreateAttributes,
-  AdminUserUpdateAttributes,
-  findOneByEmail,
-  createOne,
-} from '../../../src/domains/adminuser';
+import { findOneByEmail, createOne } from '../../../src/domains/adminuser';
 import { addRoleForUser, listRoles } from '../../../src/domains/adminrole';
 import { AUTH_TYPE, ADMIN_ROLE } from '../../../src/constants';
-import { Repository, repositoryContainer } from '../../../src/repositories';
 
 describe('domains/auth/oidc', () => {
+  // 共有の設定
+  const redirectUri = 'https://example.com/oidcredirect';
+  const defaultConfig = {
+    clientId: 'oidc-client-id',
+    clientSecret: 'oidc-client-secret',
+    configurationUrl: 'https://example.com/.well-known/openid-configuration',
+    additionalScopes: [],
+  };
+
   const sandbox = sinon.createSandbox();
-
-  let repository: Repository<
-    AdminUser,
-    AdminUserCreateAttributes,
-    AdminUserUpdateAttributes
-  >;
-
-  beforeAll(() => {
-    repository = repositoryContainer.getAdminUserRepository();
-  });
-
   afterEach(() => {
     sandbox.restore();
   });
 
   describe('genOidcClient', () => {
     it('OIDCクライアントの生成に成功する', async () => {
-      const redirectUri = 'https://example.com/oidcredirect';
-      const config = {
-        clientId: 'oidc-client-id',
-        clientSecret: 'oidc-client-secret',
-        configurationUrl:
-          'https://example.com/.well-known/openid-configuration',
-        additionalScopes: ['email'],
-      };
+      // デフォルト設定でのテスト
+      const config = defaultConfig;
 
+      // モック作成
       const mockClient = {} as unknown as Client;
       const clientStub = sandbox.stub().returns(mockClient);
-
       const mockIssuer = {
         metadata: { scopes_supported: ['openid', 'email'] },
         Client: clientStub,
       } as unknown as Issuer<Client>;
-
       const discoverStub = sandbox
         .stub(Issuer, 'discover')
         .resolves(mockIssuer);
 
+      // テスト対象の関数を呼び出し
       await genOidcClient(config, redirectUri);
 
+      // モックが期待通りに呼び出されたか確認
       sinon.assert.calledOnceWithExactly(discoverStub, config.configurationUrl);
       sinon.assert.calledOnceWithExactly(clientStub, {
         client_id: config.clientId,
@@ -76,50 +62,51 @@ describe('domains/auth/oidc', () => {
       });
     });
     it('サポートされてないscopeがある場合はエラー', async () => {
-      const redirectUri = 'https://example.com/oidcredirect';
+      // 追加スコープにoffline_accessを追加
       const config = {
-        clientId: 'oidc-client-id',
-        clientSecret: 'oidc-client-secret',
-        configurationUrl:
-          'https://example.com/.well-known/openid-configuration',
-        additionalScopes: ['email', 'offline_access'],
+        ...defaultConfig,
+        additionalScopes: ['offline_access'],
       };
 
-      const mockClient = {} as unknown as Client;
-      const clientStub = sandbox.stub().returns(mockClient);
-
+      // モックの作成
       const mockIssuer = {
-        metadata: { scopes_supported: ['openid', 'email'] }, // `unsupported-scope` はサポートされていない
-        Client: clientStub,
+        metadata: { scopes_supported: ['openid', 'email'] },
       } as unknown as Issuer<Client>;
-
       const discoverStub = sandbox
         .stub(Issuer, 'discover')
         .resolves(mockIssuer);
 
+      // テスト対象の関数を呼び出し
       await assert.rejects(
         genOidcClient(config, redirectUri),
         unsupportedScope()
       );
 
+      // モックが期待通りに呼び出されたか確認
       sinon.assert.calledOnceWithExactly(discoverStub, config.configurationUrl);
-      sinon.assert.notCalled(clientStub); // クライアント生成は呼び出されない
     });
   });
 
   describe('getOidcAuthorizationUrl', () => {
     it('OIDCのIdpへの認証画面URL生成に成功する', async () => {
-      const redirectUri = 'https://example.com/oidcredirect';
+      // テストデータ
       const state = 'XXXXXXX';
+      const scope = 'openid email';
+      const responseType = 'code';
       const codeVerifier = 'YYYYYYY';
-      const config = {
-        clientId: 'oidc-client-id',
-        clientSecret: 'oidc-client-secret',
-        configurationUrl:
-          'https://example.com/.well-known/openid-configuration',
-        additionalScopes: [],
-      };
-      const authorizationUrl = `https://idp.jp/oidc/authz?client_id=${config.clientId}&scope=openid%20email&response_type=code&redirect_uri=https%3A%2F%2Fviron.work%2Foidcredirect&code_challenge=dummy&code_challenge_method=S256&state=${state}`;
+      const config = defaultConfig;
+      const codeChallengeMethod = 'S256';
+      const codeChallenge = generators.codeChallenge(codeVerifier);
+      const authorizationEndpoint = 'https://idp.jp/oidc/authz';
+      const url = new URL(authorizationEndpoint);
+      url.searchParams.append('client_id', config.clientId);
+      url.searchParams.append('scope', scope);
+      url.searchParams.append('response_type', responseType);
+      url.searchParams.append('redirect_uri', redirectUri);
+      url.searchParams.append('code_challenge', codeChallenge);
+      url.searchParams.append('code_challenge_method', codeChallengeMethod);
+      url.searchParams.append('state', state);
+      const authorizationUrl = url.toString();
 
       // モックのClientを作成
       const authorizationUrlStub = sandbox.stub().returns(authorizationUrl);
@@ -131,8 +118,8 @@ describe('domains/auth/oidc', () => {
       const clientStub = sandbox.stub().returns(mockClient);
       const mockIssuer = {
         Client: clientStub,
-        metadata: {}, // 必須プロパティ
-        keystore: sandbox.stub(), // 必須プロパティ
+        metadata: {},
+        keystore: sandbox.stub(),
       } as unknown as Issuer<Client>;
 
       // Issuer.discover をモック
@@ -150,51 +137,51 @@ describe('domains/auth/oidc', () => {
       );
 
       // モックが期待通りに呼び出されたか確認
-      sinon.assert.calledOnceWithExactly(
-        discoverStub,
-        'https://example.com/.well-known/openid-configuration'
-      );
+      sinon.assert.calledOnceWithExactly(discoverStub, config.configurationUrl);
       sinon.assert.calledOnceWithExactly(clientStub, {
-        client_id: 'oidc-client-id',
-        client_secret: 'oidc-client-secret',
+        client_id: config.clientId,
+        client_secret: config.clientSecret,
         redirect_uris: [redirectUri],
-        response_types: ['code'],
+        response_types: [responseType],
       });
       sinon.assert.calledOnceWithExactly(authorizationUrlStub, {
-        scope: 'openid email',
+        scope,
         state,
-        code_challenge: sinon.match.string,
-        code_challenge_method: 'S256',
+        code_challenge: codeChallenge,
+        code_challenge_method: codeChallengeMethod,
       });
 
       // 結果の検証
       assert.strictEqual(result, authorizationUrl);
-      const url = new URL(result);
-      assert.strictEqual(url.searchParams.get('state'), state);
-      assert.strictEqual(url.searchParams.get('client_id'), config.clientId);
+      const resultUrl = new URL(result);
+      assert.strictEqual(resultUrl.searchParams.get('state'), state);
+      assert.strictEqual(
+        resultUrl.searchParams.get('client_id'),
+        config.clientId
+      );
     });
   });
 
   describe('signinOidc', () => {
+    // 共通の設定
+    const codeVerifier = 'valid-code-verifier';
+    const params = { state: 'state', code: 'auth-code' };
+
     beforeAll(() => {
       initJwt({
         secret: 'test',
         provider: 'oidc',
       });
     });
+
     it('OIDCのサインインに成功する', async () => {
-      const codeVerifier = 'valid-code-verifier';
-      const redirectUri = 'https://example.com/oidc/callback';
-      const params = { state: 'state', code: 'auth-code' };
+      // テストデータ
       const config = {
-        clientId: 'oidc-client-id',
-        clientSecret: 'oidc-client-secret',
-        configurationUrl:
-          'https://example.com/.well-known/openid-configuration',
-        additionalScopes: [],
+        ...defaultConfig,
         userHostedDomains: ['example.com'],
       };
 
+      // モックの作成
       const mockTokenSet = {
         access_token: 'xxxxx',
         id_token: 'yyyyy',
@@ -208,15 +195,12 @@ describe('domains/auth/oidc', () => {
         }),
         expired: (): boolean => false,
       };
-
       const callbackStub = sandbox.stub().returns(mockTokenSet);
-
-      // クライアントのモック
       const mockClient = {
         callback: callbackStub,
       } as unknown as Client;
 
-      // signinOidc関数を実行して結果を取得
+      // テスト対象の関数を呼び出し
       const result = await signinOidc(
         mockClient,
         codeVerifier,
@@ -231,22 +215,18 @@ describe('domains/auth/oidc', () => {
         state: params.state,
       });
 
+      // 結果の検証
       expect(result).toMatch(/^Bearer /);
     });
 
     it('サインイン時にidTokenが取得できないエラー', async () => {
-      const codeVerifier = 'valid-code-verifier';
-      const redirectUri = 'https://example.com/oidc/callback';
-      const params = { state: 'state', code: 'auth-code' };
+      // テストデータ
       const config = {
-        clientId: 'oidc-client-id',
-        clientSecret: 'oidc-client-secret',
-        configurationUrl:
-          'https://example.com/.well-known/openid-configuration',
-        additionalScopes: [],
+        ...defaultConfig,
         userHostedDomains: ['example.com'],
       };
 
+      // モックの作成
       const mockTokenSet = {
         access_token: 'xxxxx',
         claims: (): IdTokenClaims => ({
@@ -259,15 +239,12 @@ describe('domains/auth/oidc', () => {
         }),
         expired: (): boolean => false,
       };
-
       const callbackStub = sandbox.stub().returns(mockTokenSet);
-
-      // クライアントのモック
       const mockClient = {
         callback: callbackStub,
       } as unknown as Client;
 
-      // signinOidc関数を実行して結果を取得
+      // テスト対象の関数を呼び出し
       await assert.rejects(
         signinOidc(mockClient, codeVerifier, redirectUri, params, config),
         invalidOidcToken()
@@ -281,20 +258,16 @@ describe('domains/auth/oidc', () => {
     });
 
     it('サインイン時にemailが取得できないエラー', async () => {
-      const codeVerifier = 'valid-code-verifier';
-      const redirectUri = 'https://example.com/oidc/callback';
-      const params = { state: 'state', code: 'auth-code' };
+      // テストデータ
       const config = {
-        clientId: 'oidc-client-id',
-        clientSecret: 'oidc-client-secret',
-        configurationUrl:
-          'https://example.com/.well-known/openid-configuration',
-        additionalScopes: [],
+        ...defaultConfig,
         userHostedDomains: ['example.com'],
       };
 
+      // モックの作成
       const mockTokenSet = {
         access_token: 'xxxxx',
+        id_token: 'yyyyy',
         claims: (): IdTokenClaims => ({
           sub: 'sub',
           aud: 'aud',
@@ -304,15 +277,12 @@ describe('domains/auth/oidc', () => {
         }),
         expired: (): boolean => false,
       };
-
       const callbackStub = sandbox.stub().returns(mockTokenSet);
-
-      // クライアントのモック
       const mockClient = {
         callback: callbackStub,
       } as unknown as Client;
 
-      // signinOidc関数を実行して結果を取得
+      // テスト対象の関数を呼び出し
       await assert.rejects(
         signinOidc(mockClient, codeVerifier, redirectUri, params, config),
         invalidOidcToken()
@@ -325,19 +295,53 @@ describe('domains/auth/oidc', () => {
       });
     });
 
-    it('サインイン時にidTokenの有効期限が切れているエラー', async () => {
-      const codeVerifier = 'valid-code-verifier';
-      const redirectUri = 'https://example.com/oidc/callback';
-      const params = { state: 'state', code: 'auth-code' };
+    it('サインイン時にemailのドメインが許可対象外エラー', async () => {
+      // テストデータ
       const config = {
-        clientId: 'oidc-client-id',
-        clientSecret: 'oidc-client-secret',
-        configurationUrl:
-          'https://example.com/.well-known/openid-configuration',
-        additionalScopes: [],
+        ...defaultConfig,
+        userHostedDomains: ['no-example.com'],
+      };
+
+      // モックの作成
+      const mockTokenSet = {
+        access_token: 'xxxxx',
+        id_token: 'yyyyy',
+        claims: (): IdTokenClaims => ({
+          email: 'user@example.com',
+          sub: 'sub',
+          aud: 'aud',
+          exp: 1737455830,
+          iat: 1737455830,
+          iss: 'iss',
+        }),
+        expired: (): boolean => false,
+      };
+      const callbackStub = sandbox.stub().returns(mockTokenSet);
+      const mockClient = {
+        callback: callbackStub,
+      } as unknown as Client;
+
+      // テスト対象の関数を呼び出し
+      await assert.rejects(
+        signinOidc(mockClient, codeVerifier, redirectUri, params, config),
+        forbidden()
+      );
+
+      // スタブ呼び出し確認
+      sinon.assert.calledOnceWithExactly(callbackStub, redirectUri, params, {
+        code_verifier: codeVerifier,
+        state: params.state,
+      });
+    });
+
+    it('サインイン時にidTokenの有効期限が切れているエラー', async () => {
+      // テストデータ
+      const config = {
+        ...defaultConfig,
         userHostedDomains: ['example.com'],
       };
 
+      // モックの作成
       const mockTokenSet = {
         access_token: 'xxxxx',
         id_token: 'yyyyy',
@@ -351,15 +355,12 @@ describe('domains/auth/oidc', () => {
         }),
         expired: (): boolean => true,
       };
-
       const callbackStub = sandbox.stub().returns(mockTokenSet);
-
-      // クライアントのモック
       const mockClient = {
         callback: callbackStub,
       } as unknown as Client;
 
-      // signinOidc関数を実行して結果を取得
+      // テスト対象の関数を呼び出し
       await assert.rejects(
         signinOidc(mockClient, codeVerifier, redirectUri, params, config),
         forbidden()
@@ -373,18 +374,13 @@ describe('domains/auth/oidc', () => {
     });
 
     it('ビューアーユーザーの初回ログイン成功', async () => {
-      const codeVerifier = 'valid-code-verifier';
-      const redirectUri = 'https://example.com/oidc/callback';
-      const params = { state: 'state', code: 'auth-code' };
+      // テストデータ
       const config = {
-        clientId: 'oidc-client-id',
-        clientSecret: 'oidc-client-secret',
-        configurationUrl:
-          'https://example.com/.well-known/openid-configuration',
-        additionalScopes: [],
+        ...defaultConfig,
         userHostedDomains: ['example.com'],
       };
 
+      // モックの作成
       const mockTokenSet = {
         access_token: 'xxxxx',
         id_token: 'yyyyy',
@@ -398,18 +394,26 @@ describe('domains/auth/oidc', () => {
         }),
         expired: (): boolean => false,
       };
-
       const callbackStub = sandbox.stub().returns(mockTokenSet);
-
       // クライアントのモック
       const mockClient = {
         callback: callbackStub,
       } as unknown as Client;
 
-      // すでに管理ユーザーがいる状態にする
-      sandbox.stub(repository, 'count').withArgs().resolves(1);
+      // すでにsuperユーザーが存在する状態にする
+      await createOne(
+        {
+          email: 'super@example.com',
+          oidcAccessToken: 'xxxxx',
+          oidcExpiryDate: 1737455830,
+          oidcIdToken: 'yyyyy',
+          oidcRefreshToken: null,
+          oidcTokenType: 'Bearer',
+        },
+        AUTH_TYPE.OIDC
+      );
 
-      // signinOidc関数を実行して結果を取得
+      // テスト対象の関数を呼び出し
       const result = await signinOidc(
         mockClient,
         codeVerifier,
@@ -424,6 +428,7 @@ describe('domains/auth/oidc', () => {
         state: params.state,
       });
 
+      // 結果の検証
       expect(result).toMatch(/^Bearer /);
 
       // ユーザーが正しく作成されたか確認
@@ -441,18 +446,13 @@ describe('domains/auth/oidc', () => {
     });
 
     it('登録済みユーザーと認証タイプが違うエラー', async () => {
-      const codeVerifier = 'valid-code-verifier';
-      const redirectUri = 'https://example.com/oidc/callback';
-      const params = { state: 'state', code: 'auth-code' };
+      // テストデータ
       const config = {
-        clientId: 'oidc-client-id',
-        clientSecret: 'oidc-client-secret',
-        configurationUrl:
-          'https://example.com/.well-known/openid-configuration',
-        additionalScopes: [],
+        ...defaultConfig,
         userHostedDomains: ['example.com'],
       };
 
+      // モックの作成
       const mockTokenSet = {
         access_token: 'xxxxx',
         id_token: 'yyyyy',
@@ -466,10 +466,7 @@ describe('domains/auth/oidc', () => {
         }),
         expired: (): boolean => false,
       };
-
       const callbackStub = sandbox.stub().returns(mockTokenSet);
-
-      // クライアントのモック
       const mockClient = {
         callback: callbackStub,
       } as unknown as Client;
@@ -487,7 +484,7 @@ describe('domains/auth/oidc', () => {
         AUTH_TYPE.GOOGLE
       );
 
-      // signinOidc関数を実行して結果を取得
+      // テスト対象の関数を呼び出し
       await assert.rejects(
         signinOidc(mockClient, codeVerifier, redirectUri, params, config),
         signinFailed()
@@ -501,18 +498,13 @@ describe('domains/auth/oidc', () => {
     });
 
     it('登録済みユーザーで再ログインが成功する', async () => {
-      const codeVerifier = 'valid-code-verifier';
-      const redirectUri = 'https://example.com/oidc/callback';
-      const params = { state: 'state', code: 'auth-code' };
+      // テストデータ
       const config = {
-        clientId: 'oidc-client-id',
-        clientSecret: 'oidc-client-secret',
-        configurationUrl:
-          'https://example.com/.well-known/openid-configuration',
-        additionalScopes: [],
+        ...defaultConfig,
         userHostedDomains: ['example.com'],
       };
 
+      // モックの作成
       const mockTokenSet = {
         access_token: 'xxxxx_updated',
         id_token: 'yyyyy_updated',
@@ -526,10 +518,7 @@ describe('domains/auth/oidc', () => {
         }),
         expired: (): boolean => false,
       };
-
       const callbackStub = sandbox.stub().returns(mockTokenSet);
-
-      // クライアントのモック
       const mockClient = {
         callback: callbackStub,
       } as unknown as Client;
@@ -574,6 +563,7 @@ describe('domains/auth/oidc', () => {
 
   describe('verifyOidcAccessToken', () => {
     it('リフレッシュトークンがある場合にアクセストークンをリフレッシュする', async () => {
+      // モックの作成
       const mockTokenSet = {
         access_token: 'xxxxx_updated',
         id_token: 'yyyyy_updated',
@@ -588,10 +578,7 @@ describe('domains/auth/oidc', () => {
         }),
         expired: (): boolean => false,
       };
-
       const refreshStub = sandbox.stub().returns(mockTokenSet);
-
-      // クライアントのモック
       const mockClient = {
         refresh: refreshStub,
       } as unknown as Client;
@@ -609,13 +596,14 @@ describe('domains/auth/oidc', () => {
         AUTH_TYPE.OIDC
       );
 
-      // verifyOidcAccessToken関数を実行して結果を取得
+      // テスト対象の関数を呼び出し
       const result = await verifyOidcAccessToken(
         mockClient,
         registeredUser.id,
         registeredUser
       );
 
+      // 結果の検証
       assert.strictEqual(result, true);
 
       // スタブ呼び出し確認
@@ -635,22 +623,7 @@ describe('domains/auth/oidc', () => {
       assert.strictEqual(actual?.oidcRefreshToken, mockTokenSet.refresh_token);
     });
     it('リフレッシュトークンがない場合にintrospection_endpointでアクセストークン検証成功する', async () => {
-      const mockIntrospection = {
-        active: true,
-      };
-
-      const introspectStub = sandbox.stub().resolves(mockIntrospection);
-
-      // クライアントのモック
-      const mockClient = {
-        introspect: introspectStub,
-        issuer: {
-          metadata: {
-            introspection_endpoint: 'https://example.com/introspection',
-          },
-        },
-      } as unknown as Client;
-
+      // テストデータ
       const user = {
         oidcAccessToken: 'xxxxx',
         oidcExpiryDate: 1737455830,
@@ -660,9 +633,24 @@ describe('domains/auth/oidc', () => {
       };
       const userId = 'dummy';
 
-      // verifyOidcAccessToken関数を実行して結果を取得
+      // モックの作成
+      const mockIntrospection = {
+        active: true,
+      };
+      const introspectStub = sandbox.stub().resolves(mockIntrospection);
+      const mockClient = {
+        introspect: introspectStub,
+        issuer: {
+          metadata: {
+            introspection_endpoint: 'https://example.com/introspection',
+          },
+        },
+      } as unknown as Client;
+
+      // テスト対象の関数を呼び出し
       const result = await verifyOidcAccessToken(mockClient, userId, user);
 
+      // 結果の検証
       assert.strictEqual(result, true);
 
       // スタブ呼び出し確認
@@ -673,22 +661,7 @@ describe('domains/auth/oidc', () => {
       );
     });
     it('リフレッシュトークンがない場合にintrospection_endpointでアクセストークン検証してactive=falseでエラー', async () => {
-      const mockIntrospection = {
-        active: false,
-      };
-
-      const introspectStub = sandbox.stub().resolves(mockIntrospection);
-
-      // クライアントのモック
-      const mockClient = {
-        introspect: introspectStub,
-        issuer: {
-          metadata: {
-            introspection_endpoint: 'https://example.com/introspection',
-          },
-        },
-      } as unknown as Client;
-
+      // テストデータ
       const user = {
         oidcAccessToken: 'xxxxx',
         oidcExpiryDate: 1737455830,
@@ -698,9 +671,25 @@ describe('domains/auth/oidc', () => {
       };
       const userId = 'dummy';
 
-      // verifyOidcAccessToken関数を実行して結果を取得
+      const mockIntrospection = {
+        active: false,
+      };
+
+      // モックの作成
+      const introspectStub = sandbox.stub().resolves(mockIntrospection);
+      const mockClient = {
+        introspect: introspectStub,
+        issuer: {
+          metadata: {
+            introspection_endpoint: 'https://example.com/introspection',
+          },
+        },
+      } as unknown as Client;
+
+      // テスト対象の関数を呼び出し
       const result = await verifyOidcAccessToken(mockClient, userId, user);
 
+      // 結果の検証
       assert.strictEqual(result, false);
 
       // スタブ呼び出し確認
@@ -711,20 +700,7 @@ describe('domains/auth/oidc', () => {
       );
     });
     it('リフレッシュトークンがない場合にintrospection_endpointでアクセストークン検証して例外返却でエラー', async () => {
-      const mockIntrospection = new Error('introspect error');
-
-      const introspectStub = sandbox.stub().resolves(mockIntrospection);
-
-      // クライアントのモック
-      const mockClient = {
-        introspect: introspectStub,
-        issuer: {
-          metadata: {
-            introspection_endpoint: 'https://example.com/introspection',
-          },
-        },
-      } as unknown as Client;
-
+      // テストデータ
       const user = {
         oidcAccessToken: 'xxxxx',
         oidcExpiryDate: 1737455830,
@@ -734,9 +710,22 @@ describe('domains/auth/oidc', () => {
       };
       const userId = 'dummy';
 
-      // verifyOidcAccessToken関数を実行して結果を取得
+      // モックの作成
+      const mockIntrospection = new Error('introspect error');
+      const introspectStub = sandbox.stub().resolves(mockIntrospection);
+      const mockClient = {
+        introspect: introspectStub,
+        issuer: {
+          metadata: {
+            introspection_endpoint: 'https://example.com/introspection',
+          },
+        },
+      } as unknown as Client;
+
+      // テスト対象の関数を呼び出し
       const result = await verifyOidcAccessToken(mockClient, userId, user);
 
+      // 結果の検証
       assert.strictEqual(result, false);
 
       // スタブ呼び出し確認
@@ -747,13 +736,21 @@ describe('domains/auth/oidc', () => {
       );
     });
     it('リフレッシュトークンがない場合にuserinfo_endpointでユーザー情報が取得できアクセストークンが有効', async () => {
+      // テストデータ
+      const user = {
+        oidcAccessToken: 'xxxxx',
+        oidcExpiryDate: 1737455830,
+        oidcIdToken: 'yyyyy',
+        oidcRefreshToken: null,
+        oidcTokenType: 'Bearer',
+      };
+      const userId = 'dummy';
       const mockUserInfo = {
         sub: 'dummy',
       };
 
+      // モックの作成
       const userInfoStub = sandbox.stub().resolves(mockUserInfo);
-
-      // クライアントのモック
       const mockClient = {
         userinfo: userInfoStub,
         issuer: {
@@ -763,36 +760,17 @@ describe('domains/auth/oidc', () => {
         },
       } as unknown as Client;
 
-      const user = {
-        oidcAccessToken: 'xxxxx',
-        oidcExpiryDate: 1737455830,
-        oidcIdToken: 'yyyyy',
-        oidcRefreshToken: null,
-        oidcTokenType: 'Bearer',
-      };
-      const userId = 'dummy';
-
-      // verifyOidcAccessToken関数を実行して結果を取得
+      // テスト対象の関数を呼び出し
       const result = await verifyOidcAccessToken(mockClient, userId, user);
 
+      // 結果の検証
       assert.strictEqual(result, true);
 
       // スタブ呼び出し確認
       sinon.assert.calledOnceWithExactly(userInfoStub, user.oidcAccessToken);
     });
     it('リフレッシュトークンがない場合にuserinfo_endpointでユーザー情報取得できないエラー', async () => {
-      const userInfoStub = sandbox.stub().resolves(null);
-
-      // クライアントのモック
-      const mockClient = {
-        userinfo: userInfoStub,
-        issuer: {
-          metadata: {
-            userinfo_endpoint: 'https://example.com/userinfo',
-          },
-        },
-      } as unknown as Client;
-
+      // テストデータ
       const user = {
         oidcAccessToken: 'xxxxx',
         oidcExpiryDate: 1737455830,
@@ -802,27 +780,28 @@ describe('domains/auth/oidc', () => {
       };
       const userId = 'dummy';
 
-      // verifyOidcAccessToken関数を実行して結果を取得
+      // モックの作成
+      const userInfoStub = sandbox.stub().resolves(null);
+      const mockClient = {
+        userinfo: userInfoStub,
+        issuer: {
+          metadata: {
+            userinfo_endpoint: 'https://example.com/userinfo',
+          },
+        },
+      } as unknown as Client;
+
+      // テスト対象の関数を呼び出し
       const result = await verifyOidcAccessToken(mockClient, userId, user);
 
+      // 結果の検証
       assert.strictEqual(result, false);
 
       // スタブ呼び出し確認
       sinon.assert.calledOnceWithExactly(userInfoStub, user.oidcAccessToken);
     });
     it('リフレッシュトークンがない場合にuserinfo_endpointでユーザー情報取得で例外返却されたエラー', async () => {
-      const userInfoStub = sandbox.stub().resolves(new Error('userinfo error'));
-
-      // クライアントのモック
-      const mockClient = {
-        userinfo: userInfoStub,
-        issuer: {
-          metadata: {
-            userinfo_endpoint: 'https://example.com/userinfo',
-          },
-        },
-      } as unknown as Client;
-
+      // テストデータ
       const user = {
         oidcAccessToken: 'xxxxx',
         oidcExpiryDate: 1737455830,
@@ -832,9 +811,21 @@ describe('domains/auth/oidc', () => {
       };
       const userId = 'dummy';
 
-      // verifyOidcAccessToken関数を実行して結果を取得
+      // モックの作成
+      const userInfoStub = sandbox.stub().resolves(new Error('userinfo error'));
+      const mockClient = {
+        userinfo: userInfoStub,
+        issuer: {
+          metadata: {
+            userinfo_endpoint: 'https://example.com/userinfo',
+          },
+        },
+      } as unknown as Client;
+
+      // テスト対象の関数を呼び出し
       const result = await verifyOidcAccessToken(mockClient, userId, user);
 
+      // 結果の検証
       assert.strictEqual(result, false);
 
       // スタブ呼び出し確認
