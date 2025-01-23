@@ -17,7 +17,12 @@ import {
 import { createOne, findOneByEmail, updateOneById } from '../adminuser';
 import { addRoleForUser } from '../adminrole';
 import { createFirstAdminUser } from './common';
-import { ADMIN_ROLE, AUTH_TYPE, OIDC_DEFAULT_SCOPES } from '../../constants';
+import {
+  ADMIN_ROLE,
+  AUTH_TYPE,
+  OIDC_DEFAULT_SCOPES,
+  OIDC_TOKEN_REFRESH_BEFORE_SEC as OIDC_TOKEN_REFRESH_BUFFER_SEC,
+} from '../../constants';
 
 export interface OidcClientConfig {
   clientId: string;
@@ -49,9 +54,10 @@ export const genOidcClient = async (
   // scopes_supportedがある場合はチェック
   if (scopesSupported.length > 0) {
     // 追加スコープがある場合は追加スコープを含めてチェック
-    const scopes = config.additionalScopes
-      ? OIDC_DEFAULT_SCOPES.concat(config.additionalScopes)
-      : OIDC_DEFAULT_SCOPES;
+    const scopes =
+      config.additionalScopes && config.additionalScopes.length > 0
+        ? OIDC_DEFAULT_SCOPES.concat(config.additionalScopes)
+        : OIDC_DEFAULT_SCOPES;
     // scopes の中のどれか一つでもサポートされていない場合はエラー
     if (scopes.some((scope) => !scopesSupported.includes(scope))) {
       throw unsupportedScope();
@@ -86,9 +92,10 @@ export const getOidcAuthorizationUrl = async (
 
   // 認証URLを生成
   const authorizationUrl = client.authorizationUrl({
-    scope: config.additionalScopes
-      ? OIDC_DEFAULT_SCOPES.concat(config.additionalScopes).join(' ')
-      : OIDC_DEFAULT_SCOPES.join(' '),
+    scope:
+      config.additionalScopes && config.additionalScopes.length > 0
+        ? OIDC_DEFAULT_SCOPES.concat(config.additionalScopes).join(' ')
+        : OIDC_DEFAULT_SCOPES.join(' '),
     code_challenge: codeChallenge,
     code_challenge_method: 'S256',
     state,
@@ -278,6 +285,12 @@ export const verifyOidcAccessToken = async (
     return false;
   }
 
+  // アクセストークンの有効期限が近い場合のみリフレッシュする
+  if (!isRefresh(credentials.oidcExpiryDate)) {
+    debug('verifyOidcAccessToken no need to refresh token. userId: %s', userId);
+    return true;
+  }
+
   // リフレッシュトークンがある場合はリフレッシュトークンを使ってトークンを更新
   const refreshToken = credentials.oidcRefreshToken;
   const tokenset = await client.refresh(refreshToken);
@@ -308,4 +321,11 @@ const formatCredentials = (credentials: TokenSet): OidcCredentials => {
     oidcRefreshToken: credentials.refresh_token ?? null,
     oidcTokenType: credentials.token_type ?? null,
   };
+};
+
+const isRefresh = (expiryDate: number | null): boolean => {
+  return (
+    !expiryDate ||
+    Date.now() > (expiryDate - OIDC_TOKEN_REFRESH_BUFFER_SEC) * 1000
+  );
 };
