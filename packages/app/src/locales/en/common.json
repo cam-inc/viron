@@ -54,7 +54,7 @@
   "signout": "Signout",
   "oidc": "SSO",
   "oAuth": "Google",
-  "email": "Signin",
+  "email": "Sign in",
   "addEndpoint": {
     "title": "Create an $t(endpoint)",
     "idInputLabel": "ID",

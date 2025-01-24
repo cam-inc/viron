@@ -46,10 +46,10 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
   }, [drawerEmail]);
 
   return (
-    <div className="flex justify-center items-center gap-4">
+    <div className="flex justify-center gap-4">
       {authConfigEmail && (
         <>
-          <label className="flex flex-col items-center gap-1">
+          <label className="flex basis-15 flex-col items-center gap-1">
             <IconButton
               className="border border-thm-on-background-low"
               on={COLOR_SYSTEM.BACKGROUND}
@@ -67,7 +67,7 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
       )}
       {authConfigOAuth && (
         <>
-          <label className="flex flex-col items-center gap-1">
+          <label className="flex basis-15 flex-col items-center gap-1">
             <IconButton
               className="border border-thm-on-background-low"
               on={COLOR_SYSTEM.BACKGROUND}
@@ -85,10 +85,9 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
       )}
       {authConfigOidc && (
         <>
-          <label className="flex flex-col items-center gap-1">
+          <label className="flex basis-15 flex-col items-center gap-1">
             <IconButton
               className="border border-thm-on-background-low"
-              variant="outlined"
               on={COLOR_SYSTEM.BACKGROUND}
               onClick={handleOidcClick}
               rounded

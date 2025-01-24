@@ -1,2 +1,2 @@
-import { GoMail } from '@react-icons/all-files/go/GoMail';
-export default GoMail;
+import { FiMail } from '@react-icons/all-files/fi/FiMail';
+export default FiMail;
