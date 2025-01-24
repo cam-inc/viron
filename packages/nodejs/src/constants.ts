@@ -143,7 +143,7 @@ export const GOOGLE_OAUTH2_DEFAULT_SCOPES = [
 
 export const OIDC_DEFAULT_SCOPES = ['openid', 'email'];
 
-export const OIDC_TOKEN_REFRESH_BEFORE_SEC = 5 * 60; // 5分前からリフレッシュを開始する
+export const OIDC_TOKEN_REFRESH_BEFORE_SEC = 30; // 30秒前からリフレッシュを開始する
 
 export const THEME = {
   RED: 'red',

@@ -61,8 +61,7 @@ export const get = (mode: Mode): Config => {
       oidc: {
         clientId: process.env.OIDC_CLIENT_ID ?? '',
         clientSecret: process.env.OIDC_CLIENT_SECRET ?? '',
-        configurationUrl:
-          'https://{oidc idp host}/.well-known/openid-configuration',
+        configurationUrl: process.env.OIDC_CLIENT_CONFIGURATION_URL ?? '',
         additionalScopes: [],
         userHostedDomains: ['cam-inc.co.jp', 'cyberagent.co.jp'],
       },
