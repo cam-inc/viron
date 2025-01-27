@@ -75,6 +75,45 @@ describe('domains/auth/oidc', () => {
         response_types: ['code'],
       });
     });
+    it('キャッシュされたOIDCクライアントが返却される', async () => {
+      // デフォルト設定でのテスト
+      const config = defaultConfig;
+
+      // モック作成
+      const mockClient = {} as unknown as Client;
+      const clientStub = sandbox.stub().returns(mockClient);
+      const mockIssuer = {
+        metadata: { scopes_supported: ['openid', 'email'] },
+        Client: clientStub,
+      } as unknown as Issuer<Client>;
+      const discoverStub = sandbox
+        .stub(Issuer, 'discover')
+        .resolves(mockIssuer);
+
+      // テスト対象の関数を呼び出し
+      // 一時呼び出してキャッシュされたOIDCクライアントを取得
+      const firstCallOidcClient = await domainAuthOidc.genOidcClient(
+        config,
+        redirectUri,
+        true
+      );
+      // 二度目の呼び出しでキャッシュされたOIDCクライアントを取得
+      const secondCallOidcClient = await domainAuthOidc.genOidcClient(
+        config,
+        redirectUri
+      );
+
+      // モックが期待通りに呼び出されたか確認
+      sinon.assert.calledOnceWithExactly(discoverStub, config.configurationUrl);
+      sinon.assert.calledOnceWithExactly(clientStub, {
+        client_id: config.clientId,
+        client_secret: config.clientSecret,
+        redirect_uris: [redirectUri],
+        response_types: ['code'],
+      });
+
+      assert.strictEqual(firstCallOidcClient, secondCallOidcClient);
+    });
     it('サポートされてないscopeがある場合はエラー', async () => {
       // 追加スコープにoffline_accessを追加
       const config = {
@@ -92,7 +131,7 @@ describe('domains/auth/oidc', () => {
 
       // テスト対象の関数を呼び出し
       await assert.rejects(
-        domainAuthOidc.genOidcClient(config, redirectUri),
+        domainAuthOidc.genOidcClient(config, redirectUri, true),
         unsupportedScope()
       );
 
@@ -157,7 +196,11 @@ describe('domains/auth/oidc', () => {
         .resolves(mockIssuer);
 
       // テスト対象の関数を呼び出し
-      const client = await domainAuthOidc.genOidcClient(config, redirectUri);
+      const client = await domainAuthOidc.genOidcClient(
+        config,
+        redirectUri,
+        true
+      );
       const result = await domainAuthOidc.getOidcAuthorizationUrl(
         config,
         client,
@@ -213,7 +256,11 @@ describe('domains/auth/oidc', () => {
         .resolves(mockIssuer);
 
       // テスト対象の関数を呼び出し
-      const client = await domainAuthOidc.genOidcClient(config, redirectUri);
+      const client = await domainAuthOidc.genOidcClient(
+        config,
+        redirectUri,
+        true
+      );
       const result = await domainAuthOidc.getOidcAuthorizationUrl(
         config,
         client,
@@ -285,7 +332,11 @@ describe('domains/auth/oidc', () => {
         .resolves(mockIssuer);
 
       // テスト対象の関数を呼び出し
-      const client = await domainAuthOidc.genOidcClient(config, redirectUri);
+      const client = await domainAuthOidc.genOidcClient(
+        config,
+        redirectUri,
+        true
+      );
       const result = await domainAuthOidc.getOidcAuthorizationUrl(
         config,
         client,

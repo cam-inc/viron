@@ -36,11 +36,21 @@ export interface OidcConfig extends OidcClientConfig {
   userHostedDomains?: string[];
 }
 
+// キャッシュされたOIDCクライアント
+let cachedOidcClient: Client | null = null;
+
 // OIDCクライアントの生成
 export const genOidcClient = async (
   config: OidcConfig,
-  redirectUri?: string
+  redirectUri?: string,
+  forceReload?: boolean
 ): Promise<Client> => {
+  // forceReloadがtrueでない場合にキャッシュを使用
+  if (cachedOidcClient && !forceReload) {
+    debug('Use cached oidcClient');
+    return cachedOidcClient;
+  }
+
   // OIDCプロバイダーのIssuerを取得
   const issuer = await Issuer.discover(config.configurationUrl);
   debug('Discovered issuer %o', issuer);
@@ -67,13 +77,15 @@ export const genOidcClient = async (
 
   debug('redirectUri %s', redirectUri);
 
-  // クライアントの作成
-  return new issuer.Client({
+  // クライアントの作成とキャッシュ
+  cachedOidcClient = new issuer.Client({
     client_id: config.clientId,
     client_secret: config.clientSecret,
     response_types: ['code'],
     ...(redirectUri && { redirect_uris: [redirectUri] }),
   });
+
+  return cachedOidcClient;
 };
 
 // OIDC用のコードベリファイアを生成
