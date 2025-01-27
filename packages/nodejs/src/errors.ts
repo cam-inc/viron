@@ -47,8 +47,8 @@ export const invalidGoogleOAuth2Token = (): VironError => {
   return new VironError('Invalid Google OAuth2 Token.', 400);
 };
 
-export const invalidOidcToken = (): VironError => {
-  return new VironError('Invalid OIDC Token.', 400);
+export const invalidOidcIdToken = (): VironError => {
+  return new VironError('Invalid OIDC ID Token.', 400);
 };
 
 export const googleOAuth2Unavailable = (): VironError => {

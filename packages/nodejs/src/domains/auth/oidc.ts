@@ -1,3 +1,4 @@
+import jwt, { Algorithm, JwtPayload, TokenExpiredError } from 'jsonwebtoken';
 import {
   Issuer,
   generators,
@@ -10,7 +11,7 @@ import { signJwt } from './jwt';
 const debug = getDebug('domains:auth:oidc');
 import {
   forbidden,
-  invalidOidcToken,
+  invalidOidcIdToken,
   signinFailed,
   unsupportedScope,
 } from '../../errors';
@@ -127,7 +128,7 @@ export const signinOidc = async (
 
   if (!credentials.oidcIdToken) {
     debug('signinOidc invalid authentication codeVerifier. %s', codeVerifier);
-    throw invalidOidcToken();
+    throw invalidOidcIdToken();
   }
 
   // emailチェック
@@ -138,7 +139,7 @@ export const signinOidc = async (
       claims,
       tokenSet.id_token
     );
-    throw invalidOidcToken();
+    throw invalidOidcIdToken();
   }
   // emailドメインチェック
   const emailDomain = email.split('@').pop() as string;
@@ -188,105 +189,45 @@ export const signinOidc = async (
 // アクセストークンの検証
 export const verifyOidcAccessToken = async (
   client: Client,
+  config: OidcConfig,
   userId: string,
   credentials: OidcCredentials
 ): Promise<boolean> => {
-  // リフレッシュトークンがない場合はscope offline_accessがサポートされてないのでintrospection_endpoint or userinfo_endpointでアクセストークンの有効性を検証する
-  if (!credentials.oidcRefreshToken) {
-    if (!credentials.oidcAccessToken) {
-      debug(
-        'verifyOidcAccessToken invalid access token. %s',
-        credentials.oidcAccessToken
-      );
-      return false;
-    }
-
-    const accessToken: string = credentials.oidcAccessToken;
-    debug('Access token verification without refreshtoken userId: %s', userId);
-    debug('client.issuer.metadata. %o', client.issuer.metadata);
-
-    // introspection_endpointがある場合はアクセストークンを検証
-    if (client.issuer.metadata.introspection_endpoint) {
-      debug(
-        'Accesstoken validation if introspection_endpoint is supported userId: %s',
-        userId
-      );
-
-      // アクセストークンを検証
-      const introspect = await client
-        .introspect(accessToken, 'access_token')
-        .catch((e: Error) => {
-          debug('introspect failure. userId: %s, err: %o', userId, e);
-          return e;
-        });
-
-      // アクセストークン検証でエラーが発生した場合
-      if (introspect instanceof Error) {
-        debug(
-          'verifyOidcAccessToken introspect invalid access token error. %s',
-          accessToken
-        );
-        return false;
-      }
-
-      // アクセストークンが無効な場合
-      if (!introspect.active) {
-        debug(
-          'verifyOidcAccessToken introspect invalid access token deactive. %s',
-          credentials.oidcAccessToken
-        );
-        return false;
-      }
-
-      // activeが取得できた場合は有効なアクセストークン
-      debug('introspect %o', introspect);
-      return true;
-    }
-
-    // userinfo_endpointがある場合はアクセストークンを検証
-    if (client.issuer.metadata.userinfo_endpoint) {
-      debug(
-        'Accesstoken validation if userinfo_endpoint is supported userId: %s',
-        userId
-      );
-
-      // ユーザー情報を取得できた場合は有効なアクセストークン
-      const userInfo = await client.userinfo(accessToken).catch((e: Error) => {
-        debug('userinfo failure. userId: %s, err: %o', userId, e);
-        return e;
-      });
-
-      // ユーザー情報取得でエラーが発生した場合
-      if (userInfo instanceof Error) {
-        debug(
-          'verifyOidcAccessToken userinfo invalid access token error. %s, %o',
-          accessToken,
-          userInfo
-        );
-        return false;
-      }
-
-      // ユーザー情報が取得できなかった場合
-      if (!userInfo) {
-        debug(
-          'verifyOidcAccessToken userinfo invalid access token. %s',
-          accessToken
-        );
-        return false;
-      }
-
-      // emailが取得できた場合は有効なアクセストークン
-      debug('userinfo.email %o', userInfo.email);
-      return true;
-    }
-
-    // introspection_endpointとuserinfo_endpointがない場合はアクセストークンを検証できないのでエラー
-    debug('introspection_endpoint and userinfo_endpoint are not supported');
+  // credentialsが不正な場合はエラー
+  if (
+    !credentials.oidcAccessToken ||
+    !credentials.oidcIdToken ||
+    !credentials.oidcExpiryDate ||
+    !credentials.oidcTokenType
+  ) {
+    debug('verifyOidcAccessToken invalid credentials. %o', credentials);
     return false;
   }
 
-  // アクセストークンの有効期限が近い場合のみリフレッシュする
-  if (!isRefresh(credentials.oidcExpiryDate)) {
+  // IDトークンの検証
+  // vironではIDトークンはDBに保存されているので、改竄されることはないが
+  // DBはviron利用者が管理するため改竄されることを考慮してvironLibとしてはIDトークンの検証を毎度行う
+  const verified = await verifyOidcIdToken(
+    client,
+    config,
+    credentials.oidcIdToken
+  );
+  if (!verified) {
+    debug(
+      'verifyOidcAccessToken invalid id token. %s',
+      credentials.oidcIdToken
+    );
+    return false;
+  }
+
+  // リフレッシュトークンがない場合はIDトークンの有効期限だけで判定
+  if (!credentials.oidcRefreshToken) {
+    debug('verifyOidcAccessToken no refresh token. userId: %s', userId);
+    return !!verified.exp && verified.exp > Date.now() / 1000;
+  }
+
+  // IDトークンの有効期限が近い場合のみリフレッシュする
+  if (!isRefresh(verified.exp)) {
     debug('verifyOidcAccessToken no need to refresh token. userId: %s', userId);
     return true;
   }
@@ -299,10 +240,54 @@ export const verifyOidcAccessToken = async (
     return false;
   }
   debug('AccessToken refresh success! userId: %s', userId);
+
+  // トークンを更新
   const newCredentials = formatCredentials(tokenset);
   newCredentials.oidcRefreshToken = refreshToken;
   await updateOneById(userId, newCredentials);
+
   return true;
+};
+
+export const verifyOidcIdToken = async (
+  client: Client,
+  config: OidcConfig,
+  idToken: string
+): Promise<JwtPayload | null> => {
+  // JWTのヘッダーから`kid`を取得
+  const decodedJwt = jwt.decode(idToken, { complete: true });
+  if (!decodedJwt || typeof decodedJwt === 'string') {
+    debug('verifyIdToken decode error. %s', idToken);
+    return null;
+  }
+  const kid = decodedJwt.header.kid;
+
+  // JWKSエンドポイントから公開鍵を取得
+  const keyStore = await client.issuer.keystore();
+
+  // kidに対応する公開鍵を取得
+  const key = keyStore.get({ kid });
+  if (!key) {
+    debug('verifyIdToken invalid kid. %s', kid);
+    return null;
+  }
+
+  // JWTの検証
+  try {
+    const verified = jwt.verify(idToken, key.toPEM(), {
+      audience: config.clientId, // OIDCクライアントIDで検証
+      issuer: client.issuer.metadata.issuer, // トークン発行者で検証
+      algorithms: [key.alg as Algorithm], // アルゴリズムを指定
+    });
+    return verified as JwtPayload;
+  } catch (e) {
+    debug('verifyIdToken error: %o', e);
+    if (e instanceof TokenExpiredError) {
+      debug('Token expired! %s', idToken);
+      return null;
+    }
+    throw e;
+  }
 };
 
 interface OidcCredentials {
@@ -323,7 +308,7 @@ const formatCredentials = (credentials: TokenSet): OidcCredentials => {
   };
 };
 
-const isRefresh = (expiryDate: number | null): boolean => {
+const isRefresh = (expiryDate: number | undefined): boolean => {
   return (
     !expiryDate ||
     Date.now() > (expiryDate - OIDC_TOKEN_REFRESH_BUFFER_SEC) * 1000
