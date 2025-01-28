@@ -9,6 +9,8 @@ import {
   forbidden,
   signinFailed,
   VironError,
+  faildDecodeOidcIdToken,
+  mismatchKidOidcIdToken,
 } from '../../../src/errors';
 import {
   findOneByEmail,
@@ -403,7 +405,7 @@ describe('domains/auth/oidc', () => {
         }),
         expired: (): boolean => false,
       };
-      const callbackStub = sandbox.stub().returns(mockTokenSet);
+      const callbackStub = sandbox.stub().resolves(mockTokenSet);
       const mockClient = {
         callback: callbackStub,
       } as unknown as Client;
@@ -461,7 +463,7 @@ describe('domains/auth/oidc', () => {
         }),
         expired: (): boolean => false,
       };
-      const callbackStub = sandbox.stub().returns(mockTokenSet);
+      const callbackStub = sandbox.stub().resolves(mockTokenSet);
       const mockClient = {
         callback: callbackStub,
       } as unknown as Client;
@@ -505,7 +507,7 @@ describe('domains/auth/oidc', () => {
         }),
         expired: (): boolean => false,
       };
-      const callbackStub = sandbox.stub().returns(mockTokenSet);
+      const callbackStub = sandbox.stub().resolves(mockTokenSet);
       const mockClient = {
         callback: callbackStub,
       } as unknown as Client;
@@ -550,7 +552,7 @@ describe('domains/auth/oidc', () => {
         }),
         expired: (): boolean => false,
       };
-      const callbackStub = sandbox.stub().returns(mockTokenSet);
+      const callbackStub = sandbox.stub().resolves(mockTokenSet);
       const mockClient = {
         callback: callbackStub,
       } as unknown as Client;
@@ -595,7 +597,7 @@ describe('domains/auth/oidc', () => {
         }),
         expired: (): boolean => true,
       };
-      const callbackStub = sandbox.stub().returns(mockTokenSet);
+      const callbackStub = sandbox.stub().resolves(mockTokenSet);
       const mockClient = {
         callback: callbackStub,
       } as unknown as Client;
@@ -640,7 +642,7 @@ describe('domains/auth/oidc', () => {
         }),
         expired: (): boolean => false,
       };
-      const callbackStub = sandbox.stub().returns(mockTokenSet);
+      const callbackStub = sandbox.stub().resolves(mockTokenSet);
       // クライアントのモック
       const mockClient = {
         callback: callbackStub,
@@ -712,7 +714,7 @@ describe('domains/auth/oidc', () => {
         }),
         expired: (): boolean => false,
       };
-      const callbackStub = sandbox.stub().returns(mockTokenSet);
+      const callbackStub = sandbox.stub().resolves(mockTokenSet);
       const mockClient = {
         callback: callbackStub,
       } as unknown as Client;
@@ -770,7 +772,7 @@ describe('domains/auth/oidc', () => {
         }),
         expired: (): boolean => false,
       };
-      const callbackStub = sandbox.stub().returns(mockTokenSet);
+      const callbackStub = sandbox.stub().resolves(mockTokenSet);
       const mockClient = {
         callback: callbackStub,
       } as unknown as Client;
@@ -839,14 +841,14 @@ describe('domains/auth/oidc', () => {
         }),
         expired: (): boolean => false,
       };
-      const refreshStub = sandbox.stub().returns(mockTokenSet);
+      const refreshStub = sandbox.stub().resolves(mockTokenSet);
       const mockClient = {
         refresh: refreshStub,
       } as unknown as Client;
       sandbox
         .stub(domainAuthOidc, 'verifyOidcIdToken')
         .withArgs()
-        .resolves({ exp: 1737455830 });
+        .resolves({ payload: mockTokenSet.claims(), expired: false });
 
       // すでに同じemailでユーザーが存在する状態にする
       const registeredUser = await createOne(
@@ -916,7 +918,7 @@ describe('domains/auth/oidc', () => {
       // 結果の検証
       assert.strictEqual(result, false);
     });
-    it('IDトークンの検証失敗の場合はエラー', async () => {
+    it('IDトークンの検証に失敗した場合はエラー', async () => {
       // テストデータ
       const config = defaultConfig;
 
@@ -935,7 +937,7 @@ describe('domains/auth/oidc', () => {
       sandbox
         .stub(domainAuthOidc, 'verifyOidcIdToken')
         .withArgs()
-        .resolves(null);
+        .rejects(faildDecodeOidcIdToken());
 
       // テスト対象の関数を呼び出し
       const result = await domainAuthOidc.verifyOidcAccessToken(
@@ -967,7 +969,7 @@ describe('domains/auth/oidc', () => {
       sandbox
         .stub(domainAuthOidc, 'verifyOidcIdToken')
         .withArgs()
-        .resolves({ exp: 1737455830 });
+        .resolves({ payload: { exp: 1737455830 }, expired: true });
 
       // テスト対象の関数を呼び出し
       const result = await domainAuthOidc.verifyOidcAccessToken(
@@ -979,80 +981,6 @@ describe('domains/auth/oidc', () => {
 
       // 結果の検証
       assert.strictEqual(result, false);
-    });
-    it('リフレッシュトークンがある場合にアクセストークンをリフレッシュしてトークンがない場合エラー', async () => {
-      // テストデータ
-      const config = defaultConfig;
-
-      // モックの作成
-      const mockTokenSet = {
-        access_token: 'xxxxx_updated',
-        id_token: 'yyyyy_updated',
-        refresh_token: 'zzzzz',
-        claims: (): IdTokenClaims => ({
-          email: 'verify-access-token-no-token@example.com',
-          sub: 'sub',
-          aud: 'aud',
-          exp: 1737455830,
-          iat: 1737455830,
-          iss: 'iss',
-        }),
-        expired: (): boolean => false,
-      };
-      const refreshStub = sandbox.stub().returns(null);
-      const mockClient = {
-        refresh: refreshStub,
-      } as unknown as Client;
-      sandbox
-        .stub(domainAuthOidc, 'verifyOidcIdToken')
-        .withArgs()
-        .resolves({ exp: 1737455830 });
-
-      // すでに同じemailでユーザーが存在する状態にする
-      const registeredUser = await createOne(
-        {
-          email: mockTokenSet.claims().email as string,
-          oidcAccessToken: 'xxxxx',
-          oidcExpiryDate: 1737455830,
-          oidcIdToken: 'yyyyy',
-          oidcRefreshToken: 'zzzzz',
-          oidcTokenType: 'Bearer',
-        },
-        AUTH_TYPE.OIDC
-      );
-
-      // テスト対象の関数を呼び出し
-      const result = await domainAuthOidc.verifyOidcAccessToken(
-        mockClient,
-        config,
-        registeredUser.id,
-        registeredUser
-      );
-
-      // 結果の検証
-      assert.strictEqual(result, false);
-
-      // スタブ呼び出し確認
-      sinon.assert.calledOnceWithExactly(
-        refreshStub,
-        registeredUser.oidcRefreshToken
-      );
-
-      // ユーザーが更新されないこと確認
-      const actual = await findOneByEmail(
-        mockTokenSet.claims().email as string
-      );
-      assert.strictEqual(actual?.authType, AUTH_TYPE.OIDC);
-      assert.strictEqual(actual?.email, mockTokenSet.claims().email);
-      assert.strictEqual(
-        actual?.oidcAccessToken,
-        registeredUser.oidcAccessToken
-      );
-      assert.strictEqual(actual?.oidcIdToken, registeredUser.oidcIdToken);
-      assert.strictEqual(
-        actual?.oidcRefreshToken,
-        registeredUser.oidcRefreshToken
-      );
     });
     it('リフレッシュトークンがある場合にアクセストークンの有効期限内はリフレッシュしない', async () => {
       // テストデータ
@@ -1067,20 +995,20 @@ describe('domains/auth/oidc', () => {
           email: 'verify-access-token-no-refresh@example.com',
           sub: 'sub',
           aud: 'aud',
-          exp: 1737455830,
+          exp: Date.now() / 1000 + 10 * 60,
           iat: 1737455830,
           iss: 'iss',
         }),
         expired: (): boolean => false,
       };
-      const refreshStub = sandbox.stub().returns(mockTokenSet);
+      const refreshStub = sandbox.stub().resolves(mockTokenSet);
       const mockClient = {
         refresh: refreshStub,
       } as unknown as Client;
       sandbox
         .stub(domainAuthOidc, 'verifyOidcIdToken')
         .withArgs()
-        .resolves({ exp: Date.now() / 1000 + 10 * 60 });
+        .resolves({ payload: mockTokenSet.claims(), expired: false });
 
       // すでに同じemailでユーザーが存在する状態にする
       const registeredUser = await createOne(
@@ -1125,6 +1053,41 @@ describe('domains/auth/oidc', () => {
         registeredUser.oidcRefreshToken
       );
     });
+    it('アクセストークンのリフレッシュに失敗した場合はエラー', async () => {
+      // テストデータ
+      const config = defaultConfig;
+
+      // テストデータ
+      const user = {
+        oidcAccessToken: 'xxxxx',
+        oidcExpiryDate: 1737455830,
+        oidcIdToken: 'yyyyy',
+        oidcRefreshToken: 'zzzzz',
+        oidcTokenType: 'Bearer',
+      };
+      const userId = 'dummy';
+
+      // モックの作成
+      const refreshStub = sandbox.stub().rejects(new Error('refresh failed'));
+      const mockClient = {
+        refresh: refreshStub,
+      } as unknown as Client;
+      sandbox
+        .stub(domainAuthOidc, 'verifyOidcIdToken')
+        .withArgs()
+        .resolves({ payload: { exp: 1737455830 }, expired: true });
+
+      // テスト対象の関数を呼び出し
+      const result = await domainAuthOidc.verifyOidcAccessToken(
+        mockClient,
+        config,
+        userId,
+        user
+      );
+
+      // 結果の検証
+      assert.strictEqual(result, false);
+    });
   });
 
   describe('verifyOidcIdToken', () => {
@@ -1132,6 +1095,7 @@ describe('domains/auth/oidc', () => {
     const mockIdToken = 'mock-id-token';
     const mockDecodedJwt = {
       header: { kid: 'mock-kid' },
+      payload: { sub: '12345', name: 'Test User' },
     };
     const mockKey = {
       toPEM: sinon.stub().returns('mock-public-key'),
@@ -1150,7 +1114,7 @@ describe('domains/auth/oidc', () => {
       sinon.restore();
     });
 
-    it('正常にJWTを検証し、ペイロードを返す', async () => {
+    it('正常にJWTを検証しペイロードと期限切れ判定を返す', async () => {
       // モックのセットアップ
       const mockClient = {
         issuer: {
@@ -1173,8 +1137,13 @@ describe('domains/auth/oidc', () => {
         mockIdToken
       );
 
-      // 検証
-      expect(result).toEqual({ sub: '12345', name: 'Test User' });
+      // 結果の検証
+      expect(result).toEqual({
+        payload: { sub: '12345', name: 'Test User' },
+        expired: false,
+      });
+
+      // スタブ呼び出し確認
       sinon.assert.calledOnce(decodeStub);
       sinon.assert.calledOnce(mockClient.issuer.keystore);
       sinon.assert.calledOnce(verifyStub);
@@ -1198,15 +1167,16 @@ describe('domains/auth/oidc', () => {
       decodeStub.returns(null); // デコード失敗時
 
       // テスト対象の関数を呼び出し
-      const result = await domainAuthOidc.verifyOidcIdToken(
-        mockClient as unknown as Client,
-        defaultConfig,
-        mockIdToken
+      assert.rejects(
+        domainAuthOidc.verifyOidcIdToken(
+          mockClient as unknown as Client,
+          defaultConfig,
+          mockIdToken
+        ),
+        faildDecodeOidcIdToken()
       );
 
-      // 結果の検証
-      expect(result).toBeNull();
-
+      // スタブ呼び出し確認
       sinon.assert.calledOnce(decodeStub);
       sinon.assert.notCalled(mockClient.issuer.keystore);
       sinon.assert.notCalled(verifyStub);
@@ -1227,21 +1197,22 @@ describe('domains/auth/oidc', () => {
         get: sinon.stub().withArgs({ kid: 'mock-kid' }).returns(null),
       }); // 公開鍵が見つからない場合
 
-      const result = await domainAuthOidc.verifyOidcIdToken(
-        mockClient as unknown as Client,
-        defaultConfig,
-        mockIdToken
+      assert.rejects(
+        domainAuthOidc.verifyOidcIdToken(
+          mockClient as unknown as Client,
+          defaultConfig,
+          mockIdToken
+        ),
+        mismatchKidOidcIdToken()
       );
 
-      // 結果の検証
-      expect(result).toBeNull();
-
+      // スタブ呼び出し確認
       sinon.assert.calledOnce(decodeStub);
       sinon.assert.calledOnce(mockClient.issuer.keystore);
       sinon.assert.notCalled(verifyStub);
     });
 
-    it('JWTの検証で期限切れの場合はnullを返す', async () => {
+    it('JWTの検証で期限切れの場合はペイロードと期限切れ判定を返す', async () => {
       // モックのセットアップ
       const mockClient = {
         issuer: {
@@ -1264,8 +1235,12 @@ describe('domains/auth/oidc', () => {
       );
 
       // 結果の検証
-      expect(result).toBeNull();
+      expect(result).toEqual({
+        payload: { sub: '12345', name: 'Test User' },
+        expired: true,
+      });
 
+      // スタブ呼び出し確認
       sinon.assert.calledOnce(decodeStub);
       sinon.assert.calledOnce(mockClient.issuer.keystore);
       sinon.assert.calledOnce(verifyStub);
@@ -1298,6 +1273,8 @@ describe('domains/auth/oidc', () => {
         ),
         illigalException()
       );
+
+      // スタブ呼び出し確認
       sinon.assert.calledOnce(decodeStub);
       sinon.assert.calledOnce(mockClient.issuer.keystore);
       sinon.assert.calledOnce(verifyStub);

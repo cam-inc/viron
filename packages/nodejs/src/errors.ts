@@ -82,3 +82,11 @@ export const invalidAuthType = (): VironError => {
 export const unsupportedScope = (): VironError => {
   return new VironError('Unsupported scope.', 500);
 };
+
+export const faildDecodeOidcIdToken = (): VironError => {
+  return new VironError('Failed to decode OIDC ID Token.', 500);
+};
+
+export const mismatchKidOidcIdToken = (): VironError => {
+  return new VironError('Kid Mismatch OIDC ID Token.', 500);
+};

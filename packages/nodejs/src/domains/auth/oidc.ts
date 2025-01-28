@@ -14,6 +14,8 @@ import {
   invalidOidcIdToken,
   signinFailed,
   unsupportedScope,
+  faildDecodeOidcIdToken,
+  mismatchKidOidcIdToken,
 } from '../../errors';
 import { createOne, findOneByEmail, updateOneById } from '../adminuser';
 import { addRoleForUser } from '../adminrole';
@@ -223,32 +225,37 @@ export const verifyOidcAccessToken = async (
     client,
     config,
     credentials.oidcIdToken
-  );
-  if (!verified) {
-    debug(
-      'verifyOidcAccessToken invalid id token. %s',
-      credentials.oidcIdToken
-    );
+  ).catch((e: Error) => {
+    debug('verifyOidcIdToken failure. userId: %s, err: %o', userId, e);
+    return e;
+  });
+  // IDトークンの検証に失敗した場合はエラー
+  if (verified instanceof Error) {
     return false;
   }
 
   // リフレッシュトークンがない場合はIDトークンの有効期限だけで判定
   if (!credentials.oidcRefreshToken) {
     debug('verifyOidcAccessToken no refresh token. userId: %s', userId);
-    return !!verified.exp && verified.exp > Date.now() / 1000;
+    // IDトークンの有効期限が切れている場合はエラー
+    return !verified.expired;
   }
 
-  // IDトークンの有効期限が近い場合のみリフレッシュする
-  if (!isRefresh(verified.exp)) {
+  // ---- 以下リフレッシュトークンがある場合の処理 ----
+  // IDトークンの有効期限が近いもしくは期限切れ場合以外はリフレッシュしない
+  if (!isRefresh(verified.payload.exp)) {
     debug('verifyOidcAccessToken no need to refresh token. userId: %s', userId);
     return true;
   }
 
   // リフレッシュトークンがある場合はリフレッシュトークンを使ってトークンを更新
   const refreshToken = credentials.oidcRefreshToken;
-  const tokenset = await client.refresh(refreshToken);
-  if (!tokenset) {
-    debug('verifyOidcAccessToken invalid refresh token. %s', refreshToken);
+  const tokenset = await client.refresh(refreshToken).catch((e: Error) => {
+    debug('AccessToken refresh failure. userId: %s, err: %o', userId, e);
+    return e;
+  });
+  // アクセストークンのリフレッシュに失敗した場合はエラー
+  if (tokenset instanceof Error) {
     return false;
   }
   debug('AccessToken refresh success! userId: %s', userId);
@@ -261,16 +268,26 @@ export const verifyOidcAccessToken = async (
   return true;
 };
 
+/**
+ * IDトークンの検証
+ * 有効期限切れ以外の例外はスローする
+ *
+ * @param client
+ * @param config
+ * @param idToken
+ * @returns {Promise<{decodedJwt: Jwt, isExpired: boolean}>} デコードしたJWTと期限切れ判定を返す
+ */
 export const verifyOidcIdToken = async (
   client: Client,
   config: OidcConfig,
   idToken: string
-): Promise<JwtPayload | null> => {
+): Promise<{ payload: JwtPayload; expired: boolean }> => {
   // JWTのヘッダーから`kid`を取得
   const decodedJwt = jwt.decode(idToken, { complete: true });
-  if (!decodedJwt || typeof decodedJwt === 'string') {
+  if (decodedJwt === null || typeof decodedJwt.payload === 'string') {
+    // JWTのデコードに失敗した場合は設定不備 or 改竄された可能性があるため500エラー
     debug('verifyIdToken decode error. %s', idToken);
-    return null;
+    throw faildDecodeOidcIdToken();
   }
   const kid = decodedJwt.header.kid;
 
@@ -280,24 +297,28 @@ export const verifyOidcIdToken = async (
   // kidに対応する公開鍵を取得
   const key = keyStore.get({ kid });
   if (!key) {
-    debug('verifyIdToken invalid kid. %s', kid);
-    return null;
+    // kidに対応する公開鍵がない場合は500エラー
+    debug('verifyIdToken mismatch kid. %s', kid);
+    throw mismatchKidOidcIdToken();
   }
 
   // JWTの検証
   try {
-    const verified = jwt.verify(idToken, key.toPEM(), {
+    jwt.verify(idToken, key.toPEM(), {
       audience: config.clientId, // OIDCクライアントIDで検証
       issuer: client.issuer.metadata.issuer, // トークン発行者で検証
       algorithms: [key.alg as Algorithm], // アルゴリズムを指定
     });
-    return verified as JwtPayload;
+    // 検証成功の場合はpayloadと期限切れフラグをfalseで返す
+    return { payload: decodedJwt.payload as JwtPayload, expired: false };
   } catch (e) {
     debug('verifyIdToken error: %o', e);
+    // トークンの有効期限切れの場合のみpayloadと期限切れフラグをtrueで返す
     if (e instanceof TokenExpiredError) {
       debug('Token expired! %s', idToken);
-      return null;
+      return { payload: decodedJwt.payload as JwtPayload, expired: true };
     }
+    // トークンの有効期限切れ以外は設定不備 or 改竄された可能性があるため500エラー
     throw e;
   }
 };
