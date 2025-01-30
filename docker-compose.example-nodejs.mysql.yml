@@ -22,7 +22,7 @@ services:
       - $PWD/example/nodejs/cert:/viron/example/nodejs/cert
       - $PWD/packages/nodejs:/viron/packages/nodejs
       - $PWD/packages/linter:/viron/packages/linter
-    command: npm run dev
+    command: run dev
 
   mysql:
     extends:
