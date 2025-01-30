@@ -22,7 +22,7 @@ services:
     command: npm run dev
 
   mysql:
-    image: mysql
+    image: mysql:8.0
     restart: always
     ports:
       - 3306:3306

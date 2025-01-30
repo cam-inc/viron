@@ -5,9 +5,9 @@ import * as articles from './articles';
 import * as items from './items';
 import * as itemDetails from './item_details';
 import * as medias from './medias';
-import * as vironLibAminUsers from '@viron/lib/src/infrastructures/mysql/models/adminusers';
-import * as vironLibAuitLogs from '@viron/lib/src/infrastructures/mysql/models/auditlogs';
-import * as vironLibRevokedTokens from '@viron/lib/src/infrastructures/mysql/models/revokedtokens';
+import * as vironLibAminUsers from '@viron/lib/dist/infrastructures/mysql/models/adminusers';
+import * as vironLibAuitLogs from '@viron/lib/dist/infrastructures/mysql/models/auditlogs';
+import * as vironLibRevokedTokens from '@viron/lib/dist/infrastructures/mysql/models/revokedtokens';
 
 export interface MysqlModels {
   [users.name]: users.UserModelStatic;
