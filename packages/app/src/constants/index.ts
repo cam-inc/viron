@@ -20,6 +20,7 @@ export type Url = (typeof URL)[keyof typeof URL];
 export const ENVIRONMENTAL_VARIABLE = {
   AUTOCOMPLETE_VALUE: '${autocompleteValue}',
   OAUTH_REDIRECT_URI: '${oauthRedirectURI}',
+  OIDC_REDIRECT_URI: '${oidcRedirectURI}',
 } as const;
 export type EnvironmentalVariable =
   (typeof ENVIRONMENTAL_VARIABLE)[keyof typeof ENVIRONMENTAL_VARIABLE];
@@ -34,6 +35,13 @@ export const OAUTH_REDIRECT_URI = (function () {
     return '';
   }
   return `${globalThis.location.origin}/oauthredirect`;
+})();
+
+export const OIDC_REDIRECT_URI = (function () {
+  if (isSSR) {
+    return '';
+  }
+  return `${globalThis.location.origin}/oidcredirect`;
 })();
 
 export const HTTP_STATUS = {

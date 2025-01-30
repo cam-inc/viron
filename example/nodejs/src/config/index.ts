@@ -48,6 +48,7 @@ export interface Config {
   auth: {
     jwt: domainsAuth.JwtConfig;
     googleOAuth2: domainsAuth.GoogleOAuthConfig;
+    oidc: domainsAuth.OidcConfig;
   };
   aws: AWSConfig;
   oas: OasConfig;

@@ -47,8 +47,16 @@ export const invalidGoogleOAuth2Token = (): VironError => {
   return new VironError('Invalid Google OAuth2 Token.', 400);
 };
 
+export const invalidOidcIdToken = (): VironError => {
+  return new VironError('Invalid OIDC ID Token.', 400);
+};
+
 export const googleOAuth2Unavailable = (): VironError => {
   return new VironError('Google OAuth2 is unavailable.', 500);
+};
+
+export const oidcUnavailable = (): VironError => {
+  return new VironError('OIDC is unavailable.', 500);
 };
 
 export const mismatchState = (): VironError => {
@@ -65,4 +73,20 @@ export const unableToDeleteRole = (): VironError => {
 
 export const operationNotFound = (): VironError => {
   return new VironError('Operation Not Found.', 404);
+};
+
+export const invalidAuthType = (): VironError => {
+  return new VironError('Invalid Auth type.', 400);
+};
+
+export const unsupportedScope = (): VironError => {
+  return new VironError('Unsupported scope.', 500);
+};
+
+export const faildDecodeOidcIdToken = (): VironError => {
+  return new VironError('Failed to decode OIDC ID Token.', 500);
+};
+
+export const mismatchKidOidcIdToken = (): VironError => {
+  return new VironError('Kid Mismatch OIDC ID Token.', 500);
 };
