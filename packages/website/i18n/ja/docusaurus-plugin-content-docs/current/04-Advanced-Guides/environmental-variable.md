@@ -7,6 +7,7 @@ Environmental variables are predefined strings that are to be replaced on runtim
 This function allows you to tell Viron where those potential parameter values should be used by marking the target with predefined environmental variables:
 - `${autocompleteValue}` - query parameter values for auto-complete function.
 - `${oauthRedirectURL}` - a redirect URL used for OAuth.
+- `${oidcRedirectURL}` - a redirect URL used for OpenID Connect.
 
 Below is an example:
 

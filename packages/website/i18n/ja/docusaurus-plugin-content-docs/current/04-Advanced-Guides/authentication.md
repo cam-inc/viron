@@ -37,14 +37,14 @@ The response body of `GET /authentication`:
 
 ## Authentication Types
 
-There are four types of authentication: `email`, `oauth`, `oauthcallback`, and `signout`. Each authentication has a schema of this:
+There are four types of authentication: `email`, `oauth`, `oauthcallback`, `oidc`, `oidccallback`, and `signout`. Each authentication has a schema of this:
 
 ```json
 {
-  "type": "email" | "oauth" | "oauthcallback" | "signout";
+  "type": "email" | "oauth" | "oauthcallback" | "oidc" | "oidccallback" | "signout";
   "provider": string;
   "operatioId": string; // Used to determine how to send a request.
-  "mode"?: 'navigate' | 'cors'; // Use to determine how to open the Oauth endpoint. Only if type is oauth.
+  "mode"?: 'navigate' | 'cors'; // Used to determine the method of opening the authentication endpoint. Only applicable if type is 'oidc' or 'oauth'.
   "defaultParametersValue"?: any;
   "defaultRequestBodyValue"?: any;
 }
@@ -158,6 +158,85 @@ Those types of authentication are for [the Authorization Code Grant of the OAuth
       "/oauth/signin/callback": {
         "post": {
           "operationId": "signinOAuthCallback", // Should match the one specified in the list.
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["code"],
+                  "properties": {
+                    "code": { // Authorization code
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Viron directs the user to the authorization endpoint with a parameter of RedirectURI, whose default value is an [environmental variable](/docs/Advanced-Guides/environmental-variable). After successfully granted, the user will be redirected back to Viron with an `authorization code`. Then, Viron sends another request with the authorization code to the endpoint, expecting the response to set a cookie.
+
+### `oidc` and `oidccallback`
+
+Those types of authentication are for [the Authorization Code Flow of the OpenID Connect protocol](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
+
+```json
+{
+  "list": [
+    {
+      "type": "oidc",
+      "operationId": "signinOidc",
+      "mode": "cors",
+      "defaultParametersValue": {
+        "redirectUri": "${oidcRedirectURI}" // An environmental variable
+      }
+    },
+    {
+      "type": "oidccallback",
+      "operationId": "signinOidcCallback",
+      "defaultRequestBodyValue": {
+        "redirectUri": "${oidcRedirectURI}" // An environmental variable
+      }
+    }
+  ],
+  "oas": {
+    "openapi": "3.0.2",
+    "info": {
+      "title": "Authentication",
+      "version": "1.0.0"
+    },
+    "paths": {
+      "/oidc/signin": {
+        "get": {
+          "operationId": "signinOidc", // Should match the one specified in the list.
+          "parameters": [
+            {
+              "in": "query",
+              "name": "redirectUri",
+              "required": "true",
+              "schema": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          ],
+          "responses": {
+            "301": {
+              "description": "Redirect to the authorization endpoint."
+            }
+          }
+        }
+      },
+      "/oidc/signin/callback": {
+        "post": {
+          "operationId": "signinOidcCallback", // Should match the one specified in the list.
           "requestBody": {
             "required": true,
             "content": {
