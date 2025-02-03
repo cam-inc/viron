@@ -37,7 +37,7 @@ export const middlewareErrorHandler = (): ErrorRequestHandler => {
           HTTP_HEADER.CONTENT_TYPE,
           'application/json; charset=utf-8'
         );
-        // expressデフォルトのエラーハンドラーのみerr.stackが空になる、独自エラーハンドラーはerr.stackが表示されるので明示的に表示判断する
+        // expressデフォルトのエラーハンドラーのみerr.stackが空になるが、独自エラーハンドラーはerr.stackが表示されるので明示的に表示判断する
         res.json({
           message: err.message,
           ...(process.env.NODE_ENV !== 'production'
@@ -48,7 +48,7 @@ export const middlewareErrorHandler = (): ErrorRequestHandler => {
       }
       default:
         res.setHeader(HTTP_HEADER.CONTENT_TYPE, 'text/plain; charset=utf-8');
-        // expressデフォルトのエラーハンドラーのみerr.stackが空になる、独自エラーハンドラーはerr.stackが表示されるので明示的に表示判断する
+        // expressデフォルトのエラーハンドラーのみerr.stackが空になるが、独自エラーハンドラーはerr.stackが表示されるので明示的に表示判断する
         res.send(
           stringify({
             message: err.message,
