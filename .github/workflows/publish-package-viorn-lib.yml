@@ -3,7 +3,7 @@ name: Publish NPM Package - Viron/lib
 on:
   push:
     branches:
-      - develop
+      - fix/auth-oidc-audit-support
     paths:
       - "packages/nodejs/**"
 
