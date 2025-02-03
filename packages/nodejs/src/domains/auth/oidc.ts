@@ -80,14 +80,19 @@ export const genOidcClient = async (
   debug('redirectUri %s', redirectUri);
 
   // クライアントの作成とキャッシュ
-  cachedOidcClient = new issuer.Client({
+  const oidcClient = new issuer.Client({
     client_id: config.clientId,
     client_secret: config.clientSecret,
     response_types: ['code'],
     ...(redirectUri && { redirect_uris: [redirectUri] }),
   });
 
-  return cachedOidcClient;
+  // redirectUriが指定されている場合のみキャッシュ
+  if (redirectUri) {
+    cachedOidcClient = oidcClient;
+  }
+
+  return oidcClient;
 };
 
 // OIDC用のコードベリファイアを生成
