@@ -24,7 +24,7 @@ x-viron-authtypes-path: /authentication
 
 The response body of `GET /authentication`:
 
-```json
+```jsonc
 {
   "list": [
     // a list of authentication types
@@ -39,27 +39,21 @@ The response body of `GET /authentication`:
 
 There are four types of authentication: `email`, `oauth`, `oauthcallback`, `oidc`, `oidccallback`, and `signout`. Each authentication has a schema of this:
 
-```json
+```typescript
 {
   "type": "email" | "oauth" | "oauthcallback" | "oidc" | "oidccallback" | "signout";
   "provider": string;
   "operatioId": string; // Used to determine how to send a request.
-  "mode"?: 'navigate' | 'cors'; // Used to determine the method of opening the authentication endpoint. Only applicable if type is 'oidc' or 'oauth'.
-
   "defaultParametersValue"?: any;
   "defaultRequestBodyValue"?: any;
 }
 ```
 
-:::tip　
-Typically, you should set mode: 'cors'.
-However, if you are self-hosting Viron, you have the flexibility to choose any mode.
-
 ### `email`
 
 When this type of authentication is specified, Viron prompts users to enter fields like `email` and `password` to get authenticated. The endpoint **should** return a response with a cookie set.
 
-```json
+```jsonc
 {
   "list": [
     {
@@ -109,13 +103,12 @@ When this type of authentication is specified, Viron prompts users to enter fiel
 
 Those types of authentication are for [the Authorization Code Grant of the OAuth 2.0 authorization framework](https://datatracker.ietf.org/doc/html/rfc6749#section-4.1).
 
-```json
+```jsonc
 {
   "list": [
     {
       "type": "oauth",
       "operationId": "signinOAuth",
-      "mode": "cors",
       "defaultParametersValue": {
         "redirectUri": "${oauthRedirectURI}" // An environmental variable
       }
@@ -188,13 +181,12 @@ Viron directs the user to the authorization endpoint with a parameter of Redirec
 
 Those types of authentication are for [the Authorization Code Flow of the OpenID Connect protocol](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
 
-```json
+```jsonc
 {
   "list": [
     {
       "type": "oidc",
       "operationId": "signinOidc",
-      "mode": "cors",
       "defaultParametersValue": {
         "redirectUri": "${oidcRedirectURI}" // An environmental variable
       }
@@ -267,7 +259,7 @@ Viron directs the user to the authorization endpoint with a parameter of Redirec
 
 Use this type of authentication to `revoke` the cookie that has been set previously.
 
-```json
+```jsonc
 {
   "list": [
     {
