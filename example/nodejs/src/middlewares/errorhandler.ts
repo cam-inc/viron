@@ -2,13 +2,31 @@ import { ErrorRequestHandler } from 'express';
 import accepts from 'accepts';
 import { HTTP_HEADER } from '@viron/lib';
 import { logger } from '../context';
+import sanitizeHtml from 'sanitize-html';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const stringify = (val: any): string => {
-  if (val instanceof Error) {
-    return String(val.stack ?? val);
-  }
-  return JSON.stringify(val);
+// 特殊文字をUnicodeエスケープする
+const escapeToUnicode = (input: string): string => {
+  return input.replace(/[<>"'&]/g, (char) => {
+    switch (char) {
+      case '<':
+        return '\\u003C';
+      case '>':
+        return '\\u003E';
+      case '&':
+        return '\\u0026';
+      case '"':
+        return '\\u0022';
+      case "'":
+        return '\\u0027';
+      default:
+        return char;
+    }
+  });
+};
+
+// サニタイズ
+const sanitizeErrorContent = (content: string): string => {
+  return escapeToUnicode(sanitizeHtml(content));
 };
 
 export const middlewareErrorHandler = (): ErrorRequestHandler => {
@@ -37,12 +55,15 @@ export const middlewareErrorHandler = (): ErrorRequestHandler => {
           HTTP_HEADER.CONTENT_TYPE,
           'application/json; charset=utf-8'
         );
+        const sanitizedMessage = sanitizeErrorContent(err.message);
         // expressデフォルトのエラーハンドラーのみerr.stackが空になるが、独自エラーハンドラーはerr.stackが表示されるので明示的に表示判断する
+        const sanitizedStack =
+          process.env.NODE_ENV !== 'production'
+            ? sanitizeErrorContent(err.stack ?? '')
+            : undefined;
         res.json({
-          message: err.message,
-          ...(process.env.NODE_ENV !== 'production'
-            ? { stack: err.stack }
-            : {}),
+          message: sanitizedMessage,
+          ...(sanitizedStack ? { stack: sanitizedStack } : {}),
         });
         break;
       }
@@ -50,12 +71,14 @@ export const middlewareErrorHandler = (): ErrorRequestHandler => {
         res.setHeader(HTTP_HEADER.CONTENT_TYPE, 'text/plain; charset=utf-8');
         // expressデフォルトのエラーハンドラーのみerr.stackが空になるが、独自エラーハンドラーはerr.stackが表示されるので明示的に表示判断する
         res.send(
-          stringify({
-            message: err.message,
-            ...(process.env.NODE_ENV !== 'production'
-              ? { stack: err.stack }
-              : {}),
-          })
+          sanitizeErrorContent(
+            JSON.stringify({
+              message: err.message,
+              ...(process.env.NODE_ENV !== 'production'
+                ? { stack: err.stack }
+                : {}),
+            })
+          )
         );
         break;
     }
