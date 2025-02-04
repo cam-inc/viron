@@ -128,7 +128,7 @@ components:
         id:
           description: ロールID
           type: string
-          pattern: "^[^,'\"]*$"
+          pattern: '^[^,''"]*$'
         permissions:
           description: 権限
           type: array
@@ -162,7 +162,7 @@ components:
         id:
           description: ロールID
           type: string
-          pattern: "^[^,'\"]*$"
+          pattern: '^[^,''"]*$'
         permissions:
           description: 権限
           type: array

@@ -93,22 +93,36 @@ const sync = async (now = Date.now()): Promise<void> => {
   }
 };
 
+// adminroles(casbin_rule)で不正な文字列チェック カンマ、シングルクォート、ダブルクォートが文字列に含まれないこと
+const isValidCasbinRule = (str: string): boolean => /[,'"]/.test(str);
+
 // adminroles(casbin_rule)で不正な文字列チェック
 const validateAdminRole = (obj: AdminRole): void => {
-  console.log('validateAdminRole: ', obj);
-  // obj.idにカンマ、シングルクォート、ダブルクォートが文字列に含まれないことを確認
-  if (/[,'"]/.test(obj.id)) {
+  // obj.idのチェック
+  if (isValidCasbinRule(obj.id)) {
     throw invalidAdminRole();
   }
+
   for (const { resourceId, permission } of obj.permissions) {
-    // resourceIdにカンマ、シングルクォート、ダブルクォートが文字列に含まれないことを確認
-    if (/[,'"]/.test(resourceId)) {
+    // resourceIdのチェック
+    if (isValidCasbinRule(resourceId)) {
       throw invalidAdminRole();
     }
     // permissionがPermissionに含まれることを確認
     if (!Object.values(PERMISSION).includes(permission)) {
       throw invalidAdminRole();
     }
+  }
+};
+
+const validateUserRoles = (userId: string, roleIds: string[]): void => {
+  // userIdにカンマ、シングルクォート、ダブルクォートが文字列に含まれないことを確認
+  if (isValidCasbinRule(userId)) {
+    throw invalidAdminRole();
+  }
+  // roleIdsにカンマ、シングルクォート、ダブルクォートが文字列に含まれないことを確認
+  if (roleIds.some((roleId) => isValidCasbinRule(roleId))) {
+    throw invalidAdminRole();
   }
 };
 
@@ -128,6 +142,7 @@ export const addRoleForUser = async (
   userId: string,
   roleId: string
 ): Promise<boolean> => {
+  validateUserRoles(userId, [roleId]);
   const casbin = repositoryContainer.getCasbin();
   return casbin.addRoleForUser(userId, roleId);
 };
@@ -148,6 +163,7 @@ export const updateRolesForUser = async (
   userId: string,
   roleIds: string[]
 ): Promise<void> => {
+  validateUserRoles(userId, roleIds);
   await revokeRoleForUser(userId);
   await Promise.all(
     roleIds.map((roleId: string) => addRoleForUser(userId, roleId))
@@ -193,6 +209,7 @@ export const updatePermissionsForRole = async (
   roleId: string,
   permissions: AdminRolePermissions
 ): Promise<boolean> => {
+  validateAdminRole({ id: roleId, permissions });
   const casbin = repositoryContainer.getCasbin();
   const policies = permissions.map(
     ({ resourceId, permission }): Policy =>

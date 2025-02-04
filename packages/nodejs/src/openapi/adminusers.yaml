@@ -161,6 +161,7 @@ components:
           type: array
           items:
             type: string
+            pattern: '^[^,''"]*$'
       required:
         - email
         - password
@@ -178,3 +179,4 @@ components:
           type: array
           items:
             type: string
+            pattern: '^[^,''"]*$'
