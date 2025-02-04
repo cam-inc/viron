@@ -1,5 +1,9 @@
 import { newModel } from 'casbin';
-import { roleIdAlreadyExists, unableToDeleteRole } from '../errors';
+import {
+  roleIdAlreadyExists,
+  unableToDeleteRole,
+  invalidAdminRole,
+} from '../errors';
 import {
   ADMIN_ROLE,
   API_METHOD,
@@ -86,6 +90,25 @@ const sync = async (now = Date.now()): Promise<void> => {
   if (repositoryContainer.casbinSyncedTime + CASBIN_SYNC_INTERVAL_MSEC < now) {
     await casbin.loadPolicy();
     repositoryContainer.casbinSyncedTime = now;
+  }
+};
+
+// adminroles(casbin_rule)で不正な文字列チェック
+const validateAdminRole = (obj: AdminRole): void => {
+  console.log('validateAdminRole: ', obj);
+  // obj.idにカンマ、シングルクォート、ダブルクォートが文字列に含まれないことを確認
+  if (/[,'"]/.test(obj.id)) {
+    throw invalidAdminRole();
+  }
+  for (const { resourceId, permission } of obj.permissions) {
+    // resourceIdにカンマ、シングルクォート、ダブルクォートが文字列に含まれないことを確認
+    if (/[,'"]/.test(resourceId)) {
+      throw invalidAdminRole();
+    }
+    // permissionがPermissionに含まれることを確認
+    if (!Object.values(PERMISSION).includes(permission)) {
+      throw invalidAdminRole();
+    }
   }
 };
 
@@ -291,6 +314,7 @@ export const listByOas = async (
 
 // 1件作成
 export const createOne = async (obj: AdminRole): Promise<AdminRole> => {
+  validateAdminRole(obj);
   const roleId = obj.id;
   const policies = await listPolicies(roleId);
   if (policies?.length) {
@@ -305,6 +329,7 @@ export const updateOneById = async (
   roleId: string,
   permissions: AdminRolePermissions
 ): Promise<void> => {
+  validateAdminRole({ id: roleId, permissions });
   await updatePermissionsForRole(roleId, permissions);
 };
 
