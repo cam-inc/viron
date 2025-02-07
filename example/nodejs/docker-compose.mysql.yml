@@ -19,10 +19,10 @@ services:
       - $PWD/package.json:/example/nodejs/package.json
       - $PWD/src:/example/nodejs/src
       - $PWD/cert:/example/nodejs/cert
-    command: run dev
+    command: npm run dev
 
   mysql:
-    image: mysql:8.0
+    image: mysql
     restart: always
     ports:
       - 3306:3306
