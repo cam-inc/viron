@@ -52,9 +52,8 @@
   "importEndpoints": "Import $t(endpoints)",
   "enterEndpoint": "Enter",
   "signout": "Signout",
-  "oidc": "SSO",
-  "oAuth": "Google",
-  "email": "Sign in",
+  "oAuth": "OAuth",
+  "email": "Email",
   "addEndpoint": {
     "title": "Create an $t(endpoint)",
     "idInputLabel": "ID",

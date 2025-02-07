@@ -44,13 +44,6 @@ export const get = (): Config => {
         additionalScopes: [],
         userHostedDomains: ['gmail.com', 'cam-inc.co.jp', 'cyberagent.co.jp'],
       },
-      oidc: {
-        clientId: process.env.OIDC_CLIENT_ID ?? '',
-        clientSecret: process.env.OIDC_CLIENT_SECRET ?? '',
-        configurationUrl: process.env.OIDC_CLIENT_CONFIGURATION_URL ?? '',
-        additionalScopes: [],
-        userHostedDomains: ['cam-inc.co.jp', 'cyberagent.co.jp'],
-      },
     },
     aws: {
       s3: {

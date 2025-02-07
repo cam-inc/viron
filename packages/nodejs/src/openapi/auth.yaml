@@ -36,40 +36,6 @@ paths:
         204:
           description: No Content
 
-  /oidc/authorization:
-    get:
-      operationId: oidcAuthorization
-      tags:
-        - auth
-      summary: redirect to oidc idp authorization
-      description: OIDCのidp 認証画面へリダイレクトする
-      parameters:
-        - $ref: '#/components/parameters/RedirectUriQueryParam'
-      responses:
-        301:
-          description: Redirect to OIDC Authorization URL.
-      x-authconfig-default-parameters:
-        redirectUri: '${oidcRedirectURI}'
-
-  /oidc/callback:
-    post:
-      operationId: oidcCallback
-      tags:
-        - auth
-      summary: callback from oidc
-      description: OIDC認可後のコールバックURL
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OidcCallbackPayload'
-      responses:
-        204:
-          description: No Content.
-      x-authconfig-default-requestBody:
-        redirectUri: '${oidcRedirectURI}'
-
   /oauth2/google/authorization:
     get:
       operationId: oauth2GoogleAuthorization
@@ -113,12 +79,6 @@ components:
         type: string
         format: uri
       required: true
-    CodeQueryParam:
-      name: code
-      in: query
-      schema:
-        type: string
-      required: true
 
   schemas:
     SigninEmailPayload:
@@ -148,23 +108,6 @@ components:
           type: string
         redirectUri:
           description: GoogleOAuth2コールバックURI
-          type: string
-      required:
-        - code
-        - state
-        - redirectUri
-
-    OidcCallbackPayload:
-      type: object
-      properties:
-        code:
-          description: OIDC Idpが発行した認可コード
-          type: string
-        state:
-          description: CSRF対策用のステートパラメータ
-          type: string
-        redirectUri:
-          description: OIDCコールバックURI
           type: string
       required:
         - code

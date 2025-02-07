@@ -4,7 +4,6 @@ export const KEY = {
   ENDPOINT_LIST: 'endpointList',
   ENDPOINT_GROUP_LIST: 'endpointGroupList',
   OAUTH_ENDPOINT_ID: 'oauthEndpointId',
-  OIDC_ENDPOINT_ID: 'oidcEndpointId',
 } as const;
 export type Key = (typeof KEY)[keyof typeof KEY];
 

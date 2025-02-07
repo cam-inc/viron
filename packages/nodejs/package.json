@@ -1,6 +1,6 @@
 {
   "name": "@viron/lib",
-  "version": "2.4.0-alpha.0",
+  "version": "2.3.1",
   "scripts": {
     "build": "npm run clean && tsc --project tsconfig.json && cp -fr src/openapi dist/",
     "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
@@ -33,9 +33,8 @@
     "json-pointer": "^0.6.1",
     "json-schema-ref-parser": "^9.0.7",
     "json-schema-traverse": "^1.0.0",
-    "jsonwebtoken": "^9.0.2",
+    "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.3.4",
-    "openid-client": "^4.7.4",
     "path-to-regexp": "^6.2.0",
     "sequelize": "^6.12.5",
     "uuid": "^8.3.2"
