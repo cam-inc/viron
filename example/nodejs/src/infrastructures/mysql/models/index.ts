@@ -5,7 +5,9 @@ import * as articles from './articles';
 import * as items from './items';
 import * as itemDetails from './item_details';
 import * as medias from './medias';
-import { mysql } from '@viron/lib';
+import * as vironLibAminUsers from '@viron/lib/src/infrastructures/mysql/models/adminusers';
+import * as vironLibAuitLogs from '@viron/lib/src/infrastructures/mysql/models/auditlogs';
+import * as vironLibRevokedTokens from '@viron/lib/src/infrastructures/mysql/models/revokedtokens';
 
 export interface MysqlModels {
   [users.name]: users.UserModelStatic;
@@ -14,12 +16,9 @@ export interface MysqlModels {
   [items.name]: items.ItemModelStatic;
   [itemDetails.name]: itemDetails.ItemDetailModelStatic;
   [medias.name]: medias.MediaModelStatic;
-  [mysql.models.adminUsers
-    .name]: mysql.MysqlModels[typeof mysql.models.adminUsers.name];
-  [mysql.models.auditLogs
-    .name]: mysql.MysqlModels[typeof mysql.models.auditLogs.name];
-  [mysql.models.revokedTokens
-    .name]: mysql.MysqlModels[typeof mysql.models.revokedTokens.name];
+  [vironLibAminUsers.name]: vironLibAminUsers.AdminUserModelStatic;
+  [vironLibAuitLogs.name]: vironLibAuitLogs.AuditLogModelStatic;
+  [vironLibRevokedTokens.name]: vironLibRevokedTokens.RevokedTokenModelStatic;
 }
 
 // Get models
@@ -31,10 +30,9 @@ export const models = (s: Sequelize): MysqlModels => {
     [items.name]: items.createModel(s),
     [itemDetails.name]: itemDetails.createModel(s),
     [medias.name]: medias.createModel(s),
-    [mysql.models.adminUsers.name]: mysql.models.adminUsers.createModel(s),
-    [mysql.models.auditLogs.name]: mysql.models.auditLogs.createModel(s),
-    [mysql.models.revokedTokens.name]:
-      mysql.models.revokedTokens.createModel(s),
+    [vironLibAminUsers.name]: vironLibAminUsers.createModel(s),
+    [vironLibAuitLogs.name]: vironLibAuitLogs.createModel(s),
+    [vironLibRevokedTokens.name]: vironLibRevokedTokens.createModel(s),
   };
 
   mysqlModels[items.name].belongsTo(mysqlModels[itemDetails.name], {
