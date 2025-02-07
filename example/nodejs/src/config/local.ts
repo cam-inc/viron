@@ -56,18 +56,14 @@ export const get = (mode: Mode): Config => {
         clientId: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? '',
         clientSecret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET ?? '',
         additionalScopes: [],
-        userHostedDomains: process.env.GOOGLE_OAUTH2_USER_HOSTED_DOMAINS
-          ? process.env.GOOGLE_OAUTH2_USER_HOSTED_DOMAINS.split(',')
-          : [],
+        userHostedDomains: ['cam-inc.co.jp', 'cyberagent.co.jp'],
       },
       oidc: {
         clientId: process.env.OIDC_CLIENT_ID ?? '',
         clientSecret: process.env.OIDC_CLIENT_SECRET ?? '',
         configurationUrl: process.env.OIDC_CLIENT_CONFIGURATION_URL ?? '',
         additionalScopes: [],
-        userHostedDomains: process.env.OIDC_USER_HOSTED_DOMAINS
-          ? process.env.OIDC_USER_HOSTED_DOMAINS.split(',')
-          : [],
+        userHostedDomains: ['cam-inc.co.jp', 'cyberagent.co.jp'],
       },
     },
     aws: {
