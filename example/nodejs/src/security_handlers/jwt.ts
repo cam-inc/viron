@@ -73,24 +73,26 @@ export const jwt = async (
       return authFailure(forbidden());
     }
 
-    const user = await domainsAdminUser.findOneById(userId);
+    // credentialsありでユーザー情報取得
+    const user = await domainsAdminUser.findOneById(userId, true);
     if (user) {
-      switch (user.authType) {
+      const userView = user as domainsAdminUser.AdminUserView;
+      switch (userView.authType) {
         case AUTH_TYPE.GOOGLE: {
           // Google認証の場合はアクセストークンの検証
           if (
             await domainsAuth.verifyGoogleOAuth2AccessToken(
               userId,
-              user,
+              userView,
               ctx.config.auth.googleOAuth2
             )
           ) {
-            return authSuccess(user);
+            return authSuccess(userView);
           }
           break;
         }
         default:
-          return authSuccess(user);
+          return authSuccess(userView);
       }
     }
   }

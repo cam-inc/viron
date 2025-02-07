@@ -5,7 +5,7 @@ export const API_METHOD = {
   PATCH: 'patch',
   DELETE: 'delete',
 } as const;
-export type ApiMethod = typeof API_METHOD[keyof typeof API_METHOD];
+export type ApiMethod = (typeof API_METHOD)[keyof typeof API_METHOD];
 
 export const AUTH_CONFIG_TYPE = {
   EMAIL: 'email',
@@ -14,7 +14,7 @@ export const AUTH_CONFIG_TYPE = {
   SIGNOUT: 'signout',
 } as const;
 export type AuthConfigType =
-  typeof AUTH_CONFIG_TYPE[keyof typeof AUTH_CONFIG_TYPE];
+  (typeof AUTH_CONFIG_TYPE)[keyof typeof AUTH_CONFIG_TYPE];
 
 export const AUTH_CONFIG_PROVIDER = {
   VIRON: 'viron',
@@ -22,13 +22,13 @@ export const AUTH_CONFIG_PROVIDER = {
   SIGNOUT: 'signout',
 } as const;
 export type AuthConfigProvider =
-  typeof AUTH_CONFIG_PROVIDER[keyof typeof AUTH_CONFIG_PROVIDER];
+  (typeof AUTH_CONFIG_PROVIDER)[keyof typeof AUTH_CONFIG_PROVIDER];
 
 export const STORE_TYPE = {
   MYSQL: 'mysql',
   MONGO: 'mongo',
 } as const;
-export type StoreType = typeof STORE_TYPE[keyof typeof STORE_TYPE];
+export type StoreType = (typeof STORE_TYPE)[keyof typeof STORE_TYPE];
 
 export const HTTP_HEADER = {
   ACCESS_CONTROL_ALLOW_ORIGIN: 'access-control-allow-origin',
@@ -45,7 +45,7 @@ export const HTTP_HEADER = {
   X_REQUESTED_WITH: 'x-requested-with',
   X_VIRON_AUTHTYPES_PATH: 'x-viron-authtypes-path',
 } as const;
-export type HttpHeader = typeof HTTP_HEADER[keyof typeof HTTP_HEADER];
+export type HttpHeader = (typeof HTTP_HEADER)[keyof typeof HTTP_HEADER];
 
 export const DEFAULT_PAGER_SIZE = 10;
 export const DEFAULT_PAGER_PAGE = 1;
@@ -78,7 +78,7 @@ export const ADMIN_ROLE = {
   SUPER: 'super',
   VIEWER: 'viewer',
 } as const;
-export type AdminRole = typeof ADMIN_ROLE[keyof typeof ADMIN_ROLE];
+export type AdminRole = (typeof ADMIN_ROLE)[keyof typeof ADMIN_ROLE];
 
 export const VIRON_AUTHCONFIGS_PATH = '/viron/authconfigs';
 export const EMAIL_SIGNIN_PATH = '/email/signin';
@@ -92,7 +92,7 @@ export const PERMISSION = {
   ALL: 'all',
   DENY: 'deny',
 } as const;
-export type Permission = typeof PERMISSION[keyof typeof PERMISSION];
+export type Permission = (typeof PERMISSION)[keyof typeof PERMISSION];
 
 export const OAS_X_THUMBNAIL = 'x-thumbnail';
 export const OAS_X_THEME = 'x-theme';
@@ -112,7 +112,7 @@ export const AUTH_TYPE = {
   EMAIL: 'email',
   GOOGLE: 'google',
 } as const;
-export type AuthType = typeof AUTH_TYPE[keyof typeof AUTH_TYPE];
+export type AuthType = (typeof AUTH_TYPE)[keyof typeof AUTH_TYPE];
 
 export const AUTH_SCHEME = 'Bearer';
 export const JWT_HASH_ALGORITHM = 'HS512';
@@ -157,7 +157,7 @@ export const THEME = {
   NEON_ROSE: 'neon rose',
   ELECTRIC_CRIMSON: 'electric crimson',
 } as const;
-export type Theme = typeof THEME[keyof typeof THEME];
+export type Theme = (typeof THEME)[keyof typeof THEME];
 
 export const X_PAGE_CONTENT_TYPE = {
   NUMBER: 'number',
@@ -165,7 +165,7 @@ export const X_PAGE_CONTENT_TYPE = {
   CUSTOM: 'custom',
 } as const;
 export type XPageContentType =
-  typeof X_PAGE_CONTENT_TYPE[keyof typeof X_PAGE_CONTENT_TYPE];
+  (typeof X_PAGE_CONTENT_TYPE)[keyof typeof X_PAGE_CONTENT_TYPE];
 
 export const TABLE_SORT_DELIMITER = ':';
 export const TABLE_SORT_ORDER = {
@@ -173,7 +173,7 @@ export const TABLE_SORT_ORDER = {
   DESC: 'desc',
 } as const;
 export type TableSortOrder =
-  typeof TABLE_SORT_ORDER[keyof typeof TABLE_SORT_ORDER];
+  (typeof TABLE_SORT_ORDER)[keyof typeof TABLE_SORT_ORDER];
 
 export const CACHE_CONTROL = {
   NO_STORE: 'no-store',
@@ -188,4 +188,4 @@ export const VIRON_DOMAINS = {
   AUTHCONFIGS: 'authconfigs',
   OAS: 'oas',
 } as const;
-export type VironDomains = typeof VIRON_DOMAINS[keyof typeof VIRON_DOMAINS];
+export type VironDomains = (typeof VIRON_DOMAINS)[keyof typeof VIRON_DOMAINS];

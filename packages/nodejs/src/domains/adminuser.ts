@@ -88,6 +88,9 @@ export type AdminUserUpdateAttributes =
 export interface AdminUserView extends AdminUser {
   roleIds: string[];
 }
+export interface AdminUserBaseView extends AdminUserBase {
+  roleIds: string[];
+}
 
 export interface AdminUserEmailCreatePayload {
   email: string;
@@ -127,8 +130,22 @@ export type AdminUserUpdatePayload =
   | AdminUserEmailUpdatePayload
   | AdminUserGoogleUpdatePayload;
 
-const format = (adminUser: AdminUser, roleIds?: string[]): AdminUserView => {
-  return Object.assign({}, adminUser, { roleIds: roleIds ?? [] });
+const format = (
+  withCredential: boolean,
+  adminUser: AdminUser,
+  roleIds?: string[]
+): AdminUserView | AdminUserBaseView => {
+  if (withCredential === true) {
+    return Object.assign({}, adminUser, { roleIds: roleIds ?? [] });
+  }
+  return {
+    id: adminUser.id,
+    email: adminUser.email,
+    authType: adminUser.authType,
+    roleIds: roleIds ?? [],
+    createdAt: adminUser.createdAt,
+    updatedAt: adminUser.updatedAt,
+  };
 };
 export const formatAdminUser = format;
 
@@ -137,8 +154,9 @@ export const list = async (
   conditions: FindConditions<AdminUser> & { roleId?: string } = {},
   size?: number,
   page?: number,
-  sort = [`createdAt${TABLE_SORT_DELIMITER}${TABLE_SORT_ORDER.DESC}`]
-): Promise<ListWithPager<AdminUserView>> => {
+  sort = [`createdAt${TABLE_SORT_DELIMITER}${TABLE_SORT_ORDER.DESC}`],
+  withCredential = false
+): Promise<ListWithPager<AdminUserView | AdminUserBaseView>> => {
   const repository = repositoryContainer.getAdminUserRepository();
   if (conditions.roleId) {
     const userIds = await listUsers(conditions.roleId);
@@ -149,17 +167,21 @@ export const list = async (
   const adminRoles = await Promise.all(
     result.list.map((adminUser) => listRoles(adminUser.id))
   );
+  console.log('----------------------------withCredential', withCredential);
   return {
     ...result,
-    list: result.list.map((adminUser) => format(adminUser, adminRoles.shift())),
+    list: result.list.map((adminUser) =>
+      format(withCredential, adminUser, adminRoles.shift())
+    ),
   };
 };
 
 // 1件作成
 export const createOne = async (
   payload: AdminUserCreatePayload,
-  authType: AuthType = AUTH_TYPE.EMAIL
-): Promise<AdminUserView> => {
+  authType: AuthType = AUTH_TYPE.EMAIL,
+  withCredential = false
+): Promise<AdminUserView | AdminUserBaseView> => {
   const repository = repositoryContainer.getAdminUserRepository();
   const { roleIds, ...adminUser } = payload;
 
@@ -183,7 +205,7 @@ export const createOne = async (
   if (roleIds?.length) {
     await updateRolesForUser(user.id, roleIds);
   }
-  return format(user, roleIds);
+  return format(withCredential, user, roleIds);
 };
 
 // IDで1件更新
@@ -228,28 +250,30 @@ export const removeOneById = async (id: string): Promise<void> => {
 
 // IDで1件取得
 export const findOneById = async (
-  id: string
-): Promise<AdminUserView | null> => {
+  id: string,
+  withCredencial = false
+): Promise<AdminUserView | AdminUserBaseView | null> => {
   const repository = repositoryContainer.getAdminUserRepository();
   const user = await repository.findOneById(id);
   if (!user) {
     return null;
   }
   const roleIds = await listRoles(user.id);
-  return format(user, roleIds);
+  return format(withCredencial, user, roleIds);
 };
 
 // emailで1件取得
 export const findOneByEmail = async (
-  email: string
-): Promise<AdminUserView | null> => {
+  email: string,
+  withCredential = false
+): Promise<AdminUserView | AdminUserBaseView | null> => {
   const repository = repositoryContainer.getAdminUserRepository();
   const user = await repository.findOne({ email });
   if (!user) {
     return null;
   }
   const roleIds = await listRoles(user.id);
-  return format(user, roleIds);
+  return format(withCredential, user, roleIds);
 };
 
 // 件数取得
