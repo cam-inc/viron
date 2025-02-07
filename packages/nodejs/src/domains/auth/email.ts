@@ -1,7 +1,7 @@
 import { AUTH_TYPE } from '../../constants';
 import { verifyPassword } from '../../helpers';
 import { signinFailed } from '../../errors';
-import { findOneByEmail, AdminUserView } from '../adminuser';
+import { findOneByEmail, AdminUserWithCredential } from '../adminuser';
 import { createFirstAdminUser } from './common';
 import { signJwt } from './jwt';
 
@@ -11,32 +11,32 @@ export const signinEmail = async (
   password: string
 ): Promise<string> => {
   // credentialありで取得
-  let adminUserWithCredential = await findOneByEmail(email, true);
-  if (!adminUserWithCredential) {
-    const firstAdminUserWithCredential = await createFirstAdminUser(
+  let adminUser = await findOneByEmail(email, true);
+  if (!adminUser) {
+    const firstAdminUser = await createFirstAdminUser(
       { email, password },
       AUTH_TYPE.EMAIL
     );
-    if (!firstAdminUserWithCredential) {
+    if (!firstAdminUser) {
       // 他に管理者がいる場合は発行してもらう必要がある
       throw signinFailed();
     }
-    adminUserWithCredential = firstAdminUserWithCredential;
+    adminUser = firstAdminUser;
   }
 
   // credentialsありの型に変換
-  const adminUserEmail = adminUserWithCredential as AdminUserView;
+  const adminUserWithCredential = adminUser as AdminUserWithCredential;
 
   if (
-    adminUserEmail.authType !== AUTH_TYPE.EMAIL ||
+    adminUserWithCredential.authType !== AUTH_TYPE.EMAIL ||
     !verifyPassword(
       password,
-      adminUserEmail.password as string,
-      adminUserEmail.salt as string
+      adminUserWithCredential.password as string,
+      adminUserWithCredential.salt as string
     )
   ) {
     throw signinFailed();
   }
 
-  return signJwt(adminUserWithCredential.id);
+  return signJwt(adminUser.id);
 };

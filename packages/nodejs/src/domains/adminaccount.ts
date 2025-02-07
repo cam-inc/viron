@@ -4,8 +4,8 @@ import { repositoryContainer } from '../repositories';
 import { adminUserNotFound, forbidden } from '../errors';
 import { listRoles } from './adminrole';
 import {
+  AdminUserWithCredential,
   AdminUserView,
-  AdminUserBaseView,
   findOneById,
   formatAdminUser,
 } from './adminuser';
@@ -17,7 +17,7 @@ export interface AdminAccountUpdatePayload {
 // 一覧取得(idを指定するので結果は必ず1件)
 export const listById = async (
   id: string
-): Promise<ListWithPager<AdminUserView | AdminUserBaseView>> => {
+): Promise<ListWithPager<AdminUserWithCredential | AdminUserView>> => {
   const repository = repositoryContainer.getAdminUserRepository();
   const result = await repository.findWithPager({ id });
   const adminRoles = await Promise.all(

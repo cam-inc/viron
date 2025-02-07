@@ -85,10 +85,10 @@ export type AdminUserUpdateAttributes =
   | AdminUserEmailUpdateAttributes
   | AdminUserGoogleUpdateAttributes;
 
-export interface AdminUserView extends AdminUser {
+export interface AdminUserWithCredential extends AdminUser {
   roleIds: string[];
 }
-export interface AdminUserBaseView extends AdminUserBase {
+export interface AdminUserView extends AdminUserBase {
   roleIds: string[];
 }
 
@@ -134,7 +134,7 @@ const format = (
   withCredential: boolean,
   adminUser: AdminUser,
   roleIds?: string[]
-): AdminUserView | AdminUserBaseView => {
+): AdminUserWithCredential | AdminUserView => {
   if (withCredential === true) {
     return Object.assign({}, adminUser, { roleIds: roleIds ?? [] });
   }
@@ -156,7 +156,7 @@ export const list = async (
   page?: number,
   sort = [`createdAt${TABLE_SORT_DELIMITER}${TABLE_SORT_ORDER.DESC}`],
   withCredential = false
-): Promise<ListWithPager<AdminUserView | AdminUserBaseView>> => {
+): Promise<ListWithPager<AdminUserWithCredential | AdminUserView>> => {
   const repository = repositoryContainer.getAdminUserRepository();
   if (conditions.roleId) {
     const userIds = await listUsers(conditions.roleId);
@@ -167,7 +167,6 @@ export const list = async (
   const adminRoles = await Promise.all(
     result.list.map((adminUser) => listRoles(adminUser.id))
   );
-  console.log('----------------------------withCredential', withCredential);
   return {
     ...result,
     list: result.list.map((adminUser) =>
@@ -181,7 +180,7 @@ export const createOne = async (
   payload: AdminUserCreatePayload,
   authType: AuthType = AUTH_TYPE.EMAIL,
   withCredential = false
-): Promise<AdminUserView | AdminUserBaseView> => {
+): Promise<AdminUserWithCredential | AdminUserView> => {
   const repository = repositoryContainer.getAdminUserRepository();
   const { roleIds, ...adminUser } = payload;
 
@@ -252,7 +251,7 @@ export const removeOneById = async (id: string): Promise<void> => {
 export const findOneById = async (
   id: string,
   withCredencial = false
-): Promise<AdminUserView | AdminUserBaseView | null> => {
+): Promise<AdminUserWithCredential | AdminUserView | null> => {
   const repository = repositoryContainer.getAdminUserRepository();
   const user = await repository.findOneById(id);
   if (!user) {
@@ -266,7 +265,7 @@ export const findOneById = async (
 export const findOneByEmail = async (
   email: string,
   withCredential = false
-): Promise<AdminUserView | AdminUserBaseView | null> => {
+): Promise<AdminUserWithCredential | AdminUserView | null> => {
   const repository = repositoryContainer.getAdminUserRepository();
   const user = await repository.findOne({ email });
   if (!user) {

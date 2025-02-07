@@ -4,9 +4,9 @@ import { addRoleForUser } from '../adminrole';
 import {
   createOne,
   count,
-  AdminUserView,
+  AdminUserWithCredential,
   AdminUserCreatePayload,
-  AdminUserBaseView,
+  AdminUserView,
 } from '../adminuser';
 
 const debug = getDebug('domains:auth:common');
@@ -15,7 +15,7 @@ const debug = getDebug('domains:auth:common');
 export const createFirstAdminUser = async (
   obj: AdminUserCreatePayload,
   authType: AuthType
-): Promise<AdminUserView | AdminUserBaseView | null> => {
+): Promise<AdminUserWithCredential | AdminUserView | null> => {
   const adminUserNum = await count();
   if (adminUserNum) {
     // すでに管理ユーザーがいる場合は作成しない
