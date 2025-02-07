@@ -175,12 +175,37 @@ export const list = async (
   };
 };
 
+// オーバーロード
+export async function createOne(
+  payload: AdminUserCreatePayload,
+  authType: AuthType,
+  withCredential: true
+): Promise<AdminUserWithCredential>;
+
+// オーバーロード
+export async function createOne(
+  payload: AdminUserCreatePayload,
+  authType: AuthType,
+  withCredential: false
+): Promise<AdminUserView>;
+
+// オーバーロード
+export async function createOne(
+  payload: AdminUserCreatePayload,
+  authType: AuthType
+): Promise<AdminUserView>;
+
+// オーバーロード
+export async function createOne(
+  payload: AdminUserCreatePayload
+): Promise<AdminUserView>;
+
 // 1件作成
-export const createOne = async (
+export async function createOne(
   payload: AdminUserCreatePayload,
   authType: AuthType = AUTH_TYPE.EMAIL,
   withCredential = false
-): Promise<AdminUserWithCredential | AdminUserView> => {
+): Promise<AdminUserWithCredential | AdminUserView> {
   const repository = repositoryContainer.getAdminUserRepository();
   const { roleIds, ...adminUser } = payload;
 
@@ -205,7 +230,7 @@ export const createOne = async (
     await updateRolesForUser(user.id, roleIds);
   }
   return format(withCredential, user, roleIds);
-};
+}
 
 // IDで1件更新
 export const updateOneById = async (
@@ -261,11 +286,28 @@ export const findOneById = async (
   return format(withCredencial, user, roleIds);
 };
 
+// オーバーロード
+export async function findOneByEmail(
+  email: string,
+  withCredential: true
+): Promise<AdminUserWithCredential | null>;
+
+// オーバーロード
+export async function findOneByEmail(
+  email: string,
+  withCredential: false
+): Promise<AdminUserView | null>;
+
+// オーバーロード
+export async function findOneByEmail(
+  email: string
+): Promise<AdminUserView | null>;
+
 // emailで1件取得
-export const findOneByEmail = async (
+export async function findOneByEmail(
   email: string,
   withCredential = false
-): Promise<AdminUserWithCredential | AdminUserView | null> => {
+): Promise<AdminUserWithCredential | AdminUserView | null> {
   const repository = repositoryContainer.getAdminUserRepository();
   const user = await repository.findOne({ email });
   if (!user) {
@@ -273,7 +315,7 @@ export const findOneByEmail = async (
   }
   const roleIds = await listRoles(user.id);
   return format(withCredential, user, roleIds);
-};
+}
 
 // 件数取得
 export const count = async (): Promise<number> => {

@@ -1,7 +1,7 @@
 import { AUTH_TYPE } from '../../constants';
 import { verifyPassword } from '../../helpers';
 import { signinFailed } from '../../errors';
-import { findOneByEmail, AdminUserWithCredential } from '../adminuser';
+import { findOneByEmail } from '../adminuser';
 import { createFirstAdminUser } from './common';
 import { signJwt } from './jwt';
 
@@ -24,15 +24,12 @@ export const signinEmail = async (
     adminUser = firstAdminUser;
   }
 
-  // credentialsありの型に変換
-  const adminUserWithCredential = adminUser as AdminUserWithCredential;
-
   if (
-    adminUserWithCredential.authType !== AUTH_TYPE.EMAIL ||
+    adminUser.authType !== AUTH_TYPE.EMAIL ||
     !verifyPassword(
       password,
-      adminUserWithCredential.password as string,
-      adminUserWithCredential.salt as string
+      adminUser.password as string,
+      adminUser.salt as string
     )
   ) {
     throw signinFailed();

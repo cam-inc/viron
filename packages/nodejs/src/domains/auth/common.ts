@@ -6,7 +6,6 @@ import {
   count,
   AdminUserWithCredential,
   AdminUserCreatePayload,
-  AdminUserView,
 } from '../adminuser';
 
 const debug = getDebug('domains:auth:common');
@@ -15,7 +14,7 @@ const debug = getDebug('domains:auth:common');
 export const createFirstAdminUser = async (
   obj: AdminUserCreatePayload,
   authType: AuthType
-): Promise<AdminUserWithCredential | AdminUserView | null> => {
+): Promise<AdminUserWithCredential | null> => {
   const adminUserNum = await count();
   if (adminUserNum) {
     // すでに管理ユーザーがいる場合は作成しない
