@@ -1,9 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
-import IconButton, { Props as ButtonProps } from '~/components/button/icon';
+import Button, { Props as ButtonProps } from '~/components/button';
 import Error, { useError } from '~/components/error/';
-import GoogleLogo from '~/components/google';
-import Key from '~/components/icon/key/outline';
-import Mail from '~/components/icon/mail/outline';
+import LoginIcon from '~/components/icon/login/outline';
 import Request from '~/components/request';
 import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
@@ -17,10 +15,6 @@ export type Props = {
 };
 const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
   const { t } = useTranslation();
-  const authConfigOidc = useMemo<AuthConfig | null>(
-    () => authentication.list.find((item) => item.type === 'oidc') || null,
-    [authentication]
-  );
   const authConfigOAuth = useMemo<AuthConfig | null>(
     () => authentication.list.find((item) => item.type === 'oauth') || null,
     [authentication]
@@ -29,11 +23,6 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
     () => authentication.list.find((item) => item.type === 'email') || null,
     [authentication]
   );
-
-  const drawerOidc = useDrawer();
-  const handleOidcClick = useCallback<ButtonProps['onClick']>(() => {
-    drawerOidc.open();
-  }, [drawerOidc]);
 
   const drawerOAuth = useDrawer();
   const handleOAuthClick = useCallback<ButtonProps['onClick']>(() => {
@@ -46,113 +35,43 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
   }, [drawerEmail]);
 
   return (
-    <div className="flex justify-center gap-4">
-      {authConfigEmail && (
-        <>
-          <label className="flex basis-15 flex-col items-center gap-1">
-            <IconButton
-              className="border border-thm-on-background-low"
-              on={COLOR_SYSTEM.BACKGROUND}
-              onClick={handleEmailClick}
-              rounded
-            >
-              <Mail />
-            </IconButton>
-            <span className="text-xs">{t('email')}</span>
-          </label>
-          <Drawer {...drawerEmail.bind}>
-            <Email endpoint={endpoint} authentication={authentication} />
-          </Drawer>
-        </>
-      )}
-      {authConfigOAuth && (
-        <>
-          <label className="flex basis-15 flex-col items-center gap-1">
-            <IconButton
-              className="border border-thm-on-background-low"
-              on={COLOR_SYSTEM.BACKGROUND}
-              onClick={handleOAuthClick}
-              rounded
-            >
-              <GoogleLogo />
-            </IconButton>
-            <span className="text-xs">{t('oAuth')}</span>
-          </label>
-          <Drawer {...drawerOAuth.bind}>
-            <OAuth endpoint={endpoint} authentication={authentication} />
-          </Drawer>
-        </>
-      )}
-      {authConfigOidc && (
-        <>
-          <label className="flex basis-15 flex-col items-center gap-1">
-            <IconButton
-              className="border border-thm-on-background-low"
-              on={COLOR_SYSTEM.BACKGROUND}
-              onClick={handleOidcClick}
-              rounded
-            >
-              <Key />
-            </IconButton>
-            <span className="text-xs">{t('oidc')}</span>
-          </label>
-          <Drawer {...drawerOidc.bind}>
-            <Oidc endpoint={endpoint} authentication={authentication} />
-          </Drawer>
-        </>
-      )}
-    </div>
-  );
-};
-export default Signin;
-
-const Oidc: React.FC<{
-  endpoint: Endpoint;
-  authentication: Authentication;
-}> = ({ endpoint, authentication }) => {
-  const { prepareSigninOidc } = useEndpoint();
-  const signinOidc = useMemo<
-    ReturnType<UseEndpointReturn['prepareSigninOidc']>
-  >(
-    () => prepareSigninOidc(endpoint, authentication),
-    [authentication, endpoint, prepareSigninOidc]
-  );
-  const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
-  const setError = error.setError;
-
-  const handleSubmit = useCallback(
-    async (requestValue: RequestValue) => {
-      if (signinOidc.error) {
-        return;
-      }
-      const result = await signinOidc.execute(requestValue);
-      if (result.error) {
-        setError(result.error);
-        return;
-      }
-    },
-    [setError, signinOidc]
-  );
-
-  if (signinOidc.error) {
-    return <Error on={COLOR_SYSTEM.BACKGROUND} error={signinOidc.error} />;
-  }
-
-  return (
     <>
-      <Request
-        on={COLOR_SYSTEM.SURFACE}
-        className="h-full"
-        endpoint={signinOidc.endpoint}
-        document={signinOidc.document}
-        defaultValues={signinOidc.defaultValues}
-        request={signinOidc.request}
-        onSubmit={handleSubmit}
-      />
-      <Error.renewal {...error.bind} withModal={true} />
+      <div className="flex items-center gap-2">
+        {authConfigOAuth && (
+          <Button
+            variant="outlined"
+            className="grow max-w-50%"
+            on={COLOR_SYSTEM.BACKGROUND}
+            IconRight={LoginIcon}
+            label={t('oAuth')}
+            onClick={handleOAuthClick}
+          />
+        )}
+        {authConfigEmail && (
+          <Button
+            variant="outlined"
+            className="grow max-w-50%"
+            on={COLOR_SYSTEM.BACKGROUND}
+            IconRight={LoginIcon}
+            label={t('email')}
+            onClick={handleEmailClick}
+          />
+        )}
+      </div>
+      <Drawer {...drawerOAuth.bind}>
+        {authConfigOAuth && (
+          <OAuth endpoint={endpoint} authentication={authentication} />
+        )}
+      </Drawer>
+      <Drawer {...drawerEmail.bind}>
+        {authConfigEmail && (
+          <Email endpoint={endpoint} authentication={authentication} />
+        )}
+      </Drawer>
     </>
   );
 };
+export default Signin;
 
 const OAuth: React.FC<{
   endpoint: Endpoint;

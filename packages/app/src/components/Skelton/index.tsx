@@ -16,7 +16,7 @@ const Skelton: React.FC<BaseProps & { variant: variant }> = ({
           'rounded-full': variant === 'circular',
           rounded: variant === 'rounded',
           // For variant="text", adjust the height via font-size
-          "h-auto rounded before:content-['\\200B']": variant === 'text',
+          "h-auto rounded before:content-['\\00a0']": variant === 'text',
         },
         `bg-thm-on-${on}-slight animate-pulse`,
         className

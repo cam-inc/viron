@@ -39,19 +39,10 @@ export const get = (): Config => {
       },
       googleOAuth2: {
         clientId: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? '',
+
         clientSecret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET ?? '',
         additionalScopes: [],
-        userHostedDomains: process.env.GOOGLE_OAUTH2_USER_HOSTED_DOMAINS
-          ? process.env.GOOGLE_OAUTH2_USER_HOSTED_DOMAINS.split(',')
-          : [],
-      },
-      // 本番demoではOIDCのIdpが準備できないので設定なしにする
-      oidc: {
-        clientId: '',
-        clientSecret: '',
-        configurationUrl: '',
-        additionalScopes: [],
-        userHostedDomains: [],
+        userHostedDomains: ['gmail.com', 'cam-inc.co.jp', 'cyberagent.co.jp'],
       },
     },
     aws: {

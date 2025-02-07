@@ -94,7 +94,7 @@ const Item: React.FC<Props> = ({ endpoint }) => {
 
   return (
     <article
-      className={classNames('p-5 border rounded-lg h-full', {
+      className={classNames('p-5 border rounded-2xl h-full', {
         'bg-thm-background border-thm-on-background-low': !error,
         'bg-thm-surface border-transparent': !!error,
       })}
@@ -291,23 +291,13 @@ const SkeltonItem: React.FC<BaseProps> = ({ on }) => {
         <Skelton className="w-10 h-10" on={on} variant="rounded" />
         <Skelton className="text-base w-full flex-1" on={on} variant="text" />
       </div>
-      <div className="flex flex-col mt-6 space-y-1">
+      <div className="flex flex-col mt-4 space-y-1">
         <Skelton className="text-xxs" on={on} variant="text" />
         <Skelton className="text-xxs" on={on} variant="text" />
       </div>
-      <div className="flex justify-center gap-4 mt-2">
-        <div className="flex basis-15 flex-col items-center gap-1">
-          <Skelton className="w-11 h-11" on={on} variant="circular" />
-          <Skelton className="w-full text-xs" on={on} variant="text" />
-        </div>
-        <div className="flex basis-15 flex-col items-center gap-1">
-          <Skelton className="w-11 h-11" on={on} variant="circular" />
-          <Skelton className="w-full text-xs" on={on} variant="text" />
-        </div>
-        <div className="flex basis-15 flex-col items-center gap-1">
-          <Skelton className="w-11 h-11" on={on} variant="circular" />
-          <Skelton className="w-full text-xs" on={on} variant="text" />
-        </div>
+      <div className="mt-4 flex gap-2">
+        <Skelton className="w-full h-8" on={on} variant="circular" />
+        <Skelton className="w-full h-8" on={on} variant="circular" />
       </div>
     </div>
   );

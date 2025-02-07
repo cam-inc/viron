@@ -55,7 +55,7 @@ const Button = function <T = null>({
   size = SIZE.SM,
   data,
   onClick,
-  rounded = variant !== 'text',
+  rounded = variant === 'text' ? false : true,
 }: React.PropsWithChildren<Props<T>>): JSX.Element {
   return (
     <button

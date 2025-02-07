@@ -18,7 +18,7 @@ services:
       - $PWD/package.json:/example/nodejs/package.json
       - $PWD/src:/example/nodejs/src
       - $PWD/cert:/example/nodejs/cert
-    command: run dev
+    command: npm run dev
 
   mongo:
     image: mongo
