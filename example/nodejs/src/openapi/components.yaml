@@ -18,6 +18,8 @@ components:
       description: Size of list
       schema:
         type: integer
+        minimum: 1
+        maximum: 100
       required: false
     PagerPageQueryParam:
       name: page
@@ -25,6 +27,8 @@ components:
       description: Page number of list
       schema:
         type: integer
+        minimum: 1
+        maximum: 100
       required: false
     SortQueryParam:
       name: sort
