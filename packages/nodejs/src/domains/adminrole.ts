@@ -14,12 +14,13 @@ import {
   OAS_X_PAGE_CONTENTS,
   OAS_X_PAGE_CONTENT_RESOURCE_ID,
   CASBIN_SYNC_INTERVAL_MSEC,
+  DEFAULT_PAGER_SIZE,
+  DEFAULT_PAGER_PAGE,
 } from '../constants';
 import { ListWithPager, paging } from '../helpers';
 import { repositoryContainer } from '../repositories';
 import { findOperation, getResourceId, VironOpenAPIObject } from './oas';
 import { getDebug } from '../logging';
-
 const debug = getDebug('domains:adminrole');
 
 export interface AdminRolePermission {
@@ -301,7 +302,9 @@ export const listResourcesByOas = (oas: VironOpenAPIObject): string[] => {
 
 // 管理ロール一覧
 export const listByOas = async (
-  oas: VironOpenAPIObject
+  oas: VironOpenAPIObject,
+  size = DEFAULT_PAGER_SIZE,
+  page = DEFAULT_PAGER_PAGE
 ): Promise<ListWithPager<AdminRole>> => {
   const policies = await listPolicies();
   const resourceIds = listResourcesByOas(oas);
@@ -328,7 +331,7 @@ export const listByOas = async (
       }),
     };
   });
-  return paging(result, result.length);
+  return paging(result, size, page);
 };
 
 // 1件作成

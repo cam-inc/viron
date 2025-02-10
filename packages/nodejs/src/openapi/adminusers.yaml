@@ -15,6 +15,7 @@ info:
         - title: 管理ユーザー
           type: table
           operationId: listVironAdminUsers
+          pagination: true
           resourceId: vironAdminUser
 
 tags:
