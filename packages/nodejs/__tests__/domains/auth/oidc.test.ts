@@ -431,7 +431,8 @@ describe('domains/auth/oidc', () => {
 
       // ユーザーが正しく作成されたか確認
       const actual = await findOneByEmail(
-        mockTokenSet.claims().email as string
+        mockTokenSet.claims().email as string,
+        true
       );
       assert.strictEqual(actual?.authType, AUTH_TYPE.OIDC);
       assert.strictEqual(actual?.email, mockTokenSet.claims().email);
@@ -681,7 +682,8 @@ describe('domains/auth/oidc', () => {
 
       // ユーザーが正しく作成されたか確認
       const actual = await findOneByEmail(
-        mockTokenSet.claims().email as string
+        mockTokenSet.claims().email as string,
+        true
       );
       assert.strictEqual(actual?.authType, AUTH_TYPE.OIDC);
       assert.strictEqual(actual?.email, mockTokenSet.claims().email);
@@ -808,7 +810,8 @@ describe('domains/auth/oidc', () => {
 
       // ユーザーが正しく更新されたか確認
       const actual = await findOneByEmail(
-        mockTokenSet.claims().email as string
+        mockTokenSet.claims().email as string,
+        true
       );
       assert.strictEqual(actual?.authType, AUTH_TYPE.OIDC);
       assert.strictEqual(actual?.email, mockTokenSet.claims().email);
@@ -860,7 +863,8 @@ describe('domains/auth/oidc', () => {
           oidcRefreshToken: 'zzzzz',
           oidcTokenType: 'Bearer',
         },
-        AUTH_TYPE.OIDC
+        AUTH_TYPE.OIDC,
+        true
       );
 
       // テスト対象の関数を呼び出し
@@ -882,7 +886,8 @@ describe('domains/auth/oidc', () => {
 
       // ユーザーが正しく更新されたか確認
       const actual = await findOneByEmail(
-        mockTokenSet.claims().email as string
+        mockTokenSet.claims().email as string,
+        true
       );
       assert.strictEqual(actual?.authType, AUTH_TYPE.OIDC);
       assert.strictEqual(actual?.email, mockTokenSet.claims().email);
@@ -1020,7 +1025,8 @@ describe('domains/auth/oidc', () => {
           oidcRefreshToken: 'zzzzz',
           oidcTokenType: 'Bearer',
         },
-        AUTH_TYPE.OIDC
+        AUTH_TYPE.OIDC,
+        true
       );
 
       // テスト対象の関数を呼び出し
@@ -1039,7 +1045,8 @@ describe('domains/auth/oidc', () => {
 
       // ユーザーが更新されていないことを確認
       const actual = await findOneByEmail(
-        mockTokenSet.claims().email as string
+        mockTokenSet.claims().email as string,
+        true
       );
       assert.strictEqual(actual?.authType, AUTH_TYPE.OIDC);
       assert.strictEqual(actual?.email, registeredUser.email);
