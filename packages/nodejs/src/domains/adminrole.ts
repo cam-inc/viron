@@ -93,8 +93,10 @@ const sync = async (now = Date.now()): Promise<void> => {
   }
 };
 
-// adminroles(casbin_rule)で不正な文字列チェック カンマ、シングルクォート、ダブルクォートが文字列に含まれないこと
-const isValidCasbinRule = (str: string): boolean => /[,'"]/.test(str);
+// adminroles(casbin_rule)で不正な文字列チェック
+// 英数字、アンダースコア、ハイフン以外の文字列は不正とする
+const isValidCasbinRule = (str: string): boolean =>
+  !/^[a-zA-Z0-9_-]+$/.test(str);
 
 // adminroles(casbin_rule)で不正な文字列チェック
 const validateAdminRole = (obj: AdminRole): void => {
@@ -116,11 +118,11 @@ const validateAdminRole = (obj: AdminRole): void => {
 };
 
 const validateUserRoles = (userId: string, roleIds: string[]): void => {
-  // userIdにカンマ、シングルクォート、ダブルクォートが文字列に含まれないことを確認
+  // userIdに不正な文字列が含まれないことを確認
   if (isValidCasbinRule(userId)) {
     throw invalidAdminRole();
   }
-  // roleIdsにカンマ、シングルクォート、ダブルクォートが文字列に含まれないことを確認
+  // roleIdsに不正な文字列が含まれないことを確認
   if (roleIds.some((roleId) => isValidCasbinRule(roleId))) {
     throw invalidAdminRole();
   }
