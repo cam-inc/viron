@@ -29,7 +29,7 @@ const authFailure = (err: VironError): AuthenticationFailure => {
 };
 
 const authSuccess = (
-  user: domainsAdminUser.AdminUserView
+  user: domainsAdminUser.AdminUserWithCredential
 ): AuthenticationSuccess => {
   return { type: AUTHENTICATION_RESULT_TYPE.SUCCESS, user };
 };
@@ -73,19 +73,22 @@ export const jwt = async (
       return authFailure(forbidden());
     }
 
-    const user = await domainsAdminUser.findOneById(userId);
+    // credentialsありでユーザー情報取得
+    const user = await domainsAdminUser.findOneById(userId, true);
     if (user) {
-      switch (user.authType) {
+      const adminUserWithCredential =
+        user as domainsAdminUser.AdminUserWithCredential;
+      switch (adminUserWithCredential.authType) {
         case AUTH_TYPE.GOOGLE: {
           // Google認証の場合はアクセストークンの検証
           if (
             await domainsAuth.verifyGoogleOAuth2AccessToken(
               userId,
-              user,
+              adminUserWithCredential,
               ctx.config.auth.googleOAuth2
             )
           ) {
-            return authSuccess(user);
+            return authSuccess(adminUserWithCredential);
           }
           break;
         }
@@ -97,15 +100,15 @@ export const jwt = async (
               client,
               ctx.config.auth.oidc,
               userId,
-              user
+              adminUserWithCredential
             )
           ) {
-            return authSuccess(user);
+            return authSuccess(adminUserWithCredential);
           }
           break;
         }
         default:
-          return authSuccess(user);
+          return authSuccess(adminUserWithCredential);
       }
     }
   }

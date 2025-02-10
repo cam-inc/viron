@@ -3,7 +3,12 @@ import { ListWithPager, genPasswordHash } from '../helpers';
 import { repositoryContainer } from '../repositories';
 import { adminUserNotFound, forbidden } from '../errors';
 import { listRoles } from './adminrole';
-import { AdminUserView, findOneById, formatAdminUser } from './adminuser';
+import {
+  AdminUserWithCredential,
+  AdminUserView,
+  findOneById,
+  formatAdminUser,
+} from './adminuser';
 
 export interface AdminAccountUpdatePayload {
   password: string;
@@ -12,7 +17,7 @@ export interface AdminAccountUpdatePayload {
 // 一覧取得(idを指定するので結果は必ず1件)
 export const listById = async (
   id: string
-): Promise<ListWithPager<AdminUserView>> => {
+): Promise<ListWithPager<AdminUserWithCredential | AdminUserView>> => {
   const repository = repositoryContainer.getAdminUserRepository();
   const result = await repository.findWithPager({ id });
   const adminRoles = await Promise.all(
@@ -21,7 +26,7 @@ export const listById = async (
   return {
     ...result,
     list: result.list.map((adminUser) =>
-      formatAdminUser(adminUser, adminRoles.shift())
+      formatAdminUser(false, adminUser, adminRoles.shift())
     ),
   };
 };
