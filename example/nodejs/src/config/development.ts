@@ -42,7 +42,11 @@ export const get = (): Config => {
         'https://viron.work',
         'https://snapshot.viron.work',
       ],
-      ignorePaths: ['/ping'],
+      ignorePaths: [
+        '/ping',
+        '/oidc/authorization',
+        '/oauth2/google/authorization',
+      ],
     },
     auth: {
       jwt: {
