@@ -132,7 +132,7 @@ components:
         id:
           description: ロールID
           type: string
-          pattern: '^[^,''"]*$'
+          pattern: '^[a-zA-Z0-9_-]+$'
         permissions:
           description: 権限
           type: array
@@ -166,7 +166,7 @@ components:
         id:
           description: ロールID
           type: string
-          pattern: '^[^,''"]*$'
+          pattern: '^[a-zA-Z0-9_-]+$'
         permissions:
           description: 権限
           type: array

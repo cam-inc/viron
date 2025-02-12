@@ -162,7 +162,7 @@ components:
           type: array
           items:
             type: string
-            pattern: '^[^,''"]*$'
+            pattern: '^[a-zA-Z0-9_-]+$'
       required:
         - email
         - password
@@ -180,4 +180,4 @@ components:
           type: array
           items:
             type: string
-            pattern: '^[^,''"]*$'
+            pattern: '^[a-zA-Z0-9_-]+$'

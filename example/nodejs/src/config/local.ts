@@ -52,7 +52,6 @@ export const get = (mode: Mode): Config => {
         'https://localhost:8000',
         'https://viron.work',
         'https://snapshot.viron.work',
-        'https://viron.work:8000',
       ],
       ignorePaths: [
         '/ping',
