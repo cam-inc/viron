@@ -35,6 +35,15 @@ export const get = (): Config => {
         'https://snapshot.viron.work',
       ],
     },
+    csrf: {
+      host: 'demo.viron.work',
+      allowOrigins: [
+        'https://localhost:8000',
+        'https://viron.work',
+        'https://snapshot.viron.work',
+      ],
+      ignorePaths: ['/ping'],
+    },
     auth: {
       jwt: {
         secret: process.env.JWT_SECRET ?? '',
