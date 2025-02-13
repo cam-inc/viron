@@ -1,5 +1,9 @@
 import { newModel } from 'casbin';
-import { roleIdAlreadyExists, unableToDeleteRole } from '../errors';
+import {
+  roleIdAlreadyExists,
+  unableToDeleteRole,
+  invalidAdminRole,
+} from '../errors';
 import {
   ADMIN_ROLE,
   API_METHOD,
@@ -10,12 +14,13 @@ import {
   OAS_X_PAGE_CONTENTS,
   OAS_X_PAGE_CONTENT_RESOURCE_ID,
   CASBIN_SYNC_INTERVAL_MSEC,
+  DEFAULT_PAGER_SIZE,
+  DEFAULT_PAGER_PAGE,
 } from '../constants';
 import { ListWithPager, paging } from '../helpers';
 import { repositoryContainer } from '../repositories';
 import { findOperation, getResourceId, VironOpenAPIObject } from './oas';
 import { getDebug } from '../logging';
-
 const debug = getDebug('domains:adminrole');
 
 export interface AdminRolePermission {
@@ -89,6 +94,41 @@ const sync = async (now = Date.now()): Promise<void> => {
   }
 };
 
+// adminroles(casbin_rule)で不正な文字列チェック
+// 英数字、アンダースコア、ハイフン以外の文字列は不正とする
+const isValidCasbinRule = (str: string): boolean =>
+  !/^[a-zA-Z0-9_-]+$/.test(str);
+
+// adminroles(casbin_rule)で不正な文字列チェック
+const validateAdminRole = (obj: AdminRole): void => {
+  // obj.idのチェック
+  if (isValidCasbinRule(obj.id)) {
+    throw invalidAdminRole();
+  }
+
+  for (const { resourceId, permission } of obj.permissions) {
+    // resourceIdのチェック
+    if (isValidCasbinRule(resourceId)) {
+      throw invalidAdminRole();
+    }
+    // permissionがPermissionに含まれることを確認
+    if (!Object.values(PERMISSION).includes(permission)) {
+      throw invalidAdminRole();
+    }
+  }
+};
+
+const validateUserRoles = (userId: string, roleIds: string[]): void => {
+  // userIdに不正な文字列が含まれないことを確認
+  if (isValidCasbinRule(userId)) {
+    throw invalidAdminRole();
+  }
+  // roleIdsに不正な文字列が含まれないことを確認
+  if (roleIds.some((roleId) => isValidCasbinRule(roleId))) {
+    throw invalidAdminRole();
+  }
+};
+
 // APIメソッドをPermissionに変換
 export const method2Permissions = (method: ApiMethod): Permission[] =>
   permissionMap[method];
@@ -105,6 +145,7 @@ export const addRoleForUser = async (
   userId: string,
   roleId: string
 ): Promise<boolean> => {
+  validateUserRoles(userId, [roleId]);
   const casbin = repositoryContainer.getCasbin();
   return casbin.addRoleForUser(userId, roleId);
 };
@@ -125,6 +166,7 @@ export const updateRolesForUser = async (
   userId: string,
   roleIds: string[]
 ): Promise<void> => {
+  validateUserRoles(userId, roleIds);
   await revokeRoleForUser(userId);
   await Promise.all(
     roleIds.map((roleId: string) => addRoleForUser(userId, roleId))
@@ -170,6 +212,7 @@ export const updatePermissionsForRole = async (
   roleId: string,
   permissions: AdminRolePermissions
 ): Promise<boolean> => {
+  validateAdminRole({ id: roleId, permissions });
   const casbin = repositoryContainer.getCasbin();
   const policies = permissions.map(
     ({ resourceId, permission }): Policy =>
@@ -259,7 +302,9 @@ export const listResourcesByOas = (oas: VironOpenAPIObject): string[] => {
 
 // 管理ロール一覧
 export const listByOas = async (
-  oas: VironOpenAPIObject
+  oas: VironOpenAPIObject,
+  size = DEFAULT_PAGER_SIZE,
+  page = DEFAULT_PAGER_PAGE
 ): Promise<ListWithPager<AdminRole>> => {
   const policies = await listPolicies();
   const resourceIds = listResourcesByOas(oas);
@@ -286,11 +331,12 @@ export const listByOas = async (
       }),
     };
   });
-  return paging(result, result.length);
+  return paging(result, size, page);
 };
 
 // 1件作成
 export const createOne = async (obj: AdminRole): Promise<AdminRole> => {
+  validateAdminRole(obj);
   const roleId = obj.id;
   const policies = await listPolicies(roleId);
   if (policies?.length) {
@@ -305,6 +351,7 @@ export const updateOneById = async (
   roleId: string,
   permissions: AdminRolePermissions
 ): Promise<void> => {
+  validateAdminRole({ id: roleId, permissions });
   await updatePermissionsForRole(roleId, permissions);
 };
 

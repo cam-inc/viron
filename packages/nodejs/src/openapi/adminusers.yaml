@@ -15,6 +15,7 @@ info:
         - title: 管理ユーザー
           type: table
           operationId: listVironAdminUsers
+          pagination: true
           resourceId: vironAdminUser
 
 tags:
@@ -161,6 +162,7 @@ components:
           type: array
           items:
             type: string
+            pattern: '^[a-zA-Z0-9_-]+$'
       required:
         - email
         - password
@@ -178,3 +180,4 @@ components:
           type: array
           items:
             type: string
+            pattern: '^[a-zA-Z0-9_-]+$'

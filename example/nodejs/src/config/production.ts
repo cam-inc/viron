@@ -31,6 +31,15 @@ export const get = (): Config => {
     cors: {
       allowOrigins: ['https://viron.plus', 'https://snapshot.viron.plus'],
     },
+    csrf: {
+      host: 'demo.viron.plus',
+      allowOrigins: ['https://viron.plus', 'https://snapshot.viron.plus'],
+      ignorePaths: [
+        '/ping',
+        '/oidc/authorization',
+        '/oauth2/google/authorization',
+      ],
+    },
     auth: {
       jwt: {
         secret: process.env.JWT_SECRET ?? '',

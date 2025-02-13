@@ -1,9 +1,13 @@
+import { TABLE_SORT_DELIMITER, TABLE_SORT_ORDER } from '@viron/lib';
 import { getRepository, RepositoryNames } from '../repositories';
 
 // データエクスポート
 export const exportResources = async (
   resourceName: string,
-  format: 'json' | 'csv'
+  format: 'json' | 'csv',
+  size?: number,
+  page?: number,
+  sort = [`createdAt${TABLE_SORT_DELIMITER}${TABLE_SORT_ORDER.DESC}`]
   // eslint-disable-next-line @typescript-eslint/ban-types
 ): Promise<object | string> => {
   const repository = getRepository(resourceName as RepositoryNames);
@@ -11,15 +15,15 @@ export const exportResources = async (
     return format === 'json' ? {} : '';
   }
 
-  const result = await repository.find();
+  const result = await repository.findWithPager({}, size, page, sort);
   switch (format) {
     case 'csv': {
-      if (!result.length) {
+      if (!result.list.length) {
         return '';
       }
-      const headers = Object.keys(result[0]);
+      const headers = Object.keys(result.list[0]);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return result.reduce((ret: string, doc: any) => {
+      return result.list.reduce((ret: string, doc: any) => {
         const line: unknown[] = [];
         Object.entries(doc).forEach(([k, v]) => {
           line[headers.indexOf(k)] = v;
@@ -28,6 +32,6 @@ export const exportResources = async (
       }, headers.join(','));
     }
     default:
-      return result;
+      return result.list;
   }
 };

@@ -18,3 +18,5 @@ export const AUTHENTICATION_RESULT_TYPE = {
 } as const;
 
 export const LIMIT_MEDIA_FILE_SIZE = 2000000;
+
+export const CSRF_IGNORE_HTTP_METHODS = ['HEAD', 'OPTIONS'];

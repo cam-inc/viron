@@ -1,5 +1,15 @@
 # @viron/app
 
+## 2.15.0
+
+### Minor Changes
+
+- Added OpenId Connect to app, viron/lib(nodejs) and example(nodejs).
+
+### Patch Changes
+
+- de428228: Add a mode prop to AuthConfig to determine how to opening the OAuth endpoint.
+
 ## 2.14.0
 
 ### Minor Changes
