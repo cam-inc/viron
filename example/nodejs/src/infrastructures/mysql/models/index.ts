@@ -5,6 +5,7 @@ import * as articles from './articles';
 import * as items from './items';
 import * as itemDetails from './item_details';
 import * as medias from './medias';
+import { mysql } from '@viron/lib';
 
 export interface MysqlModels {
   [users.name]: users.UserModelStatic;
@@ -13,6 +14,12 @@ export interface MysqlModels {
   [items.name]: items.ItemModelStatic;
   [itemDetails.name]: itemDetails.ItemDetailModelStatic;
   [medias.name]: medias.MediaModelStatic;
+  [mysql.models.adminUsers
+    .name]: mysql.MysqlModels[typeof mysql.models.adminUsers.name];
+  [mysql.models.auditLogs
+    .name]: mysql.MysqlModels[typeof mysql.models.auditLogs.name];
+  [mysql.models.revokedTokens
+    .name]: mysql.MysqlModels[typeof mysql.models.revokedTokens.name];
 }
 
 // Get models
@@ -24,6 +31,10 @@ export const models = (s: Sequelize): MysqlModels => {
     [items.name]: items.createModel(s),
     [itemDetails.name]: itemDetails.createModel(s),
     [medias.name]: medias.createModel(s),
+    [mysql.models.adminUsers.name]: mysql.models.adminUsers.createModel(s),
+    [mysql.models.auditLogs.name]: mysql.models.auditLogs.createModel(s),
+    [mysql.models.revokedTokens.name]:
+      mysql.models.revokedTokens.createModel(s),
   };
 
   mysqlModels[items.name].belongsTo(mysqlModels[itemDetails.name], {

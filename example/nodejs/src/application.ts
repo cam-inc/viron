@@ -12,6 +12,7 @@ import { domainsAuth, domainsOas } from '@viron/lib';
 import { middlewareI18n } from './middlewares/i18n';
 import { middlewareNotFound } from './middlewares/notfound';
 import { middlewareCors } from './middlewares/cors';
+import { csrf as middlewareCsrf } from './middlewares/csrf';
 import { middlewareAccessLog } from './middlewares/accesslog';
 import { middlewareAuditLog } from './middlewares/auditlog';
 import { middlewareCacheControl } from './middlewares/cachecontrol';
@@ -69,6 +70,9 @@ export const createApplication = async (): Promise<Express> => {
   app.use(json());
   app.use(urlencoded({ extended: true }));
   app.use(cookieParser());
+  if (ctx.config.csrf) {
+    app.use(middlewareCsrf(ctx.config.csrf));
+  }
   app.use(middlewareAccessLog());
   app.use(middlewareI18n());
   app.use(middlewareCacheControl());

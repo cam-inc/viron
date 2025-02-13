@@ -10,7 +10,8 @@ export const signinEmail = async (
   email: string,
   password: string
 ): Promise<string> => {
-  let adminUser = await findOneByEmail(email);
+  // credentialありで取得
+  let adminUser = await findOneByEmail(email, true);
   if (!adminUser) {
     const firstAdminUser = await createFirstAdminUser(
       { email, password },

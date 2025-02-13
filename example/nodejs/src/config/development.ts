@@ -35,6 +35,19 @@ export const get = (): Config => {
         'https://snapshot.viron.work',
       ],
     },
+    csrf: {
+      host: 'demo.viron.work',
+      allowOrigins: [
+        'https://localhost:8000',
+        'https://viron.work',
+        'https://snapshot.viron.work',
+      ],
+      ignorePaths: [
+        '/ping',
+        '/oidc/authorization',
+        '/oauth2/google/authorization',
+      ],
+    },
     auth: {
       jwt: {
         secret: process.env.JWT_SECRET ?? '',
@@ -45,7 +58,18 @@ export const get = (): Config => {
         clientId: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? '',
         clientSecret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET ?? '',
         additionalScopes: [],
-        userHostedDomains: ['cam-inc.co.jp', 'cyberagent.co.jp'],
+        userHostedDomains: process.env.GOOGLE_OAUTH2_USER_HOSTED_DOMAINS
+          ? process.env.GOOGLE_OAUTH2_USER_HOSTED_DOMAINS.split(',')
+          : [],
+      },
+      oidc: {
+        clientId: process.env.OIDC_CLIENT_ID ?? '',
+        clientSecret: process.env.OIDC_CLIENT_SECRET ?? '',
+        configurationUrl: process.env.OIDC_CLIENT_CONFIGURATION_URL ?? '',
+        additionalScopes: [],
+        userHostedDomains: process.env.OIDC_USER_HOSTED_DOMAINS
+          ? process.env.OIDC_USER_HOSTED_DOMAINS.split(',')
+          : [],
       },
     },
     aws: {

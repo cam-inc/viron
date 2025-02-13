@@ -36,6 +36,22 @@ export const schemaDefinition: SchemaDefinition = {
   googleOAuth2TokenType: {
     type: Schema.Types.String,
   },
+  // for oidc
+  oidcAccessToken: {
+    type: Schema.Types.String,
+  },
+  oidcExpiryDate: {
+    type: Schema.Types.Number,
+  },
+  oidcIdToken: {
+    type: Schema.Types.String,
+  },
+  oidcRefreshToken: {
+    type: Schema.Types.String,
+  },
+  oidcTokenType: {
+    type: Schema.Types.String,
+  },
 
   createdAt: {
     type: Schema.Types.Number,
