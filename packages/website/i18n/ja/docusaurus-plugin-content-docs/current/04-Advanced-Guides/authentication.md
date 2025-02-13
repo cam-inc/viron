@@ -24,7 +24,7 @@ x-viron-authtypes-path: /authentication
 
 The response body of `GET /authentication`:
 
-```json
+```jsonc
 {
   "list": [
     // a list of authentication types
@@ -37,28 +37,23 @@ The response body of `GET /authentication`:
 
 ## Authentication Types
 
-There are four types of authentication: `email`, `oauth`, `oauthcallback`, and `signout`. Each authentication has a schema of this:
+There are four types of authentication: `email`, `oauth`, `oauthcallback`, `oidc`, `oidccallback`, and `signout`. Each authentication has a schema of this:
 
-```json
+```typescript
 {
-  "type": "email" | "oauth" | "oauthcallback" | "signout";
+  "type": "email" | "oauth" | "oauthcallback" | "oidc" | "oidccallback" | "signout";
   "provider": string;
   "operatioId": string; // Used to determine how to send a request.
-  "mode"?: 'navigate' | 'cors'; // Use to determine how to open the Oauth endpoint. Only if type is oauth.
   "defaultParametersValue"?: any;
   "defaultRequestBodyValue"?: any;
 }
 ```
 
-:::tip
-基本的には`mode: 'cors'`とします。
-ただし、vironをセルフホストしている場合は、どのモードを選んでもかまいません。
-
 ### `email`
 
 When this type of authentication is specified, Viron prompts users to enter fields like `email` and `password` to get authenticated. The endpoint **should** return a response with a cookie set.
 
-```json
+```jsonc
 {
   "list": [
     {
@@ -108,13 +103,12 @@ When this type of authentication is specified, Viron prompts users to enter fiel
 
 Those types of authentication are for [the Authorization Code Grant of the OAuth 2.0 authorization framework](https://datatracker.ietf.org/doc/html/rfc6749#section-4.1).
 
-```json
+```jsonc
 {
   "list": [
     {
       "type": "oauth",
       "operationId": "signinOAuth",
-      "mode": "cors",
       "defaultParametersValue": {
         "redirectUri": "${oauthRedirectURI}" // An environmental variable
       }
@@ -181,13 +175,91 @@ Those types of authentication are for [the Authorization Code Grant of the OAuth
 }
 ```
 
+### `oidc` and `oidccallback`
+
+Those types of authentication are for [the Authorization Code Flow of the OpenID Connect protocol](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
+
+```jsonc
+{
+  "list": [
+    {
+      "type": "oidc",
+      "operationId": "signinOidc",
+      "defaultParametersValue": {
+        "redirectUri": "${oidcRedirectURI}" // An environmental variable
+      }
+    },
+    {
+      "type": "oidccallback",
+      "operationId": "signinOidcCallback",
+      "defaultRequestBodyValue": {
+        "redirectUri": "${oidcRedirectURI}" // An environmental variable
+      }
+    }
+  ],
+  "oas": {
+    "openapi": "3.0.2",
+    "info": {
+      "title": "Authentication",
+      "version": "1.0.0"
+    },
+    "paths": {
+      "/oidc/signin": {
+        "get": {
+          "operationId": "signinOidc", // Should match the one specified in the list.
+          "parameters": [
+            {
+              "in": "query",
+              "name": "redirectUri",
+              "required": "true",
+              "schema": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          ],
+          "responses": {
+            "301": {
+              "description": "Redirect to the authorization endpoint."
+            }
+          }
+        }
+      },
+      "/oidc/signin/callback": {
+        "post": {
+          "operationId": "signinOidcCallback", // Should match the one specified in the list.
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["code"],
+                  "properties": {
+                    "code": { // Authorization code
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+### OAuth および OpenID Connect: 追加情報
+
 Viron directs the user to the authorization endpoint with a parameter of RedirectURI, whose default value is an [environmental variable](/docs/Advanced-Guides/environmental-variable). After successfully granted, the user will be redirected back to Viron with an `authorization code`. Then, Viron sends another request with the authorization code to the endpoint, expecting the response to set a cookie.
 
 ### `signout`
 
 Use this type of authentication to `revoke` the cookie that has been set previously.
 
-```json
+```jsonc
 {
   "list": [
     {

@@ -4,8 +4,7 @@
 
 ### Minor Changes
 
-- Added OpenId Connect to app, viron/lib(nodejs) and example(nodejs).
-- 40c6a0e8: Added documentation on the "mode" property used to determine how to open an Oauth endpoint
+- Added documentation about OpenId Connect
 
 ## 0.4.0
 
