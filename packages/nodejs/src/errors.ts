@@ -79,6 +79,10 @@ export const invalidAuthType = (): VironError => {
   return new VironError('Invalid Auth type.', 400);
 };
 
+export const invalidAdminRole = (): VironError => {
+  return new VironError('Invalid Admin role.', 400);
+};
+
 export const unsupportedScope = (): VironError => {
   return new VironError('Unsupported scope.', 500);
 };

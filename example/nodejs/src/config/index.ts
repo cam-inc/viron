@@ -25,6 +25,12 @@ export interface CorsConfig {
   allowOrigins: string[];
 }
 
+export interface ConfigCsrf {
+  host: string;
+  allowOrigins: string[];
+  ignorePaths: string[];
+}
+
 export interface OasConfig {
   infoExtentions: domainsOas.VironInfoObjectExtentions;
 }
@@ -45,6 +51,7 @@ export interface Config {
     vironLib: MongoConfig | MysqlConfig;
   };
   cors: CorsConfig;
+  csrf?: ConfigCsrf;
   auth: {
     jwt: domainsAuth.JwtConfig;
     googleOAuth2: domainsAuth.GoogleOAuthConfig;
