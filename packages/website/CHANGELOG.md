@@ -1,5 +1,11 @@
 # @viron/website
 
+## 0.5.0
+
+### Minor Changes
+
+- Added documentation about OpenId Connect
+
 ## 0.4.0
 
 ### Minor Changes

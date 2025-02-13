@@ -175,8 +175,6 @@ Those types of authentication are for [the Authorization Code Grant of the OAuth
 }
 ```
 
-Viron directs the user to the authorization endpoint with a parameter of RedirectURI, whose default value is an [environmental variable](/docs/Advanced-Guides/environmental-variable). After successfully granted, the user will be redirected back to Viron with an `authorization code`. Then, Viron sends another request with the authorization code to the endpoint, expecting the response to set a cookie.
-
 ### `oidc` and `oidccallback`
 
 Those types of authentication are for [the Authorization Code Flow of the OpenID Connect protocol](https://openid.net/specs/openid-connect-core-1_0.html#CodeFlowAuth)
@@ -252,6 +250,8 @@ Those types of authentication are for [the Authorization Code Flow of the OpenID
   }
 }
 ```
+
+### OAuth and OpenID Connect: Additional Information
 
 Viron directs the user to the authorization endpoint with a parameter of RedirectURI, whose default value is an [environmental variable](/docs/Advanced-Guides/environmental-variable). After successfully granted, the user will be redirected back to Viron with an `authorization code`. Then, Viron sends another request with the authorization code to the endpoint, expecting the response to set a cookie.
 
