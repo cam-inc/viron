@@ -6,7 +6,7 @@ info:
   description: admin users api specifications
   x-pages:
     - id: vironAdminUsers
-      group: 管理画面/管理
+      group: Viron管理
       title: Viron 管理ユーザー
       description: |
         # 管理ユーザーの管理

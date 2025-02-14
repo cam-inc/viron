@@ -26,6 +26,11 @@ type (
 		GoogleOAuth2IdToken      *string            `bson:"googleOAuth2IdToken,omitempty"`
 		GoogleOAuth2RefreshToken *string            `bson:"googleOAuth2RefreshToken,omitempty"`
 		GoogleOAuth2TokenType    *string            `bson:"googleOAuth2TokenType,omitempty"`
+		OidcAccessToken          *string            `bson:"oidcAccessToken,omitempty"`
+		OidcExpiryDate           *uint64            `bson:"oidcExpiryDate,omitempty"`
+		OidcIdToken              *string            `bson:"oidcIdToken,omitempty"`
+		OidcRefreshToken         *string            `bson:"oidcRefreshToken,omitempty"`
+		OidcTokenType            *string            `bson:"oidcTokenType,omitempty"`
 		CreatedAt                time.Time          `bson:"-"`
 		UpdatedAt                time.Time          `bson:"-"`
 		CreatedAtInt             int                `bson:"createdAt,omitempty"`
@@ -63,35 +68,56 @@ func (admin *AdminUserEntity) ToBSONSet() bson.D {
 	set := bson.D{}
 
 	if admin.Password != nil {
-		set = append(set, bson.E{"password", *admin.Password})
+		set = append(set, bson.E{Key: "password", Value: *admin.Password})
 	}
 
 	if admin.GoogleOAuth2AccessToken != nil {
-		set = append(set, bson.E{"googleOAuth2AccessToken", *admin.GoogleOAuth2AccessToken})
+		set = append(set, bson.E{Key: "googleOAuth2AccessToken", Value: *admin.GoogleOAuth2AccessToken})
 	}
 
 	if admin.GoogleOAuth2ExpiryDate != nil {
-		set = append(set, bson.E{"googleOAuth2ExpiryDate", *admin.GoogleOAuth2ExpiryDate})
+		set = append(set, bson.E{Key: "googleOAuth2ExpiryDate", Value: *admin.GoogleOAuth2ExpiryDate})
 	}
 
 	if admin.GoogleOAuth2IdToken != nil {
-		set = append(set, bson.E{"googleOAuth2IdToken", *admin.GoogleOAuth2IdToken})
+		set = append(set, bson.E{Key: "googleOAuth2IdToken", Value: *admin.GoogleOAuth2IdToken})
 	}
 
 	if admin.GoogleOAuth2RefreshToken != nil {
-		set = append(set, bson.E{"googleOAuth2RefreshToken", *admin.GoogleOAuth2RefreshToken})
+		set = append(set, bson.E{Key: "googleOAuth2RefreshToken", Value: *admin.GoogleOAuth2RefreshToken})
 	}
 
 	if admin.GoogleOAuth2TokenType != nil {
-		set = append(set, bson.E{"googleOAuth2TokenType", *admin.GoogleOAuth2TokenType})
+		set = append(set, bson.E{Key: "googleOAuth2TokenType", Value: *admin.GoogleOAuth2TokenType})
 	}
+
+	if admin.OidcAccessToken != nil {
+		set = append(set, bson.E{Key: "oidcAccessToken", Value: *admin.OidcAccessToken})
+	}
+
+	if admin.OidcExpiryDate != nil {
+		set = append(set, bson.E{Key: "oidcExpiryDate", Value: *admin.OidcExpiryDate})
+	}
+
+	if admin.OidcIdToken != nil {
+		set = append(set, bson.E{Key: "oidcIdToken", Value: *admin.OidcIdToken})
+	}
+
+	if admin.OidcRefreshToken != nil {
+		set = append(set, bson.E{Key: "oidcRefreshToken", Value: *admin.OidcRefreshToken})
+	}
+
+	if admin.OidcTokenType != nil {
+		set = append(set, bson.E{Key: "oidcTokenType", Value: *admin.OidcTokenType})
+	}
+
 	if admin.UpdatedAtInt == 0 {
 		admin.UpdatedAtInt = int(time.Now().Unix())
 	}
-	set = append(set, bson.E{"updatedAt", admin.UpdatedAtInt})
+	set = append(set, bson.E{Key: "updatedAt", Value: admin.UpdatedAtInt})
 
 	return bson.D{
-		{"$set", set},
+		{Key: "$set", Value: set},
 	}
 }
 
@@ -107,7 +133,7 @@ func (c *AdminUserConditions) ConvertConditionMongoDB() *MongoConditions {
 		m["email"] = c.Email
 	}
 	if c.LikeEmail != "" {
-		m["email"] = bson.M{"$regex": c.Email}
+		m["email"] = bson.M{"$regex": c.LikeEmail}
 	}
 
 	conditions.Filter = m
@@ -115,9 +141,20 @@ func (c *AdminUserConditions) ConvertConditionMongoDB() *MongoConditions {
 	if c.FindOptions == nil {
 		c.FindOptions = options.Find()
 	}
+
+	// Paginatorの値を個別にセット
 	pager := c.ConvertPager()
 	paginator := pager.PaginateMongo()
-	c.FindOptions = options.MergeFindOptions(c.FindOptions, paginator)
+
+	if paginator.Limit != nil {
+		c.FindOptions.Limit = paginator.Limit
+	}
+	if paginator.Skip != nil {
+		c.FindOptions.Skip = paginator.Skip
+	}
+	if paginator.Sort != nil {
+		c.FindOptions.Sort = paginator.Sort
+	}
 
 	conditions.FindOptions = c.FindOptions
 

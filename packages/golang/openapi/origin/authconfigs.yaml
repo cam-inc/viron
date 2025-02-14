@@ -55,6 +55,7 @@ components:
             - email
             - oauth
             - signout
+            - oidc
           example: oauth
         defaultParametersValue:
           description: クライアントからリクエストする際のパラメータ

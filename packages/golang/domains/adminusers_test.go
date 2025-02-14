@@ -52,9 +52,11 @@ func TestCreateAdminUser(t *testing.T) {
 			return nil
 		},
 	}
-	container.SetUpMock(map[string]mock.MockFunc{
+	if err := container.SetUpMock(map[string]mock.MockFunc{
 		"adminusers": f,
-	})
+	}); err != nil {
+		t.Fatal(err)
+	}
 	createdUser, err := CreateAdminUser(context.Background(), payload, constant.AUTH_TYPE_EMAIL)
 	assert.Nil(t, err)
 	assert.NotNil(t, createdUser)

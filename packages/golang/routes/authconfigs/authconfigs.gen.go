@@ -24,6 +24,8 @@ const (
 
 	VironAuthConfigTypeOauth VironAuthConfigType = "oauth"
 
+	VironAuthConfigTypeOidc VironAuthConfigType = "oidc"
+
 	VironAuthConfigTypeSignout VironAuthConfigType = "signout"
 )
 
@@ -144,16 +146,16 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 var swaggerSpec = []string{
 
 	"H4sIAAAAAAAC/6xUzW4TPRR9leh+33KUhLKbFT8rBFIRi7KosnAnNxlXM7ZreyKiaCQ6XgCqUIFFKwob",
-	"fhalUsuCVaUKHsYKKm+B7EmaZDJBgNiNfOxzzr333BlBxFPBGTKtIByBimJMif/coJKzm5mOb3PWo313",
-	"JCQXKDVFf6GLPZIl+j6RJEWNUm2QJMMSUZGkQlPOIARbfLbmky0+2uK9NV+seWp392zxzJoTBxXHtjj3",
-	"h69tsffj6I3dPbPmpXti3llzYYtvEIAeCoQQ+NY2RhryYKr+AHcyVPoW7w7/pfwiZN5a88QWH+p8CMkH",
-	"tItyWfjy5Pnl8YU1h9acWvPCOTCPIQB8RFKROJY+5/0EZ6xKS8r6jrU8qGf8fnA+vth3RCxLIdwETAlN",
-	"IABOMh1DAIr2Gc80dOa1pmBFKg9A4k5GJXYd1VU1k4sBCKLj9bLaTk35lZTco0o731Rj6kPyv8QehPBf",
-	"a5az1iRkrWrCruoGIiUZrqB/SHW8XkZ0MY/JRPsPJL3d3HXu98067WrbvHRJ88sm1fpe3MDFiXOiGnN4",
-	"DTdlPV7/ziN1iSU6XiFVQktv8uWTlcouZpFvrmoQQRtKYER7NCIO99xU+0DeGLiutBK61Zh7AwEMUKqS",
-	"q91sN6/5+QhkRFAI4Xqz3VyDuSJaJc08RTiCPupV63N5fDo+O7LFq/H+wfjrYbn34DWkN3mnCyG4ZFyN",
-	"beZNohKcqXJwa+12OT+mkXk9IkQyKbW1rZzo9Jf6F8GcBt03e7GS9bt+KCpLUyKHEPoA+jY2Zl41cb3Y",
-	"hEFlzTqecIKOgJHUjaN6K+/kPwMAAP//BhRrhB0GAAA=",
+	"fhalUsuCVaUKHsYKKm+B7EmaZDJBgNiN7rXPOffc4xlBxFPBGTKtIByBimJMif/coJKzm5mOb3PWo31X",
+	"EpILlJqiP9DFHskSfZ9IkqJGqTZIkmHZUZGkQlPOIARbfLbmky0+2uK9NV+seWp392zxzJoT1yqObXHu",
+	"i69tsffj6I3dPbPmpbti3llzYYtvEIAeCoQQ+NY2RhryYMr+AHcyVPoW7w7/Jf1iy7y15oktPtTpEJIP",
+	"aBflMvHlyfPL4wtrDq05teaFU2AeQwD4iKQicSh9zvsJzlCVlpT1HWpZqEf8fnA+vth3QCxLIdwETAlN",
+	"IABOMh1DAIr2Gc+0q9BuBJ15yumZCmMegMSdjErsOsSroSYHAxBEx+vl0J0aFyphuUeVdvKpxtRn5X+J",
+	"PQjhv9Ysbq1J1lrVoF2ND0RKMlwB/5DqeL1M6mIskwn3H1B6ubkz8PfFOu6qbZ66hPmlSbW6Fx/i4uI5",
+	"UY25fg02ZT1ef8936oJLdLyCqmwt3cmXKyuZXcwib65qEEEbSmBEezQiru+xqfaBvDFwrrQSutWYuwMB",
+	"DFCqEqvdbDev+f0IZERQCOF6s91cg7khWiXMPEQ4gj7qVa/o8vh0fHZki1fj/YPx18Py+YPnkF7knS6E",
+	"4JJxtbaZNolKcKbKxa212+X+mEbm+YgQyWTU1rZypNM/618Ecxp0b/biJOt3/VJUlqZEDiH0AfQ2NmZa",
+	"NXFebMKg8sw6HnDSHQEjqVtH9VTeyX8GAAD//+Ir4LAkBgAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

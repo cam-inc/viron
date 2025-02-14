@@ -15,8 +15,9 @@ const (
 )
 
 func init() {
-	fmt.Println("DEBUG")
-	SetUp(secret, getProvider, 1)
+	if err := SetUp(secret, getProvider, 1); err != nil {
+		panic(err)
+	}
 }
 
 func getProvider(r *http.Request) (string, []string, error) {

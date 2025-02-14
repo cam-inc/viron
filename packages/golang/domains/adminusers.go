@@ -30,6 +30,11 @@ type (
 		GoogleOAuth2IdToken      *string   `json:"googleOAuth2IdToken,omitempty"`
 		GoogleOAuth2RefreshToken *string   `json:"googleOAuth2RefreshToken,omitempty"`
 		GoogleOAuth2TokenType    *string   `json:"googleOAuth2TokenType,omitempty"`
+		OidcAccessToken          *string   `json:"oidcAccessToken,omitempty"`
+		OidcExpiryDate           *uint64   `json:"oidcExpiryDate,omitempty"`
+		OidcIdToken              *string   `json:"oidcIdToken,omitempty"`
+		OidcRefreshToken         *string   `json:"oidcRefreshToken,omitempty"`
+		OidcTokenType            *string   `json:"oidcTokenType,omitempty"`
 		RoleIDs                  []string  `json:"roleIds"`
 		CreatedAt                time.Time `json:"createdAt"`
 		UpdatedAt                time.Time `json:"updatedAt"`
@@ -73,6 +78,14 @@ func CreateAdminUser(ctx context.Context, payload *AdminUser, authType string) (
 		adminUser.GoogleOAuth2AccessToken = payload.GoogleOAuth2AccessToken
 		adminUser.GoogleOAuth2RefreshToken = payload.GoogleOAuth2RefreshToken
 		adminUser.GoogleOAuth2ExpiryDate = payload.GoogleOAuth2ExpiryDate
+	} else if authType == constant.AUTH_TYPE_OIDC {
+		adminUser.Email = string(payload.Email)
+		adminUser.AuthType = authType
+		adminUser.OidcTokenType = payload.OidcTokenType
+		adminUser.OidcIdToken = payload.OidcIdToken
+		adminUser.OidcAccessToken = payload.OidcAccessToken
+		adminUser.OidcRefreshToken = payload.OidcRefreshToken
+		adminUser.OidcExpiryDate = payload.OidcExpiryDate
 	}
 
 	entity, err := container.GetAdminUserRepository().CreateOne(ctx, adminUser)
@@ -112,7 +125,10 @@ func findOne(ctx context.Context, conditions *repositories.AdminUserConditions) 
 
 	user := &repositories.AdminUserEntity{}
 
-	result[0].Bind(user)
+	if err := result[0].Bind(user); err != nil {
+		log.Errorf("adminusers.go findOne bind failed err:%v", err)
+		return nil
+	}
 
 	user.RoleIDs = listRoles(user.ID)
 
@@ -195,7 +211,9 @@ func ListAdminUser(ctx context.Context, opts *AdminUserConditions) (*AdminUsersW
 
 	for _, result := range results {
 		entity := &repositories.AdminUserEntity{}
-		result.Bind(entity)
+		if err := result.Bind(entity); err != nil {
+			return nil, err
+		}
 		entity.RoleIDs = listRoles(entity.ID)
 		adminuser := &AdminUser{
 			ID:        entity.ID,
@@ -243,8 +261,6 @@ func UpdateAdminUserByID(ctx context.Context, id string, payload *AdminUser) *er
 				return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("adminUser update failed. %+v", err))
 			}
 		}
-	} else {
-		// TODO: google auth type update
 	}
 
 	log := logging.GetDefaultLogger()

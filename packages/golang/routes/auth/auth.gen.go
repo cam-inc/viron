@@ -32,6 +32,18 @@ type OAuth2GoogleCallbackPayload struct {
 	State string `json:"state"`
 }
 
+// OidcCallbackPayload defines model for OidcCallbackPayload.
+type OidcCallbackPayload struct {
+	// OIDC Idpが発行した認可コード
+	Code string `json:"code"`
+
+	// OIDCコールバックURI
+	RedirectUri string `json:"redirectUri"`
+
+	// CSRF対策用のステートパラメータ
+	State string `json:"state"`
+}
+
 // SigninEmailPayload defines model for SigninEmailPayload.
 type SigninEmailPayload struct {
 	// Eメールアドレス
@@ -55,11 +67,22 @@ type Oauth2GoogleAuthorizationParams struct {
 // Oauth2GoogleCallbackJSONBody defines parameters for Oauth2GoogleCallback.
 type Oauth2GoogleCallbackJSONBody OAuth2GoogleCallbackPayload
 
+// OidcAuthorizationParams defines parameters for OidcAuthorization.
+type OidcAuthorizationParams struct {
+	RedirectUri RedirectUriQueryParam `json:"redirectUri"`
+}
+
+// OidcCallbackJSONBody defines parameters for OidcCallback.
+type OidcCallbackJSONBody OidcCallbackPayload
+
 // SigninEmailJSONRequestBody defines body for SigninEmail for application/json ContentType.
 type SigninEmailJSONRequestBody SigninEmailJSONBody
 
 // Oauth2GoogleCallbackJSONRequestBody defines body for Oauth2GoogleCallback for application/json ContentType.
 type Oauth2GoogleCallbackJSONRequestBody Oauth2GoogleCallbackJSONBody
+
+// OidcCallbackJSONRequestBody defines body for OidcCallback for application/json ContentType.
+type OidcCallbackJSONRequestBody OidcCallbackJSONBody
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -72,6 +95,12 @@ type ServerInterface interface {
 	// callback from google oauth
 	// (POST /oauth2/google/callback)
 	Oauth2GoogleCallback(w http.ResponseWriter, r *http.Request)
+	// redirect to oidc idp authorization
+	// (GET /oidc/authorization)
+	OidcAuthorization(w http.ResponseWriter, r *http.Request, params OidcAuthorizationParams)
+	// callback from oidc
+	// (POST /oidc/callback)
+	OidcCallback(w http.ResponseWriter, r *http.Request)
 	// signout of viron
 	// (POST /signout)
 	Signout(w http.ResponseWriter, r *http.Request)
@@ -149,6 +178,55 @@ func (siw *ServerInterfaceWrapper) Oauth2GoogleCallback(w http.ResponseWriter, r
 	handler(w, r.WithContext(ctx))
 }
 
+// OidcAuthorization operation middleware
+func (siw *ServerInterfaceWrapper) OidcAuthorization(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params OidcAuthorizationParams
+
+	// ------------- Required query parameter "redirectUri" -------------
+	if paramValue := r.URL.Query().Get("redirectUri"); paramValue != "" {
+
+	} else {
+		http.Error(w, "Query argument redirectUri is required, but not found", http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "redirectUri", r.URL.Query(), &params.RedirectUri)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Invalid format for parameter redirectUri: %s", err), http.StatusBadRequest)
+		return
+	}
+
+	var handler = func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.OidcAuthorization(w, r, params)
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler(w, r.WithContext(ctx))
+}
+
+// OidcCallback operation middleware
+func (siw *ServerInterfaceWrapper) OidcCallback(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var handler = func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.OidcCallback(w, r)
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler(w, r.WithContext(ctx))
+}
+
 // Signout operation middleware
 func (siw *ServerInterfaceWrapper) Signout(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -211,6 +289,12 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Post(options.BaseURL+"/oauth2/google/callback", wrapper.Oauth2GoogleCallback)
 	})
 	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/oidc/authorization", wrapper.OidcAuthorization)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/oidc/callback", wrapper.OidcCallback)
+	})
+	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/signout", wrapper.Signout)
 	})
 
@@ -220,22 +304,24 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"1YIZGo4+9Yf/jKmlsBX+EwAA//8xvOvL4A0AAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

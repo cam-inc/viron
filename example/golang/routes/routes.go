@@ -7,9 +7,6 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3filter"
 
-	"github.com/cam-inc/viron/example/golang/pkg/constant"
-	"github.com/cam-inc/viron/packages/golang/logging"
-
 	"github.com/cam-inc/viron/packages/golang/routes/adminaccounts"
 
 	"github.com/cam-inc/viron/packages/golang/helpers"
@@ -40,11 +37,10 @@ import (
 
 func New() http.Handler {
 
-	log := logging.GetLogger(constant.LOG_NAME, logging.DebugLevel)
-
 	cfg := config.New()
 
 	domainAuth.NewGoogleOAuth2(cfg.Auth.GoogleOAuth2)
+	domainAuth.NewOidc(cfg.Auth.Oidc)
 
 	if cfg.StoreMode == config.StoreModeMySQL {
 		mysqlConfig := cfg.StoreMySQL
@@ -113,8 +109,7 @@ func New() http.Handler {
 	if err := merge(definition, adminusersDoc); err != nil {
 		panic(err)
 	}
-	adminaccountsDoc, err := adminaccounts.GetSwagger()
-	log.Debugf("accounts %+v err %+v", adminaccountsDoc, err)
+	adminaccountsDoc, _ := adminaccounts.GetSwagger()
 	if err := merge(definition, adminaccountsDoc); err != nil {
 		panic(err)
 	}
@@ -145,8 +140,12 @@ func New() http.Handler {
 	}
 
 	// $refの置換
-	helpers.Ref(definition, "./components.yaml", "")
-	helpers.Ref(definition, "./adminusers.yaml", "")
+	if err := helpers.Ref(definition, "./components.yaml", ""); err != nil {
+		panic(err)
+	}
+	if err := helpers.Ref(definition, "./adminusers.yaml", ""); err != nil {
+		panic(err)
+	}
 
 	routeRoot := chi.NewRouter()
 	routeRoot.Use(Cors(cfg.Cors))
@@ -166,7 +165,6 @@ func New() http.Handler {
 				AuthenticationFunc: AuthenticationFunc,
 			}),
 			JWTSecurityHandlerFunc(cfg.Auth),
-			InjectAPIACL(definition),
 		},
 	})
 
@@ -174,13 +172,13 @@ func New() http.Handler {
 	adminusers.HandlerWithOptions(adminUserImpl, adminusers.ChiServerOptions{
 		BaseRouter: routeRoot,
 		Middlewares: []adminusers.MiddlewareFunc{
-			InjectAPIDefinition(definition),
+			InjectAPIACL(definition),
 			JWTSecurityHandlerFunc(cfg.Auth),
 			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
 				AuthenticationFunc: AuthenticationFunc,
 			}),
-			JWTSecurityHandlerFunc(cfg.Auth),
-			InjectAPIACL(definition),
+			JWTAuthHandlerFunc(),
+			InjectAPIDefinition(definition),
 		},
 	})
 
@@ -188,13 +186,13 @@ func New() http.Handler {
 	adminaccounts.HandlerWithOptions(adminAccountImpl, adminaccounts.ChiServerOptions{
 		BaseRouter: routeRoot,
 		Middlewares: []adminaccounts.MiddlewareFunc{
-			InjectAPIDefinition(definition),
+			InjectAPIACL(definition),
 			JWTSecurityHandlerFunc(cfg.Auth),
 			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
 				AuthenticationFunc: AuthenticationFunc,
 			}),
-			JWTSecurityHandlerFunc(cfg.Auth),
-			InjectAPIACL(definition),
+			JWTAuthHandlerFunc(),
+			InjectAPIDefinition(definition),
 		},
 	})
 
@@ -202,13 +200,13 @@ func New() http.Handler {
 	adminroles.HandlerWithOptions(adminRoleImpl, adminroles.ChiServerOptions{
 		BaseRouter: routeRoot,
 		Middlewares: []adminroles.MiddlewareFunc{
-			InjectAPIDefinition(definition),
+			InjectAPIACL(definition),
 			JWTSecurityHandlerFunc(cfg.Auth),
 			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
 				AuthenticationFunc: AuthenticationFunc,
 			}),
-			JWTSecurityHandlerFunc(cfg.Auth),
-			InjectAPIACL(definition),
+			JWTAuthHandlerFunc(),
+			InjectAPIDefinition(definition),
 		},
 	})
 
@@ -231,9 +229,9 @@ func New() http.Handler {
 	auditlogs.HandlerWithOptions(auditlogImp, auditlogs.ChiServerOptions{
 		BaseRouter: routeRoot,
 		Middlewares: []auditlogs.MiddlewareFunc{
-			InjectAPIDefinition(definition),
-			JWTSecurityHandlerFunc(cfg.Auth),
 			InjectAPIACL(definition),
+			JWTSecurityHandlerFunc(cfg.Auth),
+			InjectAPIDefinition(definition),
 		},
 	})
 

@@ -9,6 +9,7 @@ import (
 	"github.com/cam-inc/viron/example/golang/pkg/server"
 	"github.com/cam-inc/viron/example/golang/routes"
 
+	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"go.uber.org/automaxprocs/maxprocs"
 )
@@ -22,6 +23,12 @@ type (
 )
 
 func main() {
+	// .env ファイルを読み込む
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Print(err)
+	}
+
 	//defer profile.Start().Stop()
 	if _, err := maxprocs.Set(); err != nil {
 		fmt.Print(err)

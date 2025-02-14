@@ -49,7 +49,7 @@ func (a *adminUsersPersistence) Find(ctx context.Context, conditions repositorie
 
 	for _, r := range result {
 		adminuser := &repositories.AdminUserEntity{
-			ID:                       string(r.ID),
+			ID:                       strconv.FormatUint(uint64(r.ID), 10),
 			Email:                    r.Email,
 			AuthType:                 r.AuthType,
 			Password:                 r.Password.Ptr(),
@@ -102,7 +102,7 @@ func (a *adminUsersPersistence) CreateOne(ctx context.Context, entity repositori
 	if err := model.Insert(ctx, a.conn, boil.Infer()); err != nil {
 		return nil, err
 	}
-	adminuser.ID = string(model.ID)
+	adminuser.ID = strconv.FormatUint(uint64(model.ID), 10)
 	return adminuser, nil
 }
 

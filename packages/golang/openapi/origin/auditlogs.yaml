@@ -5,7 +5,7 @@ info:
   description: auditlogs api specifications
   x-pages:
     - id: vironAuditLog
-      group: 管理画面/管理
+      group: Viron管理
       title: Viron 監査ログ
       description: このVironサーバの監査ログを閲覧できます
       contents:

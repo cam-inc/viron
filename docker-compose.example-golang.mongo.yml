@@ -12,7 +12,7 @@ services:
     ports:
       - 3000:3000
     environment:
-      - MODE=mysql
+      - MODE=mongo
     env_file:
       - $PWD/example/golang/.env
     volumes:

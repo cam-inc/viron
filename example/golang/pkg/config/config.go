@@ -66,6 +66,7 @@ type (
 	Auth struct {
 		JWT          *JWT
 		GoogleOAuth2 *pkgConfig.GoogleOAuth2
+		Oidc         *pkgConfig.Oidc
 	}
 
 	Oas struct {
@@ -114,9 +115,16 @@ func New() *Config {
 				AdditionalScope:   []string{},
 				UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
 			},
+			Oidc: &pkgConfig.Oidc{
+				ClientID:          os.Getenv(constant.OIDC_CLIENT_ID),
+				ClientSecret:      os.Getenv(constant.OIDC_CLIENT_SECRET),
+				AdditionalScope:   []string{},
+				UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
+				ConfigurationURL:  os.Getenv(constant.OIDC_CONFIGURATION_URL),
+			},
 		},
 		Cors: &Cors{
-			AllowOrigins: []string{"https://localhost:8000", "https://viron.plus", "https://viron.work"},
+			AllowOrigins: []string{"https://localhost:8000", "https://viron.plus", "https://viron.work", "https://viron.work:8000"},
 		},
 		StoreMode: mode,
 		StoreMySQL: &MySQL{

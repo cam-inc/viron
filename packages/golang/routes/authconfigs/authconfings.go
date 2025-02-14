@@ -76,6 +76,28 @@ func (a *authConfigs) ListVironAuthconfigs(w http.ResponseWriter, r *http.Reques
 		list = append(list, r)
 		paths[constant.OAUTH2_GOOGLE_CALLBACK_PATH] = pathItem
 	}
+	if r, pathItem, err := domains.GenAuthConfig(constant.AUTH_CONFIG_PROVIDER_OIDC,
+		constant.AUTH_CONFIG_TYPE_OIDC,
+		http.MethodGet,
+		constant.OIDC_AUTHORIZATION_PATH,
+		clone); err != nil {
+		helpers.SendError(w, err.StatusCode(), err)
+		return
+	} else {
+		list = append(list, r)
+		paths[constant.OIDC_AUTHORIZATION_PATH] = pathItem
+	}
+	if r, pathItem, err := domains.GenAuthConfig(constant.AUTH_CONFIG_PROVIDER_OIDC,
+		constant.AUTH_CONFIG_TYPE_OIDC_CALLBACK,
+		http.MethodPost,
+		constant.OIDC_CALLBACK_PATH,
+		clone); err != nil {
+		helpers.SendError(w, err.StatusCode(), err)
+		return
+	} else {
+		list = append(list, r)
+		paths[constant.OIDC_CALLBACK_PATH] = pathItem
+	}
 	if r, pathItem, err := domains.GenAuthConfig(constant.AUTH_CONFIG_PROVIDER_SIGNOUT,
 		constant.AUTH_CONFIG_TYPE_SIGNOUT,
 		http.MethodPost,

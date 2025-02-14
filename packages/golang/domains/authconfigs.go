@@ -1,6 +1,8 @@
 package domains
 
 import (
+	"fmt"
+
 	"github.com/cam-inc/viron/packages/golang/constant"
 	"github.com/cam-inc/viron/packages/golang/errors"
 	"github.com/cam-inc/viron/packages/golang/helpers"
@@ -28,8 +30,14 @@ func GenAuthConfig(provider string, authConfigType string, method string, path s
 	if ope == nil {
 		return nil, nil, errors.OasUndefined
 	}
-	xDefautlParameters, _ := ope.Extensions[constant.OAS_X_AUTHCONFIG_DEFAULT_PARAMETERS]
-	xDefautlRequestBody, _ := ope.Extensions[constant.OAS_X_AUTHCONFIG_DEFAULT_REQUESTBODY]
+	xDefautlParameters, ok := ope.Extensions[constant.OAS_X_AUTHCONFIG_DEFAULT_PARAMETERS]
+	if !ok {
+		fmt.Println("xDefautlParameters not found")
+	}
+	xDefautlRequestBody, ok := ope.Extensions[constant.OAS_X_AUTHCONFIG_DEFAULT_REQUESTBODY]
+	if !ok {
+		fmt.Println("xDefautlRequestBody not found")
+	}
 
 	return &AuthConfig{
 			Provider:                provider,

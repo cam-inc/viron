@@ -29,7 +29,7 @@ func (a *authObj) SigninEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if signinEmail == nil {
+	if signinEmail.Email == "" || signinEmail.Password == "" {
 		helpers.SendError(w, http.StatusBadRequest, errors.SigninFailed)
 		return
 	}
@@ -65,8 +65,8 @@ func (a *authObj) Oauth2GoogleAuthorization(w http.ResponseWriter, r *http.Reque
 		helpers.SendError(w, http.StatusBadRequest, errors.SigninFailed)
 		return
 	}
-	url, err := auth.GetGoogleOAuth2AuthorizationUrl(string(params.RedirectUri), state.String())
-	if err != nil {
+	url, errAuthUrl := auth.GetGoogleOAuth2AuthorizationUrl(string(params.RedirectUri), state.String())
+	if errAuthUrl != nil {
 		a.log.Errorf("%v", err)
 	}
 	ctx := r.Context()
@@ -111,6 +111,85 @@ func (a *authObj) Oauth2GoogleCallback(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
 	token, tokenErr := auth.SigninGoogleOAuth2(oauth2GoogleCollback.Code, oauth2GoogleCollback.RedirectUri, r)
+	if tokenErr != nil {
+		a.log.Errorf("tokenErr %v", tokenErr)
+		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
+		return
+	}
+
+	v := ctx.Value(constant.CTX_KEY_JWT_EXPIRATION_SEC)
+	var age int
+	if v != nil {
+		age, _ = v.(int)
+	}
+	opts := &http.Cookie{
+		MaxAge:   age,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+		Domain:   r.URL.Hostname(),
+	}
+
+	cookie := helpers.GenAuthorizationCookie(token, opts)
+	http.SetCookie(w, cookie)
+	helpers.Send(w, http.StatusNoContent, nil)
+}
+
+func (a *authObj) OidcAuthorization(w http.ResponseWriter, r *http.Request, params OidcAuthorizationParams) {
+	state, err := uuid.NewUUID()
+	if err != nil {
+		a.log.Errorf("%v", err)
+		helpers.SendError(w, http.StatusBadRequest, errors.SigninFailed)
+		return
+	}
+	url, errAuthUrl := auth.GetOidcAuthorizationUrl(string(params.RedirectUri), state.String())
+	if errAuthUrl != nil {
+		a.log.Errorf("%v", err)
+		helpers.SendError(w, http.StatusBadRequest, errors.SigninFailed)
+		return
+	}
+	ctx := r.Context()
+	v := ctx.Value(constant.CTX_KEY_STATE_EXPIRATION_SEC)
+	var age int
+	if v != nil {
+		age, _ = v.(int)
+	}
+	opts := &http.Cookie{
+		MaxAge:   age,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+		Domain:   r.URL.Hostname(),
+	}
+	cookie := helpers.GenOidcStateCookie(state.String(), opts)
+	http.SetCookie(w, cookie)
+	w.Header().Add("location", url)
+	helpers.Send(w, http.StatusFound, nil)
+}
+
+func (a *authObj) OidcCallback(w http.ResponseWriter, r *http.Request) {
+	state, err := r.Cookie(constant.COOKIE_KEY_OIDC_STATE)
+
+	if err != nil {
+		a.log.Errorf("%v", err)
+		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
+		return
+	}
+	oidcCollback := &OidcCallbackPayload{}
+	if err := helpers.BodyDecode(r, oidcCollback); err != nil {
+		a.log.Errorf("body decode failed -> %v", err)
+		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
+		return
+	}
+
+	if oidcCollback == nil || state == nil || oidcCollback.State != state.Value {
+		a.log.Error(errors.MismatchState)
+		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
+		return
+	}
+
+	ctx := r.Context()
+	token, tokenErr := auth.SigninOidc(oidcCollback.Code, oidcCollback.RedirectUri, r)
 	if tokenErr != nil {
 		a.log.Errorf("tokenErr %v", tokenErr)
 		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
