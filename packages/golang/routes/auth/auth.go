@@ -142,12 +142,7 @@ func (a *authObj) OidcAuthorization(w http.ResponseWriter, r *http.Request, para
 		helpers.SendError(w, http.StatusBadRequest, errors.SigninFailed)
 		return
 	}
-	url, errAuthUrl := auth.GetOidcAuthorizationUrl(string(params.RedirectUri), state.String())
-	if errAuthUrl != nil {
-		a.log.Errorf("%v", err)
-		helpers.SendError(w, http.StatusBadRequest, errors.SigninFailed)
-		return
-	}
+	url := auth.GetOidcAuthorizationUrl(string(params.RedirectUri), state.String())
 	ctx := r.Context()
 	v := ctx.Value(constant.CTX_KEY_STATE_EXPIRATION_SEC)
 	var age int

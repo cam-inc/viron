@@ -12,6 +12,6 @@ type (
 		ClientSecret      string
 		AdditionalScope   []string `yaml:"additionalScopes"`
 		UserHostedDomains []string `yaml:"userHostedDomains"`
-		ConfigurationURL  string   `yaml:"configurationUrl"`
+		IssuerURL         string   `yaml:"issuerUrl"`
 	}
 )

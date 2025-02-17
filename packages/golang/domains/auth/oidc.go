@@ -17,12 +17,13 @@ import (
 var (
 	oidcConfig   *config.Oidc
 	oidcProvider *oidc.Provider
+	oauth2Config *oauth2.Config
 )
 
 func NewOidc(c *config.Oidc) {
 	oidcConfig = c
 	var err error
-	oidcProvider, err = oidc.NewProvider(context.Background(), c.ConfigurationURL)
+	oidcProvider, err = oidc.NewProvider(context.Background(), c.IssuerURL)
 	if err != nil {
 		log.Errorf("oidc.NewProvider failed -> %v", err)
 		panic(err)
@@ -36,38 +37,34 @@ func getOidcVerifier(c *config.Oidc) (*oidc.IDTokenVerifier, *errors.VironError)
 	return oidcProvider.Verifier(oidcConfig), nil
 }
 
-func getOidcConfig(redirectUrl string, c *config.Oidc) (*oauth2.Config, *errors.VironError) {
+func getOAuth2Config(redirectUrl string, c *config.Oidc) *oauth2.Config {
+	if oauth2Config != nil {
+		return oauth2Config
+	}
 	scope := constant.OIDC_DEFAULT_SCOPES
 	if len(c.AdditionalScope) > 0 {
 		scope = append(constant.OIDC_DEFAULT_SCOPES, c.AdditionalScope...)
 	}
-	config := &oauth2.Config{
+	oauth2Config = &oauth2.Config{
 		ClientID:     c.ClientID,
 		ClientSecret: c.ClientSecret,
 		Endpoint:     oidcProvider.Endpoint(),
 		Scopes:       scope,
 		RedirectURL:  redirectUrl,
 	}
-	return config, nil
+	return oauth2Config
 }
 
-func GetOidcAuthorizationUrl(redirectUrl string, state string) (string, *errors.VironError) {
-	cfn, err := getOidcConfig(redirectUrl, oidcConfig)
-	if err != nil {
-		return "", err
-	}
-	url := cfn.AuthCodeURL(state)
-	return url, nil
+func GetOidcAuthorizationUrl(redirectUrl string, state string) string {
+	cfg := getOAuth2Config(redirectUrl, oidcConfig)
+	return cfg.AuthCodeURL(state)
 }
 
 func SigninOidc(code string, redirectUrl string, r *http.Request) (string, *errors.VironError) {
 	ctx := r.Context()
 
 	// 設定取得
-	config, err := getOidcConfig(redirectUrl, oidcConfig)
-	if err != nil {
-		return "", err
-	}
+	config := getOAuth2Config(redirectUrl, oidcConfig)
 
 	// 許可コードとトークンを交換
 	oidcToken, errExchange := config.Exchange(ctx, code)

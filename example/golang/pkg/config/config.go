@@ -120,7 +120,7 @@ func New() *Config {
 				ClientSecret:      os.Getenv(constant.OIDC_CLIENT_SECRET),
 				AdditionalScope:   []string{},
 				UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
-				ConfigurationURL:  os.Getenv(constant.OIDC_CONFIGURATION_URL),
+				IssuerURL:         os.Getenv(constant.OIDC_ISSUER_URL),
 			},
 		},
 		Cors: &Cors{
