@@ -183,3 +183,80 @@ func getOAuth2Config(redirectUrl string, c *config.Oidc) *oauth2.Config {
 	}
 	return oauth2Config
 }
+
+func VerifyOidcAccessToken(r *http.Request, userID string, credentials *domains.AdminUser) bool {
+	// credentialsが不正の場合はエラー
+	if credentials == nil ||
+		credentials.OidcAccessToken == nil ||
+		credentials.OidcExpiryDate == nil ||
+		credentials.OidcTokenType == nil ||
+		credentials.OidcIdToken == nil ||
+		credentials.OidcRefreshToken == nil {
+		log.Errorf("credentials is invalid -> %+v", credentials)
+		return false
+	}
+
+	ctx := r.Context()
+
+	// IDトークンの検証
+	// vironではIDトークンはDBに保存されているので、改竄されることはないが
+	// DBはviron利用者が管理するため改竄されることを考慮してvironLibとしてはIDトークンの検証を毎度行う
+	verifier, err := getOidcTokenVerifier(oidcConfig)
+	if err != nil {
+		log.Errorf("getOidcTokenVerifier failed -> %v", err)
+		return false
+	}
+	idToken, errVerify := verifier.Verify(ctx, *credentials.OidcIdToken)
+	if errVerify != nil {
+		log.Errorf("IDToken verify failed -> %v", errVerify)
+		return false
+	}
+
+	// リフレッシュトークンがない場合はIDトークンの有効期限だけで判定
+	if credentials.OidcRefreshToken == nil {
+		if idToken.Expiry.Before(time.Now()) {
+			log.Error("IDToken is expired.")
+			return false
+		}
+	}
+
+	// ---- 以下リフレッシュトークンがある場合の処理 ----
+	// IDトークンの有効期限が近いもしくは期限切れ場合以外はリフレッシュしない
+	if !isRefresh(idToken.Expiry) {
+		return true
+	}
+
+	// リフレッシュトークンがある場合はリフレッシュトークンを使ってトークンを更新
+	config := getOAuth2Config("", oidcConfig)
+	token := &oauth2.Token{
+		AccessToken:  *credentials.OidcAccessToken,
+		TokenType:    *credentials.OidcTokenType,
+		RefreshToken: *credentials.OidcRefreshToken,
+		Expiry:       time.Unix(0, int64(*credentials.OidcExpiryDate)*int64(time.Millisecond)),
+	}
+	newToken, errRefreshToken := config.TokenSource(ctx, token).Token()
+	if errRefreshToken != nil {
+		log.Errorf("TokenSource failed -> %v", err)
+		return false
+	}
+
+	// 新しいクレデンシャルをDBに更新
+	credentials.OidcAccessToken = &newToken.AccessToken
+	credentials.OidcTokenType = &newToken.TokenType
+	credentials.OidcRefreshToken = &newToken.RefreshToken
+	expiry := uint64(newToken.Expiry.UnixNano() / int64(time.Millisecond))
+	credentials.OidcExpiryDate = &expiry
+
+	// 更新したクレデンシャルをDBに保存
+	if err := domains.UpdateAdminUserByID(ctx, userID, credentials); err != nil {
+		log.Errorf("UpdateAdminUser failed -> %v", err)
+		return false
+	}
+
+	return true
+}
+
+func isRefresh(expiry time.Time) bool {
+	// 有効期限の30秒前からリフレッシュ
+	return expiry.Add(-30 * time.Second).Before(time.Now())
+}

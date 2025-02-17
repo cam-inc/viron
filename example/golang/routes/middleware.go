@@ -253,6 +253,23 @@ func JWTSecurityHandlerFunc(cfg *config.Auth) func(http.HandlerFunc) http.Handle
 				fmt.Println("user == nil")
 				return
 			}
+
+			// user.AuthTypeがGoogle,OIDCの場合は、accessTokenの検証を行う Emailの場合は、パススルー
+			switch user.AuthType {
+			case constant.AUTH_TYPE_GOOGLE:
+				// TODO: GoogleのaccessTokenの検証
+			case constant.AUTH_TYPE_OIDC:
+				if !auth.VerifyOidcAccessToken(r, userID, user) {
+					w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
+					cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
+						MaxAge: -1,
+					})
+					http.SetCookie(w, cookie)
+					http.Error(w, errors.UnAuthorized.Error(), errors.UnAuthorized.StatusCode())
+					return
+				}
+			}
+
 			ctx2 := context.WithValue(ctx, constant.CTX_KEY_AUTH, claim)
 			ctx3 := context.WithValue(ctx2, constant.CTX_KEY_ADMINUSER, user)
 			ctx4 := context.WithValue(ctx3, constant.CTX_KEY_ADMINUSER_ID, user.ID)
