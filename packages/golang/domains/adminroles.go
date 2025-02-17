@@ -198,6 +198,7 @@ func listRoles(userID string) []string {
 }
 
 // listUser 指定したロールを持つユーザーの一覧を取得
+//
 //nolint:unused
 func listUsers(roleID string) []string {
 	userIDs, err := casbinInstance.GetUsersForRole(roleID)

@@ -142,11 +142,17 @@ func (a *authObj) OidcAuthorization(w http.ResponseWriter, r *http.Request, para
 		helpers.SendError(w, http.StatusBadRequest, errors.SigninFailed)
 		return
 	}
-	url := auth.GetOidcAuthorizationUrl(string(params.RedirectUri), state.String())
+
+	// PKCE用のCodeVerifierを生成
+	codeVerifier := auth.GenCodeVerifier()
+
+	// OIDC認証画面URLを取得
+	url := auth.GetOidcAuthorizationUrl(string(params.RedirectUri), codeVerifier, state.String())
+
+	// CookieにOIDCのStateとPKCE用のCodeVerifierをセット
 	ctx := r.Context()
-	v := ctx.Value(constant.CTX_KEY_STATE_EXPIRATION_SEC)
 	var age int
-	if v != nil {
+	if v := ctx.Value(constant.CTX_KEY_CODE_VERIFIER_EXPIRATION_SEC); v != nil {
 		age, _ = v.(int)
 	}
 	opts := &http.Cookie{
@@ -156,38 +162,46 @@ func (a *authObj) OidcAuthorization(w http.ResponseWriter, r *http.Request, para
 		SameSite: http.SameSiteNoneMode,
 		Domain:   r.URL.Hostname(),
 	}
-	cookie := helpers.GenOidcStateCookie(state.String(), opts)
-	http.SetCookie(w, cookie)
+	stateCookie := helpers.GenOidcStateCookie(state.String(), opts)
+	http.SetCookie(w, stateCookie)
+	codeVerifierCookie := helpers.GenOidcCodeVerifierCookie(codeVerifier, opts)
+	http.SetCookie(w, codeVerifierCookie)
 	w.Header().Add("location", url)
 	helpers.Send(w, http.StatusFound, nil)
 }
 
 func (a *authObj) OidcCallback(w http.ResponseWriter, r *http.Request) {
 	state, err := r.Cookie(constant.COOKIE_KEY_OIDC_STATE)
-
 	if err != nil {
-		a.log.Errorf("%v", err)
-		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
+		a.log.Errorf("cookie oidc_state err: %v", err)
+		helpers.SendError(w, http.StatusBadRequest, errors.UnAuthorized)
 		return
 	}
+	codeVerifier, err := r.Cookie(constant.COOKIE_KEY_OIDC_CODE_VERIFIER)
+	if err != nil {
+		a.log.Errorf("cookie oidc_code_verifier err: %v", err)
+		helpers.SendError(w, http.StatusBadRequest, errors.UnAuthorized)
+		return
+	}
+
 	oidcCollback := &OidcCallbackPayload{}
 	if err := helpers.BodyDecode(r, oidcCollback); err != nil {
 		a.log.Errorf("body decode failed -> %v", err)
-		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
+		helpers.SendError(w, http.StatusBadRequest, errors.UnAuthorized)
 		return
 	}
 
-	if oidcCollback == nil || state == nil || oidcCollback.State != state.Value {
+	if state == nil || oidcCollback.State != state.Value || codeVerifier == nil {
 		a.log.Error(errors.MismatchState)
 		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
 		return
 	}
 
 	ctx := r.Context()
-	token, tokenErr := auth.SigninOidc(oidcCollback.Code, oidcCollback.RedirectUri, r)
-	if tokenErr != nil {
-		a.log.Errorf("tokenErr %v", tokenErr)
-		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
+	token, errSigninOdic := auth.SigninOidc(oidcCollback.Code, oidcCollback.State, codeVerifier.Value, oidcCollback.RedirectUri, r)
+	if errSigninOdic != nil {
+		a.log.Errorf("errSigninOdic %v", errSigninOdic)
+		helpers.SendError(w, http.StatusBadRequest, errors.UnAuthorized)
 		return
 	}
 

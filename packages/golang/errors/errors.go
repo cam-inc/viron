@@ -2,6 +2,7 @@ package errors
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
@@ -34,7 +35,7 @@ func (v *VironError) StatusCode() int {
 func Initialize(code int, message string) *VironError {
 	return &VironError{
 		code: code,
-		err:  fmt.Errorf(message, ""),
+		err:  errors.New(message),
 	}
 }
 

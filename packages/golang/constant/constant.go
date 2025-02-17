@@ -7,12 +7,13 @@ type CtxKey string
 const (
 	ENV_STORE_MODE = "mode"
 
-	CTX_KEY_API_DEFINITION       CtxKey = "apiDefinition"
-	CTX_KEY_JWT_EXPIRATION_SEC   CtxKey = "jwtExpirationSec"
-	CTX_KEY_STATE_EXPIRATION_SEC CtxKey = "stateExpirationSec"
-	CTX_KEY_ADMINUSER            CtxKey = "adminUser"
-	CTX_KEY_ADMINUSER_ID         CtxKey = "userId"
-	CTX_KEY_AUTH                 CtxKey = "auth"
+	CTX_KEY_API_DEFINITION               CtxKey = "apiDefinition"
+	CTX_KEY_JWT_EXPIRATION_SEC           CtxKey = "jwtExpirationSec"
+	CTX_KEY_STATE_EXPIRATION_SEC         CtxKey = "stateExpirationSec"
+	CTX_KEY_CODE_VERIFIER_EXPIRATION_SEC CtxKey = "codeVerifierExpirationSec"
+	CTX_KEY_ADMINUSER                    CtxKey = "adminUser"
+	CTX_KEY_ADMINUSER_ID                 CtxKey = "userId"
+	CTX_KEY_AUTH                         CtxKey = "auth"
 
 	DEFAULT_PAGER_SIZE = 10
 	DEFAULT_PAGER_PAGE = 1
@@ -88,11 +89,14 @@ const (
 
 	OIDC_STATE_EXPIRATION_SEC = 10 * 60
 
+	OIDC_CODE_VERIFIER_EXPIRATION_SEC = 10 * 60
+
 	CASBIN_LOAD_INTERVAL_SEC = 1 * 60
 
 	COOKIE_KEY_VIRON_AUTHORIZATION = "viron_authorization"
 	COOKIE_KEY_OAUTH2_STATE        = "oauth2_state"
 	COOKIE_KEY_OIDC_STATE          = "oidc_state"
+	COOKIE_KEY_OIDC_CODE_VERIFIER  = "oidc_code_verifier"
 
 	RED                  = Theme("red")
 	ULTIMATE_ORANGE      = Theme("ultimate orange")

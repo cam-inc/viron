@@ -2,6 +2,8 @@ package auth
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"net/http"
 	"strings"
 	"time"
@@ -30,44 +32,37 @@ func NewOidc(c *config.Oidc) {
 	}
 }
 
-func getOidcVerifier(c *config.Oidc) (*oidc.IDTokenVerifier, *errors.VironError) {
-	oidcConfig := &oidc.Config{
-		ClientID: c.ClientID,
+// ランダムな `code_verifier` を生成
+func GenCodeVerifier() string {
+	b := make([]byte, 32)
+	_, err := rand.Read(b)
+	if err != nil {
+		panic(err)
 	}
-	return oidcProvider.Verifier(oidcConfig), nil
+	return base64.RawURLEncoding.EncodeToString(b)
 }
 
-func getOAuth2Config(redirectUrl string, c *config.Oidc) *oauth2.Config {
-	if oauth2Config != nil {
-		return oauth2Config
-	}
-	scope := constant.OIDC_DEFAULT_SCOPES
-	if len(c.AdditionalScope) > 0 {
-		scope = append(constant.OIDC_DEFAULT_SCOPES, c.AdditionalScope...)
-	}
-	oauth2Config = &oauth2.Config{
-		ClientID:     c.ClientID,
-		ClientSecret: c.ClientSecret,
-		Endpoint:     oidcProvider.Endpoint(),
-		Scopes:       scope,
-		RedirectURL:  redirectUrl,
-	}
-	return oauth2Config
-}
-
-func GetOidcAuthorizationUrl(redirectUrl string, state string) string {
+func GetOidcAuthorizationUrl(redirectUrl string, codeVerifier string, state string) string {
 	cfg := getOAuth2Config(redirectUrl, oidcConfig)
-	return cfg.AuthCodeURL(state)
+	return cfg.AuthCodeURL(
+		state,
+		oauth2.S256ChallengeOption(codeVerifier),
+	)
 }
 
-func SigninOidc(code string, redirectUrl string, r *http.Request) (string, *errors.VironError) {
+func SigninOidc(code string, state string, codeVerifier string, redirectUrl string, r *http.Request) (string, *errors.VironError) {
 	ctx := r.Context()
 
 	// 設定取得
 	config := getOAuth2Config(redirectUrl, oidcConfig)
 
 	// 許可コードとトークンを交換
-	oidcToken, errExchange := config.Exchange(ctx, code)
+	oidcToken, errExchange := config.Exchange(
+		ctx,
+		code,
+		oauth2.SetAuthURLParam("code_verifier", codeVerifier),
+		oauth2.SetAuthURLParam("state", state),
+	)
 	if errExchange != nil {
 		log.Errorf("Exchange failed -> %v", errExchange)
 		return "", errors.SigninFailed
@@ -81,7 +76,7 @@ func SigninOidc(code string, redirectUrl string, r *http.Request) (string, *erro
 	}
 
 	// IDトークン検証機を取得
-	verifier, err := getOidcVerifier(oidcConfig)
+	verifier, err := getOidcTokenVerifier(oidcConfig)
 
 	// IDトークンを検証
 	idToken, errVerify := verifier.Verify(ctx, rawIDToken)
@@ -162,4 +157,29 @@ func SigninOidc(code string, redirectUrl string, r *http.Request) (string, *erro
 		return "", errors.SigninFailed
 	}
 	return token, nil
+}
+
+func getOidcTokenVerifier(c *config.Oidc) (*oidc.IDTokenVerifier, *errors.VironError) {
+	oidcConfig := &oidc.Config{
+		ClientID: c.ClientID,
+	}
+	return oidcProvider.Verifier(oidcConfig), nil
+}
+
+func getOAuth2Config(redirectUrl string, c *config.Oidc) *oauth2.Config {
+	if oauth2Config != nil {
+		return oauth2Config
+	}
+	scope := constant.OIDC_DEFAULT_SCOPES
+	if len(c.AdditionalScope) > 0 {
+		scope = append(constant.OIDC_DEFAULT_SCOPES, c.AdditionalScope...)
+	}
+	oauth2Config = &oauth2.Config{
+		ClientID:     c.ClientID,
+		ClientSecret: c.ClientSecret,
+		Endpoint:     oidcProvider.Endpoint(),
+		Scopes:       scope,
+		RedirectURL:  redirectUrl,
+	}
+	return oauth2Config
 }
