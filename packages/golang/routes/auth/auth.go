@@ -93,13 +93,13 @@ func (a *authObj) Oauth2GoogleCallback(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		a.log.Errorf("%v", err)
-		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
+		helpers.SendError(w, http.StatusBadRequest, errors.UnAuthorized)
 		return
 	}
 	oauth2GoogleCollback := &OAuth2GoogleCallbackPayload{}
 	if err := helpers.BodyDecode(r, oauth2GoogleCollback); err != nil {
 		a.log.Errorf("body decode failed -> %v", err)
-		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
+		helpers.SendError(w, http.StatusBadRequest, errors.UnAuthorized)
 		return
 	}
 
@@ -113,7 +113,7 @@ func (a *authObj) Oauth2GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	token, tokenErr := auth.SigninGoogleOAuth2(oauth2GoogleCollback.Code, oauth2GoogleCollback.RedirectUri, r)
 	if tokenErr != nil {
 		a.log.Errorf("tokenErr %v", tokenErr)
-		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
+		helpers.SendError(w, http.StatusBadRequest, errors.UnAuthorized)
 		return
 	}
 

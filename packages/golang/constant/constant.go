@@ -1,6 +1,9 @@
 package constant
 
-import "net/http"
+import (
+	"net/http"
+	"time"
+)
 
 type CtxKey string
 
@@ -90,6 +93,10 @@ const (
 	OIDC_STATE_EXPIRATION_SEC = 10 * 60
 
 	OIDC_CODE_VERIFIER_EXPIRATION_SEC = 10 * 60
+
+	OIDC_REFRESH_THRESHOLD = 30 * time.Second
+
+	GOOGLE_OAUTH2_REFRESH_THRESHOLD = 30 * time.Second
 
 	CASBIN_LOAD_INTERVAL_SEC = 1 * 60
 

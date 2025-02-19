@@ -114,6 +114,7 @@ func New() *Config {
 				ClientSecret:      os.Getenv(constant.GOOGLE_OAUTH2_CLIENT_SECRET),
 				AdditionalScope:   []string{},
 				UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
+				IssuerURL:         os.Getenv(constant.GOOGLE_OAUTH2_ISSUER_URL),
 			},
 			Oidc: &pkgConfig.Oidc{
 				ClientID:          os.Getenv(constant.OIDC_CLIENT_ID),

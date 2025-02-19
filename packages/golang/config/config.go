@@ -6,6 +6,7 @@ type (
 		ClientSecret      string
 		AdditionalScope   []string `yaml:"additionalScopes"`
 		UserHostedDomains []string `yaml:"userHostedDomains"`
+		IssuerURL         string   `yaml:"issuerUrl"`
 	}
 	Oidc struct {
 		ClientID          string

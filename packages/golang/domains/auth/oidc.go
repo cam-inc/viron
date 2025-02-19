@@ -12,14 +12,14 @@ import (
 	"github.com/cam-inc/viron/packages/golang/constant"
 	"github.com/cam-inc/viron/packages/golang/domains"
 	"github.com/cam-inc/viron/packages/golang/errors"
-	oidc "github.com/coreos/go-oidc/v3/oidc"
+	"github.com/coreos/go-oidc/v3/oidc"
 	"golang.org/x/oauth2"
 )
 
 var (
-	oidcConfig   *config.Oidc
-	oidcProvider *oidc.Provider
-	oauth2Config *oauth2.Config
+	oidcConfig       *config.Oidc
+	oidcProvider     *oidc.Provider
+	oidcOAuth2Config *oauth2.Config
 )
 
 func NewOidc(c *config.Oidc) {
@@ -43,7 +43,7 @@ func GenCodeVerifier() string {
 }
 
 func GetOidcAuthorizationUrl(redirectUrl string, codeVerifier string, state string) string {
-	cfg := getOAuth2Config(redirectUrl, oidcConfig)
+	cfg := getOidcOAuth2Config(redirectUrl, oidcConfig)
 	return cfg.AuthCodeURL(
 		state,
 		oauth2.S256ChallengeOption(codeVerifier),
@@ -54,7 +54,7 @@ func SigninOidc(code string, state string, codeVerifier string, redirectUrl stri
 	ctx := r.Context()
 
 	// 設定取得
-	config := getOAuth2Config(redirectUrl, oidcConfig)
+	config := getOidcOAuth2Config(redirectUrl, oidcConfig)
 
 	// 許可コードとトークンを交換
 	oidcToken, errExchange := config.Exchange(
@@ -76,7 +76,11 @@ func SigninOidc(code string, state string, codeVerifier string, redirectUrl stri
 	}
 
 	// IDトークン検証機を取得
-	verifier, err := getOidcTokenVerifier(oidcConfig)
+	verifier, errVerifier := getOidcTokenVerifier(oidcConfig)
+	if errVerifier != nil {
+		log.Errorf("getOidcTokenVerifier failed -> %v", errVerifier)
+		return "", errors.SigninFailed
+	}
 
 	// IDトークンを検証
 	idToken, errVerify := verifier.Verify(ctx, rawIDToken)
@@ -153,35 +157,10 @@ func SigninOidc(code string, state string, codeVerifier string, redirectUrl stri
 	// JWTトークンを作成
 	token, errSign := Sign(r, user.ID)
 	if errSign != nil {
-		log.Error("SigninOidc sign failed %#v \n", err)
+		log.Error("SigninOidc sign failed %#v \n", errSign)
 		return "", errors.SigninFailed
 	}
 	return token, nil
-}
-
-func getOidcTokenVerifier(c *config.Oidc) (*oidc.IDTokenVerifier, *errors.VironError) {
-	oidcConfig := &oidc.Config{
-		ClientID: c.ClientID,
-	}
-	return oidcProvider.Verifier(oidcConfig), nil
-}
-
-func getOAuth2Config(redirectUrl string, c *config.Oidc) *oauth2.Config {
-	if oauth2Config != nil {
-		return oauth2Config
-	}
-	scope := constant.OIDC_DEFAULT_SCOPES
-	if len(c.AdditionalScope) > 0 {
-		scope = append(constant.OIDC_DEFAULT_SCOPES, c.AdditionalScope...)
-	}
-	oauth2Config = &oauth2.Config{
-		ClientID:     c.ClientID,
-		ClientSecret: c.ClientSecret,
-		Endpoint:     oidcProvider.Endpoint(),
-		Scopes:       scope,
-		RedirectURL:  redirectUrl,
-	}
-	return oauth2Config
 }
 
 func VerifyOidcAccessToken(r *http.Request, userID string, credentials *domains.AdminUser) bool {
@@ -207,27 +186,29 @@ func VerifyOidcAccessToken(r *http.Request, userID string, credentials *domains.
 		return false
 	}
 	idToken, errVerify := verifier.Verify(ctx, *credentials.OidcIdToken)
-	if errVerify != nil {
-		log.Errorf("IDToken verify failed -> %v", errVerify)
-		return false
-	}
-
-	// リフレッシュトークンがない場合はIDトークンの有効期限だけで判定
-	if credentials.OidcRefreshToken == nil {
-		if idToken.Expiry.Before(time.Now()) {
+	if errVerify == nil {
+		// リフレッシュトークンがない場合はIDトークンの有効期限だけで判定
+		if credentials.OidcRefreshToken == nil && idToken.Expiry.Before(time.Now()) {
 			log.Error("IDToken is expired.")
+			return false
+		}
+		// リフレッシュが必要なければtrueを返す
+		if !isOidcAccessTokenRefresh(idToken.Expiry) {
+			return true
+		}
+	} else {
+		// errVerifyがTokenExpiredErrorの場合でリフレッシュトークンがある場合はリフレッシュ
+		if _, ok := errVerify.(*oidc.TokenExpiredError); ok && credentials.OidcRefreshToken != nil {
+			log.Info("The ID token expired, but I had a refresh token, so I refreshed it.")
+		} else {
+			log.Errorf("IDToken verify failed -> %v", errVerify)
 			return false
 		}
 	}
 
 	// ---- 以下リフレッシュトークンがある場合の処理 ----
-	// IDトークンの有効期限が近いもしくは期限切れ場合以外はリフレッシュしない
-	if !isRefresh(idToken.Expiry) {
-		return true
-	}
-
 	// リフレッシュトークンがある場合はリフレッシュトークンを使ってトークンを更新
-	config := getOAuth2Config("", oidcConfig)
+	config := getOidcOAuth2Config("", oidcConfig)
 	token := &oauth2.Token{
 		AccessToken:  *credentials.OidcAccessToken,
 		TokenType:    *credentials.OidcTokenType,
@@ -240,10 +221,18 @@ func VerifyOidcAccessToken(r *http.Request, userID string, credentials *domains.
 		return false
 	}
 
+	// IDトークンを取得
+	rawIDToken, ok := newToken.Extra("id_token").(string)
+	if !ok {
+		log.Error("id_token not found")
+		return false
+	}
+
 	// 新しいクレデンシャルをDBに更新
 	credentials.OidcAccessToken = &newToken.AccessToken
 	credentials.OidcTokenType = &newToken.TokenType
 	credentials.OidcRefreshToken = &newToken.RefreshToken
+	credentials.OidcIdToken = &rawIDToken
 	expiry := uint64(newToken.Expiry.UnixNano() / int64(time.Millisecond))
 	credentials.OidcExpiryDate = &expiry
 
@@ -256,7 +245,36 @@ func VerifyOidcAccessToken(r *http.Request, userID string, credentials *domains.
 	return true
 }
 
-func isRefresh(expiry time.Time) bool {
+func getOidcTokenVerifier(c *config.Oidc) (*oidc.IDTokenVerifier, *errors.VironError) {
+	oidcConfig := &oidc.Config{
+		ClientID: c.ClientID,
+	}
+	return oidcProvider.Verifier(oidcConfig), nil
+}
+
+func getOidcOAuth2Config(redirectUrl string, c *config.Oidc) *oauth2.Config {
+	if oidcOAuth2Config != nil {
+		return oidcOAuth2Config
+	}
+	scope := constant.OIDC_DEFAULT_SCOPES
+	if len(c.AdditionalScope) > 0 {
+		scope = append(constant.OIDC_DEFAULT_SCOPES, c.AdditionalScope...)
+	}
+	config := &oauth2.Config{
+		ClientID:     c.ClientID,
+		ClientSecret: c.ClientSecret,
+		Endpoint:     oidcProvider.Endpoint(),
+		Scopes:       scope,
+		RedirectURL:  redirectUrl,
+	}
+	// redirectUrlが空以外の場合にキャッシュ
+	if redirectUrl != "" {
+		oidcOAuth2Config = config
+	}
+	return config
+}
+
+func isOidcAccessTokenRefresh(expiry time.Time) bool {
 	// 有効期限の30秒前からリフレッシュ
-	return expiry.Add(-30 * time.Second).Before(time.Now())
+	return expiry.Add(-constant.OIDC_REFRESH_THRESHOLD).Before(time.Now())
 }

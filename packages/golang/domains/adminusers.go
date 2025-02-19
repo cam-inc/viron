@@ -249,22 +249,59 @@ func UpdateAdminUserByID(ctx context.Context, id string, payload *AdminUser) *er
 	}
 	repo := container.GetAdminUserRepository()
 
-	if user.AuthType == constant.AUTH_TYPE_EMAIL {
+	var entity *repositories.AdminUserEntity
+	switch user.AuthType {
+	case constant.AUTH_TYPE_EMAIL:
 		if payload.Password != nil {
 			pass := helpers.GenPassword(*payload.Password, *user.Salt)
 			if pass == nil {
 				return errors.Initialize(http.StatusInternalServerError, "password gen failed.")
 			}
-
-			entity := &repositories.AdminUserEntity{
+			entity = &repositories.AdminUserEntity{
 				ID:       user.ID,
 				Email:    user.Email,
 				AuthType: user.AuthType,
 				Password: &pass.Password,
 			}
-			if err := repo.UpdateByID(ctx, id, entity); err != nil {
-				return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("adminUser update failed. %+v", err))
+		}
+	case constant.AUTH_TYPE_GOOGLE:
+		if payload.GoogleOAuth2AccessToken != nil &&
+			payload.GoogleOAuth2ExpiryDate != nil &&
+			payload.GoogleOAuth2IdToken != nil &&
+			payload.GoogleOAuth2RefreshToken != nil &&
+			payload.GoogleOAuth2TokenType != nil {
+			entity = &repositories.AdminUserEntity{
+				ID:                       user.ID,
+				Email:                    user.Email,
+				AuthType:                 user.AuthType,
+				GoogleOAuth2AccessToken:  payload.GoogleOAuth2AccessToken,
+				GoogleOAuth2ExpiryDate:   payload.GoogleOAuth2ExpiryDate,
+				GoogleOAuth2IdToken:      payload.GoogleOAuth2IdToken,
+				GoogleOAuth2RefreshToken: payload.GoogleOAuth2RefreshToken,
+				GoogleOAuth2TokenType:    payload.GoogleOAuth2TokenType,
 			}
+		}
+	case constant.AUTH_TYPE_OIDC:
+		if payload.OidcAccessToken != nil &&
+			payload.OidcExpiryDate != nil &&
+			payload.OidcIdToken != nil &&
+			payload.OidcTokenType != nil {
+			entity = &repositories.AdminUserEntity{
+				ID:               user.ID,
+				Email:            user.Email,
+				AuthType:         user.AuthType,
+				OidcAccessToken:  payload.OidcAccessToken,
+				OidcExpiryDate:   payload.OidcExpiryDate,
+				OidcIdToken:      payload.OidcIdToken,
+				OidcRefreshToken: payload.OidcRefreshToken,
+				OidcTokenType:    payload.OidcTokenType,
+			}
+		}
+	}
+
+	if entity != nil {
+		if err := repo.UpdateByID(ctx, id, entity); err != nil {
+			return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("adminUser update failed. %+v", err))
 		}
 	}
 
