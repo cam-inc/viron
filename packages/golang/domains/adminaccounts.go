@@ -5,7 +5,7 @@ import (
 
 	"github.com/cam-inc/viron/packages/golang/repositories"
 
-	"github.com/cam-inc/viron/packages/golang/constant"
+	// "github.com/cam-inc/viron/packages/golang/constant"
 	"github.com/cam-inc/viron/packages/golang/repositories/container"
 
 	"github.com/cam-inc/viron/packages/golang/errors"
@@ -37,7 +37,6 @@ func ListAccountByID(ctx context.Context, userID string) *AdminAccountsWithPager
 			&AdminAccount{
 				ID:       user.ID,
 				Email:    user.Email,
-				AuthType: user.AuthType,
 				Password: user.Password,
 				Salt:     user.Salt,
 				RoleIDs:  user.RoleIDs,
@@ -54,15 +53,11 @@ func UpdateAccountByID(ctx context.Context, userID string, payload *AdminAccount
 	if user == nil {
 		return errors.AdminUserNotfound
 	}
-	if user.AuthType != constant.AUTH_TYPE_EMAIL {
-		return errors.Forbidden
-	}
 	repo := container.GetAdminUserRepository()
 
 	adminUser := &repositories.AdminUserEntity{
-		ID:       user.ID,
-		AuthType: user.AuthType,
-		Email:    user.Email,
+		ID:    user.ID,
+		Email: user.Email,
 	}
 
 	hashedNewPassword := helpers.GenPassword(*payload.Password, *user.Salt)

@@ -97,7 +97,7 @@ func GetOas(apiDef *openapi3.T, roleIDs []string) *openapi3.T {
 			rewritedPages = append(rewritedPages, page)
 		}
 	}
-	
+
 	log.Debugf("rewritedPages %+v", rewritedPages)
 
 	clone.Info.Extensions[constant.OAS_X_PAGES] = rewritedPages
@@ -155,10 +155,9 @@ func listContentsByOas(apiDef *openapi3.T) []*Content {
 	}
 
 	for _, xPage := range *xPages {
-		for _, v := range xPage.Contents {
-			contents = append(contents, v)
-		}
+		contents = append(contents, xPage.Contents...)
 	}
+
 	return contents
 }
 

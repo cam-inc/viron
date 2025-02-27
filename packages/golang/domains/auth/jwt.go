@@ -12,23 +12,19 @@ import (
 
 	"github.com/cam-inc/viron/packages/golang/constant"
 
+	"github.com/cam-inc/viron/packages/golang/config"
+
 	"github.com/lestrrat-go/jwx/jwa"
 
 	"github.com/go-chi/jwtauth"
 )
 
 type (
-	JWT struct {
-		Secret        string
-		Provider      func(r *http.Request) (string, []string, error)
-		ExpirationSec int
-		jwtAuth       *jwtauth.JWTAuth
-	}
-	Config struct {
-		Secret        string
-		Provider      string
-		ExpirationSec int
-	}
+	// Config struct {
+	// 	Secret        string
+	// 	Provider      string
+	// 	ExpirationSec int
+	// }
 	Claim struct {
 		Exp int
 		Iat int
@@ -40,16 +36,16 @@ type (
 )
 
 var (
-	jwt *JWT
+	jwt *config.JWT
 	log logging.Logger
 )
 
 func SetUp(secret string, provider func(r *http.Request) (string, []string, error), expiration int) error {
-	jwt = &JWT{
+	jwt = &config.JWT{
 		Secret:        secret,
 		Provider:      provider,
 		ExpirationSec: expiration,
-		jwtAuth:       jwtauth.New(string(jwa.HS512), []byte(secret), nil),
+		JwtAuth:       jwtauth.New(string(jwa.HS512), []byte(secret), nil),
 	}
 	log = logging.GetDefaultLogger()
 	return nil
@@ -68,7 +64,7 @@ func Sign(r *http.Request, subject string) (string, error) {
 	}
 	jwtauth.SetExpiryIn(claim, time.Duration(jwt.ExpirationSec)*time.Second)
 	jwtauth.SetIssuedNow(claim)
-	_, tokenStr, err := jwt.jwtAuth.Encode(claim)
+	_, tokenStr, err := jwt.JwtAuth.Encode(claim)
 
 	if err != nil {
 		return "", err
@@ -86,7 +82,7 @@ func Verify(r *http.Request, token string) (*Claim, error) {
 		return nil, fmt.Errorf("this token is revoked %s", token)
 	}
 
-	jwtToken, err := jwtauth.VerifyToken(jwt.jwtAuth, token)
+	jwtToken, err := jwtauth.VerifyToken(jwt.JwtAuth, token)
 	if err != nil {
 		return nil, err
 	}

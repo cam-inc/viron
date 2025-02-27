@@ -103,6 +103,9 @@ func get(name string) (Logger, bool) {
 	if len(logs) == 0 {
 		logs = map[string]Logger{}
 	}
+	if l, exists := logs[name]; exists {
+		return l, exists
+	}
 	l, exists := logs[defaultLogName]
 	return l, exists
 }

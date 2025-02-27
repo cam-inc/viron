@@ -20,6 +20,8 @@ import (
 
 	"github.com/cam-inc/viron/packages/golang/domains/auth"
 
+	pkgConfig "github.com/cam-inc/viron/packages/golang/config"
+
 	"github.com/cam-inc/viron/example/golang/pkg/config"
 	exContext "github.com/cam-inc/viron/example/golang/pkg/context"
 	"github.com/cam-inc/viron/packages/golang/constant"
@@ -106,21 +108,17 @@ func OpenAPI3ValidatorHandlerFunc(apiDef *openapi3.T, op *openapi3filter.Options
 
 func InjectAPIDefinition(apiDef *openapi3.T) func(http.HandlerFunc) http.HandlerFunc {
 	return func(handlerFunc http.HandlerFunc) http.HandlerFunc {
-		fn := func(w http.ResponseWriter, r *http.Request) {
-			fmt.Println("InjectAPIDefinition")
+		return func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 			ctx = context.WithValue(ctx, constant.CTX_KEY_API_DEFINITION, apiDef)
 			handlerFunc.ServeHTTP(w, r.WithContext(ctx))
 		}
-		return fn
-
 	}
 }
 
 func InjectAPIACL(apiDef *openapi3.T) func(http.HandlerFunc) http.HandlerFunc {
 	return func(handlerFunc http.HandlerFunc) http.HandlerFunc {
-		fn := func(w http.ResponseWriter, r *http.Request) {
-			fmt.Println("InjectAPIACL")
+		return func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 			ctxUser := ctx.Value(constant.CTX_KEY_ADMINUSER)
 			user, exists := ctxUser.(*domains.AdminUser)
@@ -134,7 +132,6 @@ func InjectAPIACL(apiDef *openapi3.T) func(http.HandlerFunc) http.HandlerFunc {
 			}
 			handlerFunc.ServeHTTP(w, r.WithContext(ctx))
 		}
-		return fn
 	}
 }
 
@@ -180,7 +177,6 @@ func AuthenticationFunc(ctx context.Context, input *openapi3filter.Authenticatio
 		return nil
 	}
 	if ctx.Value(constant.CTX_KEY_AUTH) == nil {
-		fmt.Println(constant.CTX_KEY_AUTH, "nil")
 		return errors.UnAuthorized
 	}
 	return nil
@@ -190,27 +186,23 @@ func AuthenticationFunc(ctx context.Context, input *openapi3filter.Authenticatio
 func JWTAuthHandlerFunc() func(http.HandlerFunc) http.HandlerFunc {
 	return func(handlerFunc http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			fmt.Printf("DEBUG1 uri=%s\n", r.RequestURI)
 			ctx := r.Context()
 			if ctx.Value(JwtScopes) == nil {
 				handlerFunc.ServeHTTP(w, r.WithContext(ctx))
 				return
 			}
-			fmt.Println("DEBUG1")
 			token, err := helpers.GetCookieToken(r)
 			if err != nil {
 				fmt.Println(err)
 				handlerFunc.ServeHTTP(w, r.WithContext(ctx))
 				return
 			}
-			fmt.Println("DEBUG1")
 			claim, err := auth.Verify(r, token)
 			if err != nil {
 				fmt.Println(err)
 				handlerFunc.ServeHTTP(w, r.WithContext(ctx))
 				return
 			}
-			fmt.Println("DEBUG1")
 			ctx = context.WithValue(ctx, constant.CTX_KEY_AUTH, claim)
 			rr := r.WithContext(ctx)
 			cctx := rr.Context()
@@ -219,11 +211,9 @@ func JWTAuthHandlerFunc() func(http.HandlerFunc) http.HandlerFunc {
 		}
 	}
 }
-func JWTSecurityHandlerFunc(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFunc {
+func JWTSecurityHandlerFunc(cfg *pkgConfig.Auth, domainAuthSSO *auth.AuthSSO) func(http.HandlerFunc) http.HandlerFunc {
 	return func(handlerFunc http.HandlerFunc) http.HandlerFunc {
-
-		fn := func(w http.ResponseWriter, r *http.Request) {
-
+		return func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 			if ctx.Value(JwtScopes) == nil {
 				handlerFunc.ServeHTTP(w, r.WithContext(ctx))
@@ -252,25 +242,34 @@ func JWTSecurityHandlerFunc(cfg *config.Auth) func(http.HandlerFunc) http.Handle
 				return
 			}
 
+			audiance := claim.Aud
 			userID := claim.Sub
 			user := domains.FindByID(ctx, userID)
-			if user == nil {
+
+			// ユーザーが存在しない場合とaudがない場合はエラー
+			if user == nil || len(claim.Aud) == 0 {
 				w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
 				cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
 					MaxAge: -1,
 				})
 				http.SetCookie(w, cookie)
 				http.Error(w, errors.UnAuthorized.Error(), errors.UnAuthorized.StatusCode())
-				fmt.Println("user == nil")
 				return
 			}
+
+			// メール認証に場合はパススルー
+			if user.Password != nil {
+				// アクセストークンの検証する
+				// audの最初の要素にclientIDを設定している
+				domainAuthSSO.VerifyAccessToken(r, audiance[0], userID, *user)
+			}
+
 			ctx2 := context.WithValue(ctx, constant.CTX_KEY_AUTH, claim)
 			ctx3 := context.WithValue(ctx2, constant.CTX_KEY_ADMINUSER, user)
-			ctx4 := context.WithValue(ctx3, constant.CTX_KEY_ADMINUSER_ID, fmt.Sprintf("%d", user.ID))
+			ctx4 := context.WithValue(ctx3, constant.CTX_KEY_ADMINUSER_ID, user.ID)
 			rr := r.WithContext(ctx4)
 			handlerFunc.ServeHTTP(w, rr)
 		}
-		return fn
 	}
 }
 
@@ -288,8 +287,8 @@ func InjectAuditLog(next http.Handler) http.Handler {
 			if body != "" {
 				j := map[string]interface{}{}
 				if err := json.Unmarshal([]byte(body), &j); err == nil {
-					for k, _ := range j {
-						fmt.Printf("k %+v\n", k)
+					for k, v := range j {
+						fmt.Printf("k %+v v %+v\n", k, v)
 						if strings.Contains(k, "pass") {
 							j[k] = "***************************"
 						}
@@ -319,7 +318,9 @@ func InjectAuditLog(next http.Handler) http.Handler {
 				RequestBody:   &body,
 				StatusCode:    &status,
 			}
-			domains.CreateAuditLog(r.Context(), audit)
+			if err := domains.CreateAuditLog(r.Context(), audit); err != nil {
+				fmt.Printf("audit log error %+v\n", err)
+			}
 		}(ww, r, string(rBody))
 
 		next.ServeHTTP(ww, r)

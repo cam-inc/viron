@@ -21,7 +21,7 @@ func (s *Server) Run() error {
 func (s *Server) RunTLS() error {
 	addr := fmt.Sprintf(":%d", s.Port)
 	fmt.Printf("Addr -> %s\n", addr)
-	return http.ListenAndServeTLS(addr, "/viron/example/golang/cert/viron.crt", "/viron/example/golang/cert/viron.key", s.handler)
+	return http.ListenAndServeTLS(addr, "cert/viron.crt", "cert/viron.key", s.handler)
 }
 
 // New start

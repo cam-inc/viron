@@ -49,18 +49,12 @@ func (a *adminUsersPersistence) Find(ctx context.Context, conditions repositorie
 
 	for _, r := range result {
 		adminuser := &repositories.AdminUserEntity{
-			ID:                       string(r.ID),
-			Email:                    r.Email,
-			AuthType:                 r.AuthType,
-			Password:                 r.Password.Ptr(),
-			Salt:                     r.Salt.Ptr(),
-			GoogleOAuth2TokenType:    r.GoogleOAuth2TokenType.Ptr(),
-			GoogleOAuth2RefreshToken: r.GoogleOAuth2RefreshToken.Ptr(),
-			GoogleOAuth2ExpiryDate:   r.GoogleOAuth2ExpiryDate.Ptr(),
-			GoogleOAuth2AccessToken:  r.GoogleOAuth2AccessToken.Ptr(),
-			GoogleOAuth2IdToken:      r.GoogleOAuth2IdToken.Ptr(),
-			CreatedAt:                r.CreatedAt,
-			UpdatedAt:                r.UpdatedAt,
+			ID:        strconv.FormatUint(uint64(r.ID), 10),
+			Email:     r.Email,
+			Password:  r.Password.Ptr(),
+			Salt:      r.Salt.Ptr(),
+			CreatedAt: r.CreatedAt,
+			UpdatedAt: r.UpdatedAt,
 		}
 		list = append(list, adminuser)
 	}
@@ -87,22 +81,16 @@ func (a *adminUsersPersistence) CreateOne(ctx context.Context, entity repositori
 		return nil, err
 	}
 	model := &models.Adminuser{
-		AuthType:                 adminuser.AuthType,
-		Email:                    adminuser.Email,
-		Password:                 null.StringFromPtr(adminuser.Password),
-		Salt:                     null.StringFromPtr(adminuser.Salt),
-		GoogleOAuth2AccessToken:  null.StringFromPtr(adminuser.GoogleOAuth2AccessToken),
-		GoogleOAuth2IdToken:      null.StringFromPtr(adminuser.GoogleOAuth2IdToken),
-		GoogleOAuth2RefreshToken: null.StringFromPtr(adminuser.GoogleOAuth2RefreshToken),
-		GoogleOAuth2ExpiryDate:   null.Uint64FromPtr(adminuser.GoogleOAuth2ExpiryDate),
-		GoogleOAuth2TokenType:    null.StringFromPtr(adminuser.GoogleOAuth2TokenType),
-		CreatedAt:                time.Now(),
-		UpdatedAt:                time.Now(),
+		Email:     adminuser.Email,
+		Password:  null.StringFromPtr(adminuser.Password),
+		Salt:      null.StringFromPtr(adminuser.Salt),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 	if err := model.Insert(ctx, a.conn, boil.Infer()); err != nil {
 		return nil, err
 	}
-	adminuser.ID = string(model.ID)
+	adminuser.ID = strconv.FormatUint(uint64(model.ID), 10)
 	return adminuser, nil
 }
 
@@ -117,7 +105,6 @@ func (a *adminUsersPersistence) UpdateByID(ctx context.Context, id string, entit
 	adminUser := models.Adminuser{
 		ID:        uint(iID),
 		Email:     up.Email,
-		AuthType:  up.AuthType,
 		UpdatedAt: time.Now(),
 	}
 
@@ -131,23 +118,6 @@ func (a *adminUsersPersistence) UpdateByID(ctx context.Context, id string, entit
 	if up.Salt != nil {
 		adminUser.Salt = null.NewString(*up.Salt, true)
 		columns = append(columns, models.AdminuserColumns.Salt)
-	}
-
-	if up.GoogleOAuth2AccessToken != nil {
-		adminUser.GoogleOAuth2AccessToken = null.NewString(*up.GoogleOAuth2AccessToken, true)
-		columns = append(columns, models.AdminuserColumns.GoogleOAuth2AccessToken)
-	}
-	if up.GoogleOAuth2ExpiryDate != nil {
-		adminUser.GoogleOAuth2ExpiryDate = null.NewUint64(*up.GoogleOAuth2ExpiryDate, true)
-		columns = append(columns, models.AdminuserColumns.GoogleOAuth2ExpiryDate)
-	}
-	if up.GoogleOAuth2RefreshToken != nil {
-		adminUser.GoogleOAuth2RefreshToken = null.NewString(*up.GoogleOAuth2RefreshToken, true)
-		columns = append(columns, models.AdminuserColumns.GoogleOAuth2RefreshToken)
-	}
-	if up.GoogleOAuth2TokenType != nil {
-		adminUser.GoogleOAuth2TokenType = null.NewString(*up.GoogleOAuth2TokenType, true)
-		columns = append(columns, models.AdminuserColumns.GoogleOAuth2TokenType)
 	}
 
 	_, err := adminUser.Update(ctx, a.conn, boil.Whitelist(columns...))

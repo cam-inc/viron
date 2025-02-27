@@ -156,7 +156,7 @@ func (s Sort) SQL() string {
 }
 
 func (s Sort) MongoDB() bson.E {
-	return bson.E{s.Key, s.Order}
+	return bson.E{Key: s.Key, Value: s.Order}
 }
 
 func (ss Sorts) SQL() qm.QueryMod {

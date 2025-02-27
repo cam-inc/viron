@@ -51,6 +51,22 @@ func GenOAuthStateCookie(state string, opts *http.Cookie) *http.Cookie {
 	return GenCookie(constant.COOKIE_KEY_OAUTH2_STATE, state, opts)
 }
 
+// GenOidcStateCookie cookie生成
+func GenOidcStateCookie(state string, opts *http.Cookie) *http.Cookie {
+	if opts.MaxAge == 0 && opts.Expires.IsZero() {
+		opts.MaxAge = constant.OIDC_STATE_EXPIRATION_SEC
+	}
+	return GenCookie(constant.COOKIE_KEY_OIDC_STATE, state, opts)
+}
+
+// GenOidcCodeVerifierCookie cookie生成
+func GenOidcCodeVerifierCookie(codeVerifier string, opts *http.Cookie) *http.Cookie {
+	if opts.MaxAge == 0 && opts.Expires.IsZero() {
+		opts.MaxAge = constant.OIDC_CODE_VERIFIER_EXPIRATION_SEC
+	}
+	return GenCookie(constant.COOKIE_KEY_OIDC_CODE_VERIFIER, codeVerifier, opts)
+}
+
 // GetCookieToken cookieから認証token取得
 func GetCookieToken(r *http.Request) (string, error) {
 	cookie, err := r.Cookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION)

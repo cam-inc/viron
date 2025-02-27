@@ -62,9 +62,8 @@ func (a *adminuser) CreateVironAdminUser(w http.ResponseWriter, r *http.Request)
 	user := &domains.AdminUser{
 		Email:    string(payload.Email),
 		Password: &payload.Password,
-		AuthType: constant.AUTH_TYPE_EMAIL,
 	}
-	created, err := domains.CreateAdminUser(r.Context(), user, user.AuthType)
+	created, err := domains.CreateAdminUser(r.Context(), user, constant.AUTH_TYPE_EMAIL)
 	if err != nil {
 		helpers.SendError(w, http.StatusInternalServerError, err)
 		return
@@ -124,7 +123,6 @@ func PagerToVironAdminUserListWithPager(currentPage, maxPage int, users []*domai
 		createdAt := externalRef0.VironCreatedAt(adminUser.CreatedAt)
 		updatedAt := externalRef0.VironUpdatedAt(adminUser.UpdatedAt)
 		vironPager.List = append(vironPager.List, VironAdminUser{
-			AuthType:  adminUser.AuthType,
 			Email:     openapi_types.Email(adminUser.Email),
 			Id:        adminUser.ID,
 			RoleIds:   &adminUser.RoleIDs,

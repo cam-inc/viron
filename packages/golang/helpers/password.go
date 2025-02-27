@@ -1,11 +1,10 @@
 package helpers
 
 import (
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
-	"math/rand"
-	"time"
 
 	"golang.org/x/crypto/pbkdf2"
 )
@@ -18,9 +17,7 @@ type (
 )
 
 func GenSalt(size int) string {
-	//crypto.Hash()
 	b := make([]byte, size)
-	rand.Seed(time.Now().UnixNano())
 	if _, err := rand.Read(b); err != nil {
 		return ""
 	}

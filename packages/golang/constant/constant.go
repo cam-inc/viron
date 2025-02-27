@@ -1,16 +1,22 @@
 package constant
 
-import "net/http"
+import (
+	"net/http"
+	"time"
+)
+
+type CtxKey string
 
 const (
 	ENV_STORE_MODE = "mode"
 
-	CTX_KEY_API_DEFINITION       = "apiDefinition"
-	CTX_KEY_JWT_EXPIRATION_SEC   = "jwtExpirationSec"
-	CTX_KEY_STATE_EXPIRATION_SEC = "stateExpirationSec"
-	CTX_KEY_ADMINUSER            = "adminUser"
-	CTX_KEY_ADMINUSER_ID         = "userId"
-	CTX_KEY_AUTH                 = "auth"
+	CTX_KEY_API_DEFINITION               CtxKey = "apiDefinition"
+	CTX_KEY_JWT_EXPIRATION_SEC           CtxKey = "jwtExpirationSec"
+	CTX_KEY_STATE_EXPIRATION_SEC         CtxKey = "stateExpirationSec"
+	CTX_KEY_CODE_VERIFIER_EXPIRATION_SEC CtxKey = "codeVerifierExpirationSec"
+	CTX_KEY_ADMINUSER                    CtxKey = "adminUser"
+	CTX_KEY_ADMINUSER_ID                 CtxKey = "userId"
+	CTX_KEY_AUTH                         CtxKey = "auth"
 
 	DEFAULT_PAGER_SIZE = 10
 	DEFAULT_PAGER_PAGE = 1
@@ -43,17 +49,24 @@ const (
 
 	AUTH_CONFIG_PROVIDER_VIRON      = "viron"
 	AUTH_CONFIG_PROVIDER_GOOGLE     = "google"
+	AUTH_CONFIG_PROVIDER_SSO        = "sso"
 	AUTH_CONFIG_PROVIDER_SIGNOUT    = "signout"
 	AUTH_CONFIG_TYPE_EMAIL          = "email"
 	AUTH_CONFIG_TYPE_OAUTH          = "oauth"
 	AUTH_CONFIG_TYPE_OAUTH_CALLBACK = "oauthcallback"
+	AUTH_CONFIG_TYPE_OIDC           = "oidc"
+	AUTH_CONFIG_TYPE_OIDC_CALLBACK  = "oidccallback"
 	AUTH_CONFIG_TYPE_SIGNOUT        = "signout"
 
-	VIRON_AUTHCONFIGS_PATH           = "/viron/authconfigs"
-	EMAIL_SIGNIN_PATH                = "/email/signin"
-	OAUTH2_GOOGLE_AUTHORIZATION_PATH = "/oauth2/google/authorization"
-	OAUTH2_GOOGLE_CALLBACK_PATH      = "/oauth2/google/callback"
-	SIGNOUT_PATH                     = "/signout"
+	VIRON_AUTHCONFIGS_PATH  = "/viron/authconfigs"
+	EMAIL_SIGNIN_PATH       = "/email/signin"
+	OIDC_AUTHORIZATION_PATH = "/sso/oidc/authorization"
+	OIDC_CALLBACK_PATH      = "/sso/oidc/callback"
+	SIGNOUT_PATH            = "/signout"
+
+	AUTH_SSO_IDP_CUSTOM      = "custom"
+	AUTH_SSO_IDP_GOOGLE      = "google"
+	AUTH_SSO_IDP_AWS_COGNITO = "aws_cognito"
 
 	OAS_X_THUMBNAIL                      = "x-thumbnail"
 	OAS_X_THEME                          = "x-theme"
@@ -70,6 +83,7 @@ const (
 
 	AUTH_TYPE_EMAIL  = "email"
 	AUTH_TYPE_GOOGLE = "google"
+	AUTH_TYPE_OIDC   = "oidc"
 
 	ADMIN_ROLE_SUPER  = "super"
 	ADMIN_ROLE_VIEWER = "viewer"
@@ -78,10 +92,20 @@ const (
 
 	OAUTH2_STATE_EXPIRATION_SEC = 10 * 60
 
+	OIDC_STATE_EXPIRATION_SEC = 10 * 60
+
+	OIDC_CODE_VERIFIER_EXPIRATION_SEC = 10 * 60
+
+	OIDC_REFRESH_THRESHOLD = 30 * time.Second
+
+	GOOGLE_OAUTH2_REFRESH_THRESHOLD = 30 * time.Second
+
 	CASBIN_LOAD_INTERVAL_SEC = 1 * 60
 
 	COOKIE_KEY_VIRON_AUTHORIZATION = "viron_authorization"
 	COOKIE_KEY_OAUTH2_STATE        = "oauth2_state"
+	COOKIE_KEY_OIDC_STATE          = "oidc_state"
+	COOKIE_KEY_OIDC_CODE_VERIFIER  = "oidc_code_verifier"
 
 	RED                  = Theme("red")
 	ULTIMATE_ORANGE      = Theme("ultimate orange")
@@ -146,5 +170,10 @@ var (
 
 	GOOGLE_OAUTH2_DEFAULT_SCOPES = []string{
 		"https://www.googleapis.com/auth/userinfo.email",
+	}
+
+	OIDC_DEFAULT_SCOPES = []string{
+		"openid",
+		"email",
 	}
 )
