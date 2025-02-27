@@ -20,24 +20,13 @@ import (
 
 type (
 	AdminUser struct {
-		ID                       string    `json:"id"`
-		Email                    string    `json:"email"`
-		AuthType                 string    `json:"authType"`
-		Password                 *string   `json:"password,omitempty"`
-		Salt                     *string   `json:"salt,omitempty"`
-		GoogleOAuth2AccessToken  *string   `json:"googleOAuth2AccessToken,omitempty"`
-		GoogleOAuth2ExpiryDate   *uint64   `json:"googleOAuth2ExpiryDate,omitempty"`
-		GoogleOAuth2IdToken      *string   `json:"googleOAuth2IdToken,omitempty"`
-		GoogleOAuth2RefreshToken *string   `json:"googleOAuth2RefreshToken,omitempty"`
-		GoogleOAuth2TokenType    *string   `json:"googleOAuth2TokenType,omitempty"`
-		OidcAccessToken          *string   `json:"oidcAccessToken,omitempty"`
-		OidcExpiryDate           *uint64   `json:"oidcExpiryDate,omitempty"`
-		OidcIdToken              *string   `json:"oidcIdToken,omitempty"`
-		OidcRefreshToken         *string   `json:"oidcRefreshToken,omitempty"`
-		OidcTokenType            *string   `json:"oidcTokenType,omitempty"`
-		RoleIDs                  []string  `json:"roleIds"`
-		CreatedAt                time.Time `json:"createdAt"`
-		UpdatedAt                time.Time `json:"updatedAt"`
+		ID        string    `json:"id"`
+		Email     string    `json:"email"`
+		Password  *string   `json:"password,omitempty"`
+		Salt      *string   `json:"salt,omitempty"`
+		RoleIDs   []string  `json:"roleIds"`
+		CreatedAt time.Time `json:"createdAt"`
+		UpdatedAt time.Time `json:"updatedAt"`
 	}
 
 	AdminUsersWithPager struct {
@@ -46,13 +35,12 @@ type (
 	}
 
 	AdminUserConditions struct {
-		ID       string
-		Email    string
-		AuthType string
-		RoleID   string
-		Size     int
-		Page     int
-		Sort     []string
+		ID     string
+		Email  string
+		RoleID string
+		Size   int
+		Page   int
+		Sort   []string
 	}
 )
 
@@ -62,7 +50,6 @@ func CreateAdminUser(ctx context.Context, payload *AdminUser, authType string) (
 	adminUser := &repositories.AdminUserEntity{}
 
 	if authType == constant.AUTH_TYPE_EMAIL {
-		adminUser.AuthType = authType
 		adminUser.Email = string(payload.Email)
 		if payload.Password == nil {
 			return nil, errors.Initialize(http.StatusBadRequest, "password is nil.")
@@ -72,20 +59,8 @@ func CreateAdminUser(ctx context.Context, payload *AdminUser, authType string) (
 		adminUser.Salt = &password.Salt
 	} else if authType == constant.AUTH_TYPE_GOOGLE {
 		adminUser.Email = string(payload.Email)
-		adminUser.AuthType = authType
-		adminUser.GoogleOAuth2TokenType = payload.GoogleOAuth2TokenType
-		adminUser.GoogleOAuth2IdToken = payload.GoogleOAuth2IdToken
-		adminUser.GoogleOAuth2AccessToken = payload.GoogleOAuth2AccessToken
-		adminUser.GoogleOAuth2RefreshToken = payload.GoogleOAuth2RefreshToken
-		adminUser.GoogleOAuth2ExpiryDate = payload.GoogleOAuth2ExpiryDate
 	} else if authType == constant.AUTH_TYPE_OIDC {
 		adminUser.Email = string(payload.Email)
-		adminUser.AuthType = authType
-		adminUser.OidcTokenType = payload.OidcTokenType
-		adminUser.OidcIdToken = payload.OidcIdToken
-		adminUser.OidcAccessToken = payload.OidcAccessToken
-		adminUser.OidcRefreshToken = payload.OidcRefreshToken
-		adminUser.OidcExpiryDate = payload.OidcExpiryDate
 	}
 
 	entity, err := container.GetAdminUserRepository().CreateOne(ctx, adminUser)
@@ -133,24 +108,13 @@ func findOne(ctx context.Context, conditions *repositories.AdminUserConditions) 
 	user.RoleIDs = listRoles(user.ID)
 
 	auser := &AdminUser{
-		ID:                       user.ID,
-		Email:                    user.Email,
-		Password:                 user.Password,
-		AuthType:                 user.AuthType,
-		Salt:                     user.Salt,
-		GoogleOAuth2AccessToken:  user.GoogleOAuth2AccessToken,
-		GoogleOAuth2ExpiryDate:   user.GoogleOAuth2ExpiryDate,
-		GoogleOAuth2IdToken:      user.GoogleOAuth2IdToken,
-		GoogleOAuth2RefreshToken: user.GoogleOAuth2RefreshToken,
-		GoogleOAuth2TokenType:    user.GoogleOAuth2TokenType,
-		OidcAccessToken:          user.OidcAccessToken,
-		OidcExpiryDate:           user.OidcExpiryDate,
-		OidcIdToken:              user.OidcIdToken,
-		OidcRefreshToken:         user.OidcRefreshToken,
-		OidcTokenType:            user.OidcTokenType,
-		CreatedAt:                user.CreatedAt,
-		UpdatedAt:                user.UpdatedAt,
-		RoleIDs:                  user.RoleIDs,
+		ID:        user.ID,
+		Email:     user.Email,
+		Password:  user.Password,
+		Salt:      user.Salt,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+		RoleIDs:   user.RoleIDs,
 	}
 	return auser
 }
@@ -225,13 +189,10 @@ func ListAdminUser(ctx context.Context, opts *AdminUserConditions) (*AdminUsersW
 			Email:     entity.Email,
 			Password:  entity.Password,
 			Salt:      entity.Salt,
-			AuthType:  entity.AuthType,
 			RoleIDs:   entity.RoleIDs,
 			CreatedAt: entity.CreatedAt,
 			UpdatedAt: entity.UpdatedAt,
 		}
-
-		adminuser.RoleIDs = listRoles(adminuser.ID)
 
 		withPager.List = append(withPager.List, adminuser)
 	}
@@ -250,52 +211,15 @@ func UpdateAdminUserByID(ctx context.Context, id string, payload *AdminUser) *er
 	repo := container.GetAdminUserRepository()
 
 	var entity *repositories.AdminUserEntity
-	switch user.AuthType {
-	case constant.AUTH_TYPE_EMAIL:
-		if payload.Password != nil {
-			pass := helpers.GenPassword(*payload.Password, *user.Salt)
-			if pass == nil {
-				return errors.Initialize(http.StatusInternalServerError, "password gen failed.")
-			}
-			entity = &repositories.AdminUserEntity{
-				ID:       user.ID,
-				Email:    user.Email,
-				AuthType: user.AuthType,
-				Password: &pass.Password,
-			}
+	if user.Password != nil && payload.Password != nil {
+		pass := helpers.GenPassword(*payload.Password, *user.Salt)
+		if pass == nil {
+			return errors.Initialize(http.StatusInternalServerError, "password gen failed.")
 		}
-	case constant.AUTH_TYPE_GOOGLE:
-		if payload.GoogleOAuth2AccessToken != nil &&
-			payload.GoogleOAuth2ExpiryDate != nil &&
-			payload.GoogleOAuth2IdToken != nil &&
-			payload.GoogleOAuth2RefreshToken != nil &&
-			payload.GoogleOAuth2TokenType != nil {
-			entity = &repositories.AdminUserEntity{
-				ID:                       user.ID,
-				Email:                    user.Email,
-				AuthType:                 user.AuthType,
-				GoogleOAuth2AccessToken:  payload.GoogleOAuth2AccessToken,
-				GoogleOAuth2ExpiryDate:   payload.GoogleOAuth2ExpiryDate,
-				GoogleOAuth2IdToken:      payload.GoogleOAuth2IdToken,
-				GoogleOAuth2RefreshToken: payload.GoogleOAuth2RefreshToken,
-				GoogleOAuth2TokenType:    payload.GoogleOAuth2TokenType,
-			}
-		}
-	case constant.AUTH_TYPE_OIDC:
-		if payload.OidcAccessToken != nil &&
-			payload.OidcExpiryDate != nil &&
-			payload.OidcIdToken != nil &&
-			payload.OidcTokenType != nil {
-			entity = &repositories.AdminUserEntity{
-				ID:               user.ID,
-				Email:            user.Email,
-				AuthType:         user.AuthType,
-				OidcAccessToken:  payload.OidcAccessToken,
-				OidcExpiryDate:   payload.OidcExpiryDate,
-				OidcIdToken:      payload.OidcIdToken,
-				OidcRefreshToken: payload.OidcRefreshToken,
-				OidcTokenType:    payload.OidcTokenType,
-			}
+		entity = &repositories.AdminUserEntity{
+			ID:       user.ID,
+			Email:    user.Email,
+			Password: &pass.Password,
 		}
 	}
 

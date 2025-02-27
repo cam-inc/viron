@@ -38,9 +38,7 @@ import (
 func New() http.Handler {
 
 	cfg := config.New()
-
-	domainAuth.NewGoogleOAuth2(cfg.Auth.GoogleOAuth2)
-	domainAuth.NewOidc(cfg.Auth.Oidc)
+	domainAuthSSO := domainAuth.NewSSO(cfg.Auth)
 
 	if cfg.StoreMode == config.StoreModeMySQL {
 		mysqlConfig := cfg.StoreMySQL
@@ -164,7 +162,7 @@ func New() http.Handler {
 			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
 				AuthenticationFunc: AuthenticationFunc,
 			}),
-			JWTSecurityHandlerFunc(cfg.Auth),
+			JWTSecurityHandlerFunc(cfg.Auth, domainAuthSSO),
 		},
 	})
 
@@ -173,7 +171,7 @@ func New() http.Handler {
 		BaseRouter: routeRoot,
 		Middlewares: []adminusers.MiddlewareFunc{
 			InjectAPIACL(definition),
-			JWTSecurityHandlerFunc(cfg.Auth),
+			JWTSecurityHandlerFunc(cfg.Auth, domainAuthSSO),
 			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
 				AuthenticationFunc: AuthenticationFunc,
 			}),
@@ -187,7 +185,7 @@ func New() http.Handler {
 		BaseRouter: routeRoot,
 		Middlewares: []adminaccounts.MiddlewareFunc{
 			InjectAPIACL(definition),
-			JWTSecurityHandlerFunc(cfg.Auth),
+			JWTSecurityHandlerFunc(cfg.Auth, domainAuthSSO),
 			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
 				AuthenticationFunc: AuthenticationFunc,
 			}),
@@ -201,7 +199,7 @@ func New() http.Handler {
 		BaseRouter: routeRoot,
 		Middlewares: []adminroles.MiddlewareFunc{
 			InjectAPIACL(definition),
-			JWTSecurityHandlerFunc(cfg.Auth),
+			JWTSecurityHandlerFunc(cfg.Auth, domainAuthSSO),
 			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
 				AuthenticationFunc: AuthenticationFunc,
 			}),
@@ -213,15 +211,15 @@ func New() http.Handler {
 	if err := domainAuth.SetUp(cfg.Auth.JWT.Secret, cfg.Auth.JWT.Provider, cfg.Auth.JWT.ExpirationSec); err != nil {
 		panic(err)
 	}
-	authImpl := auth.New()
+	authImpl := auth.New(domainAuthSSO)
 	auth.HandlerFromMux(authImpl, routeRoot)
 
-	authconfigImp := authconfigs.New()
+	authconfigImp := authconfigs.New(cfg.Auth.SSO)
 	authconfigs.HandlerWithOptions(authconfigImp, authconfigs.ChiServerOptions{
 		BaseRouter: routeRoot,
 		Middlewares: []authconfigs.MiddlewareFunc{
 			InjectAPIDefinition(definition),
-			JWTSecurityHandlerFunc(cfg.Auth),
+			JWTSecurityHandlerFunc(cfg.Auth, domainAuthSSO),
 		},
 	})
 
@@ -230,7 +228,7 @@ func New() http.Handler {
 		BaseRouter: routeRoot,
 		Middlewares: []auditlogs.MiddlewareFunc{
 			InjectAPIACL(definition),
-			JWTSecurityHandlerFunc(cfg.Auth),
+			JWTSecurityHandlerFunc(cfg.Auth, domainAuthSSO),
 			InjectAPIDefinition(definition),
 		},
 	})

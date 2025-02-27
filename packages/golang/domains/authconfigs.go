@@ -1,6 +1,7 @@
 package domains
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/cam-inc/viron/packages/golang/constant"
@@ -19,33 +20,78 @@ type (
 	}
 )
 
-func GenAuthConfig(provider string, authConfigType string, method string, path string, apiDef *openapi3.T) (*AuthConfig, *openapi3.PathItem, *errors.VironError) {
+func GenAuthConfig(
+	provider string,
+	authConfigType string,
+	method string,
+	path string,
+	apiDef *openapi3.T,
+	xDefaultParameters *map[string]interface{},
+	xDefaultRequestBody *map[string]interface{},
+) (*AuthConfig, *openapi3.PathItem, *errors.VironError) {
 
+	// PathItem の取得
 	pathItem, ok := apiDef.Paths[path]
 	if !ok {
+		fmt.Println("Path not found:", path)
 		return nil, nil, errors.OasUndefined
 	}
 
+	// Operation の取得
 	ope := pathItem.GetOperation(method)
 	if ope == nil {
+		fmt.Println("Operation not found for method:", method)
 		return nil, nil, errors.OasUndefined
 	}
-	xDefautlParameters, ok := ope.Extensions[constant.OAS_X_AUTHCONFIG_DEFAULT_PARAMETERS]
-	if !ok {
-		fmt.Println("xDefautlParameters not found")
-	}
-	xDefautlRequestBody, ok := ope.Extensions[constant.OAS_X_AUTHCONFIG_DEFAULT_REQUESTBODY]
-	if !ok {
-		fmt.Println("xDefautlRequestBody not found")
-	}
 
+	fmt.Println("GenAuthConfig: path=", path, "method=", method, "operationId=", ope.OperationID)
+	defaultParameters := mergeDefaultValues(ope.Extensions, constant.OAS_X_AUTHCONFIG_DEFAULT_PARAMETERS, xDefaultParameters)
+	defaultRequestBody := mergeDefaultValues(ope.Extensions, constant.OAS_X_AUTHCONFIG_DEFAULT_REQUESTBODY, xDefaultRequestBody)
+
+	// ✅ 正常な AuthConfig を返却
 	return &AuthConfig{
 			Provider:                provider,
 			AuthConfigType:          authConfigType,
 			OperationID:             helpers.UpperCamelToLowerCamel(ope.OperationID),
-			DefaultParametersValue:  xDefautlParameters,
-			DefaultRequestBodyValue: xDefautlRequestBody,
+			DefaultParametersValue:  defaultParameters,
+			DefaultRequestBodyValue: defaultRequestBody,
 		},
 		pathItem,
 		nil
+}
+
+func mergeDefaultValues(
+	extensions map[string]interface{},
+	key string,
+	targetValues *map[string]interface{},
+) *map[string]interface{} {
+	if raw, ok := extensions[key].(json.RawMessage); ok {
+		fmt.Printf("mergeDefaultValues step1 [%s] (raw JSON): %s\n", key, string(raw)) // デバッグ
+
+		var configMap map[string]interface{}
+
+		// JSON をデコード
+		if err := json.Unmarshal(raw, &configMap); err != nil {
+			fmt.Printf("❌ Error decoding %s JSON: %v\n", key, err)
+			return targetValues // エラー時は既存の `existingConfig` をそのまま返す
+		}
+
+		fmt.Printf("mergeDefaultValues step2 ✅ Successfully decoded %s: %v\n", key, configMap)
+
+		// **マージ処理**
+		if targetValues == nil {
+			targetValues = &map[string]interface{}{}
+		}
+
+		for key, value := range configMap {
+			(*targetValues)[key] = value
+		}
+
+		fmt.Printf("mergeDefaultValues step3 ✅ Merged %s: %v\n", key, targetValues)
+
+		return targetValues
+	}
+
+	fmt.Printf("mergeDefaultValues step4 ⚠️ Warning: %s is missing or not json.RawMessage\n", key)
+	return targetValues // データがなければそのまま返す
 }

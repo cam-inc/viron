@@ -21,7 +21,7 @@ type (
 		StoreMySQL *MySQL
 		StoreMongo *Mongo
 		Cors       *Cors
-		Auth       *Auth
+		Auth       *pkgConfig.Auth
 		Oas        *Oas
 	}
 
@@ -58,16 +58,6 @@ type (
 	Cors struct {
 		AllowOrigins []string `yaml:"allowOrigins"`
 	}
-	JWT struct {
-		Secret        string                                          `yaml:"secret"`
-		Provider      func(r *http.Request) (string, []string, error) `yaml:"provider"`
-		ExpirationSec int                                             `yaml:"expirationSec"`
-	}
-	Auth struct {
-		JWT          *JWT
-		GoogleOAuth2 *pkgConfig.GoogleOAuth2
-		Oidc         *pkgConfig.Oidc
-	}
 
 	Oas struct {
 		InfoExtensions map[string]interface{} `json:"infoExtensions"`
@@ -103,25 +93,31 @@ func New() *Config {
 	}
 	// TODO: yaml -> statik で環境別設定
 	return &Config{
-		Auth: &Auth{
-			JWT: &JWT{
+		Auth: &pkgConfig.Auth{
+			JWT: &pkgConfig.JWT{
 				Secret:        "xxxxxxxxxxxxxxxxxxxx",
 				Provider:      provider,
 				ExpirationSec: 24 * 60 * 60,
 			},
-			GoogleOAuth2: &pkgConfig.GoogleOAuth2{
-				ClientID:          os.Getenv(constant.GOOGLE_OAUTH2_CLIENT_ID),
-				ClientSecret:      os.Getenv(constant.GOOGLE_OAUTH2_CLIENT_SECRET),
-				AdditionalScope:   []string{},
-				UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
-				IssuerURL:         os.Getenv(constant.GOOGLE_OAUTH2_ISSUER_URL),
-			},
-			Oidc: &pkgConfig.Oidc{
-				ClientID:          os.Getenv(constant.OIDC_CLIENT_ID),
-				ClientSecret:      os.Getenv(constant.OIDC_CLIENT_SECRET),
-				AdditionalScope:   []string{},
-				UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
-				IssuerURL:         os.Getenv(constant.OIDC_ISSUER_URL),
+			MultipleAuthUser: false,
+			SSO: &pkgConfig.SSO{
+				OIDC: []pkgConfig.OIDC{
+					// {
+					// 	ClientID:          os.Getenv(constant.GOOGLE_OAUTH2_CLIENT_ID),
+					// 	ClientSecret:      os.Getenv(constant.GOOGLE_OAUTH2_CLIENT_SECRET),
+					// 	AdditionalScope:   []string{},
+					// 	UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
+					// 	IssuerURL:         os.Getenv(constant.GOOGLE_OAUTH2_ISSUER_URL),
+					// },
+					{
+						Provider:          pkgConstant.AUTH_SSO_IDP_AWS_COGNITO,
+						ClientID:          os.Getenv(constant.OIDC_CLIENT_ID),
+						ClientSecret:      os.Getenv(constant.OIDC_CLIENT_SECRET),
+						AdditionalScope:   []string{},
+						UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
+						IssuerURL:         os.Getenv(constant.OIDC_ISSUER_URL),
+					},
+				},
 			},
 		},
 		Cors: &Cors{

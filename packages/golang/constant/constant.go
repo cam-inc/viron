@@ -49,7 +49,7 @@ const (
 
 	AUTH_CONFIG_PROVIDER_VIRON      = "viron"
 	AUTH_CONFIG_PROVIDER_GOOGLE     = "google"
-	AUTH_CONFIG_PROVIDER_OIDC       = "oidc"
+	AUTH_CONFIG_PROVIDER_SSO        = "sso"
 	AUTH_CONFIG_PROVIDER_SIGNOUT    = "signout"
 	AUTH_CONFIG_TYPE_EMAIL          = "email"
 	AUTH_CONFIG_TYPE_OAUTH          = "oauth"
@@ -58,13 +58,15 @@ const (
 	AUTH_CONFIG_TYPE_OIDC_CALLBACK  = "oidccallback"
 	AUTH_CONFIG_TYPE_SIGNOUT        = "signout"
 
-	VIRON_AUTHCONFIGS_PATH           = "/viron/authconfigs"
-	EMAIL_SIGNIN_PATH                = "/email/signin"
-	OAUTH2_GOOGLE_AUTHORIZATION_PATH = "/oauth2/google/authorization"
-	OAUTH2_GOOGLE_CALLBACK_PATH      = "/oauth2/google/callback"
-	OIDC_AUTHORIZATION_PATH          = "/oidc/authorization"
-	OIDC_CALLBACK_PATH               = "/oidc/callback"
-	SIGNOUT_PATH                     = "/signout"
+	VIRON_AUTHCONFIGS_PATH  = "/viron/authconfigs"
+	EMAIL_SIGNIN_PATH       = "/email/signin"
+	OIDC_AUTHORIZATION_PATH = "/sso/oidc/authorization"
+	OIDC_CALLBACK_PATH      = "/sso/oidc/callback"
+	SIGNOUT_PATH            = "/signout"
+
+	AUTH_SSO_IDP_CUSTOM      = "custom"
+	AUTH_SSO_IDP_GOOGLE      = "google"
+	AUTH_SSO_IDP_AWS_COGNITO = "aws_cognito"
 
 	OAS_X_THUMBNAIL                      = "x-thumbnail"
 	OAS_X_THEME                          = "x-theme"

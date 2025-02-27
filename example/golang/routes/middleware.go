@@ -20,6 +20,8 @@ import (
 
 	"github.com/cam-inc/viron/packages/golang/domains/auth"
 
+	pkgConfig "github.com/cam-inc/viron/packages/golang/config"
+
 	"github.com/cam-inc/viron/example/golang/pkg/config"
 	exContext "github.com/cam-inc/viron/example/golang/pkg/context"
 	"github.com/cam-inc/viron/packages/golang/constant"
@@ -175,7 +177,6 @@ func AuthenticationFunc(ctx context.Context, input *openapi3filter.Authenticatio
 		return nil
 	}
 	if ctx.Value(constant.CTX_KEY_AUTH) == nil {
-		fmt.Println(constant.CTX_KEY_AUTH, "nil")
 		return errors.UnAuthorized
 	}
 	return nil
@@ -210,7 +211,7 @@ func JWTAuthHandlerFunc() func(http.HandlerFunc) http.HandlerFunc {
 		}
 	}
 }
-func JWTSecurityHandlerFunc(cfg *config.Auth) func(http.HandlerFunc) http.HandlerFunc {
+func JWTSecurityHandlerFunc(cfg *pkgConfig.Auth, domainAuthSSO *auth.AuthSSO) func(http.HandlerFunc) http.HandlerFunc {
 	return func(handlerFunc http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
@@ -241,42 +242,26 @@ func JWTSecurityHandlerFunc(cfg *config.Auth) func(http.HandlerFunc) http.Handle
 				return
 			}
 
+			audiance := claim.Aud
 			userID := claim.Sub
 			user := domains.FindByID(ctx, userID)
-			if user == nil {
+
+			// ユーザーが存在しない場合とaudがない場合はエラー
+			if user == nil || len(claim.Aud) == 0 {
 				w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
 				cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
 					MaxAge: -1,
 				})
 				http.SetCookie(w, cookie)
 				http.Error(w, errors.UnAuthorized.Error(), errors.UnAuthorized.StatusCode())
-				fmt.Println("user == nil")
 				return
 			}
 
-			// user.AuthTypeがGoogle,OIDCの場合は、accessTokenの検証を行う Emailの場合は、パススルー
-			switch user.AuthType {
-			case constant.AUTH_TYPE_GOOGLE:
-				fmt.Printf("user %#+v\n", user)
-				if !auth.VerifyGoogleOAuth2AccessToken(r, userID, user) {
-					w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
-					cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
-						MaxAge: -1,
-					})
-					http.SetCookie(w, cookie)
-					http.Error(w, errors.UnAuthorized.Error(), errors.UnAuthorized.StatusCode())
-					return
-				}
-			case constant.AUTH_TYPE_OIDC:
-				if !auth.VerifyOidcAccessToken(r, userID, user) {
-					w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
-					cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
-						MaxAge: -1,
-					})
-					http.SetCookie(w, cookie)
-					http.Error(w, errors.UnAuthorized.Error(), errors.UnAuthorized.StatusCode())
-					return
-				}
+			// メール認証に場合はパススルー
+			if user.Password != nil {
+				// アクセストークンの検証する
+				// audの最初の要素にclientIDを設定している
+				domainAuthSSO.VerifyAccessToken(r, audiance[0], userID, *user)
 			}
 
 			ctx2 := context.WithValue(ctx, constant.CTX_KEY_AUTH, claim)

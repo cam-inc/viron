@@ -16,7 +16,8 @@ import (
 )
 
 type authObj struct {
-	log logging.Logger
+	log           logging.Logger
+	domainAuthSSO *auth.AuthSSO
 }
 
 // SigninEmail emailサインイン
@@ -58,96 +59,22 @@ func (a *authObj) SigninEmail(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (a *authObj) Oauth2GoogleAuthorization(w http.ResponseWriter, r *http.Request, params Oauth2GoogleAuthorizationParams) {
+func (a *authObj) SsoOidcAuthorization(w http.ResponseWriter, r *http.Request, params SsoOidcAuthorizationParams) {
 	state, err := uuid.NewUUID()
 	if err != nil {
 		a.log.Errorf("%v", err)
 		helpers.SendError(w, http.StatusBadRequest, errors.SigninFailed)
 		return
 	}
-	url, errAuthUrl := auth.GetGoogleOAuth2AuthorizationUrl(string(params.RedirectUri), state.String())
-	if errAuthUrl != nil {
-		a.log.Errorf("%v", err)
-	}
-	ctx := r.Context()
-	v := ctx.Value(constant.CTX_KEY_STATE_EXPIRATION_SEC)
-	var age int
-	if v != nil {
-		age, _ = v.(int)
-	}
-	opts := &http.Cookie{
-		MaxAge:   age,
-		Secure:   true,
-		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
-		Domain:   r.URL.Hostname(),
-	}
-	cookie := helpers.GenOAuthStateCookie(state.String(), opts)
-	http.SetCookie(w, cookie)
-	w.Header().Add("location", url)
-	helpers.Send(w, http.StatusFound, nil)
-}
 
-func (a *authObj) Oauth2GoogleCallback(w http.ResponseWriter, r *http.Request) {
-	state, err := r.Cookie(constant.COOKIE_KEY_OAUTH2_STATE)
-
-	if err != nil {
-		a.log.Errorf("%v", err)
-		helpers.SendError(w, http.StatusBadRequest, errors.UnAuthorized)
-		return
-	}
-	oauth2GoogleCollback := &OAuth2GoogleCallbackPayload{}
-	if err := helpers.BodyDecode(r, oauth2GoogleCollback); err != nil {
-		a.log.Errorf("body decode failed -> %v", err)
-		helpers.SendError(w, http.StatusBadRequest, errors.UnAuthorized)
-		return
-	}
-
-	if oauth2GoogleCollback == nil || state == nil || oauth2GoogleCollback.State != state.Value {
-		a.log.Error(errors.MismatchState)
-		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
-		return
-	}
-
-	ctx := r.Context()
-	token, tokenErr := auth.SigninGoogleOAuth2(oauth2GoogleCollback.Code, oauth2GoogleCollback.RedirectUri, r)
-	if tokenErr != nil {
-		a.log.Errorf("tokenErr %v", tokenErr)
-		helpers.SendError(w, http.StatusBadRequest, errors.UnAuthorized)
-		return
-	}
-
-	v := ctx.Value(constant.CTX_KEY_JWT_EXPIRATION_SEC)
-	var age int
-	if v != nil {
-		age, _ = v.(int)
-	}
-	opts := &http.Cookie{
-		MaxAge:   age,
-		Secure:   true,
-		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
-		Domain:   r.URL.Hostname(),
-	}
-
-	cookie := helpers.GenAuthorizationCookie(token, opts)
-	http.SetCookie(w, cookie)
-	helpers.Send(w, http.StatusNoContent, nil)
-}
-
-func (a *authObj) OidcAuthorization(w http.ResponseWriter, r *http.Request, params OidcAuthorizationParams) {
-	state, err := uuid.NewUUID()
-	if err != nil {
-		a.log.Errorf("%v", err)
-		helpers.SendError(w, http.StatusBadRequest, errors.SigninFailed)
-		return
-	}
+	clientID := string(params.ClientId)
+	redirectUri := string(params.RedirectUri)
 
 	// PKCE用のCodeVerifierを生成
-	codeVerifier := auth.GenCodeVerifier()
+	codeVerifier := a.domainAuthSSO.GenOIDCCodeVerifier(clientID)
 
 	// OIDC認証画面URLを取得
-	url := auth.GetOidcAuthorizationUrl(string(params.RedirectUri), codeVerifier, state.String())
+	url := a.domainAuthSSO.GetOIDCAuthorizationUrl(clientID, redirectUri, codeVerifier, state.String())
 
 	// CookieにOIDCのStateとPKCE用のCodeVerifierをセット
 	ctx := r.Context()
@@ -170,7 +97,7 @@ func (a *authObj) OidcAuthorization(w http.ResponseWriter, r *http.Request, para
 	helpers.Send(w, http.StatusFound, nil)
 }
 
-func (a *authObj) OidcCallback(w http.ResponseWriter, r *http.Request) {
+func (a *authObj) SsoOidcCallback(w http.ResponseWriter, r *http.Request) {
 	state, err := r.Cookie(constant.COOKIE_KEY_OIDC_STATE)
 	if err != nil {
 		a.log.Errorf("cookie oidc_state err: %v", err)
@@ -184,21 +111,21 @@ func (a *authObj) OidcCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	oidcCollback := &OidcCallbackPayload{}
-	if err := helpers.BodyDecode(r, oidcCollback); err != nil {
+	oidcCollbackPayload := &SsoOidcCallbackPayload{}
+	if err := helpers.BodyDecode(r, oidcCollbackPayload); err != nil {
 		a.log.Errorf("body decode failed -> %v", err)
 		helpers.SendError(w, http.StatusBadRequest, errors.UnAuthorized)
 		return
 	}
 
-	if state == nil || oidcCollback.State != state.Value || codeVerifier == nil {
+	if state == nil || oidcCollbackPayload.State != state.Value || codeVerifier == nil {
 		a.log.Error(errors.MismatchState)
 		helpers.SendError(w, http.StatusBadRequest, errors.MismatchState)
 		return
 	}
 
 	ctx := r.Context()
-	token, errSigninOdic := auth.SigninOidc(oidcCollback.Code, oidcCollback.State, codeVerifier.Value, oidcCollback.RedirectUri, r)
+	token, errSigninOdic := a.domainAuthSSO.SigninOIDC(r, oidcCollbackPayload.ClientId, oidcCollbackPayload.RedirectUri, oidcCollbackPayload.Code, oidcCollbackPayload.State, codeVerifier.Value)
 	if errSigninOdic != nil {
 		a.log.Errorf("errSigninOdic %v", errSigninOdic)
 		helpers.SendError(w, http.StatusBadRequest, errors.UnAuthorized)
@@ -249,8 +176,9 @@ func (a *authObj) LoadOas() *openapi3.T {
 	return oas
 }
 
-func New() ServerInterface {
+func New(domainAuthSSO *auth.AuthSSO) ServerInterface {
 	return &authObj{
-		log: logging.GetDefaultLogger(),
+		log:           logging.GetDefaultLogger(),
+		domainAuthSSO: domainAuthSSO,
 	}
 }

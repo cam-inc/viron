@@ -128,9 +128,6 @@ components:
           description: Eメールアドレス
           type: string
           format: email
-        authType:
-          description: 認証タイプ
-          type: string
         roleIds:
           description: ロール一覧
           type: array
