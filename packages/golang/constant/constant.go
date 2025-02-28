@@ -64,9 +64,8 @@ const (
 	OIDC_CALLBACK_PATH      = "/sso/oidc/callback"
 	SIGNOUT_PATH            = "/signout"
 
-	AUTH_SSO_IDP_CUSTOM      = "custom"
-	AUTH_SSO_IDP_GOOGLE      = "google"
-	AUTH_SSO_IDP_AWS_COGNITO = "aws_cognito"
+	AUTH_SSO_IDP_CUSTOM = "custom"
+	AUTH_SSO_IDP_GOOGLE = "google"
 
 	OAS_X_THUMBNAIL                      = "x-thumbnail"
 	OAS_X_THEME                          = "x-theme"

@@ -48,7 +48,7 @@ func (as *AuthSSO) GetOIDCAuthorizationUrl(clientID string, redirectUrl string, 
 func (as *AuthSSO) SigninOIDC(r *http.Request, clientID string, redirectUrl string, code string, state string, codeVerifier string) (string, *errors.VironError) {
 	authOIDC := as.getAuthOIDC(clientID)
 	if authOIDC != nil {
-		return authOIDC.signinOIDC(r, redirectUrl, code, state, codeVerifier, as.authConfig.MultipleAuthUser)
+		return authOIDC.signin(r, redirectUrl, code, state, codeVerifier, as.authConfig.MultipleAuthUser)
 	}
 	log.Error("authOIDC is nil ", clientID)
 	return "", errors.SigninFailed
@@ -70,7 +70,7 @@ func (as *AuthSSO) VerifyAccessToken(r *http.Request, clientID string, userID st
 	if ssoToken.AuthType == constant.AUTH_TYPE_OIDC {
 		for _, v := range *as.oidc {
 			if v.oidcConfig.ClientID == clientID {
-				return v.verifyOidcAccessToken(r, userID, *ssoToken)
+				return v.verifyAccessToken(r, userID, *ssoToken)
 			}
 		}
 	}

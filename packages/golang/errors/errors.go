@@ -42,7 +42,7 @@ func Initialize(code int, message string) *VironError {
 var (
 	RepositoryUninitialized   = Initialize(500, "Uninitialized repository is not available")
 	JwtUninitialized          = Initialize(500, "Uninitialized jwt is not available")
-	OidcProviderFailed        = Initialize(500, "oidc provider failed")
+	OIDCProviderFailed        = Initialize(500, "oidc provider failed")
 	RequestBodyDecodeFailed   = Initialize(400, "RequestBody decode failed.")
 	RoleIdAlreadyExists       = Initialize(400, "The role-id is already exists.")
 	SigninFailed              = Initialize(400, "Signin failed")

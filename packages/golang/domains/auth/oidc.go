@@ -36,14 +36,14 @@ func newOIDC(c *config.OIDC) *AuthOIDC {
 	}
 }
 
-func (ao *AuthOIDC) verifyOidcAccessToken(r *http.Request, userID string, ssoToken domains.AdminUserSSOToken) bool {
+func (ao *AuthOIDC) verifyAccessToken(r *http.Request, userID string, ssoToken domains.AdminUserSSOToken) bool {
 	ctx := r.Context()
 	// IDトークンの検証
 	// vironではIDトークンはDBに保存されているので、改竄されることはないが
 	// DBはviron利用者が管理するため改竄されることを考慮してvironLibとしてはIDトークンの検証を毎度行う
-	verifier, err := ao.getOidcTokenVerifier()
+	verifier, err := ao.getTokenVerifier()
 	if err != nil {
-		log.Errorf("getOidcTokenVerifier failed -> %v", err)
+		log.Errorf("getTokenVerifier failed -> %v", err)
 		return false
 	}
 	idToken, errVerify := verifier.Verify(ctx, ssoToken.IdToken)
@@ -69,7 +69,7 @@ func (ao *AuthOIDC) verifyOidcAccessToken(r *http.Request, userID string, ssoTok
 
 	// ---- 以下リフレッシュトークンがある場合の処理 ----
 	// リフレッシュトークンがある場合はリフレッシュトークンを使ってトークンを更新
-	config := ao.getOidcOAuth2Config("")
+	config := ao.getOAuth2Config("")
 	token := &oauth2.Token{
 		AccessToken:  ssoToken.AccessToken,
 		TokenType:    ssoToken.TokenType,
@@ -106,14 +106,14 @@ func (ao *AuthOIDC) verifyOidcAccessToken(r *http.Request, userID string, ssoTok
 	return true
 }
 
-func (ao *AuthOIDC) getOidcTokenVerifier() (*oidc.IDTokenVerifier, *errors.VironError) {
+func (ao *AuthOIDC) getTokenVerifier() (*oidc.IDTokenVerifier, *errors.VironError) {
 	oidcConfig := &oidc.Config{
 		ClientID: ao.oidcConfig.ClientID,
 	}
 	return ao.oidcProvider.Verifier(oidcConfig), nil
 }
 
-func (ao *AuthOIDC) getOidcOAuth2Config(redirectUrl string) *oauth2.Config {
+func (ao *AuthOIDC) getOAuth2Config(redirectUrl string) *oauth2.Config {
 	if ao.oidcOAuth2Config != nil {
 		return ao.oidcOAuth2Config
 	}
@@ -164,18 +164,20 @@ func (ao *AuthOIDC) genCodeVerifier() string {
 }
 
 func (ao *AuthOIDC) getAuthorizationUrl(redirectUrl string, codeVerifier string, state string) string {
-	cfg := ao.getOidcOAuth2Config(redirectUrl)
+	cfg := ao.getOAuth2Config(redirectUrl)
 	return cfg.AuthCodeURL(
 		state,
 		oauth2.S256ChallengeOption(codeVerifier),
+		oauth2.AccessTypeOffline,
+		oauth2.ApprovalForce,
 	)
 }
 
-func (ao *AuthOIDC) signinOIDC(r *http.Request, redirectUrl string, code string, state string, codeVerifier string, multipleAuthUser bool) (string, *errors.VironError) {
+func (ao *AuthOIDC) signin(r *http.Request, redirectUrl string, code string, state string, codeVerifier string, multipleAuthUser bool) (string, *errors.VironError) {
 	ctx := r.Context()
 
 	// 設定取得
-	oauth2Config := ao.getOidcOAuth2Config(redirectUrl)
+	oauth2Config := ao.getOAuth2Config(redirectUrl)
 
 	// 許可コードとトークンを交換
 	oidcToken, errExchange := oauth2Config.Exchange(
@@ -197,9 +199,9 @@ func (ao *AuthOIDC) signinOIDC(r *http.Request, redirectUrl string, code string,
 	}
 
 	// IDトークン検証機を取得
-	verifier, errVerifier := ao.getOidcTokenVerifier()
+	verifier, errVerifier := ao.getTokenVerifier()
 	if errVerifier != nil {
-		log.Errorf("getOidcTokenVerifier failed -> %v", errVerifier)
+		log.Errorf("getTokenVerifier failed -> %v", errVerifier)
 		return "", errors.SigninFailed
 	}
 
@@ -291,6 +293,9 @@ func (ao *AuthOIDC) signinOIDC(r *http.Request, redirectUrl string, code string,
 			}
 		}
 
+		// SSOトークンのUserIDを設定
+		ssoToken.UserID = user.ID
+
 		// ここまででエラーがない場合はSSOトークンのUpsert
 		if err := domains.UpsertAdminUserSSOToken(ctx, ssoToken); err != nil {
 			log.Errorf("UpsertAdminUserSSOToken failed err:%v", err)
@@ -301,7 +306,7 @@ func (ao *AuthOIDC) signinOIDC(r *http.Request, redirectUrl string, code string,
 	// JWTトークンを作成
 	token, errSign := Sign(r, user.ID)
 	if errSign != nil {
-		log.Error("SigninOidc sign failed %#v \n", errSign)
+		log.Error("Signin sign failed %#v \n", errSign)
 		return "", errors.SigninFailed
 	}
 	return token, nil
