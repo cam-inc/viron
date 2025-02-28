@@ -53,9 +53,9 @@ components:
           type: string
           enum:
             - email
-            - oauth
+            - sso
             - signout
-          example: oauth
+          example: sso
         defaultParametersValue:
           description: クライアントからリクエストする際のパラメータ
           type: object
@@ -67,7 +67,6 @@ components:
       required:
         - provider
         - type
-        - pathObject
 
     VironAuthOas:
       type: object

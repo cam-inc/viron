@@ -11,6 +11,9 @@ import (
 	"github.com/cam-inc/viron/example/golang/pkg/constant"
 	pkgConfig "github.com/cam-inc/viron/packages/golang/config"
 	pkgConstant "github.com/cam-inc/viron/packages/golang/constant"
+	pkgDomainsAuth "github.com/cam-inc/viron/packages/golang/domains/auth"
+	pkgHelpers "github.com/cam-inc/viron/packages/golang/helpers"
+	pkgRoutesAuth "github.com/cam-inc/viron/packages/golang/routes/auth"
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -21,7 +24,7 @@ type (
 		StoreMySQL *MySQL
 		StoreMongo *Mongo
 		Cors       *Cors
-		Auth       *Auth
+		Auth       *pkgConfig.Auth
 		Oas        *Oas
 	}
 
@@ -58,15 +61,6 @@ type (
 	Cors struct {
 		AllowOrigins []string `yaml:"allowOrigins"`
 	}
-	JWT struct {
-		Secret        string                                          `yaml:"secret"`
-		Provider      func(r *http.Request) (string, []string, error) `yaml:"provider"`
-		ExpirationSec int                                             `yaml:"expirationSec"`
-	}
-	Auth struct {
-		JWT          *JWT
-		GoogleOAuth2 *pkgConfig.GoogleOAuth2
-	}
 
 	Oas struct {
 		InfoExtensions map[string]interface{} `json:"infoExtensions"`
@@ -97,26 +91,91 @@ func New() *Config {
 	if os.Getenv(pkgConstant.ENV_STORE_MODE) == string(StoreModeMySQL) {
 		mode = StoreModeMySQL
 	}
+	oidcConfigs := []pkgConfig.OIDC{
+		{
+			Provider:          pkgConstant.AUTH_SSO_IDP_GOOGLE,
+			ClientID:          os.Getenv(constant.GOOGLE_OAUTH2_CLIENT_ID),
+			ClientSecret:      os.Getenv(constant.GOOGLE_OAUTH2_CLIENT_SECRET),
+			AdditionalScope:   []string{},
+			UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
+			IssuerURL:         os.Getenv(constant.GOOGLE_OAUTH2_ISSUER_URL),
+		},
+		{
+			Provider:          pkgConstant.AUTH_SSO_IDP_CUSTOM,
+			ClientID:          os.Getenv(constant.OIDC_1_CLIENT_ID),
+			ClientSecret:      os.Getenv(constant.OIDC_1_CLIENT_SECRET),
+			AdditionalScope:   []string{},
+			UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
+			IssuerURL:         os.Getenv(constant.OIDC_1_ISSUER_URL),
+		},
+		{
+			Provider:          pkgConstant.AUTH_SSO_IDP_CUSTOM,
+			ClientID:          os.Getenv(constant.OIDC_2_CLIENT_ID),
+			ClientSecret:      os.Getenv(constant.OIDC_2_CLIENT_SECRET),
+			AdditionalScope:   []string{},
+			UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
+			IssuerURL:         os.Getenv(constant.OIDC_2_ISSUER_URL),
+		},
+	}
+
+	defualtIss := "viron_example"
+	defualtAud := "viron_example"
 	provider := func(r *http.Request) (string, []string, error) {
-		return "viron_example", []string{"viron_example"}, nil
+		// リクエストのuriが/sso/oidc/authorizationと/sso/oidc/callbackの場合bodyからclientId取得してoidcConfigsからIssuerURLとClientID取得
+		if r.RequestURI == pkgConstant.OIDC_AUTHORIZATION_PATH || r.RequestURI == pkgConstant.OIDC_CALLBACK_PATH {
+			// r.bodyのjsonからclientId取得
+			oidcCollbackPayload := &pkgRoutesAuth.SsoOidcCallbackPayload{}
+			if err := pkgHelpers.BodyDecode(r, oidcCollbackPayload); err != nil {
+				return "", nil, err
+			}
+
+			for _, c := range oidcConfigs {
+				if c.ClientID == oidcCollbackPayload.ClientId {
+					return c.IssuerURL, []string{c.ClientID}, nil
+				}
+			}
+			return "", nil, fmt.Errorf("clientId not found %s", oidcCollbackPayload.ClientId)
+		}
+		// リクエストのuriが/email/signinの場合は"viron_example", []string{"viron_example"}, nilを返す
+		if r.RequestURI == pkgConstant.EMAIL_SIGNIN_PATH {
+			return defualtIss, []string{defualtAud}, nil
+		}
+		// 上記以外の場合はすべてのリクエストのverifyなのでrのcookieからtoken取得してtokenのaud(clientId)を取得してoidcConfigsからIssuerURLとClientID取得
+		token, err := pkgHelpers.GetCookieToken(r)
+		if err != nil {
+			return "", nil, err
+		}
+		claims, err := pkgDomainsAuth.VerifyToken(token)
+		if err != nil {
+			return "", nil, err
+		}
+		// defualtAudの場合はdefualtを返す
+		if claims.Audience()[0] == defualtAud {
+			return defualtIss, []string{defualtAud}, nil
+		}
+		// それ以外の場合はoidcConfigsからIssuerURLとClientID取得
+		for _, c := range oidcConfigs {
+			if c.ClientID == claims.Audience()[0] {
+				return c.IssuerURL, []string{c.ClientID}, nil
+			}
+		}
+		return "", nil, fmt.Errorf("missing provider")
 	}
 	// TODO: yaml -> statik で環境別設定
 	return &Config{
-		Auth: &Auth{
-			JWT: &JWT{
+		Auth: &pkgConfig.Auth{
+			JWT: &pkgConfig.JWT{
 				Secret:        "xxxxxxxxxxxxxxxxxxxx",
 				Provider:      provider,
 				ExpirationSec: 24 * 60 * 60,
 			},
-			GoogleOAuth2: &pkgConfig.GoogleOAuth2{
-				ClientID:          os.Getenv(constant.GOOGLE_OAUTH2_CLIENT_ID),
-				ClientSecret:      os.Getenv(constant.GOOGLE_OAUTH2_CLIENT_SECRET),
-				AdditionalScope:   []string{},
-				UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
+			MultipleAuthUser: true,
+			SSO: &pkgConfig.SSO{
+				OIDC: oidcConfigs,
 			},
 		},
 		Cors: &Cors{
-			AllowOrigins: []string{"https://localhost:8000", "https://viron.plus", "https://viron.work"},
+			AllowOrigins: []string{"https://localhost:8000", "https://viron.plus", "https://viron.work", "https://viron.work:8000"},
 		},
 		StoreMode: mode,
 		StoreMySQL: &MySQL{

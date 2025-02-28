@@ -10,10 +10,12 @@ import (
 	"github.com/cam-inc/viron/packages/golang/repositories"
 
 	"github.com/cam-inc/viron/packages/golang/repositories/mysql/adminusers"
+	"github.com/cam-inc/viron/packages/golang/repositories/mysql/adminuserssotokens"
 	"github.com/cam-inc/viron/packages/golang/repositories/mysql/auditlogs"
 	"github.com/cam-inc/viron/packages/golang/repositories/mysql/revokedtokens"
 
 	mongoAdminUsers "github.com/cam-inc/viron/packages/golang/repositories/mongo/adminusers"
+	mongoAdminUserSSOTokens "github.com/cam-inc/viron/packages/golang/repositories/mongo/adminuserssotokens"
 	mongoAuditlogs "github.com/cam-inc/viron/packages/golang/repositories/mongo/auditlogs"
 	mongoRevokedtokens "github.com/cam-inc/viron/packages/golang/repositories/mongo/revokedtokens"
 )
@@ -24,6 +26,7 @@ var (
 
 func SetUpMongoDB(client *mongo.Client) error {
 	repositoriesContainer["adminusers"] = mongoAdminUsers.New(client)
+	repositoriesContainer["adminuserssotokens"] = mongoAdminUserSSOTokens.New(client)
 	repositoriesContainer["auditlogs"] = mongoAuditlogs.New(client)
 	repositoriesContainer["revokedtokens"] = mongoRevokedtokens.New(client)
 	return nil
@@ -31,6 +34,7 @@ func SetUpMongoDB(client *mongo.Client) error {
 
 func SetUpMySQL(conn *sql.DB) error {
 	repositoriesContainer["adminusers"] = adminusers.New(conn)
+	repositoriesContainer["adminuserssotokens"] = adminuserssotokens.New(conn)
 	repositoriesContainer["auditlogs"] = auditlogs.New(conn)
 	repositoriesContainer["revokedtokens"] = revokedtokens.New(conn)
 	// casbin
@@ -41,6 +45,9 @@ func SetUpMySQL(conn *sql.DB) error {
 func SetUpMock(m map[string]mock.MockFunc) error {
 	if _, exists := m["adminusers"]; exists {
 		repositoriesContainer["adminusers"] = mock.New(m["adminusers"])
+	}
+	if _, exists := m["adminuserssotokens"]; exists {
+		repositoriesContainer["adminuserssotokens"] = mock.New(m["adminuserssotokens"])
 	}
 	if _, exists := m["auditlogs"]; exists {
 		repositoriesContainer["auditlogs"] = mock.New(m["auditlogs"])
@@ -55,6 +62,9 @@ func GetAdminUserRepository() repositories.Repository {
 	return repositoriesContainer["adminusers"]
 }
 
+func GetAdminUserSSOTokenRepository() repositories.Repository {
+	return repositoriesContainer["adminuserssotokens"]
+}
 func GetAuditLogRepository() repositories.Repository {
 	return repositoriesContainer["auditlogs"]
 }

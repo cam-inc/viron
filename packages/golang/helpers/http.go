@@ -1,8 +1,10 @@
 package helpers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/cam-inc/viron/packages/golang/errors"
@@ -26,9 +28,15 @@ func Send(w http.ResponseWriter, code int, send interface{}) {
 	}
 }
 
-func BodyDecode(r *http.Request, value interface{}) *errors.VironError {
-	if err := json.NewDecoder(r.Body).Decode(value); err != nil {
-		return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("requestBody json decode failed %+v", err))
+func BodyDecode(r *http.Request, req interface{}) *errors.VironError {
+	// htttp.Request.decodeするとBodyが空になるので後続でdecodeできない
+	// bufferでdecodeする
+	buf, _ := io.ReadAll(r.Body)
+	body := io.NopCloser(bytes.NewBuffer(buf))
+	bak := io.NopCloser(bytes.NewBuffer(buf))
+	if e := json.NewDecoder(body).Decode(req); e != nil {
+		return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("requestBody json decode failed %+v", e))
 	}
+	r.Body = bak
 	return nil
 }

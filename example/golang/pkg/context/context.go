@@ -21,7 +21,7 @@ func Log(ctx context.Context) logging.Logger {
 }
 
 func SetLogger(r *http.Request, level logging.Level) *http.Request {
-	log := logging.GetLogger(constant.LOG_NAME, level)
+	log := logging.GetLogger(string(constant.LOG_NAME), level)
 	ctx := r.Context()
 	ctx = context.WithValue(ctx, constant.LOG_NAME, log)
 	return r.WithContext(ctx)

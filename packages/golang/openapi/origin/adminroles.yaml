@@ -5,7 +5,7 @@ info:
   description: admin roles api specifications
   x-pages:
     - id: vironAdminRoles
-      group: 管理画面/管理
+      group: Viron管理
       title: Viron 管理ロール
       description: 管理ロール一覧を閲覧できます
       contents:

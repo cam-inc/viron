@@ -8,7 +8,9 @@ import (
 )
 
 func setUpRole() {
-	NewFile("./test_casbin")
+	if err := NewFile("./test_casbin"); err != nil {
+		panic(err)
+	}
 }
 
 func TestValidateRoleAndPermissions(t *testing.T) {
