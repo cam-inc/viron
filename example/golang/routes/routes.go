@@ -214,7 +214,7 @@ func New() http.Handler {
 	authImpl := auth.New(domainAuthSSO)
 	auth.HandlerFromMux(authImpl, routeRoot)
 
-	authconfigImp := authconfigs.New(cfg.Auth.SSO)
+	authconfigImp := authconfigs.New(cfg.Auth)
 	authconfigs.HandlerWithOptions(authconfigImp, authconfigs.ChiServerOptions{
 		BaseRouter: routeRoot,
 		Middlewares: []authconfigs.MiddlewareFunc{

@@ -15,6 +15,7 @@ import (
 	"github.com/cam-inc/viron/packages/golang/config"
 
 	"github.com/lestrrat-go/jwx/jwa"
+	jwxJwt "github.com/lestrrat-go/jwx/jwt"
 
 	"github.com/go-chi/jwtauth"
 )
@@ -82,7 +83,7 @@ func Verify(r *http.Request, token string) (*Claim, error) {
 		return nil, fmt.Errorf("this token is revoked %s", token)
 	}
 
-	jwtToken, err := jwtauth.VerifyToken(jwt.JwtAuth, token)
+	jwtToken, err := VerifyToken(token)
 	if err != nil {
 		return nil, err
 	}
@@ -108,6 +109,10 @@ func Verify(r *http.Request, token string) (*Claim, error) {
 	}
 
 	return claim, nil
+}
+
+func VerifyToken(token string) (jwxJwt.Token, error) {
+	return jwtauth.VerifyToken(jwt.JwtAuth, token)
 }
 
 func checkAudience(providerAudience []string, jwtAudience []string) bool {

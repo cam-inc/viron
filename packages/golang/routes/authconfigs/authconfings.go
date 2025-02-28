@@ -16,7 +16,7 @@ import (
 
 type (
 	authConfigs struct {
-		ssoConfig *config.SSO
+		authConfig *config.Auth
 	}
 	authConfigResponse struct {
 		List []*domains.AuthConfig `json:"list"`
@@ -59,7 +59,7 @@ func (a *authConfigs) ListVironAuthconfigs(w http.ResponseWriter, r *http.Reques
 		list = append(list, r)
 		paths[constant.EMAIL_SIGNIN_PATH] = pathItem
 	}
-	for _, oidc := range a.ssoConfig.OIDC {
+	for _, oidc := range a.authConfig.SSO.OIDC {
 		if r, pathItem, err := domains.GenAuthConfig(constant.AUTH_CONFIG_PROVIDER_SSO,
 			constant.AUTH_CONFIG_TYPE_OIDC,
 			http.MethodGet,
@@ -124,8 +124,8 @@ func (a *authConfigs) ListVironAuthconfigs(w http.ResponseWriter, r *http.Reques
 	helpers.Send(w, http.StatusOK, res)
 }
 
-func New(ssoConfig *config.SSO) ServerInterface {
+func New(authConfig *config.Auth) ServerInterface {
 	return &authConfigs{
-		ssoConfig: ssoConfig,
+		authConfig: authConfig,
 	}
 }
