@@ -44,7 +44,6 @@ func GenAuthConfig(
 		return nil, nil, errors.OasUndefined
 	}
 
-	fmt.Println("GenAuthConfig: path=", path, "method=", method, "operationId=", ope.OperationID)
 	defaultParameters := mergeDefaultValues(ope.Extensions, constant.OAS_X_AUTHCONFIG_DEFAULT_PARAMETERS, xDefaultParameters)
 	defaultRequestBody := mergeDefaultValues(ope.Extensions, constant.OAS_X_AUTHCONFIG_DEFAULT_REQUESTBODY, xDefaultRequestBody)
 
@@ -66,8 +65,6 @@ func mergeDefaultValues(
 	targetValues *map[string]interface{},
 ) *map[string]interface{} {
 	if raw, ok := extensions[key].(json.RawMessage); ok {
-		fmt.Printf("mergeDefaultValues step1 [%s] (raw JSON): %s\n", key, string(raw)) // デバッグ
-
 		var configMap map[string]interface{}
 
 		// JSON をデコード
@@ -75,8 +72,6 @@ func mergeDefaultValues(
 			fmt.Printf("❌ Error decoding %s JSON: %v\n", key, err)
 			return targetValues // エラー時は既存の `existingConfig` をそのまま返す
 		}
-
-		fmt.Printf("mergeDefaultValues step2 ✅ Successfully decoded %s: %v\n", key, configMap)
 
 		// **マージ処理**
 		if targetValues == nil {
@@ -87,11 +82,8 @@ func mergeDefaultValues(
 			(*targetValues)[key] = value
 		}
 
-		fmt.Printf("mergeDefaultValues step3 ✅ Merged %s: %v\n", key, targetValues)
-
 		return targetValues
 	}
 
-	fmt.Printf("mergeDefaultValues step4 ⚠️ Warning: %s is missing or not json.RawMessage\n", key)
 	return targetValues // データがなければそのまま返す
 }

@@ -22,7 +22,11 @@ type AuthOIDC struct {
 	oidcOAuth2Config *oauth2.Config
 }
 
+// newOIDC OIDC認証の初期化
 func newOIDC(c *config.OIDC) *AuthOIDC {
+	if c == nil {
+		return nil
+	}
 	oidcProvider, err := oidc.NewProvider(context.Background(), c.IssuerURL)
 	if err != nil {
 		log.Errorf("oidc.NewProvider failed -> %v", err)
@@ -36,6 +40,7 @@ func newOIDC(c *config.OIDC) *AuthOIDC {
 	}
 }
 
+// VerifyAccessToken SSOトークンの検証
 func (ao *AuthOIDC) verifyAccessToken(r *http.Request, userID string, ssoToken domains.AdminUserSSOToken) bool {
 	ctx := r.Context()
 	// IDトークンの検証
@@ -106,6 +111,7 @@ func (ao *AuthOIDC) verifyAccessToken(r *http.Request, userID string, ssoToken d
 	return true
 }
 
+// getTokenVerifier IDトークン検証機取得
 func (ao *AuthOIDC) getTokenVerifier() (*oidc.IDTokenVerifier, *errors.VironError) {
 	oidcConfig := &oidc.Config{
 		ClientID: ao.oidcConfig.ClientID,
@@ -113,13 +119,20 @@ func (ao *AuthOIDC) getTokenVerifier() (*oidc.IDTokenVerifier, *errors.VironErro
 	return ao.oidcProvider.Verifier(oidcConfig), nil
 }
 
+// getOAuth2Config OAuth2設定取得
 func (ao *AuthOIDC) getOAuth2Config(redirectUrl string) *oauth2.Config {
 	if ao.oidcOAuth2Config != nil {
 		return ao.oidcOAuth2Config
 	}
-	scope := constant.OIDC_DEFAULT_SCOPES
+	scope := []string{}
+	// Googleの場合はデフォルトスコープに追加
+	if ao.isGoogle() {
+		scope = append(scope, constant.GOOGLE_OAUTH2_DEFAULT_SCOPES...)
+	} else {
+		scope = append(scope, constant.OIDC_DEFAULT_SCOPES...)
+	}
 	if len(ao.oidcConfig.AdditionalScope) > 0 {
-		scope = append(constant.OIDC_DEFAULT_SCOPES, ao.oidcConfig.AdditionalScope...)
+		scope = append(scope, ao.oidcConfig.AdditionalScope...)
 	}
 	config := &oauth2.Config{
 		ClientID:     ao.oidcConfig.ClientID,
@@ -135,6 +148,7 @@ func (ao *AuthOIDC) getOAuth2Config(redirectUrl string) *oauth2.Config {
 	return config
 }
 
+// allowUserHostedDomains emailドメインの許可
 func (ao *AuthOIDC) allowUserHostedDomains(email string) bool {
 	if len(ao.oidcConfig.UserHostedDomains) == 0 {
 		return true
@@ -148,12 +162,13 @@ func (ao *AuthOIDC) allowUserHostedDomains(email string) bool {
 	return false
 }
 
+// isAccessTokenRefresh アクセストークンのリフレッシュ判定
 func (ao *AuthOIDC) isAccessTokenRefresh(expiry time.Time) bool {
 	// 有効期限の30秒前からリフレッシュ
 	return expiry.Add(-constant.OIDC_REFRESH_THRESHOLD).Before(time.Now())
 }
 
-// ランダムな `code_verifier` を生成
+// genCodeVerifier Code Verifier生成
 func (ao *AuthOIDC) genCodeVerifier() string {
 	b := make([]byte, 32)
 	_, err := rand.Read(b)
@@ -163,16 +178,23 @@ func (ao *AuthOIDC) genCodeVerifier() string {
 	return base64.RawURLEncoding.EncodeToString(b)
 }
 
-func (ao *AuthOIDC) getAuthorizationUrl(redirectUrl string, codeVerifier string, state string) string {
+// genAuthorizationUrl Authorization URL生成
+func (ao *AuthOIDC) genAuthorizationUrl(redirectUrl string, codeVerifier string, state string) string {
 	cfg := ao.getOAuth2Config(redirectUrl)
-	return cfg.AuthCodeURL(
-		state,
+
+	options := []oauth2.AuthCodeOption{
 		oauth2.S256ChallengeOption(codeVerifier),
-		oauth2.AccessTypeOffline,
-		oauth2.ApprovalForce,
-	)
+	}
+
+	// Googleの場合は特殊なパラメータを追加
+	if ao.isGoogle() {
+		options = append(options, oauth2.AccessTypeOffline, oauth2.ApprovalForce)
+	}
+
+	return cfg.AuthCodeURL(state, options...)
 }
 
+// signin OIDC認証
 func (ao *AuthOIDC) signin(r *http.Request, redirectUrl string, code string, state string, codeVerifier string, multipleAuthUser bool) (string, *errors.VironError) {
 	ctx := r.Context()
 
@@ -237,10 +259,14 @@ func (ao *AuthOIDC) signin(r *http.Request, redirectUrl string, code string, sta
 	user := domains.FindByEmail(ctx, claims.Email)
 
 	// SSOトークンはUpsert
+	provider := constant.AUTH_SSO_IDPROVIDER_CUSTOME
+	if ao.isGoogle() {
+		provider = constant.AUTH_SSO_IDPROVIDER_GOOGLE
+	}
 	expiry := int64(oidcToken.Expiry.UnixNano() / int64(time.Millisecond))
 	ssoToken := &domains.AdminUserSSOToken{
 		AuthType:     constant.AUTH_TYPE_OIDC,
-		Provider:     ao.oidcConfig.Provider,
+		Provider:     provider,
 		ClientID:     ao.oidcConfig.ClientID,
 		TokenType:    oidcToken.TokenType,
 		IdToken:      rawIDToken,
@@ -250,6 +276,7 @@ func (ao *AuthOIDC) signin(r *http.Request, redirectUrl string, code string, sta
 	}
 
 	if user == nil {
+		// userが存在しない場合
 		// adminUser Entity
 		userPayload := &domains.AdminUser{
 			Email: claims.Email,
@@ -310,4 +337,9 @@ func (ao *AuthOIDC) signin(r *http.Request, redirectUrl string, code string, sta
 		return "", errors.SigninFailed
 	}
 	return token, nil
+}
+
+// isGoogle GoogleのOIDCかどうか
+func (ao *AuthOIDC) isGoogle() bool {
+	return ao.oidcConfig.IssuerURL == constant.GOOGLE_OIDC_ISSUER_URL
 }

@@ -21,11 +21,6 @@ import (
 )
 
 type (
-	// Config struct {
-	// 	Secret        string
-	// 	Provider      string
-	// 	ExpirationSec int
-	// }
 	Claim struct {
 		Exp int
 		Iat int
@@ -41,7 +36,7 @@ var (
 	log logging.Logger
 )
 
-func SetUp(secret string, provider func(r *http.Request) (string, []string, error), expiration int) error {
+func SetUpJWT(secret string, provider func(r *http.Request) (string, []string, error), expiration int) error {
 	jwt = &config.JWT{
 		Secret:        secret,
 		Provider:      provider,
@@ -116,9 +111,9 @@ func VerifyToken(token string) (jwxJwt.Token, error) {
 }
 
 func checkAudience(providerAudience []string, jwtAudience []string) bool {
-	// 発行者と依頼者が未設定はtrue
+	// 発行者と依頼者が未設定はfalse
 	if len(providerAudience) == 0 && len(jwtAudience) == 0 {
-		return true
+		return false
 	}
 	// jwt audience が provider audienceに含まれていればtrue
 	for _, ja := range jwtAudience {

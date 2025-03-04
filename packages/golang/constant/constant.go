@@ -58,14 +58,18 @@ const (
 	AUTH_CONFIG_TYPE_OIDC_CALLBACK  = "oidccallback"
 	AUTH_CONFIG_TYPE_SIGNOUT        = "signout"
 
-	VIRON_AUTHCONFIGS_PATH  = "/viron/authconfigs"
-	EMAIL_SIGNIN_PATH       = "/email/signin"
-	OIDC_AUTHORIZATION_PATH = "/sso/oidc/authorization"
-	OIDC_CALLBACK_PATH      = "/sso/oidc/callback"
-	SIGNOUT_PATH            = "/signout"
+	VIRON_AUTHCONFIGS_PATH           = "/viron/authconfigs"
+	EMAIL_SIGNIN_PATH                = "/email/signin"
+	GOOGLE_OAUTH2_AUTHORIZATION_PATH = "/oauth2/google/authorization"
+	GOOGLE_OAUTH2_CALLBACK_PATH      = "/oauth2/google/callback"
+	OIDC_AUTHORIZATION_PATH          = "/oidc/authorization"
+	OIDC_CALLBACK_PATH               = "/oidc/callback"
+	SIGNOUT_PATH                     = "/signout"
 
-	AUTH_SSO_IDP_CUSTOM = "custom"
-	AUTH_SSO_IDP_GOOGLE = "google"
+	AUTH_SSO_IDPROVIDER_GOOGLE  = "google"
+	AUTH_SSO_IDPROVIDER_CUSTOME = "custom"
+
+	GOOGLE_OIDC_ISSUER_URL = "https://accounts.google.com"
 
 	OAS_X_THUMBNAIL                      = "x-thumbnail"
 	OAS_X_THEME                          = "x-theme"
@@ -89,7 +93,9 @@ const (
 
 	DEFAULT_JWT_EXPIRATION_SEC = 24 * 60 * 60
 
-	OAUTH2_STATE_EXPIRATION_SEC = 10 * 60
+	GOOGLE_OAUTH2_STATE_EXPIRATION_SEC = 10 * 60
+
+	GOOGLE_OAUTH2_CODE_VERIFIER_EXPIRATION_SEC = 10 * 60
 
 	OIDC_STATE_EXPIRATION_SEC = 10 * 60
 
@@ -101,10 +107,11 @@ const (
 
 	CASBIN_LOAD_INTERVAL_SEC = 1 * 60
 
-	COOKIE_KEY_VIRON_AUTHORIZATION = "viron_authorization"
-	COOKIE_KEY_OAUTH2_STATE        = "oauth2_state"
-	COOKIE_KEY_OIDC_STATE          = "oidc_state"
-	COOKIE_KEY_OIDC_CODE_VERIFIER  = "oidc_code_verifier"
+	COOKIE_KEY_VIRON_AUTHORIZATION         = "viron_authorization"
+	COOKIE_KEY_GOOGLE_OAUTH2_STATE         = "google_oauth2_state"
+	COOKIE_KEY_GOOGLE_OAUTH2_CODE_VERIFIER = "google_oauth2_code_verifier"
+	COOKIE_KEY_OIDC_STATE                  = "oidc_state"
+	COOKIE_KEY_OIDC_CODE_VERIFIER          = "oidc_code_verifier"
 
 	RED                  = Theme("red")
 	ULTIMATE_ORANGE      = Theme("ultimate orange")

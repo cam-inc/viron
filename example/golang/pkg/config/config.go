@@ -24,7 +24,7 @@ type (
 		StoreMySQL *MySQL
 		StoreMongo *Mongo
 		Cors       *Cors
-		Auth       *pkgConfig.Auth
+		Auth       pkgConfig.Auth
 		Oas        *Oas
 	}
 
@@ -91,88 +91,95 @@ func New() *Config {
 	if os.Getenv(pkgConstant.ENV_STORE_MODE) == string(StoreModeMySQL) {
 		mode = StoreModeMySQL
 	}
-	oidcConfigs := []pkgConfig.OIDC{
-		{
-			Provider:          pkgConstant.AUTH_SSO_IDP_GOOGLE,
-			ClientID:          os.Getenv(constant.GOOGLE_OAUTH2_CLIENT_ID),
-			ClientSecret:      os.Getenv(constant.GOOGLE_OAUTH2_CLIENT_SECRET),
-			AdditionalScope:   []string{},
-			UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
-			IssuerURL:         os.Getenv(constant.GOOGLE_OAUTH2_ISSUER_URL),
-		},
-		{
-			Provider:          pkgConstant.AUTH_SSO_IDP_CUSTOM,
-			ClientID:          os.Getenv(constant.OIDC_1_CLIENT_ID),
-			ClientSecret:      os.Getenv(constant.OIDC_1_CLIENT_SECRET),
-			AdditionalScope:   []string{},
-			UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
-			IssuerURL:         os.Getenv(constant.OIDC_1_ISSUER_URL),
-		},
-		{
-			Provider:          pkgConstant.AUTH_SSO_IDP_CUSTOM,
-			ClientID:          os.Getenv(constant.OIDC_2_CLIENT_ID),
-			ClientSecret:      os.Getenv(constant.OIDC_2_CLIENT_SECRET),
-			AdditionalScope:   []string{},
-			UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
-			IssuerURL:         os.Getenv(constant.OIDC_2_ISSUER_URL),
-		},
+
+	// google oauth2の設定
+	googleOAuth2Config := pkgConfig.GoogleOAuth2{
+		ClientID:          os.Getenv(constant.GOOGLE_OAUTH2_CLIENT_ID),
+		ClientSecret:      os.Getenv(constant.GOOGLE_OAUTH2_CLIENT_SECRET),
+		AdditionalScope:   []string{},
+		UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
+		IssuerURL:         os.Getenv(constant.GOOGLE_OAUTH2_ISSUER_URL),
+	}
+	// oidcの設定
+	oidcConfig := pkgConfig.OIDC{
+		ClientID:          os.Getenv(constant.OIDC_CLIENT_ID),
+		ClientSecret:      os.Getenv(constant.OIDC_CLIENT_SECRET),
+		AdditionalScope:   []string{},
+		UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
+		IssuerURL:         os.Getenv(constant.OIDC_ISSUER_URL),
 	}
 
-	defualtIss := "viron_example"
-	defualtAud := "viron_example"
+	// emailの設定
+	emailJwtIssuer := os.Getenv(constant.EMAIL_JWT_ISSUER)
+	emailJwtAudience := []string{os.Getenv(constant.EMAIL_JWT_AUDIENCE)}
+
+	// jwtのprovider
 	provider := func(r *http.Request) (string, []string, error) {
-		// リクエストのuriが/sso/oidc/authorizationと/sso/oidc/callbackの場合bodyからclientId取得してoidcConfigsからIssuerURLとClientID取得
-		if r.RequestURI == pkgConstant.OIDC_AUTHORIZATION_PATH || r.RequestURI == pkgConstant.OIDC_CALLBACK_PATH {
-			// r.bodyのjsonからclientId取得
-			oidcCollbackPayload := &pkgRoutesAuth.SsoOidcCallbackPayload{}
+		switch r.RequestURI {
+		// oidc authorizationの場合はclientIDを取得してissuerURLを返す
+		case pkgConstant.OIDC_AUTHORIZATION_PATH, pkgConstant.OIDC_CALLBACK_PATH:
+			oidcCollbackPayload := &pkgRoutesAuth.OidcCallbackPayload{}
 			if err := pkgHelpers.BodyDecode(r, oidcCollbackPayload); err != nil {
 				return "", nil, err
 			}
 
-			for _, c := range oidcConfigs {
-				if c.ClientID == oidcCollbackPayload.ClientId {
-					return c.IssuerURL, []string{c.ClientID}, nil
-				}
+			if oidcConfig.ClientID == oidcCollbackPayload.ClientId {
+				return oidcConfig.IssuerURL, []string{oidcConfig.ClientID}, nil
 			}
 			return "", nil, fmt.Errorf("clientId not found %s", oidcCollbackPayload.ClientId)
-		}
-		// リクエストのuriが/email/signinの場合は"viron_example", []string{"viron_example"}, nilを返す
-		if r.RequestURI == pkgConstant.EMAIL_SIGNIN_PATH {
-			return defualtIss, []string{defualtAud}, nil
-		}
-		// 上記以外の場合はすべてのリクエストのverifyなのでrのcookieからtoken取得してtokenのaud(clientId)を取得してoidcConfigsからIssuerURLとClientID取得
-		token, err := pkgHelpers.GetCookieToken(r)
-		if err != nil {
-			return "", nil, err
-		}
-		claims, err := pkgDomainsAuth.VerifyToken(token)
-		if err != nil {
-			return "", nil, err
-		}
-		// defualtAudの場合はdefualtを返す
-		if claims.Audience()[0] == defualtAud {
-			return defualtIss, []string{defualtAud}, nil
-		}
-		// それ以外の場合はoidcConfigsからIssuerURLとClientID取得
-		for _, c := range oidcConfigs {
-			if c.ClientID == claims.Audience()[0] {
-				return c.IssuerURL, []string{c.ClientID}, nil
+		// google oauth2 authorizationの場合はclientIDを取得してissuerURLを返す
+		case pkgConstant.GOOGLE_OAUTH2_AUTHORIZATION_PATH, pkgConstant.GOOGLE_OAUTH2_CALLBACK_PATH:
+			googleOAuth2CollbackPayload := &pkgRoutesAuth.OAuth2GoogleCallbackPayload{}
+			if err := pkgHelpers.BodyDecode(r, googleOAuth2CollbackPayload); err != nil {
+				return "", nil, err
+			}
+
+			if googleOAuth2Config.ClientID == googleOAuth2CollbackPayload.ClientId {
+				return googleOAuth2Config.IssuerURL, []string{googleOAuth2Config.ClientID}, nil
+			}
+			return "", nil, fmt.Errorf("clientId not found %s", googleOAuth2CollbackPayload.ClientId)
+		// email signinの場合はissuerURLを返す
+		case pkgConstant.EMAIL_SIGNIN_PATH:
+			return emailJwtIssuer, emailJwtAudience, nil
+
+		// その他の場合はtokenを取得してissuerURLを返す
+		default:
+			token, err := pkgHelpers.GetCookieToken(r)
+			if err != nil {
+				return "", nil, err
+			}
+			claims, err := pkgDomainsAuth.VerifyToken(token)
+			if err != nil {
+				return "", nil, err
+			}
+
+			switch claims.Audience()[0] {
+			case emailJwtAudience[0]:
+				return emailJwtIssuer, emailJwtAudience, nil
+			case oidcConfig.ClientID:
+				return oidcConfig.IssuerURL, []string{oidcConfig.ClientID}, nil
+			case googleOAuth2Config.ClientID:
+				return googleOAuth2Config.IssuerURL, []string{googleOAuth2Config.ClientID}, nil
+			default:
+				return "", nil, fmt.Errorf("missing provider")
 			}
 		}
-		return "", nil, fmt.Errorf("missing provider")
 	}
-	// TODO: yaml -> statik で環境別設定
+
+	// configの生成
+	multipleAuthUser := os.Getenv(constant.MULTIPLE_AUTH_USER) == "true"
 	return &Config{
-		Auth: &pkgConfig.Auth{
-			JWT: &pkgConfig.JWT{
+		Auth: pkgConfig.Auth{
+			JWT: pkgConfig.JWT{
 				Secret:        "xxxxxxxxxxxxxxxxxxxx",
 				Provider:      provider,
 				ExpirationSec: 24 * 60 * 60,
+				Issuer:        emailJwtIssuer,
+				Audience:      emailJwtAudience,
 			},
-			MultipleAuthUser: true,
-			SSO: &pkgConfig.SSO{
-				OIDC: oidcConfigs,
-			},
+			MultipleAuthUser: &multipleAuthUser,
+			GoogleOAuth2:     &googleOAuth2Config,
+			OIDC:             &oidcConfig,
 		},
 		Cors: &Cors{
 			AllowOrigins: []string{"https://localhost:8000", "https://viron.plus", "https://viron.work", "https://viron.work:8000"},

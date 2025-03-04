@@ -15,7 +15,7 @@ const (
 )
 
 func init() {
-	if err := SetUp(secret, getProvider, 1); err != nil {
+	if err := SetUpJWT(secret, getProvider, 1); err != nil {
 		panic(err)
 	}
 }

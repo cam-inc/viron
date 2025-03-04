@@ -20,8 +20,6 @@ import (
 
 	"github.com/cam-inc/viron/packages/golang/domains/auth"
 
-	pkgConfig "github.com/cam-inc/viron/packages/golang/config"
-
 	"github.com/cam-inc/viron/example/golang/pkg/config"
 	exContext "github.com/cam-inc/viron/example/golang/pkg/context"
 	"github.com/cam-inc/viron/packages/golang/constant"
@@ -211,7 +209,7 @@ func JWTAuthHandlerFunc() func(http.HandlerFunc) http.HandlerFunc {
 		}
 	}
 }
-func JWTSecurityHandlerFunc(cfg *pkgConfig.Auth, domainAuthSSO *auth.AuthSSO) func(http.HandlerFunc) http.HandlerFunc {
+func JWTSecurityHandlerFunc(domainAuth *auth.Auth) func(http.HandlerFunc) http.HandlerFunc {
 	return func(handlerFunc http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
@@ -261,7 +259,7 @@ func JWTSecurityHandlerFunc(cfg *pkgConfig.Auth, domainAuthSSO *auth.AuthSSO) fu
 			if user.Password != nil {
 				// アクセストークンの検証する
 				// audの最初の要素にclientIDを設定している
-				domainAuthSSO.VerifyAccessToken(r, audiance[0], userID, *user)
+				domainAuth.VerifyAccessToken(r, audiance[0], userID, *user)
 			}
 
 			ctx2 := context.WithValue(ctx, constant.CTX_KEY_AUTH, claim)

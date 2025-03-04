@@ -27,7 +27,7 @@ import (
 	"github.com/cam-inc/viron/example/golang/pkg/config"
 	"github.com/cam-inc/viron/example/golang/pkg/store"
 	packageDomains "github.com/cam-inc/viron/packages/golang/domains"
-	domainAuth "github.com/cam-inc/viron/packages/golang/domains/auth"
+	packageDomainAuth "github.com/cam-inc/viron/packages/golang/domains/auth"
 	"github.com/cam-inc/viron/packages/golang/routes/auth"
 	"github.com/cam-inc/viron/packages/golang/routes/oas"
 	"github.com/go-chi/chi/middleware"
@@ -38,7 +38,7 @@ import (
 func New() http.Handler {
 
 	cfg := config.New()
-	domainAuthSSO := domainAuth.NewSSO(cfg.Auth)
+	domainAuth := packageDomainAuth.New(cfg.Auth.MultipleAuthUser, cfg.Auth.GoogleOAuth2, cfg.Auth.OIDC)
 
 	if cfg.StoreMode == config.StoreModeMySQL {
 		mysqlConfig := cfg.StoreMySQL
@@ -162,7 +162,7 @@ func New() http.Handler {
 			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
 				AuthenticationFunc: AuthenticationFunc,
 			}),
-			JWTSecurityHandlerFunc(cfg.Auth, domainAuthSSO),
+			JWTSecurityHandlerFunc(domainAuth),
 		},
 	})
 
@@ -171,7 +171,7 @@ func New() http.Handler {
 		BaseRouter: routeRoot,
 		Middlewares: []adminusers.MiddlewareFunc{
 			InjectAPIACL(definition),
-			JWTSecurityHandlerFunc(cfg.Auth, domainAuthSSO),
+			JWTSecurityHandlerFunc(domainAuth),
 			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
 				AuthenticationFunc: AuthenticationFunc,
 			}),
@@ -185,7 +185,7 @@ func New() http.Handler {
 		BaseRouter: routeRoot,
 		Middlewares: []adminaccounts.MiddlewareFunc{
 			InjectAPIACL(definition),
-			JWTSecurityHandlerFunc(cfg.Auth, domainAuthSSO),
+			JWTSecurityHandlerFunc(domainAuth),
 			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
 				AuthenticationFunc: AuthenticationFunc,
 			}),
@@ -199,7 +199,7 @@ func New() http.Handler {
 		BaseRouter: routeRoot,
 		Middlewares: []adminroles.MiddlewareFunc{
 			InjectAPIACL(definition),
-			JWTSecurityHandlerFunc(cfg.Auth, domainAuthSSO),
+			JWTSecurityHandlerFunc(domainAuth),
 			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
 				AuthenticationFunc: AuthenticationFunc,
 			}),
@@ -208,18 +208,18 @@ func New() http.Handler {
 		},
 	})
 
-	if err := domainAuth.SetUp(cfg.Auth.JWT.Secret, cfg.Auth.JWT.Provider, cfg.Auth.JWT.ExpirationSec); err != nil {
+	if err := packageDomainAuth.SetUpJWT(cfg.Auth.JWT.Secret, cfg.Auth.JWT.Provider, cfg.Auth.JWT.ExpirationSec); err != nil {
 		panic(err)
 	}
-	authImpl := auth.New(domainAuthSSO)
+	authImpl := auth.New(domainAuth)
 	auth.HandlerFromMux(authImpl, routeRoot)
 
-	authconfigImp := authconfigs.New(cfg.Auth)
+	authconfigImp := authconfigs.New(cfg.Auth.GoogleOAuth2, cfg.Auth.OIDC)
 	authconfigs.HandlerWithOptions(authconfigImp, authconfigs.ChiServerOptions{
 		BaseRouter: routeRoot,
 		Middlewares: []authconfigs.MiddlewareFunc{
 			InjectAPIDefinition(definition),
-			JWTSecurityHandlerFunc(cfg.Auth, domainAuthSSO),
+			JWTSecurityHandlerFunc(domainAuth),
 		},
 	})
 
@@ -228,7 +228,7 @@ func New() http.Handler {
 		BaseRouter: routeRoot,
 		Middlewares: []auditlogs.MiddlewareFunc{
 			InjectAPIACL(definition),
-			JWTSecurityHandlerFunc(cfg.Auth, domainAuthSSO),
+			JWTSecurityHandlerFunc(domainAuth),
 			InjectAPIDefinition(definition),
 		},
 	})
