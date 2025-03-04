@@ -21,8 +21,6 @@ type Auth struct {
 
 // New Auth初期化
 func New(multipleAuthUser *bool, google *config.GoogleOAuth2, oidc *config.OIDC) *Auth {
-	fmt.Printf("multipleAuthUser: %v, google: %v, oidc: %v\n", multipleAuthUser, google, oidc)
-
 	var googleConfig *config.OIDC
 	if google != nil {
 		// googleOAuth2は実質OIDCと同じなのでOIDCの実装を使い、isGoogleで拡張処理を行う

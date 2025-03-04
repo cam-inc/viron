@@ -209,6 +209,16 @@ func JWTAuthHandlerFunc() func(http.HandlerFunc) http.HandlerFunc {
 		}
 	}
 }
+
+func unAuthorized(w http.ResponseWriter) {
+	w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
+	cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
+		MaxAge: -1,
+	})
+	http.SetCookie(w, cookie)
+	http.Error(w, errors.UnAuthorized.Error(), errors.UnAuthorized.StatusCode())
+}
+
 func JWTSecurityHandlerFunc(domainAuth *auth.Auth) func(http.HandlerFunc) http.HandlerFunc {
 	return func(handlerFunc http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
@@ -220,46 +230,43 @@ func JWTSecurityHandlerFunc(domainAuth *auth.Auth) func(http.HandlerFunc) http.H
 			token, err := helpers.GetCookieToken(r)
 			if err != nil {
 				fmt.Println(err)
-				w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
-				cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
-					MaxAge: -1,
-				})
-				http.SetCookie(w, cookie)
-				http.Error(w, errors.UnAuthorized.Error(), errors.UnAuthorized.StatusCode())
+				unAuthorized(w)
 				return
 			}
 			claim, err := auth.Verify(r, token)
 			if err != nil {
 				fmt.Println(err)
-				w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
-				cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
-					MaxAge: -1,
-				})
-				http.SetCookie(w, cookie)
-				http.Error(w, errors.UnAuthorized.Error(), errors.UnAuthorized.StatusCode())
+				unAuthorized(w)
 				return
 			}
 
-			audiance := claim.Aud
+			audience := claim.Aud
 			userID := claim.Sub
 			user := domains.FindByID(ctx, userID)
 
 			// ユーザーが存在しない場合とaudがない場合はエラー
-			if user == nil || len(claim.Aud) == 0 {
-				w.Header().Add(constant.HTTP_HEADER_X_VIRON_AUTHTYPES_PATH, constant.VIRON_AUTHCONFIGS_PATH)
-				cookie := helpers.GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, "", &http.Cookie{
-					MaxAge: -1,
-				})
-				http.SetCookie(w, cookie)
-				http.Error(w, errors.UnAuthorized.Error(), errors.UnAuthorized.StatusCode())
+			if user == nil || len(audience) == 0 {
+				fmt.Println("user not found or aud not found")
+				unAuthorized(w)
 				return
 			}
 
-			// メール認証に場合はパススルー
-			if user.Password != nil {
-				// アクセストークンの検証する
-				// audの最初の要素にclientIDを設定している
-				domainAuth.VerifyAccessToken(r, audiance[0], userID, *user)
+			// SSOトークンを取得
+			ssoToken := domains.FindSSOTokenByUserID(ctx, audience[0], userID)
+
+			// SSOトークンが存在しない場合でパスワードない場合はエラー
+			if ssoToken == nil && user.Password == nil {
+				fmt.Println("ssoToken not found and password not found")
+				unAuthorized(w)
+				return
+			}
+
+			// SSOトークンが存在する場合は検証
+			// audの最初の要素にclientIDを設定している
+			if ssoToken != nil && !domainAuth.VerifyAccessToken(r, claim.Aud[0], userID, *user) {
+				fmt.Println("verifyAccessToken failed")
+				unAuthorized(w)
+				return
 			}
 
 			ctx2 := context.WithValue(ctx, constant.CTX_KEY_AUTH, claim)

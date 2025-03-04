@@ -90,7 +90,8 @@ func CountAdminUserSSOToken(ctx context.Context) int {
 func FindSSOTokenByUserID(ctx context.Context, clientID string, userID string) *AdminUserSSOToken {
 
 	conditions := &repositories.AdminUserSSOTokenConditions{
-		ID: userID,
+		UserID:   userID,
+		ClientID: clientID,
 		Paginate: &repositories.Paginate{
 			Size: 1,
 			Page: 1,
@@ -102,6 +103,10 @@ func FindSSOTokenByUserID(ctx context.Context, clientID string, userID string) *
 
 func findOneSSOToken(ctx context.Context, conditions *repositories.AdminUserSSOTokenConditions) *AdminUserSSOToken {
 	repo := container.GetAdminUserSSOTokenRepository()
+	conditions.Paginate = &repositories.Paginate{
+		Size: 1,
+		Page: 1,
+	}
 	result, err := repo.Find(ctx, conditions)
 	if err != nil || len(result) == 0 {
 		log.Errorf("adminuserssotokens.go findOne conditions:%+v err %+v result %+v", conditions, err, result)

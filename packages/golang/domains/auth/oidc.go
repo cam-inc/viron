@@ -42,6 +42,7 @@ func newOIDC(c *config.OIDC) *AuthOIDC {
 
 // VerifyAccessToken SSOトークンの検証
 func (ao *AuthOIDC) verifyAccessToken(r *http.Request, userID string, ssoToken domains.AdminUserSSOToken) bool {
+	log.Info("verifyAccessToken start userId:", userID)
 	ctx := r.Context()
 	// IDトークンの検証
 	// vironではIDトークンはDBに保存されているので、改竄されることはないが
