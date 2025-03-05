@@ -57,8 +57,6 @@ func CreateAdminUser(ctx context.Context, payload *AdminUser, authType string) (
 		password := helpers.GenPassword(*payload.Password, "")
 		adminUser.Password = &password.Password
 		adminUser.Salt = &password.Salt
-	} else if authType == constant.AUTH_TYPE_GOOGLE {
-		adminUser.Email = string(payload.Email)
 	} else if authType == constant.AUTH_TYPE_OIDC {
 		adminUser.Email = string(payload.Email)
 	}

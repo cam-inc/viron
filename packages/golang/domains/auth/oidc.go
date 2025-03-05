@@ -307,7 +307,7 @@ func (ao *AuthOIDC) signin(r *http.Request, redirectUrl string, code string, sta
 				return "", errors.SigninFailed
 			}
 			// userIdで登録済みSSOトークン情報を取得
-			ssoTokens, err := domains.ListAdminUserSSOToken(ctx, &domains.AdminUserSSOTokenConditions{UserID: user.ID, Size: 10000})
+			ssoTokens, err := domains.ListAdminUserSSOToken(ctx, &domains.AdminUserSSOTokenConditions{UserID: user.ID, Size: 99})
 			if err != nil {
 				log.Errorf("ListAdminUserSSOToken failed err:%v", err)
 				return "", errors.SigninFailed

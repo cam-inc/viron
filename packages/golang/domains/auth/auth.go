@@ -9,6 +9,11 @@ import (
 	"github.com/cam-inc/viron/packages/golang/constant"
 	"github.com/cam-inc/viron/packages/golang/domains"
 	"github.com/cam-inc/viron/packages/golang/errors"
+	"github.com/cam-inc/viron/packages/golang/logging"
+)
+
+var (
+	log logging.Logger
 )
 
 type Auth struct {
@@ -21,6 +26,8 @@ type Auth struct {
 
 // New Auth初期化
 func New(multipleAuthUser *bool, google *config.GoogleOAuth2, oidc *config.OIDC) *Auth {
+	log = logging.GetDefaultLogger()
+
 	var googleConfig *config.OIDC
 	if google != nil {
 		// googleOAuth2は実質OIDCと同じなのでOIDCの実装を使い、isGoogleで拡張処理を行う
@@ -126,14 +133,22 @@ func (a *Auth) VerifyAccessToken(r *http.Request, clientID string, userID string
 
 	// 認証タイプがoidcの場合はOIDCトークンを検証
 	if ssoToken.AuthType == constant.AUTH_TYPE_OIDC {
-		if a.authOIDCConfig.ClientID == clientID {
-			return a.authOIDC.verifyAccessToken(r, userID, *ssoToken)
+		switch ssoToken.Provider {
+		// SSO認証プロバイダーがcustom場合はOIDCトークンを検証
+		case constant.AUTH_SSO_IDPROVIDER_CUSTOME:
+			if a.authOIDCConfig.ClientID == clientID {
+				return a.authOIDC.verifyAccessToken(r, userID, *ssoToken)
+			}
+		// SSO認証プロバイダーがgoogleの場合はGoogleOAuth2トークンを検証
+		case constant.AUTH_SSO_IDPROVIDER_GOOGLE:
+			if a.authGoogleOAuth2Config.ClientID == clientID {
+				return a.authGoogleOAuth2.verifyAccessToken(r, userID, *ssoToken)
+			}
 		}
 	}
 
 	log.Info("authType is not oidc ", clientID)
-	return true
-
+	return false
 }
 
 // 以下 パッケージ関数

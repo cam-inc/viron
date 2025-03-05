@@ -117,7 +117,7 @@ func New() *Config {
 	provider := func(r *http.Request) (string, []string, error) {
 		switch r.RequestURI {
 		// oidc authorizationの場合はclientIDを取得してissuerURLを返す
-		case pkgConstant.OIDC_AUTHORIZATION_PATH, pkgConstant.OIDC_CALLBACK_PATH:
+		case pkgConstant.OIDC_CALLBACK_PATH:
 			oidcCollbackPayload := &pkgRoutesAuth.OidcCallbackPayload{}
 			if err := pkgHelpers.BodyDecode(r, oidcCollbackPayload); err != nil {
 				return "", nil, err
@@ -128,7 +128,7 @@ func New() *Config {
 			}
 			return "", nil, fmt.Errorf("clientId not found %s", oidcCollbackPayload.ClientId)
 		// google oauth2 authorizationの場合はclientIDを取得してissuerURLを返す
-		case pkgConstant.GOOGLE_OAUTH2_AUTHORIZATION_PATH, pkgConstant.GOOGLE_OAUTH2_CALLBACK_PATH:
+		case pkgConstant.GOOGLE_OAUTH2_CALLBACK_PATH:
 			googleOAuth2CollbackPayload := &pkgRoutesAuth.OAuth2GoogleCallbackPayload{}
 			if err := pkgHelpers.BodyDecode(r, googleOAuth2CollbackPayload); err != nil {
 				return "", nil, err

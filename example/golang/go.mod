@@ -2,8 +2,6 @@ module github.com/cam-inc/viron/example/golang
 
 go 1.23.0
 
-toolchain go1.23.6
-
 require (
 	github.com/cam-inc/viron/packages/golang v0.0.0-00010101000000-000000000000
 	github.com/getkin/kin-openapi v0.94.0

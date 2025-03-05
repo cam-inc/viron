@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cam-inc/viron/packages/golang/logging"
-
 	"github.com/cam-inc/viron/packages/golang/errors"
 
 	"github.com/cam-inc/viron/packages/golang/constant"
@@ -33,7 +31,6 @@ type (
 
 var (
 	jwt *config.JWT
-	log logging.Logger
 )
 
 func SetUpJWT(secret string, provider func(r *http.Request) (string, []string, error), expiration int) error {
@@ -43,7 +40,6 @@ func SetUpJWT(secret string, provider func(r *http.Request) (string, []string, e
 		ExpirationSec: expiration,
 		JwtAuth:       jwtauth.New(string(jwa.HS512), []byte(secret), nil),
 	}
-	log = logging.GetDefaultLogger()
 	return nil
 }
 

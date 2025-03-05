@@ -120,8 +120,6 @@ func findOneSSOToken(ctx context.Context, conditions *repositories.AdminUserSSOT
 		return nil
 	}
 
-	user.RoleIDs = listRoles(user.ID)
-
 	return &AdminUserSSOToken{
 		ID:           user.ID,
 		UserID:       user.UserID,
