@@ -292,8 +292,7 @@ func InjectAuditLog(next http.Handler) http.Handler {
 			if body != "" {
 				j := map[string]interface{}{}
 				if err := json.Unmarshal([]byte(body), &j); err == nil {
-					for k, v := range j {
-						fmt.Printf("k %+v v %+v\n", k, v)
+					for k := range j {
 						if strings.Contains(k, "pass") {
 							j[k] = "***************************"
 						}
