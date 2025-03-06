@@ -131,15 +131,15 @@ func New() *Config {
 			return "", nil, fmt.Errorf("clientId not found %s", oidcCallbackPayload.ClientId)
 		// google oauth2 authorizationの場合はclientIDを取得してissuerURLを返す
 		case pkgConstant.GOOGLE_OAUTH2_CALLBACK_PATH:
-			googleOAuth2CollbackPayload := &pkgRoutesAuth.OAuth2GoogleCallbackPayload{}
-			if err := pkgHelpers.BodyDecode(r, googleOAuth2CollbackPayload); err != nil {
+			googleOAuth2CallbackPayload := &pkgRoutesAuth.OAuth2GoogleCallbackPayload{}
+			if err := pkgHelpers.BodyDecode(r, googleOAuth2CallbackPayload); err != nil {
 				return "", nil, err
 			}
 
-			if googleOAuth2Config.ClientID == googleOAuth2CollbackPayload.ClientId {
+			if googleOAuth2Config.ClientID == googleOAuth2CallbackPayload.ClientId {
 				return googleOAuth2Config.IssuerURL, []string{googleOAuth2Config.ClientID}, nil
 			}
-			return "", nil, fmt.Errorf("clientId not found %s", googleOAuth2CollbackPayload.ClientId)
+			return "", nil, fmt.Errorf("clientId not found %s", googleOAuth2CallbackPayload.ClientId)
 		// email signinの場合はissuerURLを返す
 		case pkgConstant.EMAIL_SIGNIN_PATH:
 			return emailJwtIssuer, emailJwtAudience, nil
