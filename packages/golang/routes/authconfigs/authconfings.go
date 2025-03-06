@@ -78,10 +78,12 @@ func (a *authConfigs) ListVironAuthconfigs(w http.ResponseWriter, r *http.Reques
 			constant.OIDC_AUTHORIZATION_PATH,
 			clone,
 			&map[string]interface{}{
-				"clientId": a.configOIDC.ClientID,
+				"clientId":    a.configOIDC.ClientID,
+				"redirectUri": a.configOIDC.RedirectURL,
 			},
 			&map[string]interface{}{
-				"clientId": a.configOIDC.ClientID,
+				"clientId":    a.configOIDC.ClientID,
+				"redirectUri": a.configOIDC.RedirectURL,
 			},
 		); err != nil {
 			helpers.SendError(w, err.StatusCode(), err)
@@ -96,10 +98,12 @@ func (a *authConfigs) ListVironAuthconfigs(w http.ResponseWriter, r *http.Reques
 			constant.OIDC_CALLBACK_PATH,
 			clone,
 			&map[string]interface{}{
-				"clientId": a.configOIDC.ClientID,
+				"clientId":    a.configOIDC.ClientID,
+				"redirectUri": a.configOIDC.RedirectURL,
 			},
 			&map[string]interface{}{
-				"clientId": a.configOIDC.ClientID,
+				"clientId":    a.configOIDC.ClientID,
+				"redirectUri": a.configOIDC.RedirectURL,
 			},
 		); err != nil {
 			helpers.SendError(w, err.StatusCode(), err)
@@ -118,10 +122,12 @@ func (a *authConfigs) ListVironAuthconfigs(w http.ResponseWriter, r *http.Reques
 			constant.GOOGLE_OAUTH2_AUTHORIZATION_PATH,
 			clone,
 			&map[string]interface{}{
-				"clientId": a.configGoogleOAuth2.ClientID,
+				"clientId":    a.configGoogleOAuth2.ClientID,
+				"redirectUri": a.configGoogleOAuth2.RedirectURL,
 			},
 			&map[string]interface{}{
-				"clientId": a.configGoogleOAuth2.ClientID,
+				"clientId":    a.configGoogleOAuth2.ClientID,
+				"redirectUri": a.configGoogleOAuth2.RedirectURL,
 			},
 		); err != nil {
 			helpers.SendError(w, err.StatusCode(), err)
@@ -136,10 +142,12 @@ func (a *authConfigs) ListVironAuthconfigs(w http.ResponseWriter, r *http.Reques
 			constant.GOOGLE_OAUTH2_CALLBACK_PATH,
 			clone,
 			&map[string]interface{}{
-				"clientId": a.configGoogleOAuth2.ClientID,
+				"clientId":    a.configGoogleOAuth2.ClientID,
+				"redirectUri": a.configGoogleOAuth2.RedirectURL,
 			},
 			&map[string]interface{}{
-				"clientId": a.configGoogleOAuth2.ClientID,
+				"clientId":    a.configGoogleOAuth2.ClientID,
+				"redirectUri": a.configGoogleOAuth2.RedirectURL,
 			},
 		); err != nil {
 			helpers.SendError(w, err.StatusCode(), err)

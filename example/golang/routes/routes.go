@@ -39,8 +39,7 @@ func New() http.Handler {
 
 	cfg := config.New()
 
-	providerFactory := packageDomainAuth.OIDCProviderFactoryImpl{}
-	domainAuth := packageDomainAuth.New(cfg.Auth.MultipleAuthUser, cfg.Auth.GoogleOAuth2, cfg.Auth.OIDC, &providerFactory)
+	domainAuth := packageDomainAuth.New(cfg.Auth.MultipleAuthUser, cfg.Auth.GoogleOAuth2, cfg.Auth.OIDC, nil)
 
 	if cfg.StoreMode == config.StoreModeMySQL {
 		mysqlConfig := cfg.StoreMySQL

@@ -70,19 +70,20 @@ func mergeDefaultValues(
 		// JSON をデコード
 		if err := json.Unmarshal(raw, &configMap); err != nil {
 			fmt.Printf("❌ Error decoding %s JSON: %v\n", key, err)
-			return targetValues // エラー時は既存の `existingConfig` をそのまま返す
+			panic(err)
 		}
 
-		// **マージ処理**
+		// `targetValues` が nil の場合は空のマップを用意
 		if targetValues == nil {
 			targetValues = &map[string]interface{}{}
 		}
 
-		for key, value := range configMap {
-			(*targetValues)[key] = value
+		// `extensions` のデフォルト値を `targetValues` にマージ（既存の値は上書きしない）
+		for k, v := range configMap {
+			if _, exists := (*targetValues)[k]; !exists {
+				(*targetValues)[k] = v
+			}
 		}
-
-		return targetValues
 	}
 
 	return targetValues // データがなければそのまま返す

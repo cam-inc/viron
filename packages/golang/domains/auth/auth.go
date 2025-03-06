@@ -52,6 +52,11 @@ func New(multipleAuthUser *bool, google *config.GoogleOAuth2, oidcConfig *config
 	var googleOIDC *AuthOIDC
 	var customOIDC *AuthOIDC
 
+	// providerFactoryがnilの場合はデフォルトの実装を使う
+	if providerFactory == nil {
+		providerFactory = &OIDCProviderFactoryImpl{}
+	}
+
 	if google != nil {
 		// googleOAuth2は実質OIDCと同じなのでOIDCの実装を使い、isGoogleで拡張処理を行う
 		googleConfig := &config.OIDC{

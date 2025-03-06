@@ -338,7 +338,7 @@ func (ao *AuthOIDC) signin(r *http.Request, code string, state string, codeVerif
 	// JWTトークンを作成
 	token, errSign := Sign(r, user.ID)
 	if errSign != nil {
-		log.Error("Signin sign failed %#v \n", errSign)
+		log.Errorf("Signin sign failed %#v \n", errSign)
 		return "", errors.SigninFailed
 	}
 	return token, nil
