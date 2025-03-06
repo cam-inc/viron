@@ -1,5 +1,11 @@
 # @viron/nodejs
 
+## 2.5.0
+
+### Minor Changes
+
+- Introduced oidc to the golang version of viron/lib
+
 ## 2.4.0
 
 ### Minor Changes
