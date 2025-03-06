@@ -184,7 +184,7 @@ func New() *Config {
 			OIDC:             &oidcConfig,
 		},
 		Cors: &Cors{
-			AllowOrigins: []string{"https://localhost:8000", "https://viron.plus", "https://viron.work", "https://viron.work:8000"},
+			AllowOrigins: []string{"https://localhost:8000", "https://viron.plus", "https://viron.work"},
 		},
 		StoreMode: mode,
 		StoreMySQL: &MySQL{
