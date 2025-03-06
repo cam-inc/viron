@@ -119,13 +119,10 @@ func (a *adminUserSSOTokensPersistence) UpdateByID(ctx context.Context, id strin
 
 }
 
-func (a *adminUserSSOTokensPersistence) RemoveByID(ctx context.Context, id string) error {
-	oid, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return err
-	}
+// RemoveByID userIDに紐づくtokenをすべて削除
+func (a *adminUserSSOTokensPersistence) RemoveByID(ctx context.Context, userID string) error {
 	// 削除
-	if _, err = a.client.Collection(collectionName).DeleteOne(ctx, bson.D{{Key: "_id", Value: oid}}); err != nil {
+	if _, err := a.client.Collection(collectionName).DeleteMany(ctx, bson.D{{Key: "userId", Value: userID}}); err != nil {
 		return err
 	}
 	return nil

@@ -244,9 +244,15 @@ func RemoveAdminUserById(ctx context.Context, id string) *errors.VironError {
 	}
 
 	// userを削除
-	repo := container.GetAdminUserRepository()
-	if err := repo.RemoveByID(ctx, id); err != nil {
+	repoAdminUser := container.GetAdminUserRepository()
+	if err := repoAdminUser.RemoveByID(ctx, id); err != nil {
 		return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("adminUser delete failed. %+v", err))
+	}
+
+	// ssotokenをuserIdですべてのトークンを削除
+	repoAdminUserSSOToken := container.GetAdminUserSSOTokenRepository()
+	if err := repoAdminUserSSOToken.RemoveByID(ctx, id); err != nil {
+		return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("adminUserSSOTokens delete failed. %+v", err))
 	}
 
 	// ユーザーからロールを剥奪

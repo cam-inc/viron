@@ -80,7 +80,10 @@ func New() http.Handler {
 			},
 		},
 	}
-	rootDoc, _ := root.GetSwagger()
+	rootDoc, err := root.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
 	definition.OpenAPI = rootDoc.OpenAPI
 	definition.Servers = rootDoc.Servers
 	if err := mergo.Merge(definition.Info, *rootDoc.Info); err != nil {
@@ -89,46 +92,73 @@ func New() http.Handler {
 	if err := merge(definition, rootDoc); err != nil {
 		panic(err)
 	}
-	componentsDoc, _ := components.GetSwagger()
+	componentsDoc, err := components.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
 	if err := merge(definition, componentsDoc); err != nil {
 		panic(err)
 	}
 
-	packageComponentsDoc, _ := packageComponents.GetSwagger()
+	packageComponentsDoc, err := packageComponents.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
 	if err := merge(definition, packageComponentsDoc); err != nil {
 		panic(err)
 	}
 
-	authconfigsDoc, _ := authconfigs.GetSwagger()
+	authconfigsDoc, err := authconfigs.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
 	if err := merge(definition, authconfigsDoc); err != nil {
 		panic(err)
 	}
 
-	adminusersDoc, _ := adminusers.GetSwagger()
+	adminusersDoc, err := adminusers.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
 	if err := merge(definition, adminusersDoc); err != nil {
 		panic(err)
 	}
-	adminaccountsDoc, _ := adminaccounts.GetSwagger()
+	adminaccountsDoc, err := adminaccounts.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
 	if err := merge(definition, adminaccountsDoc); err != nil {
 		panic(err)
 	}
 
-	adminrolesDoc, _ := adminroles.GetSwagger()
+	adminrolesDoc, err := adminroles.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
 	if err := merge(definition, adminrolesDoc); err != nil {
 		panic(err)
 	}
 
-	auditlogsDoc, _ := auditlogs.GetSwagger()
+	auditlogsDoc, err := auditlogs.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
 	if err := merge(definition, auditlogsDoc); err != nil {
 		panic(err)
 	}
 
-	oasDoc, _ := oas.GetSwagger()
+	oasDoc, err := oas.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
 	if err := merge(definition, oasDoc); err != nil {
 		panic(err)
 	}
 
-	authDoc, _ := auth.GetSwagger()
+	authDoc, err := auth.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
 	if err := merge(definition, authDoc); err != nil {
 		panic(err)
 	}

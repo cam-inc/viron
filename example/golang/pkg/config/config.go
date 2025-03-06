@@ -120,15 +120,15 @@ func New() *Config {
 		switch r.RequestURI {
 		// oidc authorizationの場合はclientIDを取得してissuerURLを返す
 		case pkgConstant.OIDC_CALLBACK_PATH:
-			oidcCollbackPayload := &pkgRoutesAuth.OidcCallbackPayload{}
-			if err := pkgHelpers.BodyDecode(r, oidcCollbackPayload); err != nil {
+			oidcCallbackPayload := &pkgRoutesAuth.OidcCallbackPayload{}
+			if err := pkgHelpers.BodyDecode(r, oidcCallbackPayload); err != nil {
 				return "", nil, err
 			}
 
-			if oidcConfig.ClientID == oidcCollbackPayload.ClientId {
+			if oidcConfig.ClientID == oidcCallbackPayload.ClientId {
 				return oidcConfig.IssuerURL, []string{oidcConfig.ClientID}, nil
 			}
-			return "", nil, fmt.Errorf("clientId not found %s", oidcCollbackPayload.ClientId)
+			return "", nil, fmt.Errorf("clientId not found %s", oidcCallbackPayload.ClientId)
 		// google oauth2 authorizationの場合はclientIDを取得してissuerURLを返す
 		case pkgConstant.GOOGLE_OAUTH2_CALLBACK_PATH:
 			googleOAuth2CollbackPayload := &pkgRoutesAuth.OAuth2GoogleCallbackPayload{}

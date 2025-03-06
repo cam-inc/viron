@@ -11,7 +11,6 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang-migrate/migrate/v4 v4.14.1
 	github.com/imdario/mergo v0.3.13
-	github.com/joho/godotenv v1.5.1
 	github.com/spf13/cobra v1.5.0
 	github.com/volatiletech/sqlboiler/v4 v4.18.0
 	go.mongodb.org/mongo-driver v1.16.1
