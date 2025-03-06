@@ -9,8 +9,6 @@ import (
 	"github.com/cam-inc/viron/example/golang/pkg/server"
 	"github.com/cam-inc/viron/example/golang/routes"
 
-	// go run main.goで実行する場合は以下のコメントアウトを外し go mod tidyを実行する
-	// "github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 	"go.uber.org/automaxprocs/maxprocs"
 )
@@ -24,12 +22,6 @@ type (
 )
 
 func main() {
-	// go run main.goで実行する場合は以下のコメントアウトを外し go mod tidyを実行する
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	fmt.Print(err)
-	// }
-
 	//defer profile.Start().Stop()
 	if _, err := maxprocs.Set(); err != nil {
 		fmt.Print(err)
