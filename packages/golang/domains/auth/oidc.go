@@ -17,26 +17,65 @@ import (
 )
 
 type AuthOIDC struct {
-	oidcConfig       *config.OIDC
-	oidcProvider     *oidc.Provider
-	oidcOAuth2Config *oauth2.Config
+	oidcConfig         *config.OIDC
+	oidcProvider       OIDCProvider
+	oidcOAuth2Provider OAuthProvider
+}
+
+// OIDCProvider インターフェース
+type OIDCProvider interface {
+	Verifier(config *oidc.Config) *oidc.IDTokenVerifier
+	Endpoint() oauth2.Endpoint
+}
+
+// OAuthProvider インターフェース
+type OAuthProvider interface {
+	AuthCodeURL(state string, opts ...oauth2.AuthCodeOption) string
+	Exchange(ctx context.Context, code string, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error)
+	TokenSource(ctx context.Context, token *oauth2.Token) oauth2.TokenSource
+}
+
+// OIDCProvider の具体的な実装
+type OIDCProviderImpl struct {
+	provider *oidc.Provider
+}
+
+// Verifier OIDCProviderのIDトークン検証機取得
+func (m *OIDCProviderImpl) Verifier(config *oidc.Config) *oidc.IDTokenVerifier {
+	return m.provider.Verifier(config)
+}
+
+// Endpoint OIDCProviderのエンドポイント取得
+func (m *OIDCProviderImpl) Endpoint() oauth2.Endpoint {
+	return m.provider.Endpoint()
+}
+
+// OAuth2Provider の具体的な実装
+type OAuthProviderImpl struct {
+	config oauth2.Config
+}
+
+// AuthCodeURL OAuth2ProviderのAuthCodeURL
+func (m *OAuthProviderImpl) AuthCodeURL(state string, opts ...oauth2.AuthCodeOption) string {
+	return m.config.AuthCodeURL(state, opts...)
+}
+
+// Exchange OAuth2ProviderのExchange
+func (m *OAuthProviderImpl) Exchange(ctx context.Context, code string, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error) {
+	return m.config.Exchange(ctx, code, opts...)
+}
+
+// TokenSource OAuth2ProviderのTokenSource
+func (m *OAuthProviderImpl) TokenSource(ctx context.Context, token *oauth2.Token) oauth2.TokenSource {
+	return m.config.TokenSource(ctx, token)
 }
 
 // newOIDC OIDC認証の初期化
-func newOIDC(c *config.OIDC) *AuthOIDC {
-	if c == nil {
-		return nil
-	}
-	oidcProvider, err := oidc.NewProvider(context.Background(), c.IssuerURL)
-	if err != nil {
-		log.Errorf("oidc.NewProvider failed -> %v", err)
-		panic(err)
-	}
-
+func newOIDC(c config.OIDC, oidcProvider OIDCProvider, oauth2Provider OAuthProvider) *AuthOIDC {
 	return &AuthOIDC{
-		oidcConfig:       c,
-		oidcProvider:     oidcProvider,
-		oidcOAuth2Config: nil,
+		oidcConfig:         &c,
+		oidcProvider:       oidcProvider,
+		oidcOAuth2Provider: oauth2Provider,
 	}
 }
 
@@ -75,14 +114,13 @@ func (ao *AuthOIDC) verifyAccessToken(r *http.Request, userID string, ssoToken d
 
 	// ---- 以下リフレッシュトークンがある場合の処理 ----
 	// リフレッシュトークンがある場合はリフレッシュトークンを使ってトークンを更新
-	config := ao.getOAuth2Config("")
 	token := &oauth2.Token{
 		AccessToken:  ssoToken.AccessToken,
 		TokenType:    ssoToken.TokenType,
 		RefreshToken: *ssoToken.RefreshToken,
 		Expiry:       time.Unix(0, int64(ssoToken.ExpiryDate)*int64(time.Millisecond)),
 	}
-	newToken, errRefreshToken := config.TokenSource(ctx, token).Token()
+	newToken, errRefreshToken := ao.oidcOAuth2Provider.TokenSource(ctx, token).Token()
 	if errRefreshToken != nil {
 		log.Errorf("TokenSource failed -> %v", err)
 		return false
@@ -120,35 +158,6 @@ func (ao *AuthOIDC) getTokenVerifier() (*oidc.IDTokenVerifier, *errors.VironErro
 	return ao.oidcProvider.Verifier(oidcConfig), nil
 }
 
-// getOAuth2Config OAuth2設定取得
-func (ao *AuthOIDC) getOAuth2Config(redirectUrl string) *oauth2.Config {
-	if ao.oidcOAuth2Config != nil {
-		return ao.oidcOAuth2Config
-	}
-	scope := []string{}
-	// Googleの場合はデフォルトスコープに追加
-	if ao.isGoogle() {
-		scope = append(scope, constant.GOOGLE_OAUTH2_DEFAULT_SCOPES...)
-	} else {
-		scope = append(scope, constant.OIDC_DEFAULT_SCOPES...)
-	}
-	if len(ao.oidcConfig.AdditionalScope) > 0 {
-		scope = append(scope, ao.oidcConfig.AdditionalScope...)
-	}
-	config := &oauth2.Config{
-		ClientID:     ao.oidcConfig.ClientID,
-		ClientSecret: ao.oidcConfig.ClientSecret,
-		Endpoint:     ao.oidcProvider.Endpoint(),
-		Scopes:       scope,
-		RedirectURL:  redirectUrl,
-	}
-	// redirectUrlが空以外の場合にキャッシュ
-	if redirectUrl != "" {
-		ao.oidcOAuth2Config = config
-	}
-	return config
-}
-
 // allowUserHostedDomains emailドメインの許可
 func (ao *AuthOIDC) allowUserHostedDomains(email string) bool {
 	if len(ao.oidcConfig.UserHostedDomains) == 0 {
@@ -180,9 +189,7 @@ func (ao *AuthOIDC) genCodeVerifier() string {
 }
 
 // genAuthorizationUrl Authorization URL生成
-func (ao *AuthOIDC) genAuthorizationUrl(redirectUrl string, codeVerifier string, state string) string {
-	cfg := ao.getOAuth2Config(redirectUrl)
-
+func (ao *AuthOIDC) genAuthorizationUrl(codeVerifier string, state string) string {
 	options := []oauth2.AuthCodeOption{
 		oauth2.S256ChallengeOption(codeVerifier),
 	}
@@ -192,18 +199,15 @@ func (ao *AuthOIDC) genAuthorizationUrl(redirectUrl string, codeVerifier string,
 		options = append(options, oauth2.AccessTypeOffline, oauth2.ApprovalForce)
 	}
 
-	return cfg.AuthCodeURL(state, options...)
+	return ao.oidcOAuth2Provider.AuthCodeURL(state, options...)
 }
 
 // signin OIDC認証
-func (ao *AuthOIDC) signin(r *http.Request, redirectUrl string, code string, state string, codeVerifier string, multipleAuthUser bool) (string, *errors.VironError) {
+func (ao *AuthOIDC) signin(r *http.Request, code string, state string, codeVerifier string, multipleAuthUser bool) (string, *errors.VironError) {
 	ctx := r.Context()
 
-	// 設定取得
-	oauth2Config := ao.getOAuth2Config(redirectUrl)
-
 	// 許可コードとトークンを交換
-	oidcToken, errExchange := oauth2Config.Exchange(
+	oidcToken, errExchange := ao.oidcOAuth2Provider.Exchange(
 		ctx,
 		code,
 		oauth2.SetAuthURLParam("code_verifier", codeVerifier),

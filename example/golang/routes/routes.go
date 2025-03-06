@@ -38,7 +38,9 @@ import (
 func New() http.Handler {
 
 	cfg := config.New()
-	domainAuth := packageDomainAuth.New(cfg.Auth.MultipleAuthUser, cfg.Auth.GoogleOAuth2, cfg.Auth.OIDC)
+
+	providerFactory := packageDomainAuth.OIDCProviderFactoryImpl{}
+	domainAuth := packageDomainAuth.New(cfg.Auth.MultipleAuthUser, cfg.Auth.GoogleOAuth2, cfg.Auth.OIDC, &providerFactory)
 
 	if cfg.StoreMode == config.StoreModeMySQL {
 		mysqlConfig := cfg.StoreMySQL

@@ -99,6 +99,7 @@ func New() *Config {
 		AdditionalScope:   []string{},
 		UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
 		IssuerURL:         os.Getenv(constant.GOOGLE_OAUTH2_ISSUER_URL),
+		RedirectURL:       os.Getenv(constant.GOOGLE_OAUTH2_REDIRECT_URL),
 	}
 	// oidcの設定
 	oidcConfig := pkgConfig.OIDC{
@@ -107,6 +108,7 @@ func New() *Config {
 		AdditionalScope:   []string{},
 		UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
 		IssuerURL:         os.Getenv(constant.OIDC_ISSUER_URL),
+		RedirectURL:       os.Getenv(constant.OIDC_REDIRECT_URL),
 	}
 
 	// emailの設定
