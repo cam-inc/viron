@@ -3,6 +3,7 @@ package adminuserssotokens
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -50,6 +51,9 @@ func (a *adminUserSSOTokensPersistence) Find(ctx context.Context, conditions rep
 	for _, r := range result {
 		adminuser := &repositories.AdminUserSSOTokenEntity{
 			ID:           strconv.FormatUint(uint64(r.ID), 10),
+			UserID:       r.UserId,
+			ClientID:     r.ClientId,
+			Provider:     r.Provider,
 			AuthType:     r.AuthType,
 			TokenType:    r.TokenType,
 			RefreshToken: r.RefreshToken.Ptr(),
@@ -84,6 +88,9 @@ func (a *adminUserSSOTokensPersistence) CreateOne(ctx context.Context, entity re
 		return nil, err
 	}
 	model := &models.Adminuserssotoken{
+		UserId:       adminuserssotoken.UserID,
+		ClientId:     adminuserssotoken.ClientID,
+		Provider:     adminuserssotoken.Provider,
 		AuthType:     adminuserssotoken.AuthType,
 		AccessToken:  adminuserssotoken.AccessToken,
 		IdToken:      adminuserssotoken.IdToken,
@@ -129,21 +136,17 @@ func (a *adminUserSSOTokensPersistence) UpdateByID(ctx context.Context, id strin
 }
 
 func (a *adminUserSSOTokensPersistence) RemoveByID(ctx context.Context, id string) error {
-	unit64Id, err := strconv.ParseUint(id, 10, 64)
-	if err != nil {
-		return err
+
+	conditions := &repositories.AdminUserSSOTokenConditions{
+		UserID: id,
 	}
 
-	m, err := models.FindAdminuserssotoken(ctx, a.conn, uint(unit64Id))
+	mods := conditions.ConvertConditionMySQL()
+	count, err := models.Adminuserssotokens(mods...).DeleteAll(ctx, a.conn)
 	if err != nil {
 		return err
 	}
-
-	// 削除
-	_, err = m.Delete(ctx, a.conn)
-	if err != nil {
-		return err
-	}
+	fmt.Printf("Delete userId %s count: %d\n", id, count)
 	return nil
 }
 
