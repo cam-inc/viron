@@ -17,7 +17,7 @@ var (
 
 func NewMySQL(config *config.MySQL) *sql.DB {
 	dsn := config.ToDriverConfig().FormatDSN()
-	log := logging.GetLogger(constant.LOG_NAME, logging.DebugLevel)
+	log := logging.GetLogger(string(constant.LOG_NAME), logging.DebugLevel)
 	db, err := sql.Open(config.Dialect, dsn)
 	if err != nil {
 		log.Errorf("MySQL connection failed %v", err)

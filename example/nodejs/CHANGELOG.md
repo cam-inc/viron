@@ -1,5 +1,12 @@
 # @viron/example-nodejs
 
+## 1.1.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @viron/lib@2.5.0
+
 ## 1.1.0
 
 ### Minor Changes

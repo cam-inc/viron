@@ -7,11 +7,11 @@ services:
     build: .
     restart: always
     depends_on:
-      - mysql
+      - mongo
     ports:
       - 3000:3000
     environment:
-      - MODE=mysql
+      - MODE=mongo
     env_file:
       - .env
     volumes:

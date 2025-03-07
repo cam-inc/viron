@@ -29,7 +29,8 @@ func SignOut(ctx context.Context, token string) bool {
 }
 
 func IsSignedOut(ctx context.Context, token string) bool {
-	if token != "" {
+	// tokenが空の場合はsingoutされていないと判断
+	if token == "" {
 		return false
 	}
 	repo := container.GetRevokedTokensRepository()

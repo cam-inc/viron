@@ -84,7 +84,7 @@ func (a *auditLogsPersistence) CreateOne(ctx context.Context, entity repositorie
 	}
 
 	result := &repositories.AuditLogEntity{}
-	if err := a.client.Collection(collectionName).FindOne(ctx, bson.D{{"_id", response.InsertedID}}).Decode(result); err != nil {
+	if err := a.client.Collection(collectionName).FindOne(ctx, bson.D{{Key: "_id", Value: response.InsertedID}}).Decode(result); err != nil {
 		return nil, err
 	}
 

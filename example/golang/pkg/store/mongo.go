@@ -2,7 +2,6 @@ package store
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -21,22 +20,19 @@ type (
 var con *MongoClientWithOptions
 
 func SetupMongo(config *config.Mongo) {
-	opt := options.Client().ApplyURI(config.URI)
-	opt.SetAuth(options.Credential{
+	opt := options.Client().ApplyURI(config.URI).SetAuth(options.Credential{
 		Username: config.User,
 		Password: config.Password,
 	})
 
-	fmt.Printf("mongo client options %+v\n", opt)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
-	client, err := mongo.NewClient(opt)
+	client, err := mongo.Connect(ctx, opt)
 	if err != nil {
 		panic(err)
 	}
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	if err := client.Connect(ctx); err != nil {
-		panic(err)
-	}
+
 	con = &MongoClientWithOptions{
 		Client:  client,
 		Options: opt,

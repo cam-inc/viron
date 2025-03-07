@@ -72,8 +72,8 @@ func TestAdminUserEntity_ToBSONSet(t *testing.T) {
 
 	b := a.ToBSONSet()
 	e := bson.D{
-		{"$set", bson.D{
-			bson.E{"updatedAt", int(time.Now().Unix())},
+		{Key: "$set", Value: bson.D{
+			bson.E{Key: "updatedAt", Value: int(time.Now().Unix())},
 		},
 		},
 	}

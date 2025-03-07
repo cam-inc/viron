@@ -11,6 +11,9 @@ import (
 	"github.com/cam-inc/viron/example/golang/pkg/constant"
 	pkgConfig "github.com/cam-inc/viron/packages/golang/config"
 	pkgConstant "github.com/cam-inc/viron/packages/golang/constant"
+	pkgDomainsAuth "github.com/cam-inc/viron/packages/golang/domains/auth"
+	pkgHelpers "github.com/cam-inc/viron/packages/golang/helpers"
+	pkgRoutesAuth "github.com/cam-inc/viron/packages/golang/routes/auth"
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -21,7 +24,7 @@ type (
 		StoreMySQL *MySQL
 		StoreMongo *Mongo
 		Cors       *Cors
-		Auth       *Auth
+		Auth       pkgConfig.Auth
 		Oas        *Oas
 	}
 
@@ -58,15 +61,6 @@ type (
 	Cors struct {
 		AllowOrigins []string `yaml:"allowOrigins"`
 	}
-	JWT struct {
-		Secret        string                                          `yaml:"secret"`
-		Provider      func(r *http.Request) (string, []string, error) `yaml:"provider"`
-		ExpirationSec int                                             `yaml:"expirationSec"`
-	}
-	Auth struct {
-		JWT          *JWT
-		GoogleOAuth2 *pkgConfig.GoogleOAuth2
-	}
 
 	Oas struct {
 		InfoExtensions map[string]interface{} `json:"infoExtensions"`
@@ -97,23 +91,97 @@ func New() *Config {
 	if os.Getenv(pkgConstant.ENV_STORE_MODE) == string(StoreModeMySQL) {
 		mode = StoreModeMySQL
 	}
-	provider := func(r *http.Request) (string, []string, error) {
-		return "viron_example", []string{"viron_example"}, nil
+
+	// google oauth2の設定
+	googleOAuth2Config := pkgConfig.GoogleOAuth2{
+		ClientID:          os.Getenv(constant.GOOGLE_OAUTH2_CLIENT_ID),
+		ClientSecret:      os.Getenv(constant.GOOGLE_OAUTH2_CLIENT_SECRET),
+		AdditionalScope:   []string{},
+		UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
+		IssuerURL:         os.Getenv(constant.GOOGLE_OAUTH2_ISSUER_URL),
+		RedirectURL:       os.Getenv(constant.GOOGLE_OAUTH2_REDIRECT_URL),
 	}
-	// TODO: yaml -> statik で環境別設定
+	// oidcの設定
+	oidcConfig := pkgConfig.OIDC{
+		ClientID:          os.Getenv(constant.OIDC_CLIENT_ID),
+		ClientSecret:      os.Getenv(constant.OIDC_CLIENT_SECRET),
+		AdditionalScope:   []string{},
+		UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
+		IssuerURL:         os.Getenv(constant.OIDC_ISSUER_URL),
+		RedirectURL:       os.Getenv(constant.OIDC_REDIRECT_URL),
+	}
+
+	// emailの設定
+	emailJwtIssuer := os.Getenv(constant.EMAIL_JWT_ISSUER)
+	emailJwtAudience := []string{os.Getenv(constant.EMAIL_JWT_AUDIENCE)}
+
+	// jwtのprovider
+	provider := func(r *http.Request) (string, []string, error) {
+		switch r.RequestURI {
+		// oidc authorizationの場合はclientIDを取得してissuerURLを返す
+		case pkgConstant.OIDC_CALLBACK_PATH:
+			oidcCallbackPayload := &pkgRoutesAuth.OidcCallbackPayload{}
+			if err := pkgHelpers.BodyDecode(r, oidcCallbackPayload); err != nil {
+				return "", nil, err
+			}
+
+			if oidcConfig.ClientID == oidcCallbackPayload.ClientId {
+				return oidcConfig.IssuerURL, []string{oidcConfig.ClientID}, nil
+			}
+			return "", nil, fmt.Errorf("clientId not found %s", oidcCallbackPayload.ClientId)
+		// google oauth2 authorizationの場合はclientIDを取得してissuerURLを返す
+		case pkgConstant.GOOGLE_OAUTH2_CALLBACK_PATH:
+			googleOAuth2CallbackPayload := &pkgRoutesAuth.OAuth2GoogleCallbackPayload{}
+			if err := pkgHelpers.BodyDecode(r, googleOAuth2CallbackPayload); err != nil {
+				return "", nil, err
+			}
+
+			if googleOAuth2Config.ClientID == googleOAuth2CallbackPayload.ClientId {
+				return googleOAuth2Config.IssuerURL, []string{googleOAuth2Config.ClientID}, nil
+			}
+			return "", nil, fmt.Errorf("clientId not found %s", googleOAuth2CallbackPayload.ClientId)
+		// email signinの場合はissuerURLを返す
+		case pkgConstant.EMAIL_SIGNIN_PATH:
+			return emailJwtIssuer, emailJwtAudience, nil
+
+		// その他の場合はtokenを取得してissuerURLを返す
+		default:
+			token, err := pkgHelpers.GetCookieToken(r)
+			if err != nil {
+				return "", nil, err
+			}
+			claims, err := pkgDomainsAuth.VerifyToken(token)
+			if err != nil {
+				return "", nil, err
+			}
+
+			switch claims.Audience()[0] {
+			case emailJwtAudience[0]:
+				return emailJwtIssuer, emailJwtAudience, nil
+			case oidcConfig.ClientID:
+				return oidcConfig.IssuerURL, []string{oidcConfig.ClientID}, nil
+			case googleOAuth2Config.ClientID:
+				return googleOAuth2Config.IssuerURL, []string{googleOAuth2Config.ClientID}, nil
+			default:
+				return "", nil, fmt.Errorf("missing provider")
+			}
+		}
+	}
+
+	// configの生成
+	multipleAuthUser := os.Getenv(constant.MULTIPLE_AUTH_USER) == "true"
 	return &Config{
-		Auth: &Auth{
-			JWT: &JWT{
+		Auth: pkgConfig.Auth{
+			JWT: pkgConfig.JWT{
 				Secret:        "xxxxxxxxxxxxxxxxxxxx",
 				Provider:      provider,
 				ExpirationSec: 24 * 60 * 60,
+				Issuer:        emailJwtIssuer,
+				Audience:      emailJwtAudience,
 			},
-			GoogleOAuth2: &pkgConfig.GoogleOAuth2{
-				ClientID:          os.Getenv(constant.GOOGLE_OAUTH2_CLIENT_ID),
-				ClientSecret:      os.Getenv(constant.GOOGLE_OAUTH2_CLIENT_SECRET),
-				AdditionalScope:   []string{},
-				UserHostedDomains: []string{"cam-inc.co.jp", "cyberagent.co.jp"},
-			},
+			MultipleAuthUser: &multipleAuthUser,
+			GoogleOAuth2:     &googleOAuth2Config,
+			OIDC:             &oidcConfig,
 		},
 		Cors: &Cors{
 			AllowOrigins: []string{"https://localhost:8000", "https://viron.plus", "https://viron.work"},

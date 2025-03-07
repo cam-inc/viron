@@ -20,19 +20,13 @@ import (
 
 type (
 	AdminUser struct {
-		ID                       string    `json:"id"`
-		Email                    string    `json:"email"`
-		AuthType                 string    `json:"authType"`
-		Password                 *string   `json:"password,omitempty"`
-		Salt                     *string   `json:"salt,omitempty"`
-		GoogleOAuth2AccessToken  *string   `json:"googleOAuth2AccessToken,omitempty"`
-		GoogleOAuth2ExpiryDate   *uint64   `json:"googleOAuth2ExpiryDate,omitempty"`
-		GoogleOAuth2IdToken      *string   `json:"googleOAuth2IdToken,omitempty"`
-		GoogleOAuth2RefreshToken *string   `json:"googleOAuth2RefreshToken,omitempty"`
-		GoogleOAuth2TokenType    *string   `json:"googleOAuth2TokenType,omitempty"`
-		RoleIDs                  []string  `json:"roleIds"`
-		CreatedAt                time.Time `json:"createdAt"`
-		UpdatedAt                time.Time `json:"updatedAt"`
+		ID        string    `json:"id"`
+		Email     string    `json:"email"`
+		Password  *string   `json:"password,omitempty"`
+		Salt      *string   `json:"salt,omitempty"`
+		RoleIDs   []string  `json:"roleIds"`
+		CreatedAt time.Time `json:"createdAt"`
+		UpdatedAt time.Time `json:"updatedAt"`
 	}
 
 	AdminUsersWithPager struct {
@@ -41,13 +35,12 @@ type (
 	}
 
 	AdminUserConditions struct {
-		ID       string
-		Email    string
-		AuthType string
-		RoleID   string
-		Size     int
-		Page     int
-		Sort     []string
+		ID     string
+		Email  string
+		RoleID string
+		Size   int
+		Page   int
+		Sort   []string
 	}
 )
 
@@ -57,7 +50,6 @@ func CreateAdminUser(ctx context.Context, payload *AdminUser, authType string) (
 	adminUser := &repositories.AdminUserEntity{}
 
 	if authType == constant.AUTH_TYPE_EMAIL {
-		adminUser.AuthType = authType
 		adminUser.Email = string(payload.Email)
 		if payload.Password == nil {
 			return nil, errors.Initialize(http.StatusBadRequest, "password is nil.")
@@ -65,14 +57,8 @@ func CreateAdminUser(ctx context.Context, payload *AdminUser, authType string) (
 		password := helpers.GenPassword(*payload.Password, "")
 		adminUser.Password = &password.Password
 		adminUser.Salt = &password.Salt
-	} else if authType == constant.AUTH_TYPE_GOOGLE {
+	} else if authType == constant.AUTH_TYPE_OIDC {
 		adminUser.Email = string(payload.Email)
-		adminUser.AuthType = authType
-		adminUser.GoogleOAuth2TokenType = payload.GoogleOAuth2TokenType
-		adminUser.GoogleOAuth2IdToken = payload.GoogleOAuth2IdToken
-		adminUser.GoogleOAuth2AccessToken = payload.GoogleOAuth2AccessToken
-		adminUser.GoogleOAuth2RefreshToken = payload.GoogleOAuth2RefreshToken
-		adminUser.GoogleOAuth2ExpiryDate = payload.GoogleOAuth2ExpiryDate
 	}
 
 	entity, err := container.GetAdminUserRepository().CreateOne(ctx, adminUser)
@@ -112,24 +98,21 @@ func findOne(ctx context.Context, conditions *repositories.AdminUserConditions) 
 
 	user := &repositories.AdminUserEntity{}
 
-	result[0].Bind(user)
+	if err := result[0].Bind(user); err != nil {
+		log.Errorf("adminusers.go findOne bind failed err:%v", err)
+		return nil
+	}
 
 	user.RoleIDs = listRoles(user.ID)
 
 	auser := &AdminUser{
-		ID:                       user.ID,
-		Email:                    user.Email,
-		Password:                 user.Password,
-		AuthType:                 user.AuthType,
-		Salt:                     user.Salt,
-		GoogleOAuth2AccessToken:  user.GoogleOAuth2AccessToken,
-		GoogleOAuth2ExpiryDate:   user.GoogleOAuth2ExpiryDate,
-		GoogleOAuth2IdToken:      user.GoogleOAuth2IdToken,
-		GoogleOAuth2RefreshToken: user.GoogleOAuth2RefreshToken,
-		GoogleOAuth2TokenType:    user.GoogleOAuth2TokenType,
-		CreatedAt:                user.CreatedAt,
-		UpdatedAt:                user.UpdatedAt,
-		RoleIDs:                  user.RoleIDs,
+		ID:        user.ID,
+		Email:     user.Email,
+		Password:  user.Password,
+		Salt:      user.Salt,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+		RoleIDs:   user.RoleIDs,
 	}
 	return auser
 }
@@ -195,20 +178,19 @@ func ListAdminUser(ctx context.Context, opts *AdminUserConditions) (*AdminUsersW
 
 	for _, result := range results {
 		entity := &repositories.AdminUserEntity{}
-		result.Bind(entity)
+		if err := result.Bind(entity); err != nil {
+			return nil, err
+		}
 		entity.RoleIDs = listRoles(entity.ID)
 		adminuser := &AdminUser{
 			ID:        entity.ID,
 			Email:     entity.Email,
 			Password:  entity.Password,
 			Salt:      entity.Salt,
-			AuthType:  entity.AuthType,
 			RoleIDs:   entity.RoleIDs,
 			CreatedAt: entity.CreatedAt,
 			UpdatedAt: entity.UpdatedAt,
 		}
-
-		adminuser.RoleIDs = listRoles(adminuser.ID)
 
 		withPager.List = append(withPager.List, adminuser)
 	}
@@ -226,25 +208,23 @@ func UpdateAdminUserByID(ctx context.Context, id string, payload *AdminUser) *er
 	}
 	repo := container.GetAdminUserRepository()
 
-	if user.AuthType == constant.AUTH_TYPE_EMAIL {
-		if payload.Password != nil {
-			pass := helpers.GenPassword(*payload.Password, *user.Salt)
-			if pass == nil {
-				return errors.Initialize(http.StatusInternalServerError, "password gen failed.")
-			}
-
-			entity := &repositories.AdminUserEntity{
-				ID:       user.ID,
-				Email:    user.Email,
-				AuthType: user.AuthType,
-				Password: &pass.Password,
-			}
-			if err := repo.UpdateByID(ctx, id, entity); err != nil {
-				return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("adminUser update failed. %+v", err))
-			}
+	var entity *repositories.AdminUserEntity
+	if user.Password != nil && payload.Password != nil {
+		pass := helpers.GenPassword(*payload.Password, *user.Salt)
+		if pass == nil {
+			return errors.Initialize(http.StatusInternalServerError, "password gen failed.")
 		}
-	} else {
-		// TODO: google auth type update
+		entity = &repositories.AdminUserEntity{
+			ID:       user.ID,
+			Email:    user.Email,
+			Password: &pass.Password,
+		}
+	}
+
+	if entity != nil {
+		if err := repo.UpdateByID(ctx, id, entity); err != nil {
+			return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("adminUser update failed. %+v", err))
+		}
 	}
 
 	log := logging.GetDefaultLogger()
@@ -264,9 +244,15 @@ func RemoveAdminUserById(ctx context.Context, id string) *errors.VironError {
 	}
 
 	// userを削除
-	repo := container.GetAdminUserRepository()
-	if err := repo.RemoveByID(ctx, id); err != nil {
+	repoAdminUser := container.GetAdminUserRepository()
+	if err := repoAdminUser.RemoveByID(ctx, id); err != nil {
 		return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("adminUser delete failed. %+v", err))
+	}
+
+	// ssotokenをuserIdですべてのトークンを削除
+	repoAdminUserSSOToken := container.GetAdminUserSSOTokenRepository()
+	if err := repoAdminUserSSOToken.RemoveByID(ctx, id); err != nil {
+		return errors.Initialize(http.StatusInternalServerError, fmt.Sprintf("adminUserSSOTokens delete failed. %+v", err))
 	}
 
 	// ユーザーからロールを剥奪
