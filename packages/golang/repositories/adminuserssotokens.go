@@ -25,7 +25,7 @@ type (
 		ExpiryDate   int64              `bson:"expiryDate"`
 		IdToken      string             `bson:"idToken"`
 		RefreshToken *string            `bson:"refreshToken,omitempty"`
-		TokenType    string             `bson:"TokenType"`
+		TokenType    string             `bson:"tokenType"`
 		CreatedAt    time.Time          `bson:"-"`
 		UpdatedAt    time.Time          `bson:"-"`
 		CreatedAtInt int                `bson:"createdAt,omitempty"`
