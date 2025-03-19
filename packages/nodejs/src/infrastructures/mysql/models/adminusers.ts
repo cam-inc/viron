@@ -26,58 +26,11 @@ const schemaDefinition: ModelAttributes<AdminUserModel, AdminUser> = {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  authType: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  // for email
   password: {
     type: DataTypes.STRING(1024),
     allowNull: true,
   },
   salt: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  // for google
-  googleOAuth2AccessToken: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  googleOAuth2ExpiryDate: {
-    type: DataTypes.BIGINT,
-    allowNull: true,
-  },
-  googleOAuth2IdToken: {
-    type: DataTypes.STRING(2048),
-    allowNull: true,
-  },
-  googleOAuth2RefreshToken: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  googleOAuth2TokenType: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  // for oidc
-  oidcAccessToken: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  oidcExpiryDate: {
-    type: DataTypes.BIGINT,
-    allowNull: true,
-  },
-  oidcRefreshToken: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  oidcIdToken: {
-    type: DataTypes.STRING(2048),
-    allowNull: true,
-  },
-  oidcTokenType: {
     type: DataTypes.STRING,
     allowNull: true,
   },

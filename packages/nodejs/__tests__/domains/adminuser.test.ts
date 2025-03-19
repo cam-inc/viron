@@ -1,6 +1,5 @@
 import assert from 'assert';
 import sinon from 'sinon';
-import { AUTH_TYPE } from '../../src/constants';
 import {
   AdminUser,
   AdminUserCreateAttributes,
@@ -45,21 +44,10 @@ describe('domains/adminuser', () => {
           {
             id: '1',
             email: 'foo@example.com',
-            authType: AUTH_TYPE.EMAIL,
             salt: 'xxxxxxxxxx',
             password: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
             createdAt: new Date(),
             updatedAt: new Date(),
-            googleOAuth2AccessToken: null,
-            googleOAuth2ExpiryDate: null,
-            googleOAuth2IdToken: null,
-            googleOAuth2RefreshToken: null,
-            googleOAuth2TokenType: null,
-            oidcAccessToken: null,
-            oidcExpiryDate: null,
-            oidcIdToken: null,
-            oidcRefreshToken: null,
-            oidcTokenType: null,
           },
         ],
         maxPage: 1,
@@ -86,32 +74,19 @@ describe('domains/adminuser', () => {
         .withArgs(
           sandbox.match({
             email: data.email,
-            authType: AUTH_TYPE.EMAIL,
-            salt: sandbox.match.string,
             password: sandbox.match.string,
           })
         )
         .resolves({
           id: userId,
           email: data.email,
-          authType: AUTH_TYPE.EMAIL,
           salt,
           password,
           createdAt: new Date(),
           updatedAt: new Date(),
-          googleOAuth2AccessToken: null,
-          googleOAuth2ExpiryDate: null,
-          googleOAuth2IdToken: null,
-          googleOAuth2RefreshToken: null,
-          googleOAuth2TokenType: null,
-          oidcAccessToken: null,
-          oidcExpiryDate: null,
-          oidcIdToken: null,
-          oidcRefreshToken: null,
-          oidcTokenType: null,
         });
 
-      const result = await createOne(data);
+      const result = await createOne(true, data);
       assert.strictEqual(result.id, userId);
       assert.strictEqual(result.roleIds.length, 0);
     });
@@ -130,36 +105,23 @@ describe('domains/adminuser', () => {
         .withArgs(
           sandbox.match({
             email: data.email,
-            authType: AUTH_TYPE.EMAIL,
             password: sandbox.match.string,
-            salt: sandbox.match.string,
           })
         )
         .resolves({
           id: userId,
           email: data.email,
-          authType: AUTH_TYPE.EMAIL,
           salt,
           password,
           createdAt: new Date(),
           updatedAt: new Date(),
-          googleOAuth2AccessToken: null,
-          googleOAuth2ExpiryDate: null,
-          googleOAuth2IdToken: null,
-          googleOAuth2RefreshToken: null,
-          googleOAuth2TokenType: null,
-          oidcAccessToken: null,
-          oidcExpiryDate: null,
-          oidcIdToken: null,
-          oidcRefreshToken: null,
-          oidcTokenType: null,
         });
       sandbox
         .stub(domainsAdminrole, 'updateRolesForUser')
         .withArgs(userId, sinon.match(['editor']))
         .resolves();
 
-      const result = await createOne(data);
+      const result = await createOne(true, data);
       assert.strictEqual(result.id, userId);
       assert.strictEqual(result.roleIds[0], 'editor');
     });
@@ -176,22 +138,11 @@ describe('domains/adminuser', () => {
       sandbox.stub(domainsAdminuser, 'findOneById').withArgs(id).resolves({
         id,
         email: 'test@example.com',
-        authType: AUTH_TYPE.EMAIL,
         password: null,
         salt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
         roleIds: [],
-        googleOAuth2AccessToken: null,
-        googleOAuth2ExpiryDate: null,
-        googleOAuth2IdToken: null,
-        googleOAuth2RefreshToken: null,
-        googleOAuth2TokenType: null,
-        oidcAccessToken: null,
-        oidcExpiryDate: null,
-        oidcIdToken: null,
-        oidcRefreshToken: null,
-        oidcTokenType: null,
       });
       sandbox
         .stub(repository, 'updateOneById')
@@ -236,22 +187,11 @@ describe('domains/adminuser', () => {
       sandbox.stub(domainsAdminuser, 'findOneById').withArgs(id).resolves({
         id,
         email: 'test@example.com',
-        authType: AUTH_TYPE.EMAIL,
         password: null,
         salt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
         roleIds: [],
-        googleOAuth2AccessToken: null,
-        googleOAuth2ExpiryDate: null,
-        googleOAuth2IdToken: null,
-        googleOAuth2RefreshToken: null,
-        googleOAuth2TokenType: null,
-        oidcAccessToken: null,
-        oidcExpiryDate: null,
-        oidcIdToken: null,
-        oidcRefreshToken: null,
-        oidcTokenType: null,
       });
       sandbox.stub(repository, 'removeOneById').withArgs(id).resolves();
       sandbox
@@ -283,21 +223,10 @@ describe('domains/adminuser', () => {
       sandbox.stub(repository, 'findOneById').withArgs(id).resolves({
         id,
         email: 'test@example.com',
-        authType: AUTH_TYPE.EMAIL,
         password: null,
         salt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
-        googleOAuth2AccessToken: null,
-        googleOAuth2ExpiryDate: null,
-        googleOAuth2IdToken: null,
-        googleOAuth2RefreshToken: null,
-        googleOAuth2TokenType: null,
-        oidcAccessToken: null,
-        oidcExpiryDate: null,
-        oidcIdToken: null,
-        oidcRefreshToken: null,
-        oidcTokenType: null,
       });
       sandbox.stub(domainsAdminrole, 'listRoles').withArgs(id).resolves([]);
 
@@ -328,21 +257,10 @@ describe('domains/adminuser', () => {
         .resolves({
           id,
           email: 'test@example.com',
-          authType: AUTH_TYPE.EMAIL,
           password: null,
           salt: null,
           createdAt: new Date(),
           updatedAt: new Date(),
-          googleOAuth2AccessToken: null,
-          googleOAuth2ExpiryDate: null,
-          googleOAuth2IdToken: null,
-          googleOAuth2RefreshToken: null,
-          googleOAuth2TokenType: null,
-          oidcAccessToken: null,
-          oidcExpiryDate: null,
-          oidcIdToken: null,
-          oidcRefreshToken: null,
-          oidcTokenType: null,
         });
       sandbox.stub(domainsAdminrole, 'listRoles').withArgs(id).resolves([]);
 

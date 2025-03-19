@@ -1,4 +1,3 @@
-import { AUTH_TYPE } from '../constants';
 import { ListWithPager, genPasswordHash } from '../helpers';
 import { repositoryContainer } from '../repositories';
 import { adminUserNotFound, forbidden } from '../errors';
@@ -37,12 +36,12 @@ export const updateOneById = async (
   payload: AdminAccountUpdatePayload
 ): Promise<void> => {
   const repository = repositoryContainer.getAdminUserRepository();
-  const user = await findOneById(id);
+  const user = await findOneById(id, true);
   if (!user) {
     throw adminUserNotFound();
   }
 
-  if (user.authType === AUTH_TYPE.EMAIL) {
+  if (!(user as AdminUserWithCredential).password) {
     await repository.updateOneById(id, genPasswordHash(payload.password));
   } else {
     throw forbidden();

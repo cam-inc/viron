@@ -1,31 +1,32 @@
 import { AUTH_TYPE } from '../../constants';
 import { verifyPassword } from '../../helpers';
 import { signinFailed } from '../../errors';
-import { findOneByEmail } from '../adminuser';
+import { findOneByEmail, AdminUserCreatePayload } from '../adminuser';
 import { createFirstAdminUser } from './common';
 import { signJwt } from './jwt';
+import http from 'http';
 
 // Emailアドレスでサインイン
 export const signinEmail = async (
+  req: http.IncomingMessage,
   email: string,
   password: string
 ): Promise<string> => {
   // credentialありで取得
   let adminUser = await findOneByEmail(email, true);
   if (!adminUser) {
-    const firstAdminUser = await createFirstAdminUser(
-      { email, password },
-      AUTH_TYPE.EMAIL
-    );
-    if (!firstAdminUser) {
+    adminUser = await createFirstAdminUser(AUTH_TYPE.EMAIL, {
+      email,
+      password,
+    } as AdminUserCreatePayload);
+    if (!adminUser) {
       // 他に管理者がいる場合は発行してもらう必要がある
       throw signinFailed();
     }
-    adminUser = firstAdminUser;
   }
 
   if (
-    adminUser.authType !== AUTH_TYPE.EMAIL ||
+    adminUser?.password ||
     !verifyPassword(
       password,
       adminUser.password as string,
@@ -35,5 +36,5 @@ export const signinEmail = async (
     throw signinFailed();
   }
 
-  return signJwt(adminUser.id);
+  return signJwt(adminUser.id, req);
 };

@@ -3,6 +3,7 @@ import sinon from 'sinon';
 import { decode } from 'jsonwebtoken';
 import * as domainsAuthSignout from '../../../src/domains/auth/signout';
 import { initJwt, signJwt, verifyJwt } from '../../../src/domains/auth';
+import http from 'http';
 
 describe('domains/auth/jwt', () => {
   const sandbox = sinon.createSandbox();
@@ -33,7 +34,7 @@ describe('domains/auth/jwt', () => {
 
     it('Get a jwt.', async () => {
       const subject = 'test';
-      const result = signJwt(subject);
+      const result = await signJwt(subject, {} as http.IncomingMessage);
       assert(result);
       const [type, token] = result.split(' ');
       assert.strictEqual(type, 'Bearer');
@@ -50,33 +51,33 @@ describe('domains/auth/jwt', () => {
 
     it('Get verified claims.', async () => {
       const subject = 'test';
-      const token = signJwt(subject);
+      const token = await signJwt(subject, {} as http.IncomingMessage);
 
       sandbox
         .stub(domainsAuthSignout, 'isSignedout')
         .withArgs(token)
         .resolves(false);
 
-      const result = await verifyJwt(token);
+      const result = await verifyJwt(token, {} as http.IncomingMessage);
       assert(result);
       assert.strictEqual(result.sub, subject);
     });
 
     it('Return null when token is empty', async () => {
-      const result = await verifyJwt();
+      const result = await verifyJwt('', {} as http.IncomingMessage);
       assert.strictEqual(result, null);
     });
 
     it('Return null when token is already signed out.', async () => {
       const subject = 'test';
-      const token = signJwt(subject);
+      const token = await signJwt(subject, {} as http.IncomingMessage);
 
       sandbox
         .stub(domainsAuthSignout, 'isSignedout')
         .withArgs(token)
         .resolves(true);
 
-      const result = await verifyJwt(token);
+      const result = await verifyJwt(token, {} as http.IncomingMessage);
       assert.strictEqual(result, null);
     });
   });
@@ -86,7 +87,7 @@ describe('domains/auth/jwt', () => {
       initJwt(
         {
           secret: 'test',
-          provider: () => {
+          provider: async () => {
             return { issuer: 'custom-issuer', audience: ['custom-audience'] };
           },
           expirationSec: 60,
@@ -96,14 +97,14 @@ describe('domains/auth/jwt', () => {
     });
     it('Return custom issuer and audiences.', async () => {
       const subject = 'test';
-      const token = signJwt(subject);
+      const token = await signJwt(subject, {} as http.IncomingMessage);
 
       sandbox
         .stub(domainsAuthSignout, 'isSignedout')
         .withArgs(token)
         .resolves(false);
 
-      const result = await verifyJwt(token);
+      const result = await verifyJwt(token, {} as http.IncomingMessage);
       assert(result);
       assert.strictEqual(result.iss, 'custom-issuer');
       assert.strictEqual(result.aud[0], 'custom-audience');

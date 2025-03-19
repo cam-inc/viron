@@ -7,10 +7,10 @@ import {
   unsupportedScope,
   invalidOidcIdToken,
   forbidden,
-  signinFailed,
   VironError,
   faildDecodeOidcIdToken,
   mismatchKidOidcIdToken,
+  signinFailed,
 } from '../../../src/errors';
 import {
   findOneByEmail,
@@ -18,11 +18,18 @@ import {
   AdminUser,
   AdminUserCreateAttributes,
   AdminUserUpdateAttributes,
+  AdminUserCreatePayload,
 } from '../../../src/domains/adminuser';
 import { Repository, repositoryContainer } from '../../../src/repositories';
 import { addRoleForUser, listRoles } from '../../../src/domains/adminrole';
-import { AUTH_TYPE, ADMIN_ROLE } from '../../../src/constants';
+import { ADMIN_ROLE, AUTH_PROVIDER, AUTH_TYPE } from '../../../src/constants';
 import jwt, { TokenExpiredError } from 'jsonwebtoken';
+import http from 'http';
+import {
+  AdminUserSsoToken,
+  createOne as createOneSsoToken,
+  findOneByClientIdAndUserId,
+} from '../../../src/domains/adminuserssotoken';
 
 describe('domains/auth/oidc', () => {
   // 共有の設定
@@ -30,7 +37,7 @@ describe('domains/auth/oidc', () => {
   const defaultConfig = {
     clientId: 'oidc-client-id',
     clientSecret: 'oidc-client-secret',
-    configurationUrl: 'https://example.com/.well-known/openid-configuration',
+    issuerUrl: 'https://example.com',
     additionalScopes: [],
   };
 
@@ -69,7 +76,10 @@ describe('domains/auth/oidc', () => {
       await domainAuthOidc.genOidcClient(config, redirectUri);
 
       // モックが期待通りに呼び出されたか確認
-      sinon.assert.calledOnceWithExactly(discoverStub, config.configurationUrl);
+      sinon.assert.calledOnceWithExactly(
+        discoverStub,
+        config.issuerUrl + '/.well-known/openid-configuration'
+      );
       sinon.assert.calledOnceWithExactly(clientStub, {
         client_id: config.clientId,
         client_secret: config.clientSecret,
@@ -106,7 +116,10 @@ describe('domains/auth/oidc', () => {
       );
 
       // モックが期待通りに呼び出されたか確認
-      sinon.assert.calledOnceWithExactly(discoverStub, config.configurationUrl);
+      sinon.assert.calledOnceWithExactly(
+        discoverStub,
+        config.issuerUrl + '/.well-known/openid-configuration'
+      );
       sinon.assert.calledOnceWithExactly(clientStub, {
         client_id: config.clientId,
         client_secret: config.clientSecret,
@@ -138,7 +151,10 @@ describe('domains/auth/oidc', () => {
       );
 
       // モックが期待通りに呼び出されたか確認
-      sinon.assert.calledOnceWithExactly(discoverStub, config.configurationUrl);
+      sinon.assert.calledOnceWithExactly(
+        discoverStub,
+        config.issuerUrl + '/.well-known/openid-configuration'
+      );
     });
   });
 
@@ -149,7 +165,7 @@ describe('domains/auth/oidc', () => {
         .resolves('code-verifier');
       const result = await domainAuthOidc.genOidcCodeVerifier();
       assert.strictEqual(result, 'code-verifier');
-      sinon.assert.calledOnceWithExactly(codeVerifierStub);
+      sinon.assert.calledOnce(codeVerifierStub);
     });
   });
 
@@ -211,7 +227,10 @@ describe('domains/auth/oidc', () => {
       );
 
       // モックが期待通りに呼び出されたか確認
-      sinon.assert.calledOnceWithExactly(discoverStub, config.configurationUrl);
+      sinon.assert.calledOnceWithExactly(
+        discoverStub,
+        config.issuerUrl + '/.well-known/openid-configuration'
+      );
       sinon.assert.calledOnceWithExactly(clientStub, {
         client_id: config.clientId,
         client_secret: config.clientSecret,
@@ -271,7 +290,10 @@ describe('domains/auth/oidc', () => {
       );
 
       // モックが期待通りに呼び出されたか確認
-      sinon.assert.calledOnceWithExactly(discoverStub, config.configurationUrl);
+      sinon.assert.calledOnceWithExactly(
+        discoverStub,
+        config.issuerUrl + '/.well-known/openid-configuration'
+      );
       sinon.assert.calledOnceWithExactly(clientStub, {
         client_id: config.clientId,
         client_secret: config.clientSecret,
@@ -347,7 +369,10 @@ describe('domains/auth/oidc', () => {
       );
 
       // モックが期待通りに呼び出されたか確認
-      sinon.assert.calledOnceWithExactly(discoverStub, config.configurationUrl);
+      sinon.assert.calledOnceWithExactly(
+        discoverStub,
+        config.issuerUrl + '/.well-known/openid-configuration'
+      );
       sinon.assert.calledOnceWithExactly(clientStub, {
         client_id: config.clientId,
         client_secret: config.clientSecret,
@@ -380,7 +405,7 @@ describe('domains/auth/oidc', () => {
     beforeAll(() => {
       initJwt({
         secret: 'test',
-        provider: 'oidc',
+        provider: AUTH_PROVIDER.CUSTOME,
       });
     });
 
@@ -394,7 +419,7 @@ describe('domains/auth/oidc', () => {
       // モックの作成
       const mockTokenSet = {
         access_token: 'xxxxx',
-        id_token: 'yyyyy',
+        id_token: 'Bearer yyyyy',
         claims: (): IdTokenClaims => ({
           email: 'super_user@example.com',
           sub: 'sub',
@@ -403,6 +428,7 @@ describe('domains/auth/oidc', () => {
           iat: 1737455830,
           iss: 'iss',
         }),
+        token_type: 'Bearer',
         expired: (): boolean => false,
       };
       const callbackStub = sandbox.stub().resolves(mockTokenSet);
@@ -413,11 +439,13 @@ describe('domains/auth/oidc', () => {
 
       // テスト対象の関数を呼び出し
       const result = await domainAuthOidc.signinOidc(
+        {} as http.IncomingMessage,
         mockClient,
         codeVerifier,
         redirectUri,
         params,
-        config
+        config,
+        true
       );
 
       // スタブ呼び出し確認
@@ -434,13 +462,13 @@ describe('domains/auth/oidc', () => {
         mockTokenSet.claims().email as string,
         true
       );
-      assert.strictEqual(actual?.authType, AUTH_TYPE.OIDC);
       assert.strictEqual(actual?.email, mockTokenSet.claims().email);
-      assert.strictEqual(actual?.oidcAccessToken, mockTokenSet.access_token);
-      assert.strictEqual(actual?.oidcIdToken, mockTokenSet.id_token);
 
       // ロールが正しく設定されているか確認
-      const roleIds = await listRoles(actual?.id);
+      if (!actual) {
+        throw new Error('User not found');
+      }
+      const roleIds = await listRoles(actual.id);
       assert.strictEqual(roleIds[0], ADMIN_ROLE.SUPER);
     });
 
@@ -472,11 +500,13 @@ describe('domains/auth/oidc', () => {
       // テスト対象の関数を呼び出し
       await assert.rejects(
         domainAuthOidc.signinOidc(
+          {} as http.IncomingMessage,
           mockClient,
           codeVerifier,
           redirectUri,
           params,
-          config
+          config,
+          true
         ),
         invalidOidcIdToken()
       );
@@ -516,11 +546,13 @@ describe('domains/auth/oidc', () => {
       // テスト対象の関数を呼び出し
       await assert.rejects(
         domainAuthOidc.signinOidc(
+          {} as http.IncomingMessage,
           mockClient,
           codeVerifier,
           redirectUri,
           params,
-          config
+          config,
+          true
         ),
         invalidOidcIdToken()
       );
@@ -561,11 +593,13 @@ describe('domains/auth/oidc', () => {
       // テスト対象の関数を呼び出し
       await assert.rejects(
         domainAuthOidc.signinOidc(
+          {} as http.IncomingMessage,
           mockClient,
           codeVerifier,
           redirectUri,
           params,
-          config
+          config,
+          true
         ),
         forbidden()
       );
@@ -606,11 +640,13 @@ describe('domains/auth/oidc', () => {
       // テスト対象の関数を呼び出し
       await assert.rejects(
         domainAuthOidc.signinOidc(
+          {} as http.IncomingMessage,
           mockClient,
           codeVerifier,
           redirectUri,
           params,
-          config
+          config,
+          true
         ),
         forbidden()
       );
@@ -641,6 +677,7 @@ describe('domains/auth/oidc', () => {
           iat: 1737455830,
           iss: 'iss',
         }),
+        token_type: 'Bearer',
         expired: (): boolean => false,
       };
       const callbackStub = sandbox.stub().resolves(mockTokenSet);
@@ -650,25 +687,19 @@ describe('domains/auth/oidc', () => {
       } as unknown as Client;
 
       // すでにsuperユーザーが存在する状態にする
-      await createOne(
-        {
-          email: 'super@example.com',
-          oidcAccessToken: 'xxxxx',
-          oidcExpiryDate: 1737455830,
-          oidcIdToken: 'yyyyy',
-          oidcRefreshToken: null,
-          oidcTokenType: 'Bearer',
-        },
-        AUTH_TYPE.OIDC
-      );
+      await createOne(true, {
+        email: 'super@example.com',
+      } as AdminUserCreatePayload);
 
       // テスト対象の関数を呼び出し
       const result = await domainAuthOidc.signinOidc(
+        {} as http.IncomingMessage,
         mockClient,
         codeVerifier,
         redirectUri,
         params,
-        config
+        config,
+        true
       );
 
       // スタブ呼び出し確認
@@ -685,22 +716,24 @@ describe('domains/auth/oidc', () => {
         mockTokenSet.claims().email as string,
         true
       );
-      assert.strictEqual(actual?.authType, AUTH_TYPE.OIDC);
       assert.strictEqual(actual?.email, mockTokenSet.claims().email);
-      assert.strictEqual(actual?.oidcAccessToken, mockTokenSet.access_token);
-      assert.strictEqual(actual?.oidcIdToken, mockTokenSet.id_token);
 
       // ロールが正しく設定されているか確認
-      const roleIds = await listRoles(actual?.id);
+      if (!actual) {
+        throw new Error('User not found');
+      }
+      const roleIds = await listRoles(actual.id);
       assert.strictEqual(roleIds[0], ADMIN_ROLE.VIEWER);
     });
 
-    it('登録済みユーザーと認証タイプが違うエラー', async () => {
+    it('multipleAuthUser=falseの場合にパスワード認証ユーザーが既にいて失敗する', async () => {
       // テストデータ
       const config = {
         ...defaultConfig,
         userHostedDomains: ['example.com'],
       };
+
+      const clientId = '67890';
 
       // モックの作成
       const mockTokenSet = {
@@ -709,11 +742,12 @@ describe('domains/auth/oidc', () => {
         claims: (): IdTokenClaims => ({
           email: 'registered@example.com',
           sub: 'sub',
-          aud: 'aud',
+          aud: clientId,
           exp: 1737455830,
           iat: 1737455830,
           iss: 'iss',
         }),
+        token_type: 'Bearer',
         expired: (): boolean => false,
       };
       const callbackStub = sandbox.stub().resolves(mockTokenSet);
@@ -722,29 +756,123 @@ describe('domains/auth/oidc', () => {
       } as unknown as Client;
 
       // すでに同じemailでユーザーが存在する状態にする
-      await createOne(
-        {
-          email: mockTokenSet.claims().email as string,
-          oidcAccessToken: 'xxxxx',
-          oidcExpiryDate: 1737455830,
-          oidcIdToken: 'yyyyy',
-          oidcRefreshToken: null,
-          oidcTokenType: 'Bearer',
-        },
-        AUTH_TYPE.GOOGLE
-      );
+      const registeredUser = await createOne(true, {
+        email: mockTokenSet.claims().email as string,
+        password: 'password',
+      } as AdminUserCreatePayload);
+
+      // SSOトークンの作成
+      const userId = registeredUser.id;
+      const ssoToken = {
+        authType: AUTH_TYPE.OIDC,
+        userId,
+        clientId,
+        provider: AUTH_PROVIDER.CUSTOME,
+        accessToken: 'xxxxx',
+        expiryDate: 1737455830,
+        idToken: 'yyyyy',
+        refreshToken: 'zzzzz',
+        tokenType: 'Bearer',
+      } as AdminUserSsoToken;
+      await createOneSsoToken(ssoToken);
 
       // テスト対象の関数を呼び出し
-      await assert.rejects(
+      assert.rejects(
         domainAuthOidc.signinOidc(
+          {} as http.IncomingMessage,
           mockClient,
           codeVerifier,
           redirectUri,
           params,
-          config
+          config,
+          false
         ),
         signinFailed()
       );
+
+      // ユーザーが変わってないこと
+      const actual = await findOneByEmail(
+        mockTokenSet.claims().email as string,
+        true
+      );
+      assert.strictEqual(actual?.email, mockTokenSet.claims().email);
+
+      // スタブ呼び出し確認
+      sinon.assert.calledOnceWithExactly(callbackStub, redirectUri, params, {
+        code_verifier: codeVerifier,
+        state: params.state,
+      });
+    });
+
+    it('multipleAuthUser=falseの場合にOIDC認証ユーザーが既にいて失敗する', async () => {
+      // テストデータ
+      const config = {
+        ...defaultConfig,
+        userHostedDomains: ['example.com'],
+      };
+
+      const clientId = '67890';
+
+      // モックの作成
+      const mockTokenSet = {
+        access_token: 'xxxxx',
+        id_token: 'yyyyy',
+        claims: (): IdTokenClaims => ({
+          email: 'registered1@example.com',
+          sub: 'sub',
+          aud: clientId,
+          exp: 1737455830,
+          iat: 1737455830,
+          iss: 'iss',
+        }),
+        token_type: 'Bearer',
+        expired: (): boolean => false,
+      };
+      const callbackStub = sandbox.stub().resolves(mockTokenSet);
+      const mockClient = {
+        callback: callbackStub,
+      } as unknown as Client;
+
+      // すでに同じemailでユーザーが存在する状態にする
+      const registeredUser = await createOne(true, {
+        email: mockTokenSet.claims().email as string,
+      } as AdminUserCreatePayload);
+
+      // SSOトークンの作成
+      const userId = registeredUser.id;
+      const ssoToken = {
+        authType: AUTH_TYPE.OIDC,
+        userId,
+        clientId: 'dummuy',
+        provider: AUTH_PROVIDER.CUSTOME,
+        accessToken: 'xxxxx',
+        expiryDate: 1737455830,
+        idToken: 'yyyyy',
+        refreshToken: 'zzzzz',
+        tokenType: 'Bearer',
+      } as AdminUserSsoToken;
+      await createOneSsoToken(ssoToken);
+
+      // テスト対象の関数を呼び出し
+      assert.rejects(
+        domainAuthOidc.signinOidc(
+          {} as http.IncomingMessage,
+          mockClient,
+          codeVerifier,
+          redirectUri,
+          params,
+          config,
+          false
+        ),
+        signinFailed()
+      );
+
+      // ユーザーが変わってないこと
+      const actual = await findOneByEmail(
+        mockTokenSet.claims().email as string,
+        true
+      );
+      assert.strictEqual(actual?.email, mockTokenSet.claims().email);
 
       // スタブ呼び出し確認
       sinon.assert.calledOnceWithExactly(callbackStub, redirectUri, params, {
@@ -772,6 +900,7 @@ describe('domains/auth/oidc', () => {
           iat: 1737455830,
           iss: 'iss',
         }),
+        token_type: 'Bearer',
         expired: (): boolean => false,
       };
       const callbackStub = sandbox.stub().resolves(mockTokenSet);
@@ -780,26 +909,20 @@ describe('domains/auth/oidc', () => {
       } as unknown as Client;
 
       // すでに同じemailでユーザーが存在する状態にする
-      const registeredUser = await createOne(
-        {
-          email: mockTokenSet.claims().email as string,
-          oidcAccessToken: 'xxxxx',
-          oidcExpiryDate: 1737455830,
-          oidcIdToken: 'yyyyy',
-          oidcRefreshToken: null,
-          oidcTokenType: 'Bearer',
-        },
-        AUTH_TYPE.OIDC
-      );
+      const registeredUser = await createOne(true, {
+        email: mockTokenSet.claims().email as string,
+      } as AdminUserCreatePayload);
       await addRoleForUser(registeredUser.id, ADMIN_ROLE.VIEWER);
 
       // signinOidc関数を実行して結果を取得
       await domainAuthOidc.signinOidc(
+        {} as http.IncomingMessage,
         mockClient,
         codeVerifier,
         redirectUri,
         params,
-        config
+        config,
+        true
       );
 
       // スタブ呼び出し確認
@@ -813,12 +936,12 @@ describe('domains/auth/oidc', () => {
         mockTokenSet.claims().email as string,
         true
       );
-      assert.strictEqual(actual?.authType, AUTH_TYPE.OIDC);
       assert.strictEqual(actual?.email, mockTokenSet.claims().email);
-      assert.strictEqual(actual?.oidcAccessToken, mockTokenSet.access_token);
-      assert.strictEqual(actual?.oidcIdToken, mockTokenSet.id_token);
 
       // ロールが正しく設定されているか確認
+      if (!actual) {
+        throw new Error('User not found');
+      }
       const roleIds = await listRoles(actual?.id);
       assert.strictEqual(roleIds[0], ADMIN_ROLE.VIEWER);
     });
@@ -842,6 +965,7 @@ describe('domains/auth/oidc', () => {
           iat: 1737455830,
           iss: 'iss',
         }),
+        token_type: 'Bearer',
         expired: (): boolean => false,
       };
       const refreshStub = sandbox.stub().resolves(mockTokenSet);
@@ -854,25 +978,36 @@ describe('domains/auth/oidc', () => {
         .resolves({ payload: mockTokenSet.claims(), expired: false });
 
       // すでに同じemailでユーザーが存在する状態にする
-      const registeredUser = await createOne(
-        {
-          email: mockTokenSet.claims().email as string,
-          oidcAccessToken: 'xxxxx',
-          oidcExpiryDate: 1737455830,
-          oidcIdToken: 'yyyyy',
-          oidcRefreshToken: 'zzzzz',
-          oidcTokenType: 'Bearer',
-        },
-        AUTH_TYPE.OIDC,
-        true
-      );
+      const registeredUser = await createOne(true, {
+        email: mockTokenSet.claims().email as string,
+      } as AdminUserCreatePayload);
+
+      const clientId = '67890';
+      const ssoToken = {
+        authType: AUTH_TYPE.OIDC,
+        userId: registeredUser.id,
+        clientId,
+        provider: AUTH_PROVIDER.CUSTOME,
+        accessToken: 'xxxxx',
+        expiryDate: 1737455830,
+        idToken: 'yyyyy',
+        refreshToken: 'zzzzz',
+        tokenType: 'Bearer',
+      } as AdminUserSsoToken;
+
+      // SSOトークンを作成
+      const registeredSsoToken = await createOneSsoToken(ssoToken);
+      if (!registeredSsoToken) {
+        throw new Error('SSO token create failed');
+      }
 
       // テスト対象の関数を呼び出し
       const result = await domainAuthOidc.verifyOidcAccessToken(
         mockClient,
         config,
+        clientId,
         registeredUser.id,
-        registeredUser
+        ssoToken
       );
 
       // 結果の検証
@@ -881,33 +1016,47 @@ describe('domains/auth/oidc', () => {
       // スタブ呼び出し確認
       sinon.assert.calledOnceWithExactly(
         refreshStub,
-        registeredUser.oidcRefreshToken
+        registeredSsoToken.refreshToken
       );
 
       // ユーザーが正しく更新されたか確認
-      const actual = await findOneByEmail(
+      const actualUser = await findOneByEmail(
         mockTokenSet.claims().email as string,
         true
       );
-      assert.strictEqual(actual?.authType, AUTH_TYPE.OIDC);
-      assert.strictEqual(actual?.email, mockTokenSet.claims().email);
-      assert.strictEqual(actual?.oidcAccessToken, mockTokenSet.access_token);
-      assert.strictEqual(actual?.oidcIdToken, mockTokenSet.id_token);
-      assert.strictEqual(actual?.oidcRefreshToken, mockTokenSet.refresh_token);
+      if (!actualUser) {
+        throw new Error('User not found');
+      }
+      assert.strictEqual(actualUser?.email, mockTokenSet.claims().email);
+
+      // SSOトークンが正しく作成されたか確認
+      const actualSsoToken = await findOneByClientIdAndUserId(
+        clientId,
+        actualUser?.id
+      );
+      if (!actualSsoToken) {
+        throw new Error('SSO token not found');
+      }
+      assert.strictEqual(actualSsoToken.accessToken, mockTokenSet.access_token);
     });
     it('credentialsが不正な場合はエラー', async () => {
       // テストデータ
       const config = defaultConfig;
 
       // テストデータ
-      const user = {
-        oidcAccessToken: null,
-        oidcExpiryDate: 1737455830,
-        oidcIdToken: 'yyyyy',
-        oidcRefreshToken: null,
-        oidcTokenType: 'Bearer',
-      };
-      const userId = 'dummy';
+      const userId = '12345';
+      const clientId = '67890';
+      const ssoToken = {
+        authType: AUTH_TYPE.OIDC,
+        userId,
+        clientId,
+        provider: AUTH_PROVIDER.CUSTOME,
+        accessToken: 'xxxxx',
+        expiryDate: 1737455830,
+        idToken: 'yyyyy',
+        refreshToken: null,
+        tokenType: 'Bearer',
+      } as AdminUserSsoToken;
 
       // モックの作成
       const mockClient = {} as unknown as Client;
@@ -916,8 +1065,9 @@ describe('domains/auth/oidc', () => {
       const result = await domainAuthOidc.verifyOidcAccessToken(
         mockClient,
         config,
+        clientId,
         userId,
-        user
+        ssoToken
       );
 
       // 結果の検証
@@ -928,14 +1078,19 @@ describe('domains/auth/oidc', () => {
       const config = defaultConfig;
 
       // テストデータ
-      const user = {
-        oidcAccessToken: 'xxxxx',
-        oidcExpiryDate: 1737455830,
-        oidcIdToken: 'yyyyy',
-        oidcRefreshToken: null,
-        oidcTokenType: 'Bearer',
-      };
-      const userId = 'dummy';
+      const userId = '12345';
+      const clientId = '67890';
+      const ssoToken = {
+        authType: AUTH_TYPE.OIDC,
+        userId,
+        clientId,
+        provider: AUTH_PROVIDER.CUSTOME,
+        accessToken: 'xxxxx',
+        expiryDate: 1737455830,
+        idToken: 'yyyyy',
+        refreshToken: null,
+        tokenType: 'Bearer',
+      } as AdminUserSsoToken;
 
       // モックの作成
       const mockClient = {} as unknown as Client;
@@ -948,8 +1103,9 @@ describe('domains/auth/oidc', () => {
       const result = await domainAuthOidc.verifyOidcAccessToken(
         mockClient,
         config,
+        clientId,
         userId,
-        user
+        ssoToken
       );
 
       // 結果の検証
@@ -960,14 +1116,19 @@ describe('domains/auth/oidc', () => {
       const config = defaultConfig;
 
       // テストデータ
-      const user = {
-        oidcAccessToken: 'xxxxx',
-        oidcExpiryDate: 1737455830,
-        oidcIdToken: 'yyyyy',
-        oidcRefreshToken: null,
-        oidcTokenType: 'Bearer',
-      };
-      const userId = 'dummy';
+      const userId = '12345';
+      const clientId = '67890';
+      const ssoToken = {
+        authType: AUTH_TYPE.OIDC,
+        userId,
+        clientId,
+        provider: AUTH_PROVIDER.CUSTOME,
+        accessToken: 'xxxxx',
+        expiryDate: 1737455830,
+        idToken: 'yyyyy',
+        refreshToken: null,
+        tokenType: 'Bearer',
+      } as AdminUserSsoToken;
 
       // モックの作成
       const mockClient = {} as unknown as Client;
@@ -980,8 +1141,9 @@ describe('domains/auth/oidc', () => {
       const result = await domainAuthOidc.verifyOidcAccessToken(
         mockClient,
         config,
+        clientId,
         userId,
-        user
+        ssoToken
       );
 
       // 結果の検証
@@ -1016,25 +1178,35 @@ describe('domains/auth/oidc', () => {
         .resolves({ payload: mockTokenSet.claims(), expired: false });
 
       // すでに同じemailでユーザーが存在する状態にする
-      const registeredUser = await createOne(
-        {
-          email: mockTokenSet.claims().email as string,
-          oidcAccessToken: 'xxxxx',
-          oidcExpiryDate: Date.now() / 1000 + 10 * 60, // 10分後に有効期限切れ
-          oidcIdToken: 'yyyyy',
-          oidcRefreshToken: 'zzzzz',
-          oidcTokenType: 'Bearer',
-        },
-        AUTH_TYPE.OIDC,
-        true
-      );
+      const registeredUser = await createOne(true, {
+        email: mockTokenSet.claims().email as string,
+      } as AdminUserCreatePayload);
+
+      // SSRトークンを作成
+      const clientId = '67890';
+      const ssoToken = {
+        authType: AUTH_TYPE.OIDC,
+        userId: registeredUser.id,
+        clientId,
+        provider: AUTH_PROVIDER.CUSTOME,
+        accessToken: 'xxxxx',
+        expiryDate: 1737455830,
+        idToken: 'yyyyy',
+        refreshToken: 'zzzzz',
+        tokenType: 'Bearer',
+      } as AdminUserSsoToken;
+      const registeredSsoToken = await createOneSsoToken(ssoToken);
+      if (!registeredSsoToken) {
+        throw new Error('SSO token create failed');
+      }
 
       // テスト対象の関数を呼び出し
       const result = await domainAuthOidc.verifyOidcAccessToken(
         mockClient,
         config,
+        clientId,
         registeredUser.id,
-        registeredUser
+        registeredSsoToken
       );
 
       // 結果の検証
@@ -1044,35 +1216,44 @@ describe('domains/auth/oidc', () => {
       sinon.assert.notCalled(refreshStub);
 
       // ユーザーが更新されていないことを確認
-      const actual = await findOneByEmail(
+      const actualUser = await findOneByEmail(
         mockTokenSet.claims().email as string,
         true
       );
-      assert.strictEqual(actual?.authType, AUTH_TYPE.OIDC);
-      assert.strictEqual(actual?.email, registeredUser.email);
-      assert.strictEqual(
-        actual?.oidcAccessToken,
-        registeredUser.oidcAccessToken
+      assert.strictEqual(actualUser?.email, registeredUser.email);
+
+      // SSOトークンが更新されていないことを確認
+      const actualSsoToken = await findOneByClientIdAndUserId(
+        clientId,
+        actualUser?.id
       );
-      assert.strictEqual(actual?.oidcIdToken, registeredUser.oidcIdToken);
-      assert.strictEqual(
-        actual?.oidcRefreshToken,
-        registeredUser.oidcRefreshToken
-      );
+      assert.strictEqual(actualSsoToken?.accessToken, ssoToken.accessToken);
+      assert.strictEqual(actualSsoToken?.refreshToken, ssoToken.refreshToken);
+      assert.strictEqual(actualSsoToken?.expiryDate, ssoToken.expiryDate);
+      assert.strictEqual(actualSsoToken?.idToken, ssoToken.idToken);
+      assert.strictEqual(actualSsoToken?.tokenType, ssoToken.tokenType);
+      assert.strictEqual(actualSsoToken?.provider, ssoToken.provider);
+      assert.strictEqual(actualSsoToken?.userId, ssoToken.userId);
+      assert.strictEqual(actualSsoToken?.clientId, ssoToken.clientId);
     });
     it('アクセストークンのリフレッシュに失敗した場合はエラー', async () => {
       // テストデータ
       const config = defaultConfig;
 
       // テストデータ
-      const user = {
-        oidcAccessToken: 'xxxxx',
-        oidcExpiryDate: 1737455830,
-        oidcIdToken: 'yyyyy',
-        oidcRefreshToken: 'zzzzz',
-        oidcTokenType: 'Bearer',
-      };
-      const userId = 'dummy';
+      const userId = '12345';
+      const clientId = '67890';
+      const ssoToken = {
+        authType: AUTH_TYPE.OIDC,
+        userId,
+        clientId,
+        provider: AUTH_PROVIDER.CUSTOME,
+        accessToken: 'xxxxx',
+        expiryDate: 1737455830,
+        idToken: 'yyyyy',
+        refreshToken: 'zzzzz',
+        tokenType: 'Bearer',
+      } as AdminUserSsoToken;
 
       // モックの作成
       const refreshStub = sandbox.stub().rejects(new Error('refresh failed'));
@@ -1088,8 +1269,9 @@ describe('domains/auth/oidc', () => {
       const result = await domainAuthOidc.verifyOidcAccessToken(
         mockClient,
         config,
+        clientId,
         userId,
-        user
+        ssoToken
       );
 
       // 結果の検証

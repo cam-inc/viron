@@ -43,31 +43,51 @@ export const listVironAuthconfigs = async (
             type: AUTH_CONFIG_TYPE.OAUTH,
             method: API_METHOD.GET,
             path: OAUTH2_GOOGLE_AUTHORIZATION_PATH,
+            defaultParametersValue: {
+              clientId: ctx.config.auth.googleOAuth2.clientId,
+            },
+            defaultRequestBodyValue: {
+              clientId: ctx.config.auth.googleOAuth2.clientId,
+            },
           },
           {
             provider: AUTH_CONFIG_PROVIDER.GOOGLE,
             type: AUTH_CONFIG_TYPE.OAUTH_CALLBACK,
             method: API_METHOD.POST,
             path: OAUTH2_GOOGLE_CALLBACK_PATH,
+            defaultParametersValue: {
+              clientId: ctx.config.auth.googleOAuth2.clientId,
+            },
+            defaultRequestBodyValue: {
+              clientId: ctx.config.auth.googleOAuth2.clientId,
+            },
           },
         ]
       : []),
     // OIDC認証設定がある場合のみ追加
     ...(ctx.config.auth.oidc.clientId &&
     ctx.config.auth.oidc.clientSecret &&
-    ctx.config.auth.oidc.configurationUrl
+    ctx.config.auth.oidc.issuerUrl
       ? [
           {
             provider: AUTH_CONFIG_PROVIDER.OIDC,
             type: AUTH_CONFIG_TYPE.OIDC,
             method: API_METHOD.GET,
             path: OIDC_AUTHORIZATION_PATH,
+            defaultParametersValue: { clientId: ctx.config.auth.oidc.clientId },
+            defaultRequestBodyValue: {
+              clientId: ctx.config.auth.oidc.clientId,
+            },
           },
           {
             provider: AUTH_CONFIG_PROVIDER.OIDC,
             type: AUTH_CONFIG_TYPE.OIDC_CALLBACK,
             method: API_METHOD.POST,
             path: OIDC_CALLBACK_PATH,
+            defaultParametersValue: { clientId: ctx.config.auth.oidc.clientId },
+            defaultRequestBodyValue: {
+              clientId: ctx.config.auth.oidc.clientId,
+            },
           },
         ]
       : []),

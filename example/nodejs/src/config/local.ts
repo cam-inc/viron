@@ -1,5 +1,5 @@
 import { OAS_X_TAGS, OAS_X_THEME, OAS_X_THUMBNAIL, THEME } from '@viron/lib';
-import { Config, MongoConfig, MysqlConfig } from '.';
+import { Config, dynamicProvider, MongoConfig, MysqlConfig } from '.';
 import { Mode, MODE } from '../constants';
 
 /**
@@ -8,7 +8,7 @@ import { Mode, MODE } from '../constants';
 export const get = (mode: Mode): Config => {
   const mongo: MongoConfig = {
     type: 'mongo',
-    openUri: 'mongodb://mongo:27017',
+    openUri: 'mongodb://0.0.0.0:27017',
     connectOptions: {
       // MongoDB Options
       dbName: 'viron_example',
@@ -44,6 +44,7 @@ export const get = (mode: Mode): Config => {
         'https://localhost:8000',
         'https://viron.work',
         'https://snapshot.viron.work',
+        'https://viron.work:8000',
       ],
     },
     csrf: {
@@ -52,6 +53,7 @@ export const get = (mode: Mode): Config => {
         'https://localhost:8000',
         'https://viron.work',
         'https://snapshot.viron.work',
+        'https://viron.work:8000',
       ],
       ignorePaths: [
         '/ping',
@@ -60,23 +62,28 @@ export const get = (mode: Mode): Config => {
       ],
     },
     auth: {
+      multipleAuthUser: process.env.MULTIPLE_AUTH_USER === 'true',
       jwt: {
         secret: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-        provider: 'local-viron-example-nodejs',
+        provider: dynamicProvider,
         expirationSec: 24 * 60 * 60,
       },
       googleOAuth2: {
         clientId: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? '',
         clientSecret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET ?? '',
+        issuerUrl: process.env.GOOGLE_OAUTH2_ISSUER_URL ?? '',
         additionalScopes: [],
-        userHostedDomains: process.env.GOOGLE_OAUTH2_USER_HOSTED_DOMAINS
-          ? process.env.GOOGLE_OAUTH2_USER_HOSTED_DOMAINS.split(',')
-          : [],
+        userHostedDomains: [
+          'cam-inc.co.jp',
+          'sirok.co.jp',
+          'toiro-system.com',
+          'tapple.co.jp',
+        ],
       },
       oidc: {
         clientId: process.env.OIDC_CLIENT_ID ?? '',
         clientSecret: process.env.OIDC_CLIENT_SECRET ?? '',
-        configurationUrl: process.env.OIDC_CLIENT_CONFIGURATION_URL ?? '',
+        issuerUrl: process.env.OIDC_ISSUER_URL ?? '',
         additionalScopes: [],
         userHostedDomains: process.env.OIDC_USER_HOSTED_DOMAINS
           ? process.env.OIDC_USER_HOSTED_DOMAINS.split(',')

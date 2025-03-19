@@ -41,6 +41,7 @@ export const get = (): Config => {
       ],
     },
     auth: {
+      multipleAuthUser: process.env.MULTIPLE_AUTH_USER === 'true',
       jwt: {
         secret: process.env.JWT_SECRET ?? '',
         provider: 'viron-example-nodejs',
@@ -49,6 +50,7 @@ export const get = (): Config => {
       googleOAuth2: {
         clientId: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? '',
         clientSecret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET ?? '',
+        issuerUrl: process.env.GOOGLE_OAUTH2_ISSUER_URL ?? '',
         additionalScopes: [],
         userHostedDomains: process.env.GOOGLE_OAUTH2_USER_HOSTED_DOMAINS
           ? process.env.GOOGLE_OAUTH2_USER_HOSTED_DOMAINS.split(',')
@@ -58,7 +60,7 @@ export const get = (): Config => {
       oidc: {
         clientId: '',
         clientSecret: '',
-        configurationUrl: '',
+        issuerUrl: '',
         additionalScopes: [],
         userHostedDomains: [],
       },
