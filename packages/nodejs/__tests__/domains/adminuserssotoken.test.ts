@@ -10,18 +10,24 @@ import {
   findOneById,
   count,
   findOneByClientIdAndUserId,
-} from '../../src/domains/adminuserssotoken';
-import { repositoryContainer } from '../../src/repositories';
-import {
   AdminUserSsoTokenCreatePayload,
   AdminUserSsoTokenUpdatePayload,
+  AdminUserSsoToken,
+  AdminUserSsoTokenCreateAttributes,
+  AdminUserSsoTokenUpdateAttributes,
 } from '../../src/domains/adminuserssotoken';
+import { Repository, repositoryContainer } from '../../src/repositories';
 import { AUTH_PROVIDER, AUTH_TYPE } from '../../src/constants';
 import { adminUserSsoTokenNotFound, invalidAuthType } from '../../src/errors';
+import { ListWithPager } from '../../src/helpers';
 
 describe('AdminUserSsoToken', () => {
   const sandbox = sinon.createSandbox();
-  let repository: any;
+  let repository: Repository<
+    AdminUserSsoToken,
+    AdminUserSsoTokenCreateAttributes,
+    AdminUserSsoTokenUpdateAttributes
+  >;
 
   beforeAll(() => {
     repository = repositoryContainer.getAdminUserSsoTokenRepository();
@@ -36,7 +42,14 @@ describe('AdminUserSsoToken', () => {
     const size = 10;
     const page = 1;
     const sort = ['createdAt:desc'];
-    const expectedResult = { list: [], totalCount: 0 };
+    const expectedResult = {
+      list: [
+        { id: '1', userId: 'user1', clientId: 'client1' },
+        { id: '2', userId: 'user2', clientId: 'client2' },
+      ],
+      currentPage: 1,
+      maxPage: 2,
+    } as ListWithPager<AdminUserSsoToken>;
 
     sandbox
       .stub(repository, 'findWithPager')
@@ -93,7 +106,7 @@ describe('AdminUserSsoToken', () => {
     sandbox
       .stub(repository, 'findOne')
       .withArgs({ clientId, userId })
-      .resolves({ id: '1' });
+      .resolves({ id: '1' } as AdminUserSsoToken);
     sandbox.stub(repository, 'updateOneById').resolves();
 
     await assert.doesNotReject(
@@ -150,7 +163,7 @@ describe('AdminUserSsoToken', () => {
       refreshToken: 'refreshToken',
       tokenType: 'Bearer',
     };
-    const expectedResult = { ...payload, id };
+    const expectedResult = { ...payload, id } as AdminUserSsoToken;
 
     sandbox
       .stub(repository, 'findOne')
@@ -164,7 +177,7 @@ describe('AdminUserSsoToken', () => {
         accessToken: 'accessToken',
         expiryDate: Date.now(),
         tokenType: 'Bearer',
-      });
+      } as AdminUserSsoToken);
     sandbox.stub(repository, 'createOne').resolves(expectedResult);
 
     const result = await upsertOne(payload);
@@ -173,7 +186,11 @@ describe('AdminUserSsoToken', () => {
 
   it('should remove an admin user SSO token by id', async () => {
     const id = new mongoose.Types.ObjectId().toString();
-    const expectedResult = { id, userId: 'user1', clientId: 'client1' };
+    const expectedResult = {
+      id,
+      userId: 'user1',
+      clientId: 'client1',
+    } as AdminUserSsoToken;
 
     sandbox
       .stub(repository, 'findOneById')
@@ -193,7 +210,11 @@ describe('AdminUserSsoToken', () => {
 
   it('should find an admin user SSO token by id', async () => {
     const id = new mongoose.Types.ObjectId().toString();
-    const expectedResult = { id, userId: 'user1', clientId: 'client1' };
+    const expectedResult = {
+      id,
+      userId: 'user1',
+      clientId: 'client1',
+    } as AdminUserSsoToken;
 
     sandbox
       .stub(repository, 'findOneById')
@@ -216,7 +237,7 @@ describe('AdminUserSsoToken', () => {
   it('should find an admin user SSO token by clientId and userId', async () => {
     const clientId = 'client1';
     const userId = 'user1';
-    const expectedResult = { id: '1', userId, clientId };
+    const expectedResult = { id: '1', userId, clientId } as AdminUserSsoToken;
 
     sandbox
       .stub(repository, 'findOne')
