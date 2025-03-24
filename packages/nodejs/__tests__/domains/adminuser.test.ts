@@ -58,6 +58,31 @@ describe('domains/adminuser', () => {
       assert.strictEqual(result.maxPage, 1);
       assert.strictEqual(result.currentPage, 1);
     });
+    it('Get list with role with pager.', async () => {
+      sandbox.stub(repository, 'findWithPager').resolves({
+        list: [
+          {
+            id: '1',
+            email: 'foo@example.com',
+            salt: 'xxxxxxxxxx',
+            password: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ],
+        maxPage: 1,
+        currentPage: 1,
+      });
+      sandbox
+        .stub(domainsAdminrole, 'listUsers')
+        .withArgs('editor')
+        .resolves(['1']);
+
+      const result = await list({ roleId: 'editor' });
+      assert.strictEqual(result.list.length, 1);
+      assert.strictEqual(result.maxPage, 1);
+      assert.strictEqual(result.currentPage, 1);
+    });
   });
 
   describe('createOne', () => {
@@ -127,6 +152,41 @@ describe('domains/adminuser', () => {
     });
   });
 
+  describe('formatAdminUser', () => {
+    it('Format admin user credential true', () => {
+      const user: AdminUser = {
+        id: '1',
+        email: 'example@example.com',
+        password: 'password',
+        salt: 'xxxxxxxxxx',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      const formattedUser = domainsAdminuser.formatAdminUser(true, user);
+      assert.strictEqual(formattedUser.id, user.id);
+      assert.strictEqual(formattedUser.email, user.email);
+      assert.strictEqual(formattedUser.createdAt, user.createdAt);
+      assert.strictEqual(formattedUser.updatedAt, user.updatedAt);
+      assert.deepStrictEqual(formattedUser.roleIds, []);
+    });
+    it('Format admin user credential false', () => {
+      const user: AdminUser = {
+        id: '1',
+        email: 'example@example.com',
+        password: 'password',
+        salt: 'xxxxxxxxxx',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      const formattedUser = domainsAdminuser.formatAdminUser(false, user);
+      assert.strictEqual(formattedUser.id, user.id);
+      assert.strictEqual(formattedUser.email, user.email);
+      assert.strictEqual(formattedUser.createdAt, user.createdAt);
+      assert.strictEqual(formattedUser.updatedAt, user.updatedAt);
+      assert.deepStrictEqual(formattedUser.roleIds, []);
+    });
+  });
+
   describe('updateOneById', () => {
     it('Succeeded in update', async () => {
       const id = '1';
@@ -138,7 +198,7 @@ describe('domains/adminuser', () => {
       sandbox.stub(domainsAdminuser, 'findOneById').withArgs(id).resolves({
         id,
         email: 'test@example.com',
-        password: null,
+        password: '***********',
         salt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
