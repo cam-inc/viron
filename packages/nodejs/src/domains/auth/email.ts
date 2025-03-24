@@ -21,18 +21,21 @@ export const signinEmail = async (
     } as AdminUserCreatePayload);
     if (!adminUser) {
       // 他に管理者がいる場合は発行してもらう必要がある
+      console.error(
+        'No admin user found. Please contact the administrator to create an account.'
+      );
       throw signinFailed();
     }
   }
 
   if (
-    adminUser?.password ||
     !verifyPassword(
       password,
       adminUser.password as string,
       adminUser.salt as string
     )
   ) {
+    console.error('Invalid password');
     throw signinFailed();
   }
 

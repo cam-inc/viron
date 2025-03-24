@@ -38,5 +38,6 @@ export const verifyPassword = (
   hashedPassword: string,
   salt: string
 ): boolean => {
+  console.log('verifyPassword', password, hashedPassword, salt);
   return str2hash(password, salt) === hashedPassword;
 };

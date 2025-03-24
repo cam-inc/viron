@@ -120,7 +120,7 @@ export const jwt = async (
 
   // SSOトークンが存在する & パスワードがある場合はpassword認証なので成功
   if (
-    !ssoToken &&
+    ssoToken &&
     user &&
     (user as domainsAdminUser.AdminUserWithCredential).password
   ) {
@@ -130,7 +130,7 @@ export const jwt = async (
   // SSOトークンが存在しない & パスワードない場合はエラー
   if (
     !ssoToken &&
-    !user &&
+    user &&
     !(user as domainsAdminUser.AdminUserWithCredential).password
   ) {
     pContext.origRes.clearCookie(COOKIE_KEY.VIRON_AUTHORIZATION);

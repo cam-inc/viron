@@ -41,7 +41,7 @@ export const updateOneById = async (
     throw adminUserNotFound();
   }
 
-  if (!(user as AdminUserWithCredential).password) {
+  if ((user as AdminUserWithCredential).password) {
     await repository.updateOneById(id, genPasswordHash(payload.password));
   } else {
     throw forbidden();
