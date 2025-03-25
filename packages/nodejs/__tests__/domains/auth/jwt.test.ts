@@ -2,7 +2,12 @@ import assert from 'assert';
 import sinon from 'sinon';
 import { decode } from 'jsonwebtoken';
 import * as domainsAuthSignout from '../../../src/domains/auth/signout';
-import { initJwt, signJwt, verifyJwt } from '../../../src/domains/auth';
+import {
+  decodeJwt,
+  initJwt,
+  signJwt,
+  verifyJwt,
+} from '../../../src/domains/auth';
 import http from 'http';
 
 describe('domains/auth/jwt', () => {
@@ -79,6 +84,27 @@ describe('domains/auth/jwt', () => {
 
       const result = await verifyJwt(token, {} as http.IncomingMessage);
       assert.strictEqual(result, null);
+    });
+  });
+
+  describe('decodeJwt', () => {
+    beforeEach(() => {
+      initJwt(config, true);
+    });
+    it('Get decoded claims.', async () => {
+      const subject = 'test';
+      const token = await signJwt(subject, {} as http.IncomingMessage);
+      const result = await decodeJwt(token);
+      assert(result);
+      assert.strictEqual(result.sub, subject);
+      assert.strictEqual(result.iss, config.provider);
+      assert.strictEqual(result.aud[0], config.provider);
+      assert.strictEqual(
+        result.exp,
+        Math.floor(Date.now() / 1000) + config.expirationSec
+      );
+      assert.strictEqual(result.iat, Math.floor(Date.now() / 1000));
+      assert.strictEqual(result.nbf, 0);
     });
   });
 
