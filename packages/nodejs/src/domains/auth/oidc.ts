@@ -193,8 +193,6 @@ export const signinOidc = async (
   // emailでユーザーを検索
   let adminUser = await findOneByEmail(email, true);
 
-  console.log('adminUser', adminUser);
-
   // SSOトークンのUpsert
   const ssoTokenPayload = {
     authType: AUTH_TYPE.OIDC,

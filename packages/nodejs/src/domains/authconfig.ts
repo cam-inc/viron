@@ -94,11 +94,7 @@ export const genAuthConfigs = (
         )
       );
       ret.paths[path] = ret.paths[path] ?? {};
-      console.log(
-        `------------------genAuthConfigs provider: ${provider}, type: ${type}, method: ${method}, path: ${path}`
-      );
       const operation = findOperation(path, method, oas);
-      console.log(`genAuthConfigs findOperation: ${operation}`);
       if (!operation) {
         console.error(
           `genAuthConfigs Operation not found for path: ${path}, method: ${method}`
