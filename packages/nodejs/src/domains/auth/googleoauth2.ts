@@ -44,7 +44,7 @@ export interface GoogleOAuthConfig extends GoogleOAuthClientConfig {
 // GoogleOAuth2が有効かどうか
 export const isEnabledGoogleOAuth2 = (
   clientConfig: GoogleOAuthClientConfig
-): boolean => !!(clientConfig.clientId && clientConfig.clientSecret);
+): boolean => clientConfig.clientId != '' && clientConfig.clientSecret != '';
 
 // GoogleOAuth2クライアントを取得
 const getGoogleOAuth2Client = (
@@ -185,16 +185,21 @@ export const signinGoogleOAuth2 = async (
       // 登録済みユーザーの認証方法の確認
       // password認証が登録済みの場合はエラー
       if (adminUser.password !== '') {
+        console.error(
+          'signinGoogleOAuth2: user already has password authentication. %s',
+          adminUser.email
+        );
         throw signinFailed();
       }
       // userIdで登録済みSSOトークン情報を取得
       const ssoTokens = await findSsoTokens({ userId: adminUser.id });
-      ssoTokens.list.forEach(async (st) => {
-        // OIDC認証が登録済みの場合はエラー
-        if (st.clientId === config.clientId) {
+      for (const st of ssoTokens.list) {
+        // 今回のclientIDと違うSSOトークンがある場合はエラー
+        if (st.clientId !== payload.aud) {
+          console.error('signinFailed clientId already');
           throw signinFailed();
         }
-      });
+      }
     }
 
     // SSOトークンのUserIDを設定

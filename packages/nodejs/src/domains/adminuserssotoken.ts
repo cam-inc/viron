@@ -114,6 +114,11 @@ export const updateOneByClientIdAndUserId = async (
   const repository = repositoryContainer.getAdminUserSsoTokenRepository();
   const ssoToken = await findOneByClientIdAndUserId(clientId, userId);
   if (!ssoToken) {
+    console.error(
+      'updateOneByClientIdAndUserId: SSO token not found. clientId: %s, userId: %s',
+      clientId,
+      userId
+    );
     throw adminUserSsoTokenNotFound();
   }
 
