@@ -42,7 +42,7 @@ const schemaDefinition: ModelAttributes<
     allowNull: false,
   },
   accessToken: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(2028),
     allowNull: false,
   },
   expiryDate: {
@@ -54,7 +54,7 @@ const schemaDefinition: ModelAttributes<
     allowNull: false,
   },
   refreshToken: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(2028),
     allowNull: true,
   },
   tokenType: {
@@ -92,6 +92,6 @@ export const createModel = (
     timestamps: true,
     deletedAt: false,
     charset: 'utf8',
-    indexes: [{ unique: true, fields: ['email'] }],
+    indexes: [{ unique: true, fields: ['clientId', 'userId'] }],
   });
 };

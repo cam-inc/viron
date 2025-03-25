@@ -8,6 +8,7 @@ import {
   revokeRoleForUser,
   updateRolesForUser,
 } from './adminrole';
+import { removeAllByUserId } from './adminuserssotoken';
 
 export interface AdminUser {
   id: string;
@@ -152,7 +153,11 @@ export const removeOneById = async (id: string): Promise<void> => {
   if (!user) {
     throw adminUserNotFound();
   }
-  await Promise.all([repository.removeOneById(id), revokeRoleForUser(id)]);
+  await Promise.all([
+    repository.removeOneById(id),
+    revokeRoleForUser(id),
+    removeAllByUserId(id),
+  ]);
 };
 
 // IDで1件取得

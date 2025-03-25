@@ -6,12 +6,7 @@ import {
 } from '../constants';
 import { ListWithPager } from '../helpers';
 import { FindConditions, repositoryContainer } from '../repositories';
-import {
-  adminUserNotFound,
-  adminUserSsoTokenNotFound,
-  invalidAuthType,
-} from '../errors';
-import { revokeRoleForUser } from './adminrole';
+import { adminUserSsoTokenNotFound, invalidAuthType } from '../errors';
 
 export interface AdminUserSsoToken {
   id: string;
@@ -147,13 +142,17 @@ export const upsertOne = async (
 };
 
 // IDで1件削除
-export const removeOneById = async (id: string): Promise<void> => {
+export const removeAllByUserId = async (userId: string): Promise<void> => {
   const repository = repositoryContainer.getAdminUserSsoTokenRepository();
-  const user = await findOneById(id);
-  if (!user) {
-    throw adminUserNotFound();
+  const ssoTokens = await repository.find({ userId });
+
+  if (ssoTokens.length > 0) {
+    await Promise.all(
+      ssoTokens.map((ssoToken) => {
+        return repository.removeOneById(ssoToken.id);
+      })
+    );
   }
-  await Promise.all([repository.removeOneById(id), revokeRoleForUser(id)]);
 };
 
 // IDで1件取得

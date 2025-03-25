@@ -6,7 +6,7 @@ import {
   createOne,
   updateOneByClientIdAndUserId,
   upsertOne,
-  removeOneById,
+  removeAllByUserId,
   findOneById,
   count,
   findOneByClientIdAndUserId,
@@ -186,26 +186,28 @@ describe('AdminUserSsoToken', () => {
 
   it('should remove an admin user SSO token by id', async () => {
     const id = new mongoose.Types.ObjectId().toString();
-    const expectedResult = {
-      id,
-      userId: 'user1',
-      clientId: 'client1',
-    } as AdminUserSsoToken;
+    const expectedResult = [
+      {
+        id,
+        userId: 'user1',
+        clientId: 'client1',
+      } as AdminUserSsoToken,
+    ];
 
     sandbox
-      .stub(repository, 'findOneById')
-      .withArgs(id)
+      .stub(repository, 'find')
+      .withArgs({ userId: id })
       .resolves(expectedResult);
 
     sandbox.stub(repository, 'removeOneById').withArgs(id).resolves();
 
-    await assert.doesNotReject(removeOneById(id));
+    await assert.doesNotReject(removeAllByUserId(id));
   });
 
   it('should remove an admin user SSO token by id no sso token', async () => {
     const id = new mongoose.Types.ObjectId().toString();
 
-    await assert.rejects(removeOneById(id), adminUserSsoTokenNotFound());
+    await assert.doesNotReject(removeAllByUserId(id));
   });
 
   it('should find an admin user SSO token by id', async () => {

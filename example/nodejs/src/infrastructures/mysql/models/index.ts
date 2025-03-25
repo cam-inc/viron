@@ -20,6 +20,8 @@ export interface MysqlModels {
     .name]: mysql.MysqlModels[typeof mysql.models.auditLogs.name];
   [mysql.models.revokedTokens
     .name]: mysql.MysqlModels[typeof mysql.models.revokedTokens.name];
+  [mysql.models.adminUserSsoTokens
+    .name]: mysql.MysqlModels[typeof mysql.models.adminUserSsoTokens.name];
 }
 
 // Get models
@@ -32,6 +34,8 @@ export const models = (s: Sequelize): MysqlModels => {
     [itemDetails.name]: itemDetails.createModel(s),
     [medias.name]: medias.createModel(s),
     [mysql.models.adminUsers.name]: mysql.models.adminUsers.createModel(s),
+    [mysql.models.adminUserSsoTokens.name]:
+      mysql.models.adminUserSsoTokens.createModel(s),
     [mysql.models.auditLogs.name]: mysql.models.auditLogs.createModel(s),
     [mysql.models.revokedTokens.name]:
       mysql.models.revokedTokens.createModel(s),
