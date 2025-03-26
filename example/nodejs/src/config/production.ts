@@ -1,5 +1,5 @@
 import { OAS_X_TAGS, OAS_X_THEME, OAS_X_THUMBNAIL, THEME } from '@viron/lib';
-import { Config, MongoConfig } from '.';
+import { Config, MongoConfig, dynamicProvider } from '.';
 
 /**
  * Get configuration data.
@@ -44,7 +44,7 @@ export const get = (): Config => {
       multipleAuthUser: process.env.MULTIPLE_AUTH_USER === 'true',
       jwt: {
         secret: process.env.JWT_SECRET ?? '',
-        provider: 'viron-example-nodejs',
+        provider: dynamicProvider,
         expirationSec: 24 * 60 * 60,
       },
       googleOAuth2: {
