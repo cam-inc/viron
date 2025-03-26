@@ -184,7 +184,7 @@ export const signinGoogleOAuth2 = async (
     if (!multipleAuthUser) {
       // 登録済みユーザーの認証方法の確認
       // password認証が登録済みの場合はエラー
-      if (adminUser.password !== '') {
+      if (!adminUser.password && adminUser.password !== '') {
         console.error(
           'signinGoogleOAuth2: user already has password authentication. %s',
           adminUser.email
