@@ -29,6 +29,18 @@ const authFailure = (err: VironError): AuthenticationFailure => {
   };
 };
 
+const authFailureAndClearCookie = (
+  context: PluginContext,
+  err: VironError
+): AuthenticationFailure => {
+  context.origRes.clearCookie(COOKIE_KEY.VIRON_AUTHORIZATION);
+  context.res.header(
+    HTTP_HEADER.X_VIRON_AUTHTYPES_PATH,
+    VIRON_AUTHCONFIGS_PATH
+  );
+  return authFailure(err);
+};
+
 const authSuccess = (
   user: domainsAdminUser.AdminUserWithCredential
 ): AuthenticationSuccess => {
@@ -51,6 +63,7 @@ export const jwt = async (
     console.error('req.method is undefined');
     return authFailure(unauthorized());
   }
+
   const method = pContext.req.method.toLowerCase();
   if (!domainsAdminRole.isApiMethod(method)) {
     console.error('method is invalid');
@@ -59,13 +72,8 @@ export const jwt = async (
 
   const token = pContext.req.cookies[COOKIE_KEY.VIRON_AUTHORIZATION];
   if (!token) {
-    pContext.origRes.clearCookie(COOKIE_KEY.VIRON_AUTHORIZATION);
-    pContext.res.header(
-      HTTP_HEADER.X_VIRON_AUTHTYPES_PATH,
-      VIRON_AUTHCONFIGS_PATH
-    );
     console.error('header jwt token is invalid');
-    return authFailure(unauthorized());
+    return authFailureAndClearCookie(pContext, unauthorized());
   }
 
   const claims = await domainsAuth.verifyJwt(token, pContext.req);
@@ -74,13 +82,8 @@ export const jwt = async (
 
   // claimsがない場合はエラー
   if (!claims) {
-    pContext.origRes.clearCookie(COOKIE_KEY.VIRON_AUTHORIZATION);
-    pContext.res.header(
-      HTTP_HEADER.X_VIRON_AUTHTYPES_PATH,
-      VIRON_AUTHCONFIGS_PATH
-    );
     console.error('claims is invalid');
-    return authFailure(unauthorized());
+    return authFailureAndClearCookie(pContext, unauthorized());
   }
   const userId = claims.sub;
 
@@ -102,13 +105,8 @@ export const jwt = async (
 
   // ユーザーが存在しない場合とaudがない場合はエラー
   if (!user || !claims.aud) {
-    pContext.origRes.clearCookie(COOKIE_KEY.VIRON_AUTHORIZATION);
-    pContext.res.header(
-      HTTP_HEADER.X_VIRON_AUTHTYPES_PATH,
-      VIRON_AUTHCONFIGS_PATH
-    );
     console.error('user or aud is invalid');
-    return authFailure(unauthorized());
+    return authFailureAndClearCookie(pContext, unauthorized());
   }
 
   // SSOトークンを取得
@@ -133,13 +131,8 @@ export const jwt = async (
     user &&
     !(user as domainsAdminUser.AdminUserWithCredential).password
   ) {
-    pContext.origRes.clearCookie(COOKIE_KEY.VIRON_AUTHORIZATION);
-    pContext.res.header(
-      HTTP_HEADER.X_VIRON_AUTHTYPES_PATH,
-      VIRON_AUTHCONFIGS_PATH
-    );
     console.error('ssoToken is invalid or password is invalid');
-    return authFailure(unauthorized());
+    return authFailureAndClearCookie(pContext, unauthorized());
   }
 
   // SSOトークンが存在する場合は検証
