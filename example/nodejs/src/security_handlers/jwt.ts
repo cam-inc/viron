@@ -153,7 +153,7 @@ export const jwt = async (
         }
         break;
       }
-      case AUTH_PROVIDER.CUSTOME: {
+      case AUTH_PROVIDER.CUSTOM: {
         // OIDC認証の場合はアクセストークンの検証
         const client = await domainsAuth.genOidcClient(ctx.config.auth.oidc);
         if (

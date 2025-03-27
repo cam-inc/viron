@@ -89,7 +89,7 @@ export async function createOne(
   const repository = repositoryContainer.getAdminUserSsoTokenRepository();
 
   if (
-    (payload.provider === AUTH_PROVIDER.CUSTOME ||
+    (payload.provider === AUTH_PROVIDER.CUSTOM ||
       payload.provider === AUTH_PROVIDER.GOOGLE) &&
     payload.authType === AUTH_TYPE.OIDC
   ) {

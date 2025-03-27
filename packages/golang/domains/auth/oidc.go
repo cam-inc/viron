@@ -264,7 +264,7 @@ func (ao *AuthOIDC) signin(r *http.Request, code string, state string, codeVerif
 	user := domains.FindByEmail(ctx, claims.Email)
 
 	// SSOトークンはUpsert
-	provider := constant.AUTH_SSO_IDPROVIDER_CUSTOME
+	provider := constant.AUTH_SSO_IDPROVIDER_CUSTOM
 	if ao.isGoogle() {
 		provider = constant.AUTH_SSO_IDPROVIDER_GOOGLE
 	}

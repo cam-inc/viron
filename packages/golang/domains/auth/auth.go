@@ -199,7 +199,7 @@ func (a *Auth) VerifyAccessToken(r *http.Request, clientID string, userID string
 	if ssoToken.AuthType == constant.AUTH_TYPE_OIDC {
 		switch ssoToken.Provider {
 		// SSO認証プロバイダーがcustom場合はOIDCトークンを検証
-		case constant.AUTH_SSO_IDPROVIDER_CUSTOME:
+		case constant.AUTH_SSO_IDPROVIDER_CUSTOM:
 			if a.authOIDCConfig.ClientID == clientID {
 				return a.authOIDC.verifyAccessToken(r, userID, *ssoToken)
 			}

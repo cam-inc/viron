@@ -94,7 +94,7 @@ describe('AdminUserSsoToken', () => {
     const payload: AdminUserSsoTokenUpdatePayload = {
       authType: AUTH_TYPE.OIDC,
       userId,
-      provider: AUTH_PROVIDER.CUSTOME,
+      provider: AUTH_PROVIDER.CUSTOM,
       clientId,
       accessToken: 'newAccessToken',
       expiryDate: Date.now(),
@@ -120,7 +120,7 @@ describe('AdminUserSsoToken', () => {
     const payload: AdminUserSsoTokenCreatePayload = {
       authType: AUTH_TYPE.OIDC,
       userId,
-      provider: AUTH_PROVIDER.CUSTOME,
+      provider: AUTH_PROVIDER.CUSTOM,
       clientId,
       accessToken: 'accessToken',
       expiryDate: Date.now(),
@@ -155,7 +155,7 @@ describe('AdminUserSsoToken', () => {
     const payload: AdminUserSsoTokenCreatePayload = {
       authType: AUTH_TYPE.OIDC,
       userId,
-      provider: AUTH_PROVIDER.CUSTOME,
+      provider: AUTH_PROVIDER.CUSTOM,
       clientId,
       accessToken: 'accessToken',
       expiryDate: Date.now(),
@@ -173,7 +173,7 @@ describe('AdminUserSsoToken', () => {
         userId,
         clientId,
         authType: AUTH_TYPE.OIDC,
-        provider: AUTH_PROVIDER.CUSTOME,
+        provider: AUTH_PROVIDER.CUSTOM,
         accessToken: 'accessToken',
         expiryDate: Date.now(),
         tokenType: 'Bearer',
@@ -256,7 +256,7 @@ describe('AdminUserSsoToken', () => {
     const payload: AdminUserSsoTokenUpdatePayload = {
       authType: AUTH_TYPE.OIDC,
       userId,
-      provider: AUTH_PROVIDER.CUSTOME,
+      provider: AUTH_PROVIDER.CUSTOM,
       clientId,
       accessToken: 'newAccessToken',
       expiryDate: Date.now(),
@@ -280,7 +280,7 @@ describe('AdminUserSsoToken', () => {
     const payload: AdminUserSsoTokenCreatePayload = {
       authType: 'invalid',
       userId: 'user1',
-      provider: AUTH_PROVIDER.CUSTOME,
+      provider: AUTH_PROVIDER.CUSTOM,
       clientId: 'client1',
       accessToken: 'accessToken',
       expiryDate: Date.now(),

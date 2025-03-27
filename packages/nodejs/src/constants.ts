@@ -122,7 +122,7 @@ export type AuthType = (typeof AUTH_TYPE)[keyof typeof AUTH_TYPE];
 
 export const AUTH_PROVIDER = {
   GOOGLE: 'google',
-  CUSTOME: 'custome',
+  CUSTOM: 'custom',
 } as const;
 export type AuthProvider = (typeof AUTH_PROVIDER)[keyof typeof AUTH_PROVIDER];
 

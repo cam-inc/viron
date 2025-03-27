@@ -196,7 +196,7 @@ export const signinOidc = async (
   // SSOトークンのUpsert
   const ssoTokenPayload = {
     authType: AUTH_TYPE.OIDC,
-    provider: AUTH_PROVIDER.CUSTOME,
+    provider: AUTH_PROVIDER.CUSTOM,
     clientId: config.clientId,
     ...ssoToken,
   } as AdminUserSsoTokenCreatePayload;
@@ -308,7 +308,7 @@ export const verifyOidcAccessToken = async (
     userId,
     clientId,
     authType: AUTH_TYPE.OIDC,
-    provider: AUTH_PROVIDER.CUSTOME,
+    provider: AUTH_PROVIDER.CUSTOM,
   } as AdminUserSsoTokenCreatePayload;
 
   await updateAdminUserSsoTokenOneByUserId(clientId, userId, newSsoToken);
