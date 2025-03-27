@@ -1,6 +1,5 @@
-# === Stage 1: Build package/nodejs module ===
 ARG DOCKER_PROXY_HOST="docker.io"
-FROM ${DOCKER_PROXY_HOST}/node:22 AS package-builder
+FROM ${DOCKER_PROXY_HOST}/node:22
 
 # 環境変数の設定
 USER node
