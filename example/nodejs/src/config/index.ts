@@ -107,7 +107,7 @@ export const dynamicProvider = async (
   switch (req.url) {
     case OIDC_CALLBACK_PATH: {
       const oidcClientId = await getBodyValue(req, 'clientId');
-      if (oidcClientId === process.env.OIDC_CLIENT_ID) {
+      if (oidcClientId && oidcClientId === process.env.OIDC_CLIENT_ID) {
         return {
           issuer: process.env.OIDC_ISSUER_URL || '',
           audience: [process.env.OIDC_CLIENT_ID || ''],
@@ -123,7 +123,10 @@ export const dynamicProvider = async (
 
     case OAUTH2_GOOGLE_CALLBACK_PATH: {
       const googleClientId = await getBodyValue(req, 'clientId');
-      if (googleClientId === process.env.GOOGLE_OAUTH2_CLIENT_ID) {
+      if (
+        googleClientId &&
+        googleClientId === process.env.GOOGLE_OAUTH2_CLIENT_ID
+      ) {
         return {
           issuer: process.env.GOOGLE_OAUTH2_ISSUER_URL || '',
           audience: [process.env.GOOGLE_OAUTH2_CLIENT_ID || ''],
