@@ -11,7 +11,10 @@ import {
   faildDecodeOidcIdToken,
   mismatchKidOidcIdToken,
 } from '../../errors';
-import { findOneByEmail, AdminUserCreatePayload } from '../adminuser';
+import {
+  AdminUserCreatePayload,
+  findOneWithCredentialByEmail,
+} from '../adminuser';
 import {
   AdminUserSsoToken,
   AdminUserSsoTokenCreatePayload,
@@ -154,7 +157,7 @@ export const signinOidc = async (
   const claims = tokenSet.claims();
   const ssoToken = formatTokenSetToSsoTokens(tokenSet);
 
-  if (ssoToken.idToken == '') {
+  if (ssoToken.idToken === '') {
     debug(
       'signinOidc invalid authentication codeVerifier. %s, %o',
       codeVerifier,
@@ -191,7 +194,7 @@ export const signinOidc = async (
   }
 
   // emailでユーザーを検索
-  let adminUser = await findOneByEmail(email, true);
+  let adminUser = await findOneWithCredentialByEmail(email);
 
   // SSOトークンのUpsert
   const ssoTokenPayload = {
@@ -203,7 +206,7 @@ export const signinOidc = async (
 
   // ユーザーが存在しない場合は新規作成
   if (!adminUser) {
-    const adminUserCreatePayload = { email } as AdminUserCreatePayload;
+    const adminUserCreatePayload: AdminUserCreatePayload = { email };
 
     // 最初ログイン時ユーザー作成(SUPER)
     adminUser = await createFirstAdminUser(

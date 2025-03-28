@@ -1,5 +1,6 @@
 import assert from 'assert';
 import sinon from 'sinon';
+import mongoose from 'mongoose';
 import {
   AdminUser,
   AdminUserCreateAttributes,
@@ -7,14 +8,14 @@ import {
   AdminUserUpdateAttributes,
   AdminUserUpdatePayload,
   count,
-  createOne,
+  createOneWithCredential,
   findOneById,
   findOneByEmail,
   list,
   removeOneById,
   updateOneById,
 } from '../../src/domains/adminuser';
-import * as domainsAdminuser from '../../src/domains/adminuser';
+import * as domainsAdminUser from '../../src/domains/adminuser';
 import * as domainsAdminrole from '../../src/domains/adminrole';
 import { genPasswordHash } from '../../src/helpers';
 import { Repository, repositoryContainer } from '../../src/repositories';
@@ -91,7 +92,7 @@ describe('domains/adminuser', () => {
         email: 'foo@exmaple.com',
         password: 'pass',
       };
-      const { salt, password } = genPasswordHash(data.password);
+      const { salt, password } = genPasswordHash(data.password as string);
       const userId = '1';
 
       sandbox
@@ -111,7 +112,7 @@ describe('domains/adminuser', () => {
           updatedAt: new Date(),
         });
 
-      const result = await createOne(true, data);
+      const result = await createOneWithCredential(data);
       assert.strictEqual(result.id, userId);
       assert.strictEqual(result.roleIds.length, 0);
     });
@@ -122,7 +123,7 @@ describe('domains/adminuser', () => {
         password: 'pass',
         roleIds: ['editor'],
       };
-      const { salt, password } = genPasswordHash(data.password);
+      const { salt, password } = genPasswordHash(data.password as string);
       const userId = '1';
 
       sandbox
@@ -146,7 +147,7 @@ describe('domains/adminuser', () => {
         .withArgs(userId, sinon.match(['editor']))
         .resolves();
 
-      const result = await createOne(true, data);
+      const result = await createOneWithCredential(data);
       assert.strictEqual(result.id, userId);
       assert.strictEqual(result.roleIds[0], 'editor');
     });
@@ -162,7 +163,8 @@ describe('domains/adminuser', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      const formattedUser = domainsAdminuser.formatAdminUser(true, user);
+      const formattedUser =
+        domainsAdminUser.formatAdminUserWithCredential(user);
       assert.strictEqual(formattedUser.id, user.id);
       assert.strictEqual(formattedUser.email, user.email);
       assert.strictEqual(formattedUser.createdAt, user.createdAt);
@@ -178,7 +180,7 @@ describe('domains/adminuser', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      const formattedUser = domainsAdminuser.formatAdminUser(false, user);
+      const formattedUser = domainsAdminUser.formatAdminUser(user);
       assert.strictEqual(formattedUser.id, user.id);
       assert.strictEqual(formattedUser.email, user.email);
       assert.strictEqual(formattedUser.createdAt, user.createdAt);
@@ -189,21 +191,24 @@ describe('domains/adminuser', () => {
 
   describe('updateOneById', () => {
     it('Succeeded in update', async () => {
-      const id = '1';
+      const id = new mongoose.Types.ObjectId().toString();
       const data: AdminUserUpdatePayload = {
         password: 'pass',
         roleIds: ['operator'],
       };
 
-      sandbox.stub(domainsAdminuser, 'findOneById').withArgs(id).resolves({
-        id,
-        email: 'test@example.com',
-        password: '***********',
-        salt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        roleIds: [],
-      });
+      sandbox
+        .stub(domainsAdminUser, 'findOneWithCredentialById')
+        .withArgs(id)
+        .resolves({
+          id,
+          email: 'test@example.com',
+          password: '***********',
+          salt: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          roleIds: [],
+        });
       sandbox
         .stub(repository, 'updateOneById')
         .withArgs(
@@ -223,13 +228,13 @@ describe('domains/adminuser', () => {
     });
 
     it('User not found', async () => {
-      const id = '1';
+      const id = new mongoose.Types.ObjectId().toString();
       const data: AdminUserUpdatePayload = {
         password: 'pass',
         roleIds: ['operator'],
       };
 
-      sandbox.stub(domainsAdminuser, 'findOneById').withArgs(id).resolves();
+      sandbox.stub(domainsAdminUser, 'findOneById').withArgs(id).resolves();
 
       const expects = adminUserNotFound();
       await assert.rejects(updateOneById(id, data), {
@@ -244,11 +249,9 @@ describe('domains/adminuser', () => {
     it('Succeeded in remove', async () => {
       const id = '1';
 
-      sandbox.stub(domainsAdminuser, 'findOneById').withArgs(id).resolves({
+      sandbox.stub(domainsAdminUser, 'findOneById').withArgs(id).resolves({
         id,
         email: 'test@example.com',
-        password: null,
-        salt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
         roleIds: [],
@@ -265,7 +268,7 @@ describe('domains/adminuser', () => {
     it('User not found', async () => {
       const id = '1';
 
-      sandbox.stub(domainsAdminuser, 'findOneById').withArgs(id).resolves();
+      sandbox.stub(domainsAdminUser, 'findOneById').withArgs(id).resolves();
 
       const expects = adminUserNotFound();
       await assert.rejects(removeOneById(id), {

@@ -1,7 +1,7 @@
 import { AUTH_TYPE } from '../../constants';
 import { verifyPassword } from '../../helpers';
 import { signinFailed } from '../../errors';
-import { findOneByEmail, AdminUserCreatePayload } from '../adminuser';
+import { findOneWithCredentialByEmail } from '../adminuser';
 import { createFirstAdminUser } from './common';
 import { signJwt } from './jwt';
 import http from 'http';
@@ -13,12 +13,12 @@ export const signinEmail = async (
   password: string
 ): Promise<string> => {
   // credentialありで取得
-  let adminUser = await findOneByEmail(email, true);
+  let adminUser = await findOneWithCredentialByEmail(email);
   if (!adminUser) {
     adminUser = await createFirstAdminUser(AUTH_TYPE.EMAIL, {
       email,
       password,
-    } as AdminUserCreatePayload);
+    });
     if (!adminUser) {
       // 他に管理者がいる場合は発行してもらう必要がある
       console.error(
@@ -29,11 +29,9 @@ export const signinEmail = async (
   }
 
   if (
-    !verifyPassword(
-      password,
-      adminUser.password as string,
-      adminUser.salt as string
-    )
+    !adminUser.password ||
+    !adminUser.salt ||
+    !verifyPassword(password, adminUser.password, adminUser.salt)
   ) {
     console.error('Invalid password');
     throw signinFailed();

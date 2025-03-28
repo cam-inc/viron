@@ -14,7 +14,10 @@ import * as domainsAdminUser from '../../../src/domains/adminuser';
 import * as domainsAdminUserSsoToken from '../../../src/domains/adminuserssotoken';
 import * as domainsAdminRole from '../../../src/domains/adminrole';
 
-const mockCreateOneAdminUser = sinon.stub(domainsAdminUser, 'createOne');
+const mockCreateOneWithCredentialAdminUser = sinon.stub(
+  domainsAdminUser,
+  'createOneWithCredential'
+);
 const mockCount = sinon.stub(domainsAdminUser, 'count');
 const mockCreateOneSsoToken = sinon.stub(domainsAdminUserSsoToken, 'createOne');
 const mockAddRoleForUser = sinon.stub(domainsAdminRole, 'addRoleForUser');
@@ -27,7 +30,7 @@ describe('Auth Common Functions', () => {
   describe('createFirstAdminUser', () => {
     it('should create the first admin user if none exists', async () => {
       mockCount.resolves(0);
-      mockCreateOneAdminUser.resolves({
+      mockCreateOneWithCredentialAdminUser.resolves({
         id: '1',
         email: 'admin@example.com',
       } as domainsAdminUser.AdminUserWithCredential);
@@ -61,9 +64,9 @@ describe('Auth Common Functions', () => {
 
       expect(result).toEqual({ id: '1', email: 'admin@example.com' });
       expect(mockCount.called).toBe(true);
-      expect(mockCreateOneAdminUser.calledWith(true, adminUserPayload)).toBe(
-        true
-      );
+      expect(
+        mockCreateOneWithCredentialAdminUser.calledWith(adminUserPayload)
+      ).toBe(true);
       //   expect(mockCreateOneSsoToken.calledWith(adminUserPayload)).toBe(true);
       expect(mockAddRoleForUser.calledWith('1', ADMIN_ROLE.SUPER)).toBe(true);
     });
@@ -96,7 +99,7 @@ describe('Auth Common Functions', () => {
 
       expect(result).toBeNull();
       expect(mockCount.called).toBe(true);
-      expect(mockCreateOneAdminUser.called).toBe(false);
+      expect(mockCreateOneWithCredentialAdminUser.called).toBe(false);
       expect(mockCreateOneSsoToken.called).toBe(false);
       expect(mockAddRoleForUser.called).toBe(false);
     });
@@ -104,7 +107,7 @@ describe('Auth Common Functions', () => {
 
   describe('createViewer', () => {
     it('should create a viewer admin user', async () => {
-      mockCreateOneAdminUser.resolves({
+      mockCreateOneWithCredentialAdminUser.resolves({
         id: '2',
         email: 'viewer@example.com',
       } as domainsAdminUser.AdminUserWithCredential);
@@ -137,9 +140,9 @@ describe('Auth Common Functions', () => {
       );
 
       expect(result).toEqual({ id: '2', email: 'viewer@example.com' });
-      expect(mockCreateOneAdminUser.calledWith(true, adminUserPayload)).toBe(
-        true
-      );
+      expect(
+        mockCreateOneWithCredentialAdminUser.calledWith(adminUserPayload)
+      ).toBe(true);
       //   expect(mockCreateOneSsoToken.calledWith({ token: 'token', userId: '2' })).toBe(true);
       expect(mockAddRoleForUser.calledWith('2', ADMIN_ROLE.VIEWER)).toBe(true);
     });
@@ -147,7 +150,7 @@ describe('Auth Common Functions', () => {
 
   describe('createAdminUser', () => {
     it('should create an admin user with the specified role', async () => {
-      mockCreateOneAdminUser.resolves({
+      mockCreateOneWithCredentialAdminUser.resolves({
         id: '3',
         email: 'admin@example.com',
       } as domainsAdminUser.AdminUserWithCredential);
@@ -181,9 +184,9 @@ describe('Auth Common Functions', () => {
       );
 
       expect(result).toEqual({ id: '3', email: 'admin@example.com' });
-      expect(mockCreateOneAdminUser.calledWith(true, adminUserPayload)).toBe(
-        true
-      );
+      expect(
+        mockCreateOneWithCredentialAdminUser.calledWith(adminUserPayload)
+      ).toBe(true);
       //   expect(mockCreateOneSsoToken.calledWith({ token: 'token', userId: '3' })).toBe(true);
       expect(mockAddRoleForUser.calledWith('3', ADMIN_ROLE.SUPER)).toBe(true);
     });
@@ -249,7 +252,7 @@ describe('Auth Common Functions', () => {
         accessToken: '',
         expiryDate: 0,
         idToken: '',
-        refreshToken: '',
+        refreshToken: null,
         tokenType: '',
       });
     });

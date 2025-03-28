@@ -23,7 +23,7 @@ describe('signinEmail', () => {
     const token = 'token';
 
     sandbox
-      .stub(domainsAdminUser, 'findOneByEmail')
+      .stub(domainsAdminUser, 'findOneWithCredentialByEmail')
       .withArgs(email)
       .resolves({
         id: '1',

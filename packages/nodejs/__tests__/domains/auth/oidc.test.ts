@@ -13,12 +13,12 @@ import {
   signinFailed,
 } from '../../../src/errors';
 import {
-  findOneByEmail,
+  findOneWithCredentialByEmail,
   createOne,
   AdminUser,
   AdminUserCreateAttributes,
   AdminUserUpdateAttributes,
-  AdminUserCreatePayload,
+  createOneWithCredential,
 } from '../../../src/domains/adminuser';
 import { Repository, repositoryContainer } from '../../../src/repositories';
 import { addRoleForUser, listRoles } from '../../../src/domains/adminrole';
@@ -458,9 +458,8 @@ describe('domains/auth/oidc', () => {
       expect(result).toMatch(/^Bearer /);
 
       // ユーザーが正しく作成されたか確認
-      const actual = await findOneByEmail(
-        mockTokenSet.claims().email as string,
-        true
+      const actual = await findOneWithCredentialByEmail(
+        mockTokenSet.claims().email as string
       );
       assert.strictEqual(actual?.email, mockTokenSet.claims().email);
 
@@ -687,9 +686,9 @@ describe('domains/auth/oidc', () => {
       } as unknown as Client;
 
       // すでにsuperユーザーが存在する状態にする
-      await createOne(true, {
+      await createOne({
         email: 'super@example.com',
-      } as AdminUserCreatePayload);
+      });
 
       // テスト対象の関数を呼び出し
       const result = await domainAuthOidc.signinOidc(
@@ -712,9 +711,8 @@ describe('domains/auth/oidc', () => {
       expect(result).toMatch(/^Bearer /);
 
       // ユーザーが正しく作成されたか確認
-      const actual = await findOneByEmail(
-        mockTokenSet.claims().email as string,
-        true
+      const actual = await findOneWithCredentialByEmail(
+        mockTokenSet.claims().email as string
       );
       assert.strictEqual(actual?.email, mockTokenSet.claims().email);
 
@@ -756,10 +754,10 @@ describe('domains/auth/oidc', () => {
       } as unknown as Client;
 
       // すでに同じemailでユーザーが存在する状態にする
-      const registeredUser = await createOne(true, {
+      const registeredUser = await createOneWithCredential({
         email: mockTokenSet.claims().email as string,
         password: 'password',
-      } as AdminUserCreatePayload);
+      });
 
       // SSOトークンの作成
       const userId = registeredUser.id;
@@ -791,9 +789,8 @@ describe('domains/auth/oidc', () => {
       );
 
       // ユーザーが変わってないこと
-      const actual = await findOneByEmail(
-        mockTokenSet.claims().email as string,
-        true
+      const actual = await findOneWithCredentialByEmail(
+        mockTokenSet.claims().email as string
       );
       assert.strictEqual(actual?.email, mockTokenSet.claims().email);
 
@@ -834,9 +831,9 @@ describe('domains/auth/oidc', () => {
       } as unknown as Client;
 
       // すでに同じemailでユーザーが存在する状態にする
-      const registeredUser = await createOne(true, {
+      const registeredUser = await createOneWithCredential({
         email: mockTokenSet.claims().email as string,
-      } as AdminUserCreatePayload);
+      });
 
       // SSOトークンの作成
       const userId = registeredUser.id;
@@ -868,9 +865,8 @@ describe('domains/auth/oidc', () => {
       );
 
       // ユーザーが変わってないこと
-      const actual = await findOneByEmail(
-        mockTokenSet.claims().email as string,
-        true
+      const actual = await findOneWithCredentialByEmail(
+        mockTokenSet.claims().email as string
       );
       assert.strictEqual(actual?.email, mockTokenSet.claims().email);
 
@@ -909,9 +905,9 @@ describe('domains/auth/oidc', () => {
       } as unknown as Client;
 
       // すでに同じemailでユーザーが存在する状態にする
-      const registeredUser = await createOne(true, {
+      const registeredUser = await createOneWithCredential({
         email: mockTokenSet.claims().email as string,
-      } as AdminUserCreatePayload);
+      });
       await addRoleForUser(registeredUser.id, ADMIN_ROLE.VIEWER);
 
       // signinOidc関数を実行して結果を取得
@@ -932,9 +928,8 @@ describe('domains/auth/oidc', () => {
       });
 
       // ユーザーが正しく更新されたか確認
-      const actual = await findOneByEmail(
-        mockTokenSet.claims().email as string,
-        true
+      const actual = await findOneWithCredentialByEmail(
+        mockTokenSet.claims().email as string
       );
       assert.strictEqual(actual?.email, mockTokenSet.claims().email);
 
@@ -978,9 +973,9 @@ describe('domains/auth/oidc', () => {
         .resolves({ payload: mockTokenSet.claims(), expired: false });
 
       // すでに同じemailでユーザーが存在する状態にする
-      const registeredUser = await createOne(true, {
+      const registeredUser = await createOneWithCredential({
         email: mockTokenSet.claims().email as string,
-      } as AdminUserCreatePayload);
+      });
 
       const clientId = '67890';
       const ssoToken = {
@@ -1020,9 +1015,8 @@ describe('domains/auth/oidc', () => {
       );
 
       // ユーザーが正しく更新されたか確認
-      const actualUser = await findOneByEmail(
-        mockTokenSet.claims().email as string,
-        true
+      const actualUser = await findOneWithCredentialByEmail(
+        mockTokenSet.claims().email as string
       );
       if (!actualUser) {
         throw new Error('User not found');
@@ -1178,9 +1172,9 @@ describe('domains/auth/oidc', () => {
         .resolves({ payload: mockTokenSet.claims(), expired: false });
 
       // すでに同じemailでユーザーが存在する状態にする
-      const registeredUser = await createOne(true, {
+      const registeredUser = await createOneWithCredential({
         email: mockTokenSet.claims().email as string,
-      } as AdminUserCreatePayload);
+      });
 
       // SSRトークンを作成
       const clientId = '67890';
@@ -1216,9 +1210,8 @@ describe('domains/auth/oidc', () => {
       sinon.assert.notCalled(refreshStub);
 
       // ユーザーが更新されていないことを確認
-      const actualUser = await findOneByEmail(
-        mockTokenSet.claims().email as string,
-        true
+      const actualUser = await findOneWithCredentialByEmail(
+        mockTokenSet.claims().email as string
       );
       assert.strictEqual(actualUser?.email, registeredUser.email);
 

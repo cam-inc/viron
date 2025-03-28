@@ -14,7 +14,7 @@ export const listVironAdminUsers = async (
 export const createVironAdminUser = async (
   context: RouteContext
 ): Promise<void> => {
-  const result = await domainsAdminUser.createOne(false, context.requestBody);
+  const result = await domainsAdminUser.createOne(context.requestBody);
   context.res.status(201).json(result);
 };
 

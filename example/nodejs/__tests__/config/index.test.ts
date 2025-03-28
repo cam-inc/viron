@@ -1,4 +1,4 @@
-import { get, dynamicProvider, getBodyValue } from '../../src/config';
+import { get, genDynamicProvider, getBodyValue } from '../../src/config';
 import { ExegesisIncomingMessage } from '../../src/application';
 import {
   OAUTH2_GOOGLE_CALLBACK_PATH,
@@ -58,6 +58,21 @@ describe('Config Module', () => {
     process.env.GOOGLE_OAUTH2_ISSUER_URL = 'https://google.example.com';
     process.env.EMAIL_JWT_ISSUER = 'https://email.example.com';
     process.env.EMAIL_JWT_AUDIENCE = 'email_audience';
+
+    const dynamicProvider = genDynamicProvider({
+      oidc: {
+        clientId: process.env.OIDC_CLIENT_ID,
+        issuerUrl: process.env.OIDC_ISSUER_URL,
+      },
+      googleOAuth2: {
+        clientId: process.env.GOOGLE_OAUTH2_CLIENT_ID,
+        issuerUrl: process.env.GOOGLE_OAUTH2_ISSUER_URL,
+      },
+      email: {
+        jwtIssuer: process.env.EMAIL_JWT_ISSUER,
+        jwtAudience: process.env.EMAIL_JWT_AUDIENCE,
+      },
+    });
 
     it('should handle OIDC callback path', async () => {
       const req = mockRequest('/oidc/callback', {

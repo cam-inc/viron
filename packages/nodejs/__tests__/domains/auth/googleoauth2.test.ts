@@ -20,7 +20,7 @@ import * as domainsAuthCommon from '../../../src/domains/auth/common';
 import http from 'http';
 import { AdminUserSsoToken } from '../../../src/domains/adminuserssotoken';
 import { AUTH_PROVIDER, AUTH_TYPE } from '../../../src/constants';
-import { AdminUserWithCredential } from '../../../src/domains/adminuser';
+// import { AdminUserWithCredential } from '../../../src/domains/adminuser';
 import { ListWithPager } from '../../../src/helpers';
 
 describe('domains/auth/googleoauth2', () => {
@@ -356,11 +356,15 @@ describe('domains/auth/googleoauth2', () => {
           })
         );
 
-      sandbox.stub(domainsAdminUser, 'findOneByEmail').resolves({
+      sandbox.stub(domainsAdminUser, 'findOneWithCredentialByEmail').resolves({
         id: '1',
         email: 'example@example.com',
-        password: '',
-      } as AdminUserWithCredential);
+        password: null,
+        salt: 'salt',
+        roleIds: ['admin'],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
       sandbox.stub(domainsAuthCommon, 'createFirstAdminUser').resolves(null);
       sandbox.stub(domainsAdminUserSsoToken, 'upsertOne').resolves({
         id: '1',
@@ -416,11 +420,15 @@ describe('domains/auth/googleoauth2', () => {
           })
         );
 
-      sandbox.stub(domainsAdminUser, 'findOneByEmail').resolves({
+      sandbox.stub(domainsAdminUser, 'findOneWithCredentialByEmail').resolves({
         id: '1',
         email: 'example@example.com',
         password: 'password',
-      } as AdminUserWithCredential);
+        salt: 'salt',
+        roleIds: ['admin'],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
       sandbox.stub(domainsAuthCommon, 'createFirstAdminUser').resolves(null);
 
       assert.rejects(
@@ -467,11 +475,15 @@ describe('domains/auth/googleoauth2', () => {
           })
         );
 
-      sandbox.stub(domainsAdminUser, 'findOneByEmail').resolves({
+      sandbox.stub(domainsAdminUser, 'findOneWithCredentialByEmail').resolves({
         id: '1',
         email: 'example@example.com',
-        password: '',
-      } as AdminUserWithCredential);
+        password: null,
+        salt: 'salt',
+        roleIds: ['admin'],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
       sandbox.stub(domainsAuthCommon, 'createFirstAdminUser').resolves(null);
       sandbox.stub(domainsAdminUserSsoToken, 'list').resolves({
         currentPage: 1,

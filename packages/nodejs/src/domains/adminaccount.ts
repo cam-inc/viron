@@ -5,8 +5,8 @@ import { listRoles } from './adminrole';
 import {
   AdminUserWithCredential,
   AdminUserView,
-  findOneById,
   formatAdminUser,
+  findOneWithCredentialById,
 } from './adminuser';
 
 export interface AdminAccountUpdatePayload {
@@ -25,7 +25,7 @@ export const listById = async (
   return {
     ...result,
     list: result.list.map((adminUser) =>
-      formatAdminUser(false, adminUser, adminRoles.shift())
+      formatAdminUser(adminUser, adminRoles.shift())
     ),
   };
 };
@@ -36,12 +36,12 @@ export const updateOneById = async (
   payload: AdminAccountUpdatePayload
 ): Promise<void> => {
   const repository = repositoryContainer.getAdminUserRepository();
-  const user = await findOneById(id, true);
+  const user = await findOneWithCredentialById(id);
   if (!user) {
     throw adminUserNotFound();
   }
 
-  if ((user as AdminUserWithCredential).password) {
+  if (user.password) {
     await repository.updateOneById(id, genPasswordHash(payload.password));
   } else {
     throw forbidden();

@@ -1,5 +1,5 @@
 import { OAS_X_TAGS, OAS_X_THEME, OAS_X_THUMBNAIL, THEME } from '@viron/lib';
-import { Config, MongoConfig, dynamicProvider } from '.';
+import { Config, MongoConfig, genDynamicProvider } from '.';
 
 /**
  * Get configuration data.
@@ -44,7 +44,16 @@ export const get = (): Config => {
       multipleAuthUser: process.env.MULTIPLE_AUTH_USER === 'true',
       jwt: {
         secret: process.env.JWT_SECRET ?? '',
-        provider: dynamicProvider,
+        provider: genDynamicProvider({
+          googleOAuth2: {
+            issuerUrl: process.env.GOOGLE_OAUTH2_ISSUER_URL ?? '',
+            clientId: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? '',
+          },
+          email: {
+            jwtIssuer: process.env.EMAIL_JWT_ISSUER ?? '',
+            jwtAudience: process.env.EMAIL_JWT_AUDIENCE ?? '',
+          },
+        }),
         expirationSec: 24 * 60 * 60,
       },
       googleOAuth2: {

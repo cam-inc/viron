@@ -6,10 +6,10 @@ import { AuthType, ADMIN_ROLE, AUTH_TYPE } from '../../constants';
 import { getDebug } from '../../logging';
 import { addRoleForUser } from '../adminrole';
 import {
-  createOne as createOneAdminUser,
   count,
   AdminUserWithCredential,
   AdminUserCreatePayload,
+  createOneWithCredential,
 } from '../adminuser';
 import { TokenSet } from 'openid-client';
 import { Auth } from 'googleapis';
@@ -58,7 +58,7 @@ export const createAdminUser = async (
   adminUserSsoTokenPayload?: AdminUserSsoTokenCreatePayload
 ): Promise<AdminUserWithCredential> => {
   // 作成後にcredentialsありで返却
-  const userWithCredential = await createOneAdminUser(true, adminUserPayload);
+  const userWithCredential = await createOneWithCredential(adminUserPayload);
 
   // SSOトークンを作成
   if (authType === AUTH_TYPE.OIDC && adminUserSsoTokenPayload) {
@@ -101,7 +101,7 @@ export const formatCredentialsToSsoTokens = (
     accessToken: credentials.access_token ?? '',
     expiryDate: credentials.expiry_date ?? 0,
     idToken: credentials.id_token ?? '',
-    refreshToken: credentials.refresh_token ?? '',
+    refreshToken: credentials.refresh_token ?? null,
     tokenType: credentials.token_type ?? '',
   };
 };

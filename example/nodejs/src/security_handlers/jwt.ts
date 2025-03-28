@@ -101,7 +101,7 @@ export const jwt = async (
   }
 
   // credentialsありでユーザー情報取得
-  const user = await domainsAdminUser.findOneById(userId, true);
+  const user = await domainsAdminUser.findOneWithCredentialById(userId);
 
   // ユーザーが存在しない場合とaudがない場合はエラー
   if (!user || !claims.aud) {

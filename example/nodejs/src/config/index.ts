@@ -101,104 +101,112 @@ export const getBodyValue = async (
   return (req as ExegesisIncomingMessage).body[key];
 };
 
-export const dynamicProvider = async (
-  req: http.IncomingMessage
-): Promise<{ issuer: string; audience: string[] }> => {
-  const oidcClientId = process.env.OIDC_CLIENT_ID;
-  const oidcClientSecret = process.env.OIDC_CLIENT_SECRET;
-  const oidcIssuerUrl = process.env.OIDC_ISSUER_URL;
-  const googleOAuth2ClientId = process.env.GOOGLE_OAUTH2_CLIENT_ID;
-  const googleOAuth2ClientSecret = process.env.GOOGLE_OAUTH2_CLIENT_SECRET;
-  const googleOAuth2IssuerUrl = process.env.GOOGLE_OAUTH2_ISSUER_URL;
-  const emailJwtIssuer = process.env.EMAIL_JWT_ISSUER;
-  const emailJwtAudience = process.env.EMAIL_JWT_AUDIENCE;
-  if (!emailJwtIssuer || !emailJwtAudience) {
-    console.error('Email JWT configuration is missing', emailJwtIssuer);
-    throw unauthorized();
-  }
-  if (!oidcClientId || !oidcClientSecret || !oidcIssuerUrl) {
-    console.error('OIDC configuration is missing', oidcClientId);
-    throw unauthorized();
-  }
-  if (
-    !googleOAuth2ClientId ||
-    !googleOAuth2ClientSecret ||
-    !googleOAuth2IssuerUrl
-  ) {
-    console.error(
-      'Google OAuth2 configuration is missing',
-      googleOAuth2ClientId
-    );
-    throw unauthorized();
-  }
-
-  switch (req.url) {
-    case OIDC_CALLBACK_PATH: {
-      const clientId = await getBodyValue(req, 'clientId');
-      if (clientId !== oidcClientId) {
-        console.error('OIDC post clientId is missing', clientId);
-        throw unauthorized();
-      }
-      return {
-        issuer: oidcIssuerUrl,
-        audience: [oidcClientId],
-      };
-    }
-
-    case OAUTH2_GOOGLE_CALLBACK_PATH: {
-      const clientId = await getBodyValue(req, 'clientId');
-      if (clientId !== googleOAuth2ClientId) {
-        console.error('Google OAuth2 post clientId is missing', clientId);
-        throw unauthorized();
-      }
-      return {
-        issuer: googleOAuth2IssuerUrl,
-        audience: [googleOAuth2ClientId],
-      };
-    }
-
-    case EMAIL_SIGNIN_PATH: {
-      return {
-        issuer: emailJwtIssuer,
-        audience: [emailJwtAudience],
-      };
-    }
-
-    default: {
-      const cookies = cookie.parse(req.headers.cookie || '');
-      const token = cookies[COOKIE_KEY.VIRON_AUTHORIZATION];
-      if (!token) {
-        console.error('dynamicProvider token is invalid', cookies, req.url);
-        throw unauthorized();
-      }
-
-      const claims = await domainsAuth.decodeJwt(token);
-      if (!claims) {
-        console.error('claims is invalid');
-        throw unauthorized();
-      }
-      switch (
-        (claims.aud as string[])[0] // audはsignで配列で入れている
-      ) {
-        case emailJwtAudience:
-          return {
-            issuer: emailJwtIssuer,
-            audience: [emailJwtAudience],
-          };
-        case oidcClientId:
-          return {
-            issuer: oidcIssuerUrl,
-            audience: [oidcClientId],
-          };
-        case googleOAuth2ClientId:
-          return {
-            issuer: googleOAuth2IssuerUrl,
-            audience: [googleOAuth2ClientId],
-          };
-        default:
-          console.error('aud is invalid', claims);
+export const genDynamicProvider = (params: {
+  oidc?: {
+    clientId: string;
+    issuerUrl: string;
+  };
+  googleOAuth2?: {
+    clientId: string;
+    issuerUrl: string;
+  };
+  email?: {
+    jwtIssuer: string;
+    jwtAudience: string;
+  };
+}): domainsAuth.ProviderFunction => {
+  return async (
+    req: http.IncomingMessage
+  ): Promise<{ issuer: string; audience: string[] }> => {
+    switch (req.url) {
+      case OIDC_CALLBACK_PATH: {
+        if (!params.oidc?.clientId || !params.oidc?.issuerUrl) {
+          throw new Error('OIDC_CLIENT_ID is not set');
+        }
+        const clientId = await getBodyValue(req, 'clientId');
+        if (clientId !== params.oidc.clientId) {
+          console.error('OIDC post clientId is missing', clientId);
           throw unauthorized();
+        }
+        return {
+          issuer: params.oidc.issuerUrl,
+          audience: [params.oidc.clientId],
+        };
+      }
+
+      case OAUTH2_GOOGLE_CALLBACK_PATH: {
+        if (!params.googleOAuth2?.clientId || !params.googleOAuth2?.issuerUrl) {
+          throw new Error('GOOGLE_OAUTH2_CLIENT_ID is not set');
+        }
+        const clientId = await getBodyValue(req, 'clientId');
+        if (clientId !== params.googleOAuth2.clientId) {
+          console.error('Google OAuth2 post clientId is missing', clientId);
+          throw unauthorized();
+        }
+        return {
+          issuer: params.googleOAuth2.issuerUrl,
+          audience: [params.googleOAuth2.clientId],
+        };
+      }
+
+      case EMAIL_SIGNIN_PATH: {
+        if (!params.email?.jwtIssuer || !params.email?.jwtAudience) {
+          throw new Error('EMAIL_JWT_ISSUER is not set');
+        }
+        return {
+          issuer: params.email.jwtIssuer,
+          audience: [params.email.jwtAudience],
+        };
+      }
+
+      default: {
+        const cookies = cookie.parse(req.headers.cookie || '');
+        const token = cookies[COOKIE_KEY.VIRON_AUTHORIZATION];
+        if (!token) {
+          console.error('dynamicProvider token is invalid', cookies, req.url);
+          throw unauthorized();
+        }
+
+        const claims = await domainsAuth.decodeJwt(token);
+        if (!claims) {
+          console.error('claims is invalid');
+          throw unauthorized();
+        }
+        switch (
+          (claims.aud as string[])[0] // audはsignで配列で入れている
+        ) {
+          case params.oidc?.clientId:
+            if (!params.oidc?.clientId || !params.oidc?.issuerUrl) {
+              throw new Error('EMAIL_JWT_ISSUER is not set');
+            }
+            return {
+              issuer: params.oidc.issuerUrl,
+              audience: [params.oidc.clientId],
+            };
+          case params.googleOAuth2?.clientId:
+            if (
+              !params.googleOAuth2?.clientId ||
+              !params.googleOAuth2?.issuerUrl
+            ) {
+              throw new Error('OIDC_CLIENT_ID is not set');
+            }
+            return {
+              issuer: params.googleOAuth2.issuerUrl,
+              audience: [params.googleOAuth2.clientId],
+            };
+          case params.email?.jwtAudience:
+            if (!params.email?.jwtIssuer || !params.email?.jwtAudience) {
+              throw new Error('GOOGLE_OAUTH2_CLIENT_ID is not set');
+            }
+            return {
+              issuer: params.email.jwtIssuer,
+              audience: [params.email.jwtAudience],
+            };
+          default:
+            console.error('aud is invalid', claims);
+            throw unauthorized();
+        }
       }
     }
-  }
+  };
 };

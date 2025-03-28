@@ -13,7 +13,10 @@ import {
   signinFailed,
 } from '../../errors';
 import { getDebug } from '../../logging';
-import { findOneByEmail, AdminUserCreatePayload } from '../adminuser';
+import {
+  AdminUserCreatePayload,
+  findOneWithCredentialByEmail,
+} from '../adminuser';
 import {
   AdminUserSsoToken,
   AdminUserSsoTokenCreatePayload,
@@ -149,7 +152,7 @@ export const signinGoogleOAuth2 = async (
   }
 
   // emailでユーザーを検索
-  let adminUser = await findOneByEmail(email, true);
+  let adminUser = await findOneWithCredentialByEmail(email);
 
   // SSOトークンのUpsert
   const ssoTokenPayload = {
@@ -161,7 +164,7 @@ export const signinGoogleOAuth2 = async (
 
   // ユーザーが存在しない場合は新規作成
   if (!adminUser) {
-    const adminUserCreatePayload = { email } as AdminUserCreatePayload;
+    const adminUserCreatePayload: AdminUserCreatePayload = { email };
 
     // 最初ログイン時ユーザー作成(SUPER)
     adminUser = await createFirstAdminUser(
