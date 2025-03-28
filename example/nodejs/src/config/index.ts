@@ -104,46 +104,63 @@ export const getBodyValue = async (
 export const dynamicProvider = async (
   req: http.IncomingMessage
 ): Promise<{ issuer: string; audience: string[] }> => {
+  const oidcClientId = process.env.OIDC_CLIENT_ID;
+  const oidcClientSecret = process.env.OIDC_CLIENT_SECRET;
+  const oidcIssuerUrl = process.env.OIDC_ISSUER_URL;
+  const googleOAuth2ClientId = process.env.GOOGLE_OAUTH2_CLIENT_ID;
+  const googleOAuth2ClientSecret = process.env.GOOGLE_OAUTH2_CLIENT_SECRET;
+  const googleOAuth2IssuerUrl = process.env.GOOGLE_OAUTH2_ISSUER_URL;
+  const emailJwtIssuer = process.env.EMAIL_JWT_ISSUER;
+  const emailJwtAudience = process.env.EMAIL_JWT_AUDIENCE;
+  if (!emailJwtIssuer || !emailJwtAudience) {
+    console.error('Email JWT configuration is missing', emailJwtIssuer);
+    throw unauthorized();
+  }
+  if (!oidcClientId || !oidcClientSecret || !oidcIssuerUrl) {
+    console.error('OIDC configuration is missing', oidcClientId);
+    throw unauthorized();
+  }
+  if (
+    !googleOAuth2ClientId ||
+    !googleOAuth2ClientSecret ||
+    !googleOAuth2IssuerUrl
+  ) {
+    console.error(
+      'Google OAuth2 configuration is missing',
+      googleOAuth2ClientId
+    );
+    throw unauthorized();
+  }
+
   switch (req.url) {
     case OIDC_CALLBACK_PATH: {
-      const oidcClientId = await getBodyValue(req, 'clientId');
-      if (oidcClientId && oidcClientId === process.env.OIDC_CLIENT_ID) {
-        return {
-          issuer: process.env.OIDC_ISSUER_URL || '',
-          audience: [process.env.OIDC_CLIENT_ID || ''],
-        };
+      const clientId = await getBodyValue(req, 'clientId');
+      if (clientId !== oidcClientId) {
+        console.error('OIDC post clientId is missing', clientId);
+        throw unauthorized();
       }
-      console.error(
-        'oidcClientId is invalid',
-        oidcClientId,
-        process.env.OIDC_CLIENT_ID
-      );
-      throw unauthorized();
+      return {
+        issuer: oidcIssuerUrl,
+        audience: [oidcClientId],
+      };
     }
 
     case OAUTH2_GOOGLE_CALLBACK_PATH: {
-      const googleClientId = await getBodyValue(req, 'clientId');
-      if (
-        googleClientId &&
-        googleClientId === process.env.GOOGLE_OAUTH2_CLIENT_ID
-      ) {
-        return {
-          issuer: process.env.GOOGLE_OAUTH2_ISSUER_URL || '',
-          audience: [process.env.GOOGLE_OAUTH2_CLIENT_ID || ''],
-        };
+      const clientId = await getBodyValue(req, 'clientId');
+      if (clientId !== googleOAuth2ClientId) {
+        console.error('Google OAuth2 post clientId is missing', clientId);
+        throw unauthorized();
       }
-      console.error(
-        'googleClientId is invalid',
-        googleClientId,
-        process.env.GOOGLE_OAUTH2_CLIENT_ID
-      );
-      throw unauthorized();
+      return {
+        issuer: googleOAuth2IssuerUrl,
+        audience: [googleOAuth2ClientId],
+      };
     }
 
     case EMAIL_SIGNIN_PATH: {
       return {
-        issuer: process.env.EMAIL_JWT_ISSUER || '',
-        audience: [process.env.EMAIL_JWT_AUDIENCE || ''],
+        issuer: emailJwtIssuer,
+        audience: [emailJwtAudience],
       };
     }
 
@@ -165,18 +182,18 @@ export const dynamicProvider = async (
       ) {
         case process.env.EMAIL_JWT_AUDIENCE:
           return {
-            issuer: process.env.EMAIL_JWT_ISSUER || '',
-            audience: [process.env.EMAIL_JWT_AUDIENCE || ''],
+            issuer: emailJwtIssuer,
+            audience: [emailJwtAudience],
           };
         case process.env.OIDC_CLIENT_ID:
           return {
-            issuer: process.env.OIDC_ISSUER_URL || '',
-            audience: [process.env.OIDC_CLIENT_ID || ''],
+            issuer: oidcIssuerUrl,
+            audience: [oidcClientId],
           };
         case process.env.GOOGLE_OAUTH2_CLIENT_ID:
           return {
-            issuer: process.env.GOOGLE_OAUTH2_ISSUER_URL || '',
-            audience: [process.env.GOOGLE_OAUTH2_CLIENT_ID || ''],
+            issuer: googleOAuth2IssuerUrl,
+            audience: [googleOAuth2ClientId],
           };
         default:
           console.error('aud is invalid', claims);

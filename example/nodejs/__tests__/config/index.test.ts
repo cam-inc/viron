@@ -50,10 +50,16 @@ describe('Config Module', () => {
       return req;
     };
 
-    it('should handle OIDC callback path', async () => {
-      process.env.OIDC_CLIENT_ID = 'test_oidc_client_id';
-      process.env.OIDC_ISSUER_URL = 'https://oidc.example.com';
+    process.env.OIDC_CLIENT_ID = 'test_oidc_client_id';
+    process.env.OIDC_CLIENT_SECRET = 'test_oidc_client_secret';
+    process.env.OIDC_ISSUER_URL = 'https://oidc.example.com';
+    process.env.GOOGLE_OAUTH2_CLIENT_ID = 'test_google_client_id';
+    process.env.GOOGLE_OAUTH2_CLIENT_SECRET = 'test_google_client_secret';
+    process.env.GOOGLE_OAUTH2_ISSUER_URL = 'https://google.example.com';
+    process.env.EMAIL_JWT_ISSUER = 'https://email.example.com';
+    process.env.EMAIL_JWT_AUDIENCE = 'email_audience';
 
+    it('should handle OIDC callback path', async () => {
       const req = mockRequest('/oidc/callback', {
         clientId: 'test_oidc_client_id',
       });
@@ -66,9 +72,6 @@ describe('Config Module', () => {
     });
 
     it('should handle Google OAuth2 callback path', async () => {
-      process.env.GOOGLE_OAUTH2_CLIENT_ID = 'test_google_client_id';
-      process.env.GOOGLE_OAUTH2_ISSUER_URL = 'https://google.example.com';
-
       const req = mockRequest('/oauth2/google/callback', {
         clientId: 'test_google_client_id',
       });
@@ -81,9 +84,6 @@ describe('Config Module', () => {
     });
 
     it('should handle Email Signin path', async () => {
-      process.env.EMAIL_JWT_ISSUER = 'https://email.example.com';
-      process.env.EMAIL_JWT_AUDIENCE = 'email_audience';
-
       const req = mockRequest('/email/signin', {});
       const result = await dynamicProvider(req);
 
@@ -94,13 +94,6 @@ describe('Config Module', () => {
     });
 
     it('should handle token-based dynamic provider', async () => {
-      process.env.EMAIL_JWT_ISSUER = 'https://email.example.com';
-      process.env.EMAIL_JWT_AUDIENCE = 'email_audience';
-      process.env.OIDC_CLIENT_ID = 'test_oidc_client_id';
-      process.env.OIDC_ISSUER_URL = 'https://oidc.example.com';
-      process.env.GOOGLE_OAUTH2_CLIENT_ID = 'test_google_client_id';
-      process.env.GOOGLE_OAUTH2_ISSUER_URL = 'https://google.example.com';
-
       domainsAuth.initJwt(
         { provider: dynamicProvider, secret: 'test_secret' },
         true
@@ -124,14 +117,7 @@ describe('Config Module', () => {
       });
     });
 
-    it('should handle token-based dynamic provider no clientId', async () => {
-      process.env.EMAIL_JWT_ISSUER = 'https://email.example.com';
-      process.env.EMAIL_JWT_AUDIENCE = 'email_audience';
-      process.env.OIDC_CLIENT_ID = 'test_oidc_client_id';
-      process.env.OIDC_ISSUER_URL = 'https://oidc.example.com';
-      process.env.GOOGLE_OAUTH2_CLIENT_ID = 'test_google_client_id';
-      process.env.GOOGLE_OAUTH2_ISSUER_URL = 'https://google.example.com';
-
+    it('should handle token-based dynamic provider post no clientId', async () => {
       domainsAuth.initJwt(
         { provider: dynamicProvider, secret: 'test_secret' },
         true
@@ -156,6 +142,16 @@ describe('Config Module', () => {
       await expect(
         domainsAuth.signJwt('123', reqSignGoogleOAuth)
       ).rejects.toThrow(unauthorized());
+    });
+
+    it('should handle token-based dynamic provider env no clientId', async () => {
+      const req = mockRequest(
+        OAUTH2_GOOGLE_CALLBACK_PATH,
+        {},
+        { viron_authorization: 'test_token' }
+      );
+
+      await expect(dynamicProvider(req)).rejects.toThrow(unauthorized());
     });
 
     it('should throw unauthorized error for invalid token', async () => {
