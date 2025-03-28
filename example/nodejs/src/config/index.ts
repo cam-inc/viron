@@ -68,6 +68,7 @@ export interface Config {
     jwt: domainsAuth.JwtConfig;
     googleOAuth2: domainsAuth.GoogleOAuthConfig;
     oidc: domainsAuth.OidcConfig;
+    email: domainsAuth.EmailConfig;
   };
   aws: AWSConfig;
   oas: OasConfig;
@@ -111,8 +112,10 @@ export const genDynamicProvider = (params: {
     issuerUrl: string;
   };
   email?: {
-    jwtIssuer: string;
-    jwtAudience: string;
+    jwt: {
+      issuer: string;
+      audience: string;
+    };
   };
 }): domainsAuth.ProviderFunction => {
   return async (
@@ -150,12 +153,12 @@ export const genDynamicProvider = (params: {
       }
 
       case EMAIL_SIGNIN_PATH: {
-        if (!params.email?.jwtIssuer || !params.email?.jwtAudience) {
+        if (!params.email?.jwt.issuer || !params.email?.jwt.audience) {
           throw new Error('EMAIL_JWT_ISSUER is not set');
         }
         return {
-          issuer: params.email.jwtIssuer,
-          audience: [params.email.jwtAudience],
+          issuer: params.email.jwt.issuer,
+          audience: [params.email.jwt.audience],
         };
       }
 
@@ -194,13 +197,13 @@ export const genDynamicProvider = (params: {
               issuer: params.googleOAuth2.issuerUrl,
               audience: [params.googleOAuth2.clientId],
             };
-          case params.email?.jwtAudience:
-            if (!params.email?.jwtIssuer || !params.email?.jwtAudience) {
+          case params.email?.jwt.audience:
+            if (!params.email?.jwt.issuer || !params.email?.jwt.audience) {
               throw new Error('GOOGLE_OAUTH2_CLIENT_ID is not set');
             }
             return {
-              issuer: params.email.jwtIssuer,
-              audience: [params.email.jwtAudience],
+              issuer: params.email.jwt.issuer,
+              audience: [params.email.jwt.audience],
             };
           default:
             console.error('aud is invalid', claims);

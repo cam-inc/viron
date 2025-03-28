@@ -73,7 +73,7 @@ export const createAdminUser = async (
     userWithCredential.email,
     ADMIN_ROLE.SUPER
   );
-  return userWithCredential as AdminUserWithCredential;
+  return userWithCredential;
 };
 
 interface SsoTokens {

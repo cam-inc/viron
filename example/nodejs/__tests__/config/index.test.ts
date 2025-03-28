@@ -69,8 +69,10 @@ describe('Config Module', () => {
         issuerUrl: process.env.GOOGLE_OAUTH2_ISSUER_URL,
       },
       email: {
-        jwtIssuer: process.env.EMAIL_JWT_ISSUER,
-        jwtAudience: process.env.EMAIL_JWT_AUDIENCE,
+        jwt: {
+          issuer: process.env.EMAIL_JWT_ISSUER,
+          audience: process.env.EMAIL_JWT_AUDIENCE,
+        },
       },
     });
 

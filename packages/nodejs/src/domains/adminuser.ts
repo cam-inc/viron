@@ -131,9 +131,16 @@ async function createOneUserAndRole(
   const adminUserRepository = repositoryContainer.getAdminUserRepository();
 
   const { roleIds, ...adminUser } = adminUserCreatePayload;
+  let updatePassword = {};
+  if (adminUser.password) {
+    updatePassword = {
+      ...genPasswordHash(adminUser.password),
+    };
+  }
 
   const user = await adminUserRepository.createOne({
     ...adminUser,
+    ...updatePassword,
   } as AdminUserCreateAttributes);
 
   if (roleIds?.length) {

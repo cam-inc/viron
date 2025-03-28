@@ -8,7 +8,7 @@ import { Mode, MODE } from '../constants';
 export const get = (mode: Mode): Config => {
   const mongo: MongoConfig = {
     type: 'mongo',
-    openUri: 'mongodb://mongo:27017',
+    openUri: 'mongodb://0.0.0.0:27017',
     connectOptions: {
       // MongoDB Options
       dbName: 'viron_example',
@@ -73,8 +73,10 @@ export const get = (mode: Mode): Config => {
             clientId: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? '',
           },
           email: {
-            jwtIssuer: process.env.EMAIL_JWT_ISSUER ?? '',
-            jwtAudience: process.env.EMAIL_JWT_AUDIENCE ?? '',
+            jwt: {
+              issuer: process.env.EMAIL_JWT_ISSUER ?? '',
+              audience: process.env.EMAIL_JWT_AUDIENCE ?? '',
+            },
           },
         }),
         expirationSec: 24 * 60 * 60,
@@ -99,6 +101,12 @@ export const get = (mode: Mode): Config => {
         userHostedDomains: process.env.OIDC_USER_HOSTED_DOMAINS
           ? process.env.OIDC_USER_HOSTED_DOMAINS.split(',')
           : [],
+      },
+      email: {
+        jwt: {
+          issuer: process.env.EMAIL_JWT_ISSUER ?? '',
+          audience: process.env.EMAIL_JWT_AUDIENCE ?? '',
+        },
       },
     },
     aws: {

@@ -109,6 +109,11 @@ export const jwt = async (
     return authFailureAndClearCookie(pContext, unauthorized());
   }
 
+  // Email認証の場合はトークン検証不要なので成功
+  if (claims.aud[0] === ctx.config.auth.email.jwt.audience) {
+    return authSuccess(user);
+  }
+
   // SSOトークンを取得
   const clientId = claims.aud[0];
   const ssoToken = await domainsAdminUserSsoToken.findOneByClientIdAndUserId(
@@ -116,21 +121,8 @@ export const jwt = async (
     userId
   );
 
-  // SSOトークンが存在する & パスワードがある場合はpassword認証なので成功
-  if (
-    ssoToken &&
-    user &&
-    (user as domainsAdminUser.AdminUserWithCredential).password
-  ) {
-    return authSuccess(user as domainsAdminUser.AdminUserWithCredential);
-  }
-
-  // SSOトークンが存在しない & パスワードない場合はエラー
-  if (
-    !ssoToken &&
-    user &&
-    !(user as domainsAdminUser.AdminUserWithCredential).password
-  ) {
+  // SSOトークンが存在しない場合はエラー
+  if (!ssoToken) {
     console.error('ssoToken is invalid or password is invalid');
     return authFailureAndClearCookie(pContext, unauthorized());
   }

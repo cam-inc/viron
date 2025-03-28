@@ -50,8 +50,10 @@ export const get = (): Config => {
             clientId: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? '',
           },
           email: {
-            jwtIssuer: process.env.EMAIL_JWT_ISSUER ?? '',
-            jwtAudience: process.env.EMAIL_JWT_AUDIENCE ?? '',
+            jwt: {
+              issuer: process.env.EMAIL_JWT_ISSUER ?? '',
+              audience: process.env.EMAIL_JWT_AUDIENCE ?? '',
+            },
           },
         }),
         expirationSec: 24 * 60 * 60,
@@ -72,6 +74,12 @@ export const get = (): Config => {
         issuerUrl: '',
         additionalScopes: [],
         userHostedDomains: [],
+      },
+      email: {
+        jwt: {
+          issuer: process.env.EMAIL_JWT_ISSUER ?? '',
+          audience: process.env.EMAIL_JWT_AUDIENCE ?? '',
+        },
       },
     },
     aws: {

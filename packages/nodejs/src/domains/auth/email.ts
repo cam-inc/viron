@@ -6,6 +6,13 @@ import { createFirstAdminUser } from './common';
 import { signJwt } from './jwt';
 import http from 'http';
 
+export interface EmailConfig {
+  jwt: {
+    issuer: string;
+    audience: string;
+  };
+}
+
 // Emailアドレスでサインイン
 export const signinEmail = async (
   req: http.IncomingMessage,
