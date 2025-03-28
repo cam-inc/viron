@@ -180,17 +180,17 @@ export const dynamicProvider = async (
       switch (
         (claims.aud as string[])[0] // audはsignで配列で入れている
       ) {
-        case process.env.EMAIL_JWT_AUDIENCE:
+        case emailJwtAudience:
           return {
             issuer: emailJwtIssuer,
             audience: [emailJwtAudience],
           };
-        case process.env.OIDC_CLIENT_ID:
+        case oidcClientId:
           return {
             issuer: oidcIssuerUrl,
             audience: [oidcClientId],
           };
-        case process.env.GOOGLE_OAUTH2_CLIENT_ID:
+        case googleOAuth2ClientId:
           return {
             issuer: googleOAuth2IssuerUrl,
             audience: [googleOAuth2ClientId],
