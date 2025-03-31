@@ -155,14 +155,6 @@ export const removeAllByUserId = async (userId: string): Promise<void> => {
   }
 };
 
-// IDで1件取得
-export const findOneById = async (
-  id: string
-): Promise<AdminUserSsoToken | null> => {
-  const repository = repositoryContainer.getAdminUserSsoTokenRepository();
-  return await repository.findOneById(id);
-};
-
 // 件数取得
 export const count = async (): Promise<number> => {
   const repository = repositoryContainer.getAdminUserSsoTokenRepository();

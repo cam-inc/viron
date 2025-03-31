@@ -72,7 +72,7 @@ const format = (adminUser: AdminUser, roleIds?: string[]): AdminUserView => {
 };
 
 export const formatAdminUser = format;
-export const formatAdminUserWithCredential = format;
+export const formatAdminUserWithCredential = formatWithCredential;
 
 const find = async (
   conditions: FindConditions<AdminUser> & { roleId?: string } = {},
@@ -89,6 +89,19 @@ const find = async (
   return await repository.findWithPager(conditions, size, page, sort);
 };
 
+const findRoleIdsGroupByUserId = async (
+  userIds: string[]
+): Promise<Record<string, string[]>> => {
+  const entries = await Promise.all(
+    userIds.map(async (userId) => {
+      const roleIds = await listRoles(userId);
+      return [userId, roleIds] as const;
+    })
+  );
+  // 配列からオブジェクトに変換（Object.fromEntries）
+  return Object.fromEntries(entries);
+};
+
 // 一覧取得
 export const list = async (
   conditions: FindConditions<AdminUser> & { roleId?: string } = {},
@@ -97,12 +110,13 @@ export const list = async (
   sort = [`createdAt${TABLE_SORT_DELIMITER}${TABLE_SORT_ORDER.DESC}`]
 ): Promise<ListWithPager<AdminUserView>> => {
   const result = await find(conditions, size, page, sort);
-  const adminRoles = await Promise.all(
-    result.list.map((adminUser) => listRoles(adminUser.id))
-  );
+  const userIds = result.list.map((adminUser) => adminUser.id);
+  const adminRoles = await findRoleIdsGroupByUserId(userIds);
   return {
     ...result,
-    list: result.list.map((adminUser) => format(adminUser, adminRoles.shift())),
+    list: result.list.map((adminUser) =>
+      format(adminUser, adminRoles[adminUser.id])
+    ),
   };
 };
 
@@ -114,13 +128,12 @@ export const listWithCredential = async (
   sort = [`createdAt${TABLE_SORT_DELIMITER}${TABLE_SORT_ORDER.DESC}`]
 ): Promise<ListWithPager<AdminUserWithCredential>> => {
   const result = await find(conditions, size, page, sort);
-  const adminRoles = await Promise.all(
-    result.list.map((adminUser) => listRoles(adminUser.id))
-  );
+  const userIds = result.list.map((adminUser) => adminUser.id);
+  const adminRoles = await findRoleIdsGroupByUserId(userIds);
   return {
     ...result,
     list: result.list.map((adminUser) =>
-      formatWithCredential(adminUser, adminRoles.shift())
+      formatWithCredential(adminUser, adminRoles[adminUser.id])
     ),
   };
 };

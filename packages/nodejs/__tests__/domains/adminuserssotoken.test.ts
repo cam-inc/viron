@@ -7,7 +7,6 @@ import {
   updateOneByClientIdAndUserId,
   upsertOne,
   removeAllByUserId,
-  findOneById,
   count,
   findOneByClientIdAndUserId,
   AdminUserSsoTokenCreatePayload,
@@ -208,23 +207,6 @@ describe('AdminUserSsoToken', () => {
     const id = new mongoose.Types.ObjectId().toString();
 
     await assert.doesNotReject(removeAllByUserId(id));
-  });
-
-  it('should find an admin user SSO token by id', async () => {
-    const id = new mongoose.Types.ObjectId().toString();
-    const expectedResult = {
-      id,
-      userId: 'user1',
-      clientId: 'client1',
-    } as AdminUserSsoToken;
-
-    sandbox
-      .stub(repository, 'findOneById')
-      .withArgs(id)
-      .resolves(expectedResult);
-
-    const result = await findOneById(id);
-    assert.deepStrictEqual(result, expectedResult);
   });
 
   it('should count admin user SSO tokens', async () => {
