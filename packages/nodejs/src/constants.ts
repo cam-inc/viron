@@ -120,6 +120,12 @@ export const AUTH_TYPE = {
 } as const;
 export type AuthType = (typeof AUTH_TYPE)[keyof typeof AUTH_TYPE];
 
+export const AUTH_PROVIDER = {
+  GOOGLE: 'google',
+  CUSTOM: 'custom',
+} as const;
+export type AuthProvider = (typeof AUTH_PROVIDER)[keyof typeof AUTH_PROVIDER];
+
 export const AUTH_SCHEME = 'Bearer';
 export const JWT_HASH_ALGORITHM = 'HS512';
 export const DEFAULT_JWT_EXPIRATION_SEC = 24 * 60 * 60;

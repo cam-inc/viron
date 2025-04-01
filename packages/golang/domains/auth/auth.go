@@ -199,7 +199,7 @@ func (a *Auth) VerifyAccessToken(r *http.Request, clientID string, userID string
 	if ssoToken.AuthType == constant.AUTH_TYPE_OIDC {
 		switch ssoToken.Provider {
 		// SSO認証プロバイダーがcustom場合はOIDCトークンを検証
-		case constant.AUTH_SSO_IDPROVIDER_CUSTOME:
+		case constant.AUTH_SSO_IDPROVIDER_CUSTOM:
 			if a.authOIDCConfig.ClientID == clientID {
 				return a.authOIDC.verifyAccessToken(r, userID, *ssoToken)
 			}
@@ -218,7 +218,7 @@ func (a *Auth) VerifyAccessToken(r *http.Request, clientID string, userID string
 // 以下 パッケージ関数
 func createFirstAdminUser(ctx context.Context, user *domains.AdminUser, ssoToken *domains.AdminUserSSOToken, authType string) (*domains.AdminUser, *domains.AdminUserSSOToken, error) {
 	if domains.CountAdminUser(ctx) != 0 {
-		return nil, nil, nil
+		return nil, ssoToken, nil
 	}
 	return createAdminUser(ctx, user, ssoToken, authType, constant.ADMIN_ROLE_SUPER)
 }

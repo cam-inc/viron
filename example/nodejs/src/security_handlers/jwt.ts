@@ -13,8 +13,9 @@ import {
   VIRON_AUTHCONFIGS_PATH,
   COOKIE_KEY,
   forbidden,
-  AUTH_TYPE,
   VironError,
+  domainsAdminUserSsoToken,
+  AUTH_PROVIDER,
 } from '@viron/lib';
 import { AUTHENTICATION_RESULT_TYPE } from '../constants';
 import { ctx } from '../context';
@@ -26,6 +27,18 @@ const authFailure = (err: VironError): AuthenticationFailure => {
     status: err.statusCode,
     message: err.message,
   };
+};
+
+const authFailureAndClearCookie = (
+  context: PluginContext,
+  err: VironError
+): AuthenticationFailure => {
+  context.origRes.clearCookie(COOKIE_KEY.VIRON_AUTHORIZATION);
+  context.res.header(
+    HTTP_HEADER.X_VIRON_AUTHTYPES_PATH,
+    VIRON_AUTHCONFIGS_PATH
+  );
+  return authFailure(err);
 };
 
 const authSuccess = (
@@ -47,76 +60,109 @@ export const jwt = async (
 ): Promise<AuthenticationResult> => {
   const pContext = context as PluginContext;
   if (!pContext.req.method) {
+    console.error('req.method is undefined');
     return authFailure(unauthorized());
   }
+
   const method = pContext.req.method.toLowerCase();
   if (!domainsAdminRole.isApiMethod(method)) {
+    console.error('method is invalid');
     return authFailure(unauthorized());
   }
 
   const token = pContext.req.cookies[COOKIE_KEY.VIRON_AUTHORIZATION];
-  const claims = await domainsAuth.verifyJwt(token);
+  if (!token) {
+    console.error('header jwt token is invalid');
+    return authFailureAndClearCookie(pContext, unauthorized());
+  }
+
+  const claims = await domainsAuth.verifyJwt(token, pContext.req);
   // exegesisのContext外でも使えるように
   pContext.req._context.auth = claims;
 
-  if (claims) {
-    const userId = claims.sub;
+  // claimsがない場合はエラー
+  if (!claims) {
+    console.error('claims is invalid');
+    return authFailureAndClearCookie(pContext, unauthorized());
+  }
+  const userId = claims.sub;
 
-    if (
-      !(await domainsAdminRole.hasPermission(
-        userId,
-        pContext.req.path,
-        method,
-        pContext.req._context.apiDefinition
-      ))
-    ) {
-      return authFailure(forbidden());
-    }
+  // 権限がない場合はエラー
+  if (
+    !(await domainsAdminRole.hasPermission(
+      userId,
+      pContext.req.path,
+      method,
+      pContext.req._context.apiDefinition
+    ))
+  ) {
+    console.error('role is invalid');
+    return authFailure(forbidden());
+  }
 
-    // credentialsありでユーザー情報取得
-    const user = await domainsAdminUser.findOneById(userId, true);
-    if (user) {
-      const adminUserWithCredential =
-        user as domainsAdminUser.AdminUserWithCredential;
-      switch (adminUserWithCredential.authType) {
-        case AUTH_TYPE.GOOGLE: {
-          // Google認証の場合はアクセストークンの検証
-          if (
-            await domainsAuth.verifyGoogleOAuth2AccessToken(
-              userId,
-              adminUserWithCredential,
-              ctx.config.auth.googleOAuth2
-            )
-          ) {
-            return authSuccess(adminUserWithCredential);
-          }
-          break;
+  // credentialsありでユーザー情報取得
+  const user = await domainsAdminUser.findOneWithCredentialById(userId);
+
+  // ユーザーが存在しない場合とaudがない場合はエラー
+  if (!user || !claims.aud) {
+    console.error('user or aud is invalid');
+    return authFailureAndClearCookie(pContext, unauthorized());
+  }
+
+  // Email認証の場合はトークン検証不要なので成功
+  if (claims.aud[0] === ctx.config.auth.email.jwt.audience) {
+    return authSuccess(user);
+  }
+
+  // SSOトークンを取得
+  const clientId = claims.aud[0];
+  const ssoToken = await domainsAdminUserSsoToken.findOneByClientIdAndUserId(
+    clientId,
+    userId
+  );
+
+  // SSOトークンが存在しない場合はエラー
+  if (!ssoToken) {
+    console.error('ssoToken is invalid or password is invalid');
+    return authFailureAndClearCookie(pContext, unauthorized());
+  }
+
+  // SSOトークンが存在する場合は検証
+  // audの最初の要素にclientIDを設定している
+  if (ssoToken) {
+    switch (ssoToken.provider) {
+      case AUTH_PROVIDER.GOOGLE: {
+        // Google認証の場合はアクセストークンの検証
+        if (
+          await domainsAuth.verifyGoogleOAuth2AccessToken(
+            clientId,
+            userId,
+            ssoToken,
+            ctx.config.auth.googleOAuth2
+          )
+        ) {
+          return authSuccess(user as domainsAdminUser.AdminUserWithCredential);
         }
-        case AUTH_TYPE.OIDC: {
-          // OIDC認証の場合はアクセストークンの検証
-          const client = await domainsAuth.genOidcClient(ctx.config.auth.oidc);
-          if (
-            await domainsAuth.verifyOidcAccessToken(
-              client,
-              ctx.config.auth.oidc,
-              userId,
-              adminUserWithCredential
-            )
-          ) {
-            return authSuccess(adminUserWithCredential);
-          }
-          break;
+        break;
+      }
+      case AUTH_PROVIDER.CUSTOM: {
+        // OIDC認証の場合はアクセストークンの検証
+        const client = await domainsAuth.genOidcClient(ctx.config.auth.oidc);
+        if (
+          await domainsAuth.verifyOidcAccessToken(
+            client,
+            ctx.config.auth.oidc,
+            clientId,
+            userId,
+            ssoToken
+          )
+        ) {
+          return authSuccess(user as domainsAdminUser.AdminUserWithCredential);
         }
-        default:
-          return authSuccess(adminUserWithCredential);
+        break;
       }
     }
   }
-
-  pContext.origRes.clearCookie(COOKIE_KEY.VIRON_AUTHORIZATION);
-  pContext.res.header(
-    HTTP_HEADER.X_VIRON_AUTHTYPES_PATH,
-    VIRON_AUTHCONFIGS_PATH
-  );
+  console.error('ssoToken is invalid', ssoToken);
   return authFailure(unauthorized());
 };

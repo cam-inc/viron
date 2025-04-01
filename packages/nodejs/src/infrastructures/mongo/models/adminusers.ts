@@ -9,47 +9,10 @@ export const schemaDefinition: SchemaDefinition = {
     required: true,
     unique: true,
   },
-  authType: {
-    type: Schema.Types.String,
-    required: true,
-  },
-  // for email
   password: {
     type: Schema.Types.String,
   },
   salt: {
-    type: Schema.Types.String,
-  },
-  // for google
-  googleOAuth2AccessToken: {
-    type: Schema.Types.String,
-  },
-  googleOAuth2ExpiryDate: {
-    type: Schema.Types.Number,
-  },
-  googleOAuth2IdToken: {
-    type: Schema.Types.String,
-  },
-  googleOAuth2RefreshToken: {
-    type: Schema.Types.String,
-  },
-  googleOAuth2TokenType: {
-    type: Schema.Types.String,
-  },
-  // for oidc
-  oidcAccessToken: {
-    type: Schema.Types.String,
-  },
-  oidcExpiryDate: {
-    type: Schema.Types.Number,
-  },
-  oidcIdToken: {
-    type: Schema.Types.String,
-  },
-  oidcRefreshToken: {
-    type: Schema.Types.String,
-  },
-  oidcTokenType: {
     type: Schema.Types.String,
   },
 

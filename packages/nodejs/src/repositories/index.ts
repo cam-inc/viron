@@ -18,6 +18,7 @@ import {
 import {
   domainsAdminRole,
   domainsAdminUser,
+  domainsAdminUserSsoToken,
   domainsAuditLog,
   domainsAuth,
 } from '../domains';
@@ -218,6 +219,14 @@ export class RepositoryContainer {
     domainsAdminUser.AdminUserUpdateAttributes
   > {
     return this.get('adminUsers');
+  }
+
+  getAdminUserSsoTokenRepository(): Repository<
+    domainsAdminUserSsoToken.AdminUserSsoToken,
+    domainsAdminUserSsoToken.AdminUserSsoTokenCreateAttributes,
+    domainsAdminUserSsoToken.AdminUserSsoTokenUpdateAttributes
+  > {
+    return this.get('adminUserSsoTokens');
   }
 
   getRevokedTokenRepository(): Repository<

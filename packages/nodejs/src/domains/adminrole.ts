@@ -86,7 +86,7 @@ const parsePolicy = (policy: Policy): ParsedPolicy => {
 };
 
 // casbinインスタンスとDBの差異を解消するために同期する
-const sync = async (now = Date.now()): Promise<void> => {
+export const sync = async (now = Date.now()): Promise<void> => {
   const casbin = repositoryContainer.getCasbin();
   if (repositoryContainer.casbinSyncedTime + CASBIN_SYNC_INTERVAL_MSEC < now) {
     await casbin.loadPolicy();
@@ -100,7 +100,7 @@ const isValidCasbinRule = (str: string): boolean =>
   !/^[a-zA-Z0-9_-]+$/.test(str);
 
 // adminroles(casbin_rule)で不正な文字列チェック
-const validateAdminRole = (obj: AdminRole): void => {
+export const validateAdminRole = (obj: AdminRole): void => {
   // obj.idのチェック
   if (isValidCasbinRule(obj.id)) {
     throw invalidAdminRole();
@@ -118,7 +118,7 @@ const validateAdminRole = (obj: AdminRole): void => {
   }
 };
 
-const validateUserRoles = (userId: string, roleIds: string[]): void => {
+export const validateUserRoles = (userId: string, roleIds: string[]): void => {
   // userIdに不正な文字列が含まれないことを確認
   if (isValidCasbinRule(userId)) {
     throw invalidAdminRole();

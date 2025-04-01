@@ -67,7 +67,7 @@ const (
 	SIGNOUT_PATH                     = "/signout"
 
 	AUTH_SSO_IDPROVIDER_GOOGLE  = "google"
-	AUTH_SSO_IDPROVIDER_CUSTOME = "custom"
+	AUTH_SSO_IDPROVIDER_CUSTOM = "custom"
 
 	GOOGLE_OIDC_ISSUER_URL = "https://accounts.google.com"
 

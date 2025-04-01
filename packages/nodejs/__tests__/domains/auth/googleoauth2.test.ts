@@ -7,8 +7,21 @@ import {
   signinGoogleOAuth2,
   verifyGoogleOAuth2AccessToken,
 } from '../../../src/domains/auth';
-import { forbidden, invalidGoogleOAuth2Token } from '../../../src/errors';
-import { domainsAdminUser } from '../../../src/domains';
+import {
+  forbidden,
+  invalidGoogleOAuth2Token,
+  signinFailed,
+} from '../../../src/errors';
+import {
+  domainsAdminUser,
+  domainsAdminUserSsoToken,
+} from '../../../src/domains';
+import * as domainsAuthCommon from '../../../src/domains/auth/common';
+import http from 'http';
+import { AdminUserSsoToken } from '../../../src/domains/adminuserssotoken';
+import { AUTH_PROVIDER, AUTH_TYPE } from '../../../src/constants';
+// import { AdminUserWithCredential } from '../../../src/domains/adminuser';
+import { ListWithPager } from '../../../src/helpers';
 
 describe('domains/auth/googleoauth2', () => {
   const sandbox = sinon.createSandbox();
@@ -24,6 +37,7 @@ describe('domains/auth/googleoauth2', () => {
       const config = {
         clientId: 'google-oauth2-client-id',
         clientSecret: 'google-oauth2-client-secret',
+        issuerUrl: 'https://accounts.google.com',
       };
       const result = getGoogleOAuth2AuthorizationUrl(
         redirectUrl,
@@ -46,6 +60,7 @@ describe('domains/auth/googleoauth2', () => {
       const config = {
         clientId: 'google-oauth2-client-id',
         clientSecret: 'google-oauth2-client-secret',
+        issuerUrl: 'https://accounts.google.com',
         additionalScopes: ['https://www.googleapis.com/auth/spreadsheets'],
         userHostedDomains: ['example.com'],
       };
@@ -67,6 +82,36 @@ describe('domains/auth/googleoauth2', () => {
       );
       assert.strictEqual(url.searchParams.get('client_id'), config.clientId);
     });
+
+    // throw googleOAuth2Unavailableになるテスト
+    it('Throw googleOAuth2Unavailable error when clientId or clientSecret is empty.', () => {
+      const redirectUrl = 'https://example.com/oauthredirect';
+      const state = 'XXXXXXX';
+      const config = {
+        clientId: '',
+        clientSecret: 'google-oauth2-client-secret',
+        issuerUrl: 'https://accounts.google.com',
+      };
+      assert.throws(() => {
+        getGoogleOAuth2AuthorizationUrl(redirectUrl, state, config);
+      });
+      const config2 = {
+        clientId: 'google-oauth2-client-id',
+        clientSecret: '',
+        issuerUrl: 'https://accounts.google.com',
+      };
+      assert.throws(() => {
+        getGoogleOAuth2AuthorizationUrl(redirectUrl, state, config2);
+      });
+      const config3 = {
+        clientId: '',
+        clientSecret: '',
+        issuerUrl: 'https://accounts.google.com',
+      };
+      assert.throws(() => {
+        getGoogleOAuth2AuthorizationUrl(redirectUrl, state, config3);
+      });
+    });
   });
 
   describe('signinGoogleOAuth2', () => {
@@ -75,6 +120,7 @@ describe('domains/auth/googleoauth2', () => {
       clientId: 'google-oauth2-client-id',
       clientSecret: 'google-oauth2-client-secret',
       userHostedDomains: ['example.com'],
+      issuerUrl: 'https://accounts.google.com',
     };
     let dummyClient: Auth.OAuth2Client;
 
@@ -137,7 +183,15 @@ describe('domains/auth/googleoauth2', () => {
           })
         );
 
-      const result = await signinGoogleOAuth2(code, redirectUrl, config);
+      sandbox.stub(domainsAuthCommon, 'createFirstAdminUser').resolves(null);
+
+      const result = await signinGoogleOAuth2(
+        {} as http.IncomingMessage,
+        code,
+        redirectUrl,
+        config,
+        true
+      );
       assert(result.startsWith('Bearer '));
     });
 
@@ -157,11 +211,20 @@ describe('domains/auth/googleoauth2', () => {
         });
 
       const expects = invalidGoogleOAuth2Token();
-      assert.rejects(signinGoogleOAuth2(code, redirectUrl, config), {
-        message: expects.message,
-        name: expects.name,
-        statusCode: expects.statusCode,
-      });
+      assert.rejects(
+        signinGoogleOAuth2(
+          {} as http.IncomingMessage,
+          code,
+          redirectUrl,
+          config,
+          true
+        ),
+        {
+          message: expects.message,
+          name: expects.name,
+          statusCode: expects.statusCode,
+        }
+      );
     });
 
     it('Failed to login when invalid loginTicket', async () => {
@@ -196,11 +259,20 @@ describe('domains/auth/googleoauth2', () => {
         );
 
       const expects = invalidGoogleOAuth2Token();
-      assert.rejects(signinGoogleOAuth2(code, redirectUrl, config), {
-        message: expects.message,
-        name: expects.name,
-        statusCode: expects.statusCode,
-      });
+      assert.rejects(
+        signinGoogleOAuth2(
+          {} as http.IncomingMessage,
+          code,
+          redirectUrl,
+          config,
+          true
+        ),
+        {
+          message: expects.message,
+          name: expects.name,
+          statusCode: expects.statusCode,
+        }
+      );
     });
 
     it('Failed to login when email domain isn`t hosted.', async () => {
@@ -236,11 +308,211 @@ describe('domains/auth/googleoauth2', () => {
         );
 
       const expects = forbidden();
-      assert.rejects(signinGoogleOAuth2(code, redirectUrl, config), {
-        message: expects.message,
-        name: expects.name,
-        statusCode: expects.statusCode,
+      assert.rejects(
+        signinGoogleOAuth2(
+          {} as http.IncomingMessage,
+          code,
+          redirectUrl,
+          config,
+          true
+        ),
+        {
+          message: expects.message,
+          name: expects.name,
+          statusCode: expects.statusCode,
+        }
+      );
+    });
+
+    it('Succeed to login when user already exists.', async () => {
+      const code = 'aaaaaaaaaaaaaaaaaaaaa';
+
+      getStub<'getToken', [string]>('getToken')
+        .withArgs(code)
+        .resolves({
+          tokens: {
+            access_token: 'ACCESSTOKEN',
+            expiry_date: 1623828515177,
+            id_token: 'IDTOKEN',
+            refresh_token: 'REFRESHTOKEN',
+            token_type: 'Bearer',
+          },
+        });
+      getStub<'verifyIdToken', [Auth.VerifyIdTokenOptions]>('verifyIdToken')
+        .withArgs(
+          sinon.match({
+            idToken: 'IDTOKEN',
+            audience: config.clientId,
+          })
+        )
+        .resolves(
+          new Auth.LoginTicket(undefined, {
+            iss: 'ISSUER',
+            sub: 'identifier',
+            aud: 'audience',
+            iat: Date.now(),
+            exp: Date.now() + 100000,
+            email: 'test@example.com',
+          })
+        );
+
+      sandbox.stub(domainsAdminUser, 'findOneWithCredentialByEmail').resolves({
+        id: '1',
+        email: 'example@example.com',
+        password: null,
+        salt: 'salt',
+        roleIds: ['admin'],
+        createdAt: new Date(),
+        updatedAt: new Date(),
       });
+      sandbox.stub(domainsAuthCommon, 'createFirstAdminUser').resolves(null);
+      sandbox.stub(domainsAdminUserSsoToken, 'upsertOne').resolves({
+        id: '1',
+        provider: AUTH_PROVIDER.GOOGLE,
+        authType: AUTH_TYPE.OIDC,
+        clientId: 'google-oauth2-client-id',
+        userId: '1',
+        accessToken: 'ACCESSTOKEN',
+        expiryDate: 1623828515177,
+        refreshToken: 'REFRESHTOKEN',
+        tokenType: 'Bearer',
+      } as AdminUserSsoToken);
+
+      const result = await signinGoogleOAuth2(
+        {} as http.IncomingMessage,
+        code,
+        redirectUrl,
+        config,
+        false
+      );
+      assert(result.startsWith('Bearer '));
+    });
+
+    it('Succeed to login when user already exists multiple auth user false already password.', async () => {
+      const code = 'aaaaaaaaaaaaaaaaaaaaa';
+
+      getStub<'getToken', [string]>('getToken')
+        .withArgs(code)
+        .resolves({
+          tokens: {
+            access_token: 'ACCESSTOKEN',
+            expiry_date: 1623828515177,
+            id_token: 'IDTOKEN',
+            refresh_token: 'REFRESHTOKEN',
+            token_type: 'Bearer',
+          },
+        });
+      getStub<'verifyIdToken', [Auth.VerifyIdTokenOptions]>('verifyIdToken')
+        .withArgs(
+          sinon.match({
+            idToken: 'IDTOKEN',
+            audience: config.clientId,
+          })
+        )
+        .resolves(
+          new Auth.LoginTicket(undefined, {
+            iss: 'ISSUER',
+            sub: 'identifier',
+            aud: 'audience',
+            iat: Date.now(),
+            exp: Date.now() + 100000,
+            email: 'test@example.com',
+          })
+        );
+
+      sandbox.stub(domainsAdminUser, 'findOneWithCredentialByEmail').resolves({
+        id: '1',
+        email: 'example@example.com',
+        password: 'password',
+        salt: 'salt',
+        roleIds: ['admin'],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      sandbox.stub(domainsAuthCommon, 'createFirstAdminUser').resolves(null);
+
+      assert.rejects(
+        signinGoogleOAuth2(
+          {} as http.IncomingMessage,
+          code,
+          redirectUrl,
+          config,
+          false
+        ),
+        signinFailed()
+      );
+    });
+
+    it('Succeed to login when user already exists multiple auth user false no password.', async () => {
+      const code = 'aaaaaaaaaaaaaaaaaaaaa';
+
+      getStub<'getToken', [string]>('getToken')
+        .withArgs(code)
+        .resolves({
+          tokens: {
+            access_token: 'ACCESSTOKEN',
+            expiry_date: 1623828515177,
+            id_token: 'IDTOKEN',
+            refresh_token: 'REFRESHTOKEN',
+            token_type: 'Bearer',
+          },
+        });
+      getStub<'verifyIdToken', [Auth.VerifyIdTokenOptions]>('verifyIdToken')
+        .withArgs(
+          sinon.match({
+            idToken: 'IDTOKEN',
+            audience: config.clientId,
+          })
+        )
+        .resolves(
+          new Auth.LoginTicket(undefined, {
+            iss: 'ISSUER',
+            sub: 'identifier',
+            aud: 'audience',
+            iat: Date.now(),
+            exp: Date.now() + 100000,
+            email: 'test@example.com',
+          })
+        );
+
+      sandbox.stub(domainsAdminUser, 'findOneWithCredentialByEmail').resolves({
+        id: '1',
+        email: 'example@example.com',
+        password: null,
+        salt: 'salt',
+        roleIds: ['admin'],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+      sandbox.stub(domainsAuthCommon, 'createFirstAdminUser').resolves(null);
+      sandbox.stub(domainsAdminUserSsoToken, 'list').resolves({
+        currentPage: 1,
+        maxPage: 2,
+        list: [
+          {
+            provider: AUTH_PROVIDER.GOOGLE,
+            authType: AUTH_TYPE.OIDC,
+            clientId: 'google-oauth2-client-id',
+            userId: '1',
+            accessToken: 'ACCESSTOKEN',
+            expiryDate: 1623828515177,
+            idToken: 'IDTOKEN',
+            refreshToken: 'REFRESHTOKEN',
+            tokenType: 'Bearer',
+          } as AdminUserSsoToken,
+        ],
+      } as ListWithPager<AdminUserSsoToken>);
+
+      assert.rejects(
+        signinGoogleOAuth2(
+          {} as http.IncomingMessage,
+          code,
+          redirectUrl,
+          config,
+          false
+        ),
+        signinFailed()
+      );
     });
   });
 
@@ -249,23 +521,29 @@ describe('domains/auth/googleoauth2', () => {
       clientId: 'google-oauth2-client-id',
       clientSecret: 'google-oauth2-client-secret',
       userHostedDomains: ['example.com'],
+      issuerUrl: 'https://accounts.google.com',
     };
 
     it('Succeed to verify access token.', async () => {
       const userId = '1';
-      const credentials = {
-        googleOAuth2AccessToken: 'ACCESSTOKEN',
-        googleOAuth2ExpiryDate: 1623828515177,
-        googleOAuth2IdToken: 'IDTOKEN',
-        googleOAuth2RefreshToken: 'REFRESHTOKEN',
-        googleOAuth2TokenType: 'Bearer',
-      };
+      const clientId = '12345';
+      const ssoToken = {
+        provider: AUTH_PROVIDER.GOOGLE,
+        authType: AUTH_TYPE.OIDC,
+        clientId,
+        userId,
+        accessToken: 'ACCESSTOKEN',
+        expiryDate: 1623828515177,
+        idToken: 'IDTOKEN',
+        refreshToken: 'REFRESHTOKEN',
+        tokenType: 'Bearer',
+      } as AdminUserSsoToken;
 
       const dummyClient = new google.auth.GoogleAuth().fromJSON({
         type: 'authorized_user',
         client_id: config.clientId,
         client_secret: config.clientSecret,
-        refresh_token: credentials.googleOAuth2RefreshToken,
+        refresh_token: ssoToken.refreshToken ?? undefined,
       });
 
       sandbox
@@ -278,28 +556,32 @@ describe('domains/auth/googleoauth2', () => {
       sandbox.stub(dummyClient, 'getAccessToken').resolves({});
 
       const result = await verifyGoogleOAuth2AccessToken(
+        clientId,
         userId,
-        credentials,
+        ssoToken,
         config
       );
       assert.strictEqual(result, true);
     });
 
     it('Succeed to verify access token with refresh.', async () => {
-      const userId = '1';
-      const credentials = {
-        googleOAuth2AccessToken: 'ACCESSTOKEN',
-        googleOAuth2ExpiryDate: 1623828515177,
-        googleOAuth2IdToken: 'IDTOKEN',
-        googleOAuth2RefreshToken: 'REFRESHTOKEN',
-        googleOAuth2TokenType: 'Bearer',
-      };
+      const clientId = '12345';
+      const ssoToken = {
+        provider: AUTH_PROVIDER.GOOGLE,
+        authType: AUTH_TYPE.OIDC,
+        clientId,
+        accessToken: 'ACCESSTOKEN',
+        expiryDate: 1623828515177,
+        idToken: 'IDTOKEN',
+        refreshToken: 'REFRESHTOKEN',
+        tokenType: 'Bearer',
+      } as AdminUserSsoToken;
 
       const dummyClient = new google.auth.GoogleAuth().fromJSON({
         type: 'authorized_user',
         client_id: config.clientId,
         client_secret: config.clientSecret,
-        refresh_token: credentials.googleOAuth2RefreshToken,
+        refresh_token: ssoToken.refreshToken ?? undefined,
       });
 
       sandbox
@@ -319,11 +601,15 @@ describe('domains/auth/googleoauth2', () => {
           },
         },
       });
-      sandbox.stub(domainsAdminUser, 'updateOneById').resolves();
+
+      sandbox
+        .stub(domainsAdminUserSsoToken, 'updateOneByClientIdAndUserId')
+        .resolves();
 
       const result = await verifyGoogleOAuth2AccessToken(
-        userId,
-        credentials,
+        clientId,
+        ssoToken.userId,
+        ssoToken,
         config
       );
       assert.strictEqual(result, true);
@@ -331,19 +617,24 @@ describe('domains/auth/googleoauth2', () => {
 
     it('Failed to refresh.', async () => {
       const userId = '1';
-      const credentials = {
-        googleOAuth2AccessToken: 'ACCESSTOKEN',
-        googleOAuth2ExpiryDate: 1623828515177,
-        googleOAuth2IdToken: 'IDTOKEN',
-        googleOAuth2RefreshToken: 'REFRESHTOKEN',
-        googleOAuth2TokenType: 'Bearer',
-      };
+      const clientId = '12345';
+      const ssoToken = {
+        provider: AUTH_PROVIDER.GOOGLE,
+        authType: AUTH_TYPE.OIDC,
+        clientId,
+        userId,
+        accessToken: 'ACCESSTOKEN',
+        expiryDate: 1623828515177,
+        idToken: 'IDTOKEN',
+        refreshToken: 'REFRESHTOKEN',
+        tokenType: 'Bearer',
+      } as AdminUserSsoToken;
 
       const dummyClient = new google.auth.GoogleAuth().fromJSON({
         type: 'authorized_user',
         client_id: config.clientId,
         client_secret: config.clientSecret,
-        refresh_token: credentials.googleOAuth2RefreshToken,
+        refresh_token: ssoToken.refreshToken ?? undefined,
       });
 
       sandbox
@@ -359,8 +650,9 @@ describe('domains/auth/googleoauth2', () => {
       });
 
       const result = await verifyGoogleOAuth2AccessToken(
+        clientId,
         userId,
-        credentials,
+        ssoToken,
         config
       );
       assert.strictEqual(result, false);

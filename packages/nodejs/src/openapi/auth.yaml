@@ -45,6 +45,7 @@ paths:
       description: OIDCのidp 認証画面へリダイレクトする
       parameters:
         - $ref: '#/components/parameters/RedirectUriQueryParam'
+        - $ref: '#/components/parameters/ClientIdQueryParam'
       responses:
         301:
           description: Redirect to OIDC Authorization URL.
@@ -79,6 +80,7 @@ paths:
       description: GoogleのOAuth認可画面へリダイレクトする
       parameters:
         - $ref: '#/components/parameters/RedirectUriQueryParam'
+        - $ref: '#/components/parameters/ClientIdQueryParam'
       responses:
         301:
           description: Redirect to Google OAuth URL.
@@ -119,6 +121,12 @@ components:
       schema:
         type: string
       required: true
+    ClientIdQueryParam:
+      name: clientId
+      in: query
+      schema:
+        type: string
+      required: true
 
   schemas:
     SigninEmailPayload:
@@ -149,10 +157,14 @@ components:
         redirectUri:
           description: GoogleOAuth2コールバックURI
           type: string
+        clientId:
+          description: GoogleOAuth2クライアントID
+          type: string
       required:
         - code
         - state
         - redirectUri
+        - clientId
 
     OidcCallbackPayload:
       type: object
@@ -166,7 +178,11 @@ components:
         redirectUri:
           description: OIDCコールバックURI
           type: string
+        clientId:
+          description: OIDCクライアントID
+          type: string
       required:
         - code
         - state
         - redirectUri
+        - clientId

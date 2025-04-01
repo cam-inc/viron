@@ -1,11 +1,5 @@
 import jwt, { Algorithm, JwtPayload, TokenExpiredError } from 'jsonwebtoken';
-import {
-  Issuer,
-  generators,
-  Client,
-  TokenSet,
-  CallbackParamsType,
-} from 'openid-client';
+import { Issuer, generators, Client, CallbackParamsType } from 'openid-client';
 import { getDebug } from '../../logging';
 import { signJwt } from './jwt';
 const debug = getDebug('domains:auth:oidc');
@@ -17,20 +11,34 @@ import {
   faildDecodeOidcIdToken,
   mismatchKidOidcIdToken,
 } from '../../errors';
-import { createOne, findOneByEmail, updateOneById } from '../adminuser';
-import { addRoleForUser } from '../adminrole';
-import { createFirstAdminUser } from './common';
 import {
-  ADMIN_ROLE,
+  AdminUserCreatePayload,
+  findOneWithCredentialByEmail,
+} from '../adminuser';
+import {
+  AdminUserSsoToken,
+  AdminUserSsoTokenCreatePayload,
+  list as findSsoTokens,
+  upsertOne as upsertAdminUserSsoToken,
+  updateOneByClientIdAndUserId as updateAdminUserSsoTokenOneByUserId,
+} from '../adminuserssotoken';
+import {
+  createFirstAdminUser,
+  formatTokenSetToSsoTokens,
+  createViewer,
+} from './common';
+import {
+  AUTH_PROVIDER,
   AUTH_TYPE,
   OIDC_DEFAULT_SCOPES,
   OIDC_TOKEN_REFRESH_BEFORE_SEC as OIDC_TOKEN_REFRESH_BUFFER_SEC,
 } from '../../constants';
+import http from 'http';
 
 export interface OidcClientConfig {
   clientId: string;
   clientSecret: string;
-  configurationUrl: string;
+  issuerUrl: string;
 }
 
 export interface OidcConfig extends OidcClientConfig {
@@ -54,7 +62,9 @@ export const genOidcClient = async (
   }
 
   // OIDCプロバイダーのIssuerを取得
-  const issuer = await Issuer.discover(config.configurationUrl);
+  const issuer = await Issuer.discover(
+    config.issuerUrl + '/.well-known/openid-configuration'
+  );
   debug('Discovered issuer %o', issuer);
 
   // issuer.metadata.scopes_supportedでサポートされていないスコープがないかチェック
@@ -128,11 +138,13 @@ export const getOidcAuthorizationUrl = async (
 
 // Oidcサインイン
 export const signinOidc = async (
+  req: http.IncomingMessage,
   client: Client,
   codeVerifier: string,
   redirectUri: string,
   params: CallbackParamsType,
-  config: OidcConfig
+  config: OidcConfig,
+  multipleAuthUser: boolean
 ): Promise<string> => {
   debug('params:', params);
   debug('codeVerifier:', codeVerifier);
@@ -143,10 +155,14 @@ export const signinOidc = async (
   });
 
   const claims = tokenSet.claims();
-  const credentials = formatCredentials(tokenSet);
+  const ssoToken = formatTokenSetToSsoTokens(tokenSet);
 
-  if (!credentials.oidcIdToken) {
-    debug('signinOidc invalid authentication codeVerifier. %s', codeVerifier);
+  if (ssoToken.idToken === '') {
+    debug(
+      'signinOidc invalid authentication codeVerifier. %s, %o',
+      codeVerifier,
+      ssoToken
+    );
     throw invalidOidcIdToken();
   }
 
@@ -178,58 +194,82 @@ export const signinOidc = async (
   }
 
   // emailでユーザーを検索
-  let adminUser = await findOneByEmail(email);
+  let adminUser = await findOneWithCredentialByEmail(email);
+
+  // SSOトークンのUpsert
+  const ssoTokenPayload = {
+    authType: AUTH_TYPE.OIDC,
+    provider: AUTH_PROVIDER.CUSTOM,
+    clientId: config.clientId,
+    ...ssoToken,
+  } as AdminUserSsoTokenCreatePayload;
 
   // ユーザーが存在しない場合は新規作成
   if (!adminUser) {
-    const firstAdminUser = await createFirstAdminUser(
-      { email, ...credentials },
-      AUTH_TYPE.OIDC
+    const adminUserCreatePayload: AdminUserCreatePayload = { email };
+
+    // 最初ログイン時ユーザー作成(SUPER)
+    adminUser = await createFirstAdminUser(
+      AUTH_TYPE.OIDC,
+      adminUserCreatePayload,
+      ssoTokenPayload
     );
-    if (firstAdminUser) {
-      adminUser = firstAdminUser;
-    } else {
-      // 初回ログイン時ユーザー作成
-      adminUser = await createOne({ email, ...credentials }, AUTH_TYPE.OIDC);
-      await addRoleForUser(adminUser.id, ADMIN_ROLE.VIEWER);
+
+    // 管理者ユーザー存在する場合はviewerユーザー作成
+    if (!adminUser) {
+      adminUser = await createViewer(
+        AUTH_TYPE.OIDC,
+        adminUserCreatePayload,
+        ssoTokenPayload
+      );
     }
   } else {
-    if (adminUser.authType !== AUTH_TYPE.OIDC) {
-      throw signinFailed();
+    // userが存在する場合
+    // multipleAuthUser=falseの場合は認証方法は1つのみに制限する
+    if (!multipleAuthUser) {
+      // 登録済みユーザーの認証方法の確認
+      // password認証が登録済みの場合はエラー
+      if (adminUser.password && adminUser.password !== '') {
+        console.error('signinFailed password auth already', adminUser.id);
+        throw signinFailed();
+      }
+      // userIdで登録済みSSOトークン情報を取得
+      const ssoTokens = await findSsoTokens({ userId: adminUser.id });
+      for (const st of ssoTokens.list) {
+        // 今回のclientIDと違うSSOトークンがある場合はエラー
+        if (st.clientId !== claims.aud) {
+          console.error('signinFailed clientId already');
+          throw signinFailed();
+        }
+      }
     }
-    // 既存ユーザーの情報を更新
-    await updateOneById(adminUser.id, credentials);
+
+    // SSOトークンのUserIDを設定
+    ssoTokenPayload.userId = adminUser.id;
+
+    // ここまででエラーがない場合はSSOトークンのUpsert
+    upsertAdminUserSsoToken(ssoTokenPayload);
   }
 
   debug('signinOidc Sign jwt for user: %s', adminUser.id);
-  return signJwt(adminUser.id);
+  return signJwt(adminUser.id, req);
 };
 
 // アクセストークンの検証
 export const verifyOidcAccessToken = async (
   client: Client,
   config: OidcConfig,
+  clientId: string,
   userId: string,
-  credentials: OidcCredentials
+  ssoToken: AdminUserSsoToken
 ): Promise<boolean> => {
-  // credentialsが不正な場合はエラー
-  if (
-    !credentials.oidcAccessToken ||
-    !credentials.oidcIdToken ||
-    !credentials.oidcExpiryDate ||
-    !credentials.oidcTokenType
-  ) {
-    debug('verifyOidcAccessToken invalid credentials. %o', credentials);
-    return false;
-  }
-
   // IDトークンの検証
   // vironではIDトークンはDBに保存されているので、改竄されることはないが
   // DBはviron利用者が管理するため改竄されることを考慮してvironLibとしてはIDトークンの検証を毎度行う
   const verified = await verifyOidcIdToken(
     client,
     config,
-    credentials.oidcIdToken
+    ssoToken.idToken
   ).catch((e: Error) => {
     debug('verifyOidcIdToken failure. userId: %s, err: %o', userId, e);
     return e;
@@ -240,7 +280,7 @@ export const verifyOidcAccessToken = async (
   }
 
   // リフレッシュトークンがない場合はIDトークンの有効期限だけで判定
-  if (!credentials.oidcRefreshToken) {
+  if (!ssoToken.refreshToken) {
     debug('verifyOidcAccessToken no refresh token. userId: %s', userId);
     // IDトークンの有効期限が切れている場合はエラー
     return !verified.expired;
@@ -254,7 +294,7 @@ export const verifyOidcAccessToken = async (
   }
 
   // リフレッシュトークンがある場合はリフレッシュトークンを使ってトークンを更新
-  const refreshToken = credentials.oidcRefreshToken;
+  const refreshToken = ssoToken.refreshToken;
   const tokenset = await client.refresh(refreshToken).catch((e: Error) => {
     debug('AccessToken refresh failure. userId: %s, err: %o', userId, e);
     return e;
@@ -266,10 +306,15 @@ export const verifyOidcAccessToken = async (
   debug('AccessToken refresh success! userId: %s', userId);
 
   // トークンを更新
-  const newCredentials = formatCredentials(tokenset);
-  newCredentials.oidcRefreshToken = refreshToken;
-  await updateOneById(userId, newCredentials);
+  const newSsoToken = {
+    ...formatTokenSetToSsoTokens(tokenset),
+    userId,
+    clientId,
+    authType: AUTH_TYPE.OIDC,
+    provider: AUTH_PROVIDER.CUSTOM,
+  } as AdminUserSsoTokenCreatePayload;
 
+  await updateAdminUserSsoTokenOneByUserId(clientId, userId, newSsoToken);
   return true;
 };
 
@@ -326,24 +371,6 @@ export const verifyOidcIdToken = async (
     // トークンの有効期限切れ以外は設定不備 or 改竄された可能性があるため500エラー
     throw e;
   }
-};
-
-interface OidcCredentials {
-  oidcAccessToken: string | null;
-  oidcExpiryDate: number | null;
-  oidcIdToken: string | null;
-  oidcRefreshToken: string | null;
-  oidcTokenType: string | null;
-}
-
-const formatCredentials = (credentials: TokenSet): OidcCredentials => {
-  return {
-    oidcAccessToken: credentials.access_token ?? null,
-    oidcExpiryDate: credentials.expires_at ?? null,
-    oidcIdToken: credentials.id_token ?? null,
-    oidcRefreshToken: credentials.refresh_token ?? null,
-    oidcTokenType: credentials.token_type ?? null,
-  };
 };
 
 const isRefresh = (expiryDate: number | undefined): boolean => {
