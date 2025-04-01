@@ -8,7 +8,7 @@ import { Mode, MODE } from '../constants';
 export const get = (mode: Mode): Config => {
   const mongo: MongoConfig = {
     type: 'mongo',
-    openUri: 'mongodb://0.0.0.0:27017',
+    openUri: 'mongodb://mongo:27017',
     connectOptions: {
       // MongoDB Options
       dbName: 'viron_example',
