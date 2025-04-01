@@ -16,17 +16,27 @@ import {
   revokeRoleForUser,
   updatePermissionsForRole,
   updateRolesForUser,
+  sync,
+  validateAdminRole,
+  validateUserRoles,
+  updateOneById,
+  removeOneById,
 } from '../../src/domains/adminrole';
 import { VironOpenAPIObject } from '../../src/domains/oas';
 import { repositoryContainer } from '../../src/repositories';
 import {
   ADMIN_ROLE,
   API_METHOD,
+  CASBIN_SYNC_INTERVAL_MSEC,
   OAS_X_PAGES,
   PERMISSION,
   X_PAGE_CONTENT_TYPE,
 } from '../../src/constants';
-import { roleIdAlreadyExists } from '../../src/errors';
+import {
+  invalidAdminRole,
+  roleIdAlreadyExists,
+  unableToDeleteRole,
+} from '../../src/errors';
 import { mongooseAdapter } from '../fixtures/setup_repositories';
 
 describe('domains/adminrole', () => {
@@ -104,6 +114,79 @@ describe('domains/adminrole', () => {
   afterEach(async () => {
     await mongooseAdapter.getCasbinRule().deleteMany({});
     await casbin.loadPolicy();
+  });
+
+  describe('sync', () => {
+    it('sync casbin loading.', async () => {
+      const now = Date.now() - CASBIN_SYNC_INTERVAL_MSEC - 1;
+      await sync(now);
+      repositoryContainer.casbinSyncedTime = now;
+      assert.strictEqual(repositoryContainer.casbinSyncedTime, now);
+    });
+  });
+
+  describe('validateAdminRole', () => {
+    it('Succeed to validate invalid admin role.', async () => {
+      const adminRole = {
+        id: 'editor***',
+        permissions: [
+          {
+            resourceId: 'blog',
+            permission: PERMISSION.READ,
+          },
+        ],
+      };
+      try {
+        validateAdminRole(adminRole);
+      } catch (err) {
+        assert.strictEqual((err as Error).message, invalidAdminRole().message);
+        return;
+      }
+      assert.fail('Should have thrown an error');
+    });
+    it('Succeed to validate invalid admin role resourceId.', async () => {
+      const adminRole = {
+        id: 'editor',
+        permissions: [
+          {
+            resourceId: 'blog***',
+            permission: PERMISSION.READ,
+          },
+        ],
+      };
+      try {
+        validateAdminRole(adminRole);
+      } catch (err) {
+        assert.strictEqual((err as Error).message, invalidAdminRole().message);
+        return;
+      }
+      assert.fail('Should have thrown an error');
+    });
+  });
+
+  describe('validateUserRoles', () => {
+    it('Succeed to validate user roles.', async () => {
+      const userId = '1**';
+      const roles = ['editor', 'reader'];
+      try {
+        validateUserRoles(userId, roles);
+      } catch (err) {
+        assert.strictEqual((err as Error).message, invalidAdminRole().message);
+        return;
+      }
+      assert.fail('Should have thrown an error');
+    });
+    it('Succeed to validate user roles roleIds.', async () => {
+      const userId = '1';
+      const roles = ['editor', 'reader***'];
+      try {
+        validateUserRoles(userId, roles);
+      } catch (err) {
+        assert.strictEqual((err as Error).message, invalidAdminRole().message);
+        return;
+      }
+      assert.fail('Should have thrown an error');
+    });
   });
 
   describe('listRoles', () => {
@@ -345,12 +428,37 @@ describe('domains/adminrole', () => {
       );
       assert.strictEqual(result, false);
     });
+
+    it('Return false when hasn`t pemission no resourceId.', async () => {
+      const userId = '1';
+      await addRoleForUser(userId, 'reader');
+
+      const result = await hasPermission(
+        userId,
+        '/dummy',
+        API_METHOD.POST,
+        oas
+      );
+      assert.strictEqual(result, false);
+    });
   });
 
   describe('listResourcesByOas', () => {
     it('Get resource id list.', async () => {
       const result = listResourcesByOas(oas);
       assert.deepStrictEqual(result, ['blog', 'news']);
+    });
+    it('Get resource id list no pages.', async () => {
+      const oas = {
+        openapi: '3.0.2',
+        info: {
+          title: 'test',
+          version: '1.0.0',
+        },
+        paths: {},
+      };
+      const result = listResourcesByOas(oas);
+      assert.deepStrictEqual(result, []);
     });
   });
 
@@ -462,7 +570,7 @@ describe('domains/adminrole', () => {
     });
   });
 
-  describe('updateOneById', () => {
+  describe('updatePermissionsForRole', () => {
     it('Succeed to update permissions for role.', async () => {
       const result = await updatePermissionsForRole('editor', [
         {
@@ -492,13 +600,36 @@ describe('domains/adminrole', () => {
     });
   });
 
+  describe('updateOneById', () => {
+    it('Succeed to update role.', async () => {
+      const permissions = [
+        {
+          resourceId: 'blog',
+          permission: PERMISSION.READ,
+        },
+        {
+          resourceId: 'news',
+          permission: PERMISSION.WRITE,
+        },
+      ];
+      await updateOneById('editor', permissions);
+
+      const actual = await listPolicies('editor');
+      assert.strictEqual(actual.length, 2);
+    });
+  });
+
   describe('removeOneById', () => {
     it('Succeed to remove role.', async () => {
-      const result = await removeRole('editor');
-      assert.strictEqual(result, true);
+      await removeOneById('editor');
 
-      const actual = await listRoles('editor');
+      const actual = await listPolicies('editor');
       assert.deepStrictEqual(actual, []);
+    });
+    it('Failed to remove role.', async () => {
+      const userId = '1';
+      await addRoleForUser(userId, 'editor');
+      assert.rejects(removeOneById('editor'), unableToDeleteRole());
     });
   });
 
@@ -525,6 +656,13 @@ describe('domains/adminrole', () => {
 
       const result = await createViewer(oas);
       assert.strictEqual(result, false);
+    });
+  });
+
+  describe('isApiMethod', () => {
+    it('Succeed to check api method.', async () => {
+      const result = API_METHOD.GET;
+      assert.strictEqual(result, 'get');
     });
   });
 });

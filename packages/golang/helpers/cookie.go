@@ -43,12 +43,36 @@ func GenAuthorizationCookie(token string, opts *http.Cookie) *http.Cookie {
 	return GenCookie(constant.COOKIE_KEY_VIRON_AUTHORIZATION, token, opts)
 }
 
-// GenOAuthStateCookie cookie生成
-func GenOAuthStateCookie(state string, opts *http.Cookie) *http.Cookie {
+// GenGoogleOAuth2StateCookie cookie生成
+func GenGoogleOAuth2StateCookie(state string, opts *http.Cookie) *http.Cookie {
 	if opts.MaxAge == 0 && opts.Expires.IsZero() {
-		opts.MaxAge = constant.OAUTH2_STATE_EXPIRATION_SEC
+		opts.MaxAge = constant.GOOGLE_OAUTH2_STATE_EXPIRATION_SEC
 	}
-	return GenCookie(constant.COOKIE_KEY_OAUTH2_STATE, state, opts)
+	return GenCookie(constant.COOKIE_KEY_GOOGLE_OAUTH2_STATE, state, opts)
+}
+
+// GenGoogleOAuth2CodeVerifierCookie cookie生成
+func GenGoogleOAuth2CodeVerifierCookie(codeVerifier string, opts *http.Cookie) *http.Cookie {
+	if opts.MaxAge == 0 && opts.Expires.IsZero() {
+		opts.MaxAge = constant.GOOGLE_OAUTH2_CODE_VERIFIER_EXPIRATION_SEC
+	}
+	return GenCookie(constant.COOKIE_KEY_GOOGLE_OAUTH2_CODE_VERIFIER, codeVerifier, opts)
+}
+
+// GenOidcStateCookie cookie生成
+func GenOidcStateCookie(state string, opts *http.Cookie) *http.Cookie {
+	if opts.MaxAge == 0 && opts.Expires.IsZero() {
+		opts.MaxAge = constant.OIDC_STATE_EXPIRATION_SEC
+	}
+	return GenCookie(constant.COOKIE_KEY_OIDC_STATE, state, opts)
+}
+
+// GenOidcCodeVerifierCookie cookie生成
+func GenOidcCodeVerifierCookie(codeVerifier string, opts *http.Cookie) *http.Cookie {
+	if opts.MaxAge == 0 && opts.Expires.IsZero() {
+		opts.MaxAge = constant.OIDC_CODE_VERIFIER_EXPIRATION_SEC
+	}
+	return GenCookie(constant.COOKIE_KEY_OIDC_CODE_VERIFIER, codeVerifier, opts)
 }
 
 // GetCookieToken cookieから認証token取得

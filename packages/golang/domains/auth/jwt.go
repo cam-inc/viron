@@ -6,29 +6,19 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/cam-inc/viron/packages/golang/logging"
-
 	"github.com/cam-inc/viron/packages/golang/errors"
 
 	"github.com/cam-inc/viron/packages/golang/constant"
 
+	"github.com/cam-inc/viron/packages/golang/config"
+
 	"github.com/lestrrat-go/jwx/jwa"
+	jwxJwt "github.com/lestrrat-go/jwx/jwt"
 
 	"github.com/go-chi/jwtauth"
 )
 
 type (
-	JWT struct {
-		Secret        string
-		Provider      func(r *http.Request) (string, []string, error)
-		ExpirationSec int
-		jwtAuth       *jwtauth.JWTAuth
-	}
-	Config struct {
-		Secret        string
-		Provider      string
-		ExpirationSec int
-	}
 	Claim struct {
 		Exp int
 		Iat int
@@ -40,18 +30,16 @@ type (
 )
 
 var (
-	jwt *JWT
-	log logging.Logger
+	jwt *config.JWT
 )
 
-func SetUp(secret string, provider func(r *http.Request) (string, []string, error), expiration int) error {
-	jwt = &JWT{
+func SetUpJWT(secret string, provider func(r *http.Request) (string, []string, error), expiration int) error {
+	jwt = &config.JWT{
 		Secret:        secret,
 		Provider:      provider,
 		ExpirationSec: expiration,
-		jwtAuth:       jwtauth.New(string(jwa.HS512), []byte(secret), nil),
+		JwtAuth:       jwtauth.New(string(jwa.HS512), []byte(secret), nil),
 	}
-	log = logging.GetDefaultLogger()
 	return nil
 }
 
@@ -68,7 +56,7 @@ func Sign(r *http.Request, subject string) (string, error) {
 	}
 	jwtauth.SetExpiryIn(claim, time.Duration(jwt.ExpirationSec)*time.Second)
 	jwtauth.SetIssuedNow(claim)
-	_, tokenStr, err := jwt.jwtAuth.Encode(claim)
+	_, tokenStr, err := jwt.JwtAuth.Encode(claim)
 
 	if err != nil {
 		return "", err
@@ -86,7 +74,7 @@ func Verify(r *http.Request, token string) (*Claim, error) {
 		return nil, fmt.Errorf("this token is revoked %s", token)
 	}
 
-	jwtToken, err := jwtauth.VerifyToken(jwt.jwtAuth, token)
+	jwtToken, err := VerifyToken(token)
 	if err != nil {
 		return nil, err
 	}
@@ -114,10 +102,14 @@ func Verify(r *http.Request, token string) (*Claim, error) {
 	return claim, nil
 }
 
+func VerifyToken(token string) (jwxJwt.Token, error) {
+	return jwtauth.VerifyToken(jwt.JwtAuth, token)
+}
+
 func checkAudience(providerAudience []string, jwtAudience []string) bool {
-	// 発行者と依頼者が未設定はtrue
+	// 発行者と依頼者が未設定はfalse
 	if len(providerAudience) == 0 && len(jwtAudience) == 0 {
-		return true
+		return false
 	}
 	// jwt audience が provider audienceに含まれていればtrue
 	for _, ja := range jwtAudience {

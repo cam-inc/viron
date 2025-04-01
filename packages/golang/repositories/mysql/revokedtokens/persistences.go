@@ -23,6 +23,10 @@ func (r *revokedTokensPersistence) FindOne(ctx context.Context, token string) (r
 		RevokedTokenEntity: &repositories.RevokedTokenEntity{
 			Token: token,
 		},
+		Paginate: &repositories.Paginate{
+			Size: 1,
+			Page: 1,
+		},
 	}
 
 	results, err := r.Find(ctx, cond)

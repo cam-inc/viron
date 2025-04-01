@@ -6,7 +6,7 @@ info:
   description: admin user account api specifications
   x-pages:
     - id: vironAdminAccount
-      group: 管理画面/管理
+      group: Viron管理
       title: Viron アカウント設定
       description: アカウント設定を閲覧できます
       contents:

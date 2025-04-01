@@ -5,4 +5,4 @@
   user      = ""
   pass      = ""
   sslmode   = "false"
-  whitelist = ["adminusers", "auditlogs", "revokedtokens"]
+  whitelist = ["adminusers", "auditlogs", "revokedtokens", "adminuserssotokens"]

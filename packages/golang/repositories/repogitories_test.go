@@ -54,7 +54,7 @@ func TestPaginateMongo(t *testing.T) {
 	assert.Equal(t, paginate.Skip, &offset)
 }
 
-func TestpaginateMySQL(t *testing.T) {
+func TestPaginateMySQL(t *testing.T) {
 	p := &Paginate{
 		Size: 10,
 		Page: 2,

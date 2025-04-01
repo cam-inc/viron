@@ -31,6 +31,10 @@ export interface AuthConfigDefinition {
   type: AuthConfigType;
   method: ApiMethod;
   path: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  defaultParametersValue?: Record<string, any>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  defaultRequestBodyValue?: any;
 }
 
 export type AuthConfigDefinitions = AuthConfigDefinition[];
@@ -40,7 +44,10 @@ const genAuthConfig = (
   type: AuthConfigType,
   method: ApiMethod,
   path: string,
-  oas: VironOpenAPIObject
+  oas: VironOpenAPIObject,
+  defaultParametersValue?: Record<string, unknown>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  defaultRequestBodyValue?: any
 ): AuthConfig => {
   const operationObject = findOperation(path, method, oas);
   if (!operationObject) {
@@ -50,10 +57,14 @@ const genAuthConfig = (
     provider,
     type,
     operationId: operationObject.operationId,
-    defaultParametersValue:
-      operationObject[OAS_X_AUTHCONFIG_DEFAULT_PARAMETERS],
-    defaultRequestBodyValue:
-      operationObject[OAS_X_AUTHCONFIG_DEFAULT_REQUESTBODY],
+    defaultParametersValue: {
+      ...operationObject[OAS_X_AUTHCONFIG_DEFAULT_PARAMETERS],
+      ...defaultParametersValue,
+    },
+    defaultRequestBodyValue: {
+      ...operationObject[OAS_X_AUTHCONFIG_DEFAULT_REQUESTBODY],
+      ...defaultRequestBodyValue,
+    },
   };
 };
 
@@ -63,11 +74,31 @@ export const genAuthConfigs = (
 ): VironAuthConfigList => {
   const { list, paths } = defs.reduce(
     (ret, def) => {
-      const { provider, type, method, path } = def;
-      ret.list.push(genAuthConfig(provider, type, method, path, oas));
+      const {
+        provider,
+        type,
+        method,
+        path,
+        defaultParametersValue,
+        defaultRequestBodyValue,
+      } = def;
+      ret.list.push(
+        genAuthConfig(
+          provider,
+          type,
+          method,
+          path,
+          oas,
+          defaultParametersValue,
+          defaultRequestBodyValue
+        )
+      );
       ret.paths[path] = ret.paths[path] ?? {};
       const operation = findOperation(path, method, oas);
       if (!operation) {
+        console.error(
+          `genAuthConfigs Operation not found for path: ${path}, method: ${method}`
+        );
         throw operationNotFound();
       }
       ret.paths[path][method] = operation;

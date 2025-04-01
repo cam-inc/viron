@@ -2,7 +2,7 @@ import { google, Auth } from 'googleapis';
 import { v4 as uuidv4 } from 'uuid';
 import { signJwt } from '.';
 import {
-  ADMIN_ROLE,
+  AUTH_PROVIDER,
   AUTH_TYPE,
   GOOGLE_OAUTH2_DEFAULT_SCOPES,
 } from '../../constants';
@@ -13,15 +13,30 @@ import {
   signinFailed,
 } from '../../errors';
 import { getDebug } from '../../logging';
-import { createOne, findOneByEmail, updateOneById } from '../adminuser';
-import { addRoleForUser } from '../adminrole';
-import { createFirstAdminUser } from './common';
+import {
+  AdminUserCreatePayload,
+  findOneWithCredentialByEmail,
+} from '../adminuser';
+import {
+  AdminUserSsoToken,
+  AdminUserSsoTokenCreatePayload,
+  list as findSsoTokens,
+  upsertOne as upsertAdminUserSsoToken,
+  updateOneByClientIdAndUserId as updateAdminUserSsoTokenOneByUserId,
+} from '../adminuserssotoken';
+import {
+  createFirstAdminUser,
+  createViewer,
+  formatCredentialsToSsoTokens,
+} from './common';
+import http from 'http';
 
 const debug = getDebug('domains:auth:googleoauth2');
 
 export interface GoogleOAuthClientConfig {
   clientId: string;
   clientSecret: string;
+  issuerUrl: string;
 }
 
 export interface GoogleOAuthConfig extends GoogleOAuthClientConfig {
@@ -32,7 +47,7 @@ export interface GoogleOAuthConfig extends GoogleOAuthClientConfig {
 // GoogleOAuth2が有効かどうか
 export const isEnabledGoogleOAuth2 = (
   clientConfig: GoogleOAuthClientConfig
-): boolean => !!(clientConfig.clientId && clientConfig.clientSecret);
+): boolean => clientConfig.clientId != '' && clientConfig.clientSecret != '';
 
 // GoogleOAuth2クライアントを取得
 const getGoogleOAuth2Client = (
@@ -53,19 +68,19 @@ const getGoogleOAuth2Client = (
 // GoogleOAuth2リフレッシュ用クライアントを取得
 const getGoogleOAuth2RefreshClient = async (
   clientConfig: GoogleOAuthClientConfig,
-  credentials: GoogleOAuth2Credentials
+  ssoToken: AdminUserSsoToken
 ): Promise<Auth.UserRefreshClient> => {
   const client = new google.auth.GoogleAuth().fromJSON({
     type: 'authorized_user',
     client_id: clientConfig.clientId,
     client_secret: clientConfig.clientSecret,
-    refresh_token: credentials.googleOAuth2RefreshToken ?? undefined,
+    refresh_token: ssoToken.refreshToken ?? undefined,
   });
   client.credentials = {
-    expiry_date: credentials.googleOAuth2ExpiryDate,
-    access_token: credentials.googleOAuth2AccessToken,
-    token_type: credentials.googleOAuth2TokenType,
-    refresh_token: credentials.googleOAuth2RefreshToken,
+    expiry_date: ssoToken.expiryDate,
+    access_token: ssoToken.accessToken,
+    token_type: ssoToken.tokenType,
+    refresh_token: ssoToken.refreshToken,
     scope: GOOGLE_OAUTH2_DEFAULT_SCOPES[0],
   };
   return client as Auth.UserRefreshClient;
@@ -96,42 +111,24 @@ export const getGoogleOAuth2AuthorizationUrl = (
 // ステートを生成
 export const genState = (): string => uuidv4();
 
-interface GoogleOAuth2Credentials {
-  googleOAuth2AccessToken: string | null;
-  googleOAuth2ExpiryDate: number | null;
-  googleOAuth2IdToken: string | null;
-  googleOAuth2RefreshToken: string | null;
-  googleOAuth2TokenType: string | null;
-}
-
-const formatCredentials = (
-  credentials: Auth.Credentials
-): GoogleOAuth2Credentials => {
-  return {
-    googleOAuth2AccessToken: credentials.access_token ?? null,
-    googleOAuth2ExpiryDate: credentials.expiry_date ?? null,
-    googleOAuth2IdToken: credentials.id_token ?? null,
-    googleOAuth2RefreshToken: credentials.refresh_token ?? null,
-    googleOAuth2TokenType: credentials.token_type ?? null,
-  };
-};
-
 // Googleサインイン
 export const signinGoogleOAuth2 = async (
+  req: http.IncomingMessage,
   code: string,
   redirectUrl: string,
-  config: GoogleOAuthConfig
+  config: GoogleOAuthConfig,
+  multipleAuthUser: boolean
 ): Promise<string> => {
   debug('signinGoogleOAuth2 authentication code: %s', code);
   const client = getGoogleOAuth2Client(config, redirectUrl);
   const { tokens } = await client.getToken(code);
-  const credentials = formatCredentials(tokens);
-  if (!credentials.googleOAuth2IdToken) {
+  const ssoTokens = formatCredentialsToSsoTokens(tokens);
+  if (!ssoTokens.idToken) {
     debug('signinGoogleOAuth2 invalid authentication code. %s', code);
     throw invalidGoogleOAuth2Token();
   }
   const loginTicket = await client.verifyIdToken({
-    idToken: credentials.googleOAuth2IdToken,
+    idToken: ssoTokens.idToken,
     audience: config.clientId,
   });
   const payload = loginTicket.getPayload();
@@ -140,7 +137,7 @@ export const signinGoogleOAuth2 = async (
     debug(
       'signinGoogleOAuth2 invalid login ticket: %o, idToken: %s',
       loginTicket.getAttributes(),
-      credentials.googleOAuth2IdToken
+      ssoTokens.idToken
     );
     throw invalidGoogleOAuth2Token();
   }
@@ -154,35 +151,79 @@ export const signinGoogleOAuth2 = async (
     throw forbidden();
   }
 
-  let adminUser = await findOneByEmail(email);
+  // emailでユーザーを検索
+  let adminUser = await findOneWithCredentialByEmail(email);
+
+  // SSOトークンのUpsert
+  const ssoTokenPayload = {
+    authType: AUTH_TYPE.OIDC,
+    provider: AUTH_PROVIDER.GOOGLE,
+    clientId: config.clientId,
+    ...ssoTokens,
+  } as AdminUserSsoTokenCreatePayload;
+
+  // ユーザーが存在しない場合は新規作成
   if (!adminUser) {
-    const firstAdminUser = await createFirstAdminUser(
-      { email, ...credentials },
-      AUTH_TYPE.GOOGLE
+    const adminUserCreatePayload: AdminUserCreatePayload = { email };
+
+    // 最初ログイン時ユーザー作成(SUPER)
+    adminUser = await createFirstAdminUser(
+      AUTH_TYPE.OIDC,
+      adminUserCreatePayload,
+      ssoTokenPayload
     );
-    if (firstAdminUser) {
-      adminUser = firstAdminUser;
-    } else {
-      // 初回ログイン時ユーザー作成
-      adminUser = await createOne({ email, ...credentials }, AUTH_TYPE.GOOGLE);
-      await addRoleForUser(adminUser.id, ADMIN_ROLE.VIEWER);
+
+    // 管理者ユーザー存在する場合はviewerユーザー作成
+    if (!adminUser) {
+      adminUser = await createViewer(
+        AUTH_TYPE.OIDC,
+        adminUserCreatePayload,
+        ssoTokenPayload
+      );
     }
-  }
-  if (adminUser.authType !== AUTH_TYPE.GOOGLE) {
-    throw signinFailed();
+  } else {
+    // userが存在する場合
+    // multipleAuthUser=falseの場合は認証方法は1つのみに制限する
+    if (!multipleAuthUser) {
+      // 登録済みユーザーの認証方法の確認
+      // password認証が登録済みの場合はエラー
+      if (adminUser.password && adminUser.password !== '') {
+        console.error(
+          'signinGoogleOAuth2: user already has password authentication. %s',
+          adminUser.email
+        );
+        throw signinFailed();
+      }
+      // userIdで登録済みSSOトークン情報を取得
+      const ssoTokens = await findSsoTokens({ userId: adminUser.id });
+      for (const st of ssoTokens.list) {
+        // 今回のclientIDと違うSSOトークンがある場合はエラー
+        if (st.clientId !== payload.aud) {
+          console.error('signinFailed clientId already');
+          throw signinFailed();
+        }
+      }
+    }
+
+    // SSOトークンのUserIDを設定
+    ssoTokenPayload.userId = adminUser.id;
+
+    // ここまででエラーがない場合はSSOトークンのUpsert
+    upsertAdminUserSsoToken(ssoTokenPayload);
   }
 
   debug('signinGoogleOAuth2 Sign jwt for user: %s', adminUser.id);
-  return signJwt(adminUser.id);
+  return await signJwt(adminUser.id, req);
 };
 
 // アクセストークンの検証
 export const verifyGoogleOAuth2AccessToken = async (
+  clientId: string,
   userId: string,
-  credentials: GoogleOAuth2Credentials,
+  ssoToken: AdminUserSsoToken,
   config: GoogleOAuthConfig
 ): Promise<boolean> => {
-  const client = await getGoogleOAuth2RefreshClient(config, credentials);
+  const client = await getGoogleOAuth2RefreshClient(config, ssoToken);
   const accessToken = await client.getAccessToken().catch((e: Error) => {
     debug('getAccessToken failure. userId: %s, err: %o', userId, e);
     return e;
@@ -200,9 +241,14 @@ export const verifyGoogleOAuth2AccessToken = async (
   }
 
   debug('AccessToken refresh success! userId: %s', userId);
-  const newCredentials = formatCredentials(
-    accessToken.res.data as Auth.Credentials
-  );
-  await updateOneById(userId, newCredentials);
+  const newSsoToken = {
+    ...formatCredentialsToSsoTokens(accessToken.res.data as Auth.Credentials),
+    userId,
+    clientId,
+    authType: AUTH_TYPE.OIDC,
+    provider: AUTH_PROVIDER.GOOGLE,
+  } as AdminUserSsoTokenCreatePayload;
+
+  await updateAdminUserSsoTokenOneByUserId(clientId, userId, newSsoToken);
   return true;
 };

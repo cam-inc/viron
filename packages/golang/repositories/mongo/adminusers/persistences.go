@@ -91,7 +91,7 @@ func (a *adminUsersPersistence) CreateOne(ctx context.Context, entity repositori
 
 	result := &repositories.AdminUserEntity{}
 
-	if err := a.client.Collection(collectionName).FindOne(ctx, bson.D{{"_id", response.InsertedID}}).Decode(result); err != nil {
+	if err := a.client.Collection(collectionName).FindOne(ctx, bson.D{{Key: "_id", Value: response.InsertedID}}).Decode(result); err != nil {
 		return nil, err
 	}
 	result.ID = result.OID.Hex()

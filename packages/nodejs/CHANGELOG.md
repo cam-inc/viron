@@ -1,5 +1,11 @@
 # @viron/nodejs
 
+## 2.5.0
+
+### Minor Changes
+
+- I have implemented support for logging in with multiple authentication methods (email, Google OAuth2, and OIDC) for the same user. The feature can be enabled or disabled using the multipleAuthUser flag.
+
 ## 2.4.0
 
 ### Minor Changes

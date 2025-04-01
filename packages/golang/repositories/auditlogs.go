@@ -50,7 +50,9 @@ func (c *AuditLogConditions) ConvertConditionMongoDB() *MongoConditions {
 	m := bson.M{}
 
 	if c.ID != "" {
-		m["_id"], _ = primitive.ObjectIDFromHex(c.ID)
+		if objID, err := primitive.ObjectIDFromHex(c.ID); err == nil {
+			m["_id"] = objID
+		}
 	}
 
 	if c.RequestMethod != nil {
@@ -83,9 +85,19 @@ func (c *AuditLogConditions) ConvertConditionMongoDB() *MongoConditions {
 		c.FindOptions = options.Find()
 	}
 
+	// Paginatorの値を個別にセット
 	pager := c.ConvertPager()
 	paginator := pager.PaginateMongo()
-	c.FindOptions = options.MergeFindOptions(c.FindOptions, paginator)
+
+	if paginator.Limit != nil {
+		c.FindOptions.Limit = paginator.Limit
+	}
+	if paginator.Skip != nil {
+		c.FindOptions.Skip = paginator.Skip
+	}
+	if paginator.Sort != nil {
+		c.FindOptions.Sort = paginator.Sort
+	}
 
 	conditions.FindOptions = c.FindOptions
 

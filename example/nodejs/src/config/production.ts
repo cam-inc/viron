@@ -1,5 +1,5 @@
 import { OAS_X_TAGS, OAS_X_THEME, OAS_X_THUMBNAIL, THEME } from '@viron/lib';
-import { Config, MongoConfig } from '.';
+import { Config, MongoConfig, genDynamicProvider } from '.';
 
 /**
  * Get configuration data.
@@ -41,14 +41,27 @@ export const get = (): Config => {
       ],
     },
     auth: {
+      multipleAuthUser: process.env.MULTIPLE_AUTH_USER === 'true',
       jwt: {
         secret: process.env.JWT_SECRET ?? '',
-        provider: 'viron-example-nodejs',
+        provider: genDynamicProvider({
+          googleOAuth2: {
+            issuerUrl: process.env.GOOGLE_OAUTH2_ISSUER_URL ?? '',
+            clientId: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? '',
+          },
+          email: {
+            jwt: {
+              issuer: process.env.EMAIL_JWT_ISSUER ?? '',
+              audience: process.env.EMAIL_JWT_AUDIENCE ?? '',
+            },
+          },
+        }),
         expirationSec: 24 * 60 * 60,
       },
       googleOAuth2: {
         clientId: process.env.GOOGLE_OAUTH2_CLIENT_ID ?? '',
         clientSecret: process.env.GOOGLE_OAUTH2_CLIENT_SECRET ?? '',
+        issuerUrl: process.env.GOOGLE_OAUTH2_ISSUER_URL ?? '',
         additionalScopes: [],
         userHostedDomains: process.env.GOOGLE_OAUTH2_USER_HOSTED_DOMAINS
           ? process.env.GOOGLE_OAUTH2_USER_HOSTED_DOMAINS.split(',')
@@ -58,9 +71,15 @@ export const get = (): Config => {
       oidc: {
         clientId: '',
         clientSecret: '',
-        configurationUrl: '',
+        issuerUrl: '',
         additionalScopes: [],
         userHostedDomains: [],
+      },
+      email: {
+        jwt: {
+          issuer: process.env.EMAIL_JWT_ISSUER ?? '',
+          audience: process.env.EMAIL_JWT_AUDIENCE ?? '',
+        },
       },
     },
     aws: {

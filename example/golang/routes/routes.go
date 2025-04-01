@@ -7,9 +7,6 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3filter"
 
-	"github.com/cam-inc/viron/example/golang/pkg/constant"
-	"github.com/cam-inc/viron/packages/golang/logging"
-
 	"github.com/cam-inc/viron/packages/golang/routes/adminaccounts"
 
 	"github.com/cam-inc/viron/packages/golang/helpers"
@@ -30,7 +27,7 @@ import (
 	"github.com/cam-inc/viron/example/golang/pkg/config"
 	"github.com/cam-inc/viron/example/golang/pkg/store"
 	packageDomains "github.com/cam-inc/viron/packages/golang/domains"
-	domainAuth "github.com/cam-inc/viron/packages/golang/domains/auth"
+	packageDomainAuth "github.com/cam-inc/viron/packages/golang/domains/auth"
 	"github.com/cam-inc/viron/packages/golang/routes/auth"
 	"github.com/cam-inc/viron/packages/golang/routes/oas"
 	"github.com/go-chi/chi/middleware"
@@ -40,11 +37,9 @@ import (
 
 func New() http.Handler {
 
-	log := logging.GetLogger(constant.LOG_NAME, logging.DebugLevel)
-
 	cfg := config.New()
 
-	domainAuth.NewGoogleOAuth2(cfg.Auth.GoogleOAuth2)
+	domainAuth := packageDomainAuth.New(cfg.Auth.MultipleAuthUser, cfg.Auth.GoogleOAuth2, cfg.Auth.OIDC, nil)
 
 	if cfg.StoreMode == config.StoreModeMySQL {
 		mysqlConfig := cfg.StoreMySQL
@@ -85,7 +80,10 @@ func New() http.Handler {
 			},
 		},
 	}
-	rootDoc, _ := root.GetSwagger()
+	rootDoc, err := root.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
 	definition.OpenAPI = rootDoc.OpenAPI
 	definition.Servers = rootDoc.Servers
 	if err := mergo.Merge(definition.Info, *rootDoc.Info); err != nil {
@@ -94,47 +92,73 @@ func New() http.Handler {
 	if err := merge(definition, rootDoc); err != nil {
 		panic(err)
 	}
-	componentsDoc, _ := components.GetSwagger()
+	componentsDoc, err := components.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
 	if err := merge(definition, componentsDoc); err != nil {
 		panic(err)
 	}
 
-	packageComponentsDoc, _ := packageComponents.GetSwagger()
+	packageComponentsDoc, err := packageComponents.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
 	if err := merge(definition, packageComponentsDoc); err != nil {
 		panic(err)
 	}
 
-	authconfigsDoc, _ := authconfigs.GetSwagger()
+	authconfigsDoc, err := authconfigs.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
 	if err := merge(definition, authconfigsDoc); err != nil {
 		panic(err)
 	}
 
-	adminusersDoc, _ := adminusers.GetSwagger()
+	adminusersDoc, err := adminusers.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
 	if err := merge(definition, adminusersDoc); err != nil {
 		panic(err)
 	}
 	adminaccountsDoc, err := adminaccounts.GetSwagger()
-	log.Debugf("accounts %+v err %+v", adminaccountsDoc, err)
+	if err != nil {
+		panic(err)
+	}
 	if err := merge(definition, adminaccountsDoc); err != nil {
 		panic(err)
 	}
 
-	adminrolesDoc, _ := adminroles.GetSwagger()
+	adminrolesDoc, err := adminroles.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
 	if err := merge(definition, adminrolesDoc); err != nil {
 		panic(err)
 	}
 
-	auditlogsDoc, _ := auditlogs.GetSwagger()
+	auditlogsDoc, err := auditlogs.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
 	if err := merge(definition, auditlogsDoc); err != nil {
 		panic(err)
 	}
 
-	oasDoc, _ := oas.GetSwagger()
+	oasDoc, err := oas.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
 	if err := merge(definition, oasDoc); err != nil {
 		panic(err)
 	}
 
-	authDoc, _ := auth.GetSwagger()
+	authDoc, err := auth.GetSwagger()
+	if err != nil {
+		panic(err)
+	}
 	if err := merge(definition, authDoc); err != nil {
 		panic(err)
 	}
@@ -145,8 +169,12 @@ func New() http.Handler {
 	}
 
 	// $refの置換
-	helpers.Ref(definition, "./components.yaml", "")
-	helpers.Ref(definition, "./adminusers.yaml", "")
+	if err := helpers.Ref(definition, "./components.yaml", ""); err != nil {
+		panic(err)
+	}
+	if err := helpers.Ref(definition, "./adminusers.yaml", ""); err != nil {
+		panic(err)
+	}
 
 	routeRoot := chi.NewRouter()
 	routeRoot.Use(Cors(cfg.Cors))
@@ -165,8 +193,7 @@ func New() http.Handler {
 			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
 				AuthenticationFunc: AuthenticationFunc,
 			}),
-			JWTSecurityHandlerFunc(cfg.Auth),
-			InjectAPIACL(definition),
+			JWTSecurityHandlerFunc(domainAuth),
 		},
 	})
 
@@ -174,13 +201,13 @@ func New() http.Handler {
 	adminusers.HandlerWithOptions(adminUserImpl, adminusers.ChiServerOptions{
 		BaseRouter: routeRoot,
 		Middlewares: []adminusers.MiddlewareFunc{
-			InjectAPIDefinition(definition),
-			JWTSecurityHandlerFunc(cfg.Auth),
+			InjectAPIACL(definition),
+			JWTSecurityHandlerFunc(domainAuth),
 			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
 				AuthenticationFunc: AuthenticationFunc,
 			}),
-			JWTSecurityHandlerFunc(cfg.Auth),
-			InjectAPIACL(definition),
+			JWTAuthHandlerFunc(),
+			InjectAPIDefinition(definition),
 		},
 	})
 
@@ -188,13 +215,13 @@ func New() http.Handler {
 	adminaccounts.HandlerWithOptions(adminAccountImpl, adminaccounts.ChiServerOptions{
 		BaseRouter: routeRoot,
 		Middlewares: []adminaccounts.MiddlewareFunc{
-			InjectAPIDefinition(definition),
-			JWTSecurityHandlerFunc(cfg.Auth),
+			InjectAPIACL(definition),
+			JWTSecurityHandlerFunc(domainAuth),
 			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
 				AuthenticationFunc: AuthenticationFunc,
 			}),
-			JWTSecurityHandlerFunc(cfg.Auth),
-			InjectAPIACL(definition),
+			JWTAuthHandlerFunc(),
+			InjectAPIDefinition(definition),
 		},
 	})
 
@@ -202,28 +229,28 @@ func New() http.Handler {
 	adminroles.HandlerWithOptions(adminRoleImpl, adminroles.ChiServerOptions{
 		BaseRouter: routeRoot,
 		Middlewares: []adminroles.MiddlewareFunc{
-			InjectAPIDefinition(definition),
-			JWTSecurityHandlerFunc(cfg.Auth),
+			InjectAPIACL(definition),
+			JWTSecurityHandlerFunc(domainAuth),
 			OpenAPI3ValidatorHandlerFunc(definition, &openapi3filter.Options{
 				AuthenticationFunc: AuthenticationFunc,
 			}),
-			JWTSecurityHandlerFunc(cfg.Auth),
-			InjectAPIACL(definition),
+			JWTAuthHandlerFunc(),
+			InjectAPIDefinition(definition),
 		},
 	})
 
-	if err := domainAuth.SetUp(cfg.Auth.JWT.Secret, cfg.Auth.JWT.Provider, cfg.Auth.JWT.ExpirationSec); err != nil {
+	if err := packageDomainAuth.SetUpJWT(cfg.Auth.JWT.Secret, cfg.Auth.JWT.Provider, cfg.Auth.JWT.ExpirationSec); err != nil {
 		panic(err)
 	}
-	authImpl := auth.New()
+	authImpl := auth.New(domainAuth)
 	auth.HandlerFromMux(authImpl, routeRoot)
 
-	authconfigImp := authconfigs.New()
+	authconfigImp := authconfigs.New(cfg.Auth.GoogleOAuth2, cfg.Auth.OIDC)
 	authconfigs.HandlerWithOptions(authconfigImp, authconfigs.ChiServerOptions{
 		BaseRouter: routeRoot,
 		Middlewares: []authconfigs.MiddlewareFunc{
 			InjectAPIDefinition(definition),
-			JWTSecurityHandlerFunc(cfg.Auth),
+			JWTSecurityHandlerFunc(domainAuth),
 		},
 	})
 
@@ -231,9 +258,9 @@ func New() http.Handler {
 	auditlogs.HandlerWithOptions(auditlogImp, auditlogs.ChiServerOptions{
 		BaseRouter: routeRoot,
 		Middlewares: []auditlogs.MiddlewareFunc{
-			InjectAPIDefinition(definition),
-			JWTSecurityHandlerFunc(cfg.Auth),
 			InjectAPIACL(definition),
+			JWTSecurityHandlerFunc(domainAuth),
+			InjectAPIDefinition(definition),
 		},
 	})
 

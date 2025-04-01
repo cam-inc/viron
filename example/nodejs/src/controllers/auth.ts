@@ -22,7 +22,7 @@ export const signout = async (context: RouteContext): Promise<void> => {
 // Emailサインイン
 export const signinEmail = async (context: RouteContext): Promise<void> => {
   const { email, password } = context.requestBody;
-  const token = await domainsAuth.signinEmail(email, password);
+  const token = await domainsAuth.signinEmail(context.req, email, password);
   context.res.setHeader(
     HTTP_HEADER.SET_COOKIE,
     genAuthorizationCookie(token, { maxAge: ctx.config.auth.jwt.expirationSec })
@@ -79,11 +79,13 @@ export const oidcCallback = async (context: RouteContext): Promise<void> => {
   );
   const params = client.callbackParams(context.req);
   const token = await domainsAuth.signinOidc(
+    context.req,
     client,
     codeVerifier as string,
     redirectUri,
     params,
-    ctx.config.auth.oidc
+    ctx.config.auth.oidc,
+    ctx.config.auth.multipleAuthUser
   );
   context.res.setHeader(
     HTTP_HEADER.SET_COOKIE,
@@ -127,9 +129,11 @@ export const oauth2GoogleCallback = async (
   }
 
   const token = await domainsAuth.signinGoogleOAuth2(
+    context.req,
     code,
     redirectUri,
-    ctx.config.auth.googleOAuth2
+    ctx.config.auth.googleOAuth2,
+    ctx.config.auth.multipleAuthUser
   );
   context.res.setHeader(
     HTTP_HEADER.SET_COOKIE,

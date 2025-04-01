@@ -16,7 +16,7 @@ phases:
         --cache-from $REPOSITORY_URI:latest
         --build-arg DOCKER_PROXY_HOST=$DOCKER_PROXY_HOST
         -t $IMAGE_REPO_NAME:latest
-        -f ./example/nodejs/Dockerfile ./example/nodejs
+        -f ./example/nodejs/Dockerfile ./
       - docker tag $IMAGE_REPO_NAME:latest $REPOSITORY_URI:$COMMIT_ID
       - docker tag $IMAGE_REPO_NAME:latest $REPOSITORY_URI:latest
 

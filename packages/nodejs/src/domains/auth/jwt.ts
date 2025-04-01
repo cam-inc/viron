@@ -1,5 +1,5 @@
 import http from 'http';
-import { JwtPayload, sign, verify } from 'jsonwebtoken';
+import { JwtPayload, sign, verify, decode } from 'jsonwebtoken';
 import {
   AUTH_SCHEME,
   DEFAULT_JWT_EXPIRATION_SEC,
@@ -11,10 +11,10 @@ import { isSignedout } from './signout';
 
 const debug = getDebug('domains:auth:jwt');
 
-export type ProviderFunction = (req?: http.IncomingMessage) => {
+export type ProviderFunction = (req: http.IncomingMessage) => Promise<{
   issuer: string;
   audience: string[];
-};
+}>;
 
 export interface JwtConfig {
   secret: string;
@@ -28,7 +28,7 @@ export interface JwtClaims {
   nbf: number;
   sub: string;
   iss: string;
-  aud: string;
+  aud: string | string[];
 }
 
 const regExpAuthScheme = new RegExp(`^${AUTH_SCHEME}$`, 'i');
@@ -44,10 +44,10 @@ class Jwt {
     this.expirationSec = config.expirationSec ?? DEFAULT_JWT_EXPIRATION_SEC;
   }
 
-  private getIssuerAndAudience(req?: http.IncomingMessage): {
+  private async getIssuerAndAudience(req: http.IncomingMessage): Promise<{
     issuer: string;
     audience: string[];
-  } {
+  }> {
     if (typeof this.provider === 'string') {
       return {
         issuer: this.provider,
@@ -58,9 +58,9 @@ class Jwt {
   }
 
   // 署名
-  sign(subject: string, req?: http.IncomingMessage): string {
+  async sign(subject: string, req: http.IncomingMessage): Promise<string> {
     const now = Math.floor(Date.now() / 1000);
-    const { issuer, audience } = this.getIssuerAndAudience(req);
+    const { issuer, audience } = await this.getIssuerAndAudience(req);
     const token = sign(
       {
         exp: now + this.expirationSec, // 有効期限
@@ -81,13 +81,13 @@ class Jwt {
   // 検証
   async verify(
     token: string,
-    req?: http.IncomingMessage
+    req: http.IncomingMessage
   ): Promise<JwtClaims | null> {
     const [scheme, credentials, ...unexpects] = token.split(' ');
     if (unexpects?.length || !regExpAuthScheme.test(scheme)) {
       return null;
     }
-    const { issuer, audience } = this.getIssuerAndAudience(req);
+    const { issuer, audience } = await this.getIssuerAndAudience(req);
     return await new Promise((resolve): void => {
       verify(
         credentials,
@@ -109,6 +109,15 @@ class Jwt {
       );
     });
   }
+
+  // デコード
+  decode(token: string): JwtClaims | null {
+    const [scheme, credentials, ...unexpects] = token.split(' ');
+    if (unexpects?.length || !regExpAuthScheme.test(scheme)) {
+      return null;
+    }
+    return decode(credentials) as JwtClaims;
+  }
 }
 
 let jwt: Jwt | undefined;
@@ -122,30 +131,35 @@ export const initJwt = (config: JwtConfig, force = false): Jwt => {
 };
 
 // JWT生成
-export const signJwt = (
+export const signJwt = async (
   subject: string,
-  req?: http.IncomingMessage
-): string => {
+  req: http.IncomingMessage
+): Promise<string> => {
   if (!jwt) {
     throw jwtUninitialized();
   }
-  return jwt.sign(subject, req);
+  return await jwt.sign(subject, req);
 };
 
 // JWT検証
 export const verifyJwt = async (
-  token?: string | null,
-  req?: http.IncomingMessage
+  token: string,
+  req: http.IncomingMessage
 ): Promise<JwtClaims | null> => {
   if (!jwt) {
     throw jwtUninitialized();
-  }
-  if (!token) {
-    return null;
   }
   if (await isSignedout(token)) {
     debug('Already signed out. token: %s', token);
     return null;
   }
   return await jwt.verify(token, req);
+};
+
+// JWTデコード
+export const decodeJwt = async (token: string): Promise<JwtClaims | null> => {
+  if (!jwt) {
+    throw jwtUninitialized();
+  }
+  return jwt.decode(token);
 };
