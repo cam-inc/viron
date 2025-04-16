@@ -116,9 +116,9 @@ module.exports = {
     return safelist;
   })(),
   theme: {
-    screens: {
-      lg: '640px',
-    },
+    // screens: {
+    //   lg: '640px',
+    // }, // TODO: shadcnと干渉する。デグレしているので、治す
     extend: {
       keyframes: {
         'move-left-and-back': {
@@ -138,7 +138,7 @@ module.exports = {
         'move-left-and-back': 'move-left-and-back 2s ease-out infinite',
       },
       colors: {
-        ...COLORS, // デグレを防ぐために一旦入れておく、後で消す
+        ...COLORS,
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
@@ -178,6 +178,16 @@ module.exports = {
           3: 'hsl(var(--chart-3))',
           4: 'hsl(var(--chart-4))',
           5: 'hsl(var(--chart-5))',
+        },
+        sidebar: {
+          DEFAULT: 'hsl(var(--sidebar-background))',
+          foreground: 'hsl(var(--sidebar-foreground))',
+          primary: 'hsl(var(--sidebar-primary))',
+          'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+          accent: 'hsl(var(--sidebar-accent))',
+          'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+          border: 'hsl(var(--sidebar-border))',
+          ring: 'hsl(var(--sidebar-ring))',
         },
       },
       fontSize: {

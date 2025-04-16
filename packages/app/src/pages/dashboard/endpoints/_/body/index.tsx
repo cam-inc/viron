@@ -17,8 +17,8 @@ import Menu from '../../../_/menu';
 import Add from './add/';
 import Item from './item/';
 
-export type Props = Parameters<LayoutProps['renderBody']>[0];
-const Body: React.FC<Props> = ({ className, style }) => {
+export type Props = Record<string, never>;
+const Body: React.FC<Props> = () => {
   const { t } = useTranslation();
   const { listByGroup, listUngrouped } = useEndpoint();
   // Add modal.
@@ -26,8 +26,8 @@ const Body: React.FC<Props> = ({ className, style }) => {
 
   return (
     <>
-      <div className={className} style={style}>
-        <div className="max-w-[1252px] mx-auto @container px-4 lg:px-8">
+      <div>
+        <div className="max-w-[1252px] mx-auto px-4 lg:px-8">
           {/* Head */}
           <div>
             <div className="py-6 lg:py-10 flex justify-between items-center">
@@ -209,7 +209,7 @@ const EndpointList: React.FC<EndpointListProps> = ({
     <ul
       ref={ref}
       className={classnames(
-        'grid grid-cols-1 @[740px]:grid-cols-2 @[995px]:grid-cols-3 gap-6 py-2',
+        'grid grid-cols-1 lg:grid-cols-2 gap-6 py-2',
         className
       )}
     >
