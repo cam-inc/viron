@@ -1,4 +1,4 @@
-FROM node:16
+FROM node:22
 
 RUN mkdir -p /viron/example/nodejs
 RUN mkdir -p /viron/packages/nodejs
