@@ -30,4 +30,4 @@ USER root
 
 WORKDIR $HOME/example/nodejs
 ENTRYPOINT ["npm"]
-CMD ["run", "dev"]
+CMD ["start"]

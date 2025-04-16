@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "pre-push": "npm run ci:local",
-    "dev": "gatsby develop --https -p 8000 --open",
+    "dev": "gatsby develop --https -p 8000 --host local.viron.work --open",
     "build": "gatsby build",
     "build:prefix": "gatsby build --prefix-paths",
     "serve": "gatsby serve -p 9000",
