@@ -29,4 +29,5 @@ EXPOSE 3000
 USER root
 
 WORKDIR $HOME/example/nodejs
-CMD npm run dev
+ENTRYPOINT ["npm"]
+CMD ["start"]
