@@ -237,6 +237,7 @@ body {
 }
 
 @layer base {
+  /* default */
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
@@ -290,6 +291,52 @@ body {
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+
+  :root .theme-amber {
+    --background: 45 100% 95%;
+    --foreground: 45 5% 0%;
+    --card: 45 50% 90%;
+    --card-foreground: 45 5% 10%;
+    --popover: 45 100% 95%;
+    --popover-foreground: 45 100% 0%;
+    --primary: 45 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 45 30% 70%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 7 30% 85%;
+    --muted-foreground: 45 5% 35%;
+    --accent: 7 30% 80%;
+    --accent-foreground: 45 5% 10%;
+    --destructive: 0 100% 30%;
+    --destructive-foreground: 45 5% 90%;
+    --border: 45 30% 50%;
+    --input: 45 30% 18%;
+    --ring: 45 100% 50%;
+    --radius: 0.5rem;
+  }
+  .dark .theme-amber {
+    --background: 45 50% 5%;
+    --foreground: 45 5% 90%;
+    --card: 45 50% 0%;
+    --card-foreground: 45 5% 90%;
+    --popover: 45 50% 5%;
+    --popover-foreground: 45 5% 90%;
+    --primary: 45 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 45 30% 10%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 7 30% 15%;
+    --muted-foreground: 45 5% 60%;
+    --accent: 7 30% 15%;
+    --accent-foreground: 45 5% 90%;
+    --destructive: 0 100% 30%;
+    --destructive-foreground: 45 5% 90%;
+    --border: 45 30% 18%;
+    --input: 45 30% 18%;
+    --ring: 45 100% 50%;
+    --radius: 0.5rem;
+  }
+  /* TODO: 全THEME分色を追加する @see https://zippystarter.com/tools/shadcn-ui-theme-generator */
 }
 
 @layer base {

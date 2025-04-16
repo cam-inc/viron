@@ -18,6 +18,7 @@ import Error, { useError } from '~/components/error';
 import ErrorBoundary from '~/components/errorBoundary';
 import Spinner from '~/components/spinner';
 import { UnhandledError } from '~/errors';
+import { cn } from '~/lib/utils';
 import {
   GlobalStateProvider,
   useAppIsLaunchedGlobalState,
@@ -26,6 +27,7 @@ import {
 } from '~/store';
 import '~/styles/global.css';
 import { ClassName, COLOR_SYSTEM } from '~/types';
+import { Theme } from '~/types/oas';
 import { getCustomProperties } from '~/utils/colorSystem';
 import DrawerWrapper from '~/wrappers/drawer';
 import ModalWrapper from '~/wrappers/modal';
@@ -60,7 +62,7 @@ export default RootWrapper;
 
 const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
   // Entry point.
-  const { launch, isLaunched, style, error } = useRoot();
+  const { launch, isLaunched, style, error, theme } = useRoot();
 
   useEffect(() => {
     launch();
@@ -69,7 +71,7 @@ const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
   return (
     <>
       {style}
-      <div id="root" className="relative">
+      <div id="root" className={cn('relative', `theme-${theme}`)}>
         <div>{children}</div>
         <DrawerWrapper className="fixed inset-0 z-wrapper-drawer" />
         <ModalWrapper className="fixed inset-0 z-wrapper-modal" />
@@ -88,6 +90,7 @@ type UseRootReturn = {
   isLaunched: boolean;
   style: JSX.Element;
   error: ReturnType<typeof useError>;
+  theme: Theme;
 };
 const useRoot = (): UseRootReturn => {
   const [isLaunched, setIsLaunched] = useAppIsLaunchedGlobalState();
@@ -182,6 +185,7 @@ const useRoot = (): UseRootReturn => {
   return {
     launch,
     isLaunched,
+    theme,
     style,
     error,
   };
