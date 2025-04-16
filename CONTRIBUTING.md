@@ -23,14 +23,14 @@ We apply the monorepo architecture; see each workspace's `README.md` for details
 Use the npm command's option `--workspace` with a workspace name to execute workspace-specific npm scripts, like:
 
 ```
-$ npm run develop --workspace=@viron/app
-$ npm run build --workspace=@viron/app --workspace=@viron/lib
+npm run dev --workspace=@viron/app
+npm run build --workspace=@viron/app --workspace=@viron/lib
 ```
 
 Use the `--workspaces` option to execute a npm script on each workspace.
 
 ```
-$ npm run test --workspaces
+npm run test --workspaces
 ```
 
 Below is a quick guide to code contribution.

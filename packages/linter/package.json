@@ -7,11 +7,9 @@
     "dist"
   ],
   "scripts": {
-    "pre-commit": "echo PRE-COMMIT",
-    "pre-push": "echo PRE-PUSH",
-    "build": "npm run clean && tsc",
-    "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
-    "test": "echo TEST"
+    "prebuild": "npm run clean",
+    "build": "tsc",
+    "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo"
   },
   "dependencies": {
     "ajv": "^6.12.6"

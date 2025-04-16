@@ -1,4 +1,4 @@
-FROM node:16
+FROM node:22
 
 RUN mkdir -p /viron/example/nodejs
 RUN mkdir -p /viron/packages/nodejs
@@ -29,4 +29,5 @@ EXPOSE 3000
 USER root
 
 WORKDIR $HOME/example/nodejs
-CMD npm run dev
+ENTRYPOINT ["npm"]
+CMD ["run", "dev"]
