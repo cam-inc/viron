@@ -49,8 +49,6 @@ As we use Gatsby of version 2, we need to do some tricks to architect a UI tree.
 <RootWrapper>
 ```
 
-navigations
-
 - RootWrapper: This stays at the outermost layer of the application wrapping Root element which is gatsby's default root element.
 - Root: This is Gatsby's default root element.
 - PageWrapper: This stays at the outside of the page page elements. It will get rendered as navigations happen.
