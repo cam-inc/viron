@@ -68,10 +68,15 @@ const data = {
 
 export function AppSidebar() {
   const { t } = useTranslation();
-  const { languages, changeLanguage, language: currentLanguage } = useI18n();
+  const {
+    languages,
+    changeLanguage,
+    language: currentLanguage,
+    originalPath,
+  } = useI18n();
 
   return (
-    <Sidebar>
+    <Sidebar variant="inset">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -93,7 +98,10 @@ export function AppSidebar() {
             <SidebarMenu>
               {data.navMain.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={originalPath.startsWith(item.to)}
+                  >
                     <Link to={item.to}>
                       <item.icon />
                       <span>{t(item.title)}</span>

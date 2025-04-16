@@ -5,13 +5,19 @@ import { Props as BaseProps } from '~/components';
 
 type Props = Omit<BaseProps, 'on'> &
   Pick<ComponentProps<typeof I18nextLink>, 'to' | 'language'>;
-const Link: React.FC<Props> = ({ className = '', to, language, children }) => {
+const Link: React.FC<Props> = ({
+  className = '',
+  to,
+  language,
+  children,
+  ...props
+}) => {
   const isInternal = /^\/(?!\/)/.test(to);
   if (isInternal) {
     return (
       // TODO: 直す
       // @ts-expect-error
-      <I18nextLink to={to} className={className} language={language}>
+      <I18nextLink to={to} className={className} language={language} {...props}>
         {children}
       </I18nextLink>
     );
