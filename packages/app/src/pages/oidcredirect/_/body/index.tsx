@@ -1,4 +1,3 @@
-import classnames from 'classnames';
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useState } from 'react';
 import Error, { useError } from '~/components/error';
@@ -6,16 +5,15 @@ import Request from '~/components/request';
 import Spinner from '~/components/spinner';
 import { BaseError } from '~/errors';
 import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
-import { Props as LayoutProps } from '~/layouts';
 import { KEY, get } from '~/storage';
 import { useEndpointListItemGlobalStateValue } from '~/store';
 import { COLOR_SYSTEM, EndpointID } from '~/types';
 import { RequestValue } from '~/types/oas';
 
-export type Props = Parameters<LayoutProps['renderBody']>[0] & {
+export type Props = {
   search: string;
 };
-const Body: React.FC<Props> = ({ className = '', search }) => {
+const Body: React.FC<Props> = ({ search }) => {
   const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
   const setError = error.setError;
   const [isPending, setIsPending] = useState<boolean>(true);
@@ -95,12 +93,7 @@ const Body: React.FC<Props> = ({ className = '', search }) => {
 
   if (isPending) {
     return (
-      <div
-        className={classnames(
-          'p-4 flex justify-center items-center h-full',
-          className
-        )}
-      >
+      <div className="p-4 flex justify-center items-center h-full">
         <Spinner className="w-8" on={COLOR_SYSTEM.BACKGROUND} />
       </div>
     );
@@ -110,7 +103,7 @@ const Body: React.FC<Props> = ({ className = '', search }) => {
   }
   if (signinOidcCallback.error) {
     return (
-      <div className={classnames('p-4', className)}>
+      <div className="p-4">
         <Error on={COLOR_SYSTEM.BACKGROUND} error={signinOidcCallback.error} />
       </div>
     );
