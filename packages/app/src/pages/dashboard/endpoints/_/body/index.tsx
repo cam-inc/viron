@@ -1,10 +1,8 @@
 import classnames from 'classnames';
 import { Plus } from 'lucide-react';
-import React, { PropsWithChildren, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Sortable from 'sortablejs';
 import EndpointsEmptyIcon from '~/components/endpoinitsEmptyIcon';
-import ChevronDownIcon from '~/components/icon/chevronDown/outline';
-import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import {
   Accordion,
   AccordionContent,
@@ -12,12 +10,12 @@ import {
   AccordionTrigger,
 } from '~/components/ui/accordion';
 import { Button } from '~/components/ui/button';
+import { Dialog, DialogTrigger } from '~/components/ui/dialog';
 import { UN_GROUP_ID } from '~/constants';
-import { useEndpoint, useEndpointGroupToggle } from '~/hooks/endpoint';
+import { useEndpoint } from '~/hooks/endpoint';
 import { Trans, useTranslation } from '~/hooks/i18n';
 import { cn } from '~/lib/utils';
-import Modal, { useModal } from '~/portals/modal';
-import { COLOR_SYSTEM, Endpoint, EndpointGroup } from '~/types';
+import { COLOR_SYSTEM, Endpoint } from '~/types';
 import Menu from '../../../_/menu';
 import Add from './add/';
 import Item from './item/';
@@ -27,110 +25,73 @@ const Body: React.FC<Props> = ({ className }) => {
   const { t } = useTranslation();
   const { listByGroup, listUngrouped } = useEndpoint();
   // Add modal.
-  const modal = useModal({});
+  const [addEndpointDialogOpen, setAddEndpointDialogOpen] = useState(false);
 
   return (
-    <>
-      <div className={cn('flex flex-col py-4 md:py-6 px-4 lg:px-6', className)}>
-        {/* Head */}
-        <div className="flex justify-end items-center">
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={modal.open}>
-              <Plus />
-              {t('addEndpointButtonLabel')}
-            </Button>
-            <Menu />
-          </div>
-        </div>
-        {/* Body */}
-        <div className="py-2 space-y-4">
-          {!!listByGroup.length && (
-            <Accordion
-              type="multiple"
-              defaultValue={listByGroup.map((item) => item.group.id)}
-            >
-              {listByGroup.map((item) => (
-                <AccordionItem key={item.group.id} value={item.group.id}>
-                  <AccordionTrigger>{item.group.name}</AccordionTrigger>
-                  <AccordionContent className="space-y-4">
-                    <p className="text-sm text-muted-foreground">
-                      {item.group.description}
-                    </p>
-                    <EndpointList list={item.list} groupId={item.group.id} />
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          )}
-          {!!listUngrouped.length && (
-            <EndpointList list={listUngrouped} groupId={UN_GROUP_ID} />
-          )}
-          {!listByGroup.length && !listUngrouped.length && (
-            <div className="flex flex-col justify-center items-center py-30 gap-6">
-              <EndpointsEmptyIcon
-                className="w-[182px] text-thm-on-background-slight"
-                on={COLOR_SYSTEM.BACKGROUND}
-              />
-              <p className="text-center text-thm-on-background-low">
-                <Trans
-                  t={t}
-                  i18nKey="dashboard.endpoints.emptyMessage"
-                  components={{
-                    br: <br />,
-                  }}
-                />
-              </p>
-            </div>
-          )}
+    <div className={cn('flex flex-col py-4 md:py-6 px-4 lg:px-6', className)}>
+      {/* Head */}
+      <div className="flex justify-end items-center">
+        <div className="flex items-center gap-2">
+          <Dialog
+            open={addEndpointDialogOpen}
+            onOpenChange={setAddEndpointDialogOpen}
+          >
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <Plus />
+                {t('addEndpointButtonLabel')}
+              </Button>
+            </DialogTrigger>
+            <Add onOpenChange={setAddEndpointDialogOpen} />
+          </Dialog>
+          <Menu />
         </div>
       </div>
-      <Modal {...modal.bind}>
-        <Add onAdd={modal.close} onCancel={modal.close} />
-      </Modal>
-    </>
-  );
-};
-export default Body;
-
-type GroupAccordionProps = PropsWithChildren<{
-  group: EndpointGroup;
-}>;
-const GroupAccordion: React.FC<GroupAccordionProps> = ({ group, children }) => {
-  const { isOpen, toggle } = useEndpointGroupToggle(group.id);
-  const ToggleIcon = isOpen ? ChevronDownIcon : ChevronRightIcon;
-
-  return (
-    <div>
-      {/* Head */}
-      <button
-        className="flex gap-1 w-full hover:bg-thm-on-background-faint py-2 rounded"
-        onClick={toggle}
-      >
-        <span className="p-0.5">
-          <ToggleIcon className="w-4 h-4" />
-        </span>
-        <span className="text-start">
-          <span className="block text-sm text-thm-on-background font-bold">
-            {group.name}
-          </span>
-          {group.description && (
-            <span className="block text-sm text-thm-on-background-low truncate">
-              {group.description}
-            </span>
-          )}
-        </span>
-      </button>
       {/* Body */}
-      <div
-        className={classnames('mt-2', {
-          hidden: !isOpen,
-        })}
-      >
-        {children}
+      <div className="py-2 space-y-4">
+        {!!listByGroup.length && (
+          <Accordion
+            type="multiple"
+            defaultValue={listByGroup.map((item) => item.group.id)}
+          >
+            {listByGroup.map((item) => (
+              <AccordionItem key={item.group.id} value={item.group.id}>
+                <AccordionTrigger>{item.group.name}</AccordionTrigger>
+                <AccordionContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    {item.group.description}
+                  </p>
+                  <EndpointList list={item.list} groupId={item.group.id} />
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        )}
+        {!!listUngrouped.length && (
+          <EndpointList list={listUngrouped} groupId={UN_GROUP_ID} />
+        )}
+        {!listByGroup.length && !listUngrouped.length && (
+          <div className="flex flex-col justify-center items-center py-30 gap-6">
+            <EndpointsEmptyIcon
+              className="w-[182px] text-thm-on-background-slight"
+              on={COLOR_SYSTEM.BACKGROUND}
+            />
+            <p className="text-center text-thm-on-background-low">
+              <Trans
+                t={t}
+                i18nKey="dashboard.endpoints.emptyMessage"
+                components={{
+                  br: <br />,
+                }}
+              />
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
 };
+export default Body;
 
 type EndpointListProps = {
   groupId: string;

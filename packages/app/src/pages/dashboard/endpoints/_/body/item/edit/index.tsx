@@ -107,7 +107,7 @@ const EditEndpoint: React.FC<Props> = ({ onOpenChange, endpoint }) => {
         <DialogTitle>{t('editEndpoint.title')}</DialogTitle>
       </DialogHeader>
       <Form {...form}>
-        <form id={FORM_ID} className="space-y-8" onSubmit={handleSubmit}>
+        <form id={FORM_ID} className="space-y-4 py-4" onSubmit={handleSubmit}>
           {formState.errors.manual?.message && (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
