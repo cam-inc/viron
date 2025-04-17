@@ -5,6 +5,12 @@ import Sortable from 'sortablejs';
 import EndpointsEmptyIcon from '~/components/endpoinitsEmptyIcon';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '~/components/ui/accordion';
 import { Button } from '~/components/ui/button';
 import { UN_GROUP_ID } from '~/constants';
 import { useEndpoint, useEndpointGroupToggle } from '~/hooks/endpoint';
@@ -37,20 +43,24 @@ const Body: React.FC<Props> = ({ className }) => {
           </div>
         </div>
         {/* Body */}
-        <div className="space-y-2">
+        <div className="py-2 space-y-4">
           {!!listByGroup.length && (
-            <ul>
+            <Accordion
+              type="multiple"
+              defaultValue={listByGroup.map((item) => item.group.id)}
+            >
               {listByGroup.map((item) => (
-                <li
-                  key={item.group.id}
-                  className="py-1 border-b border-thm-on-background-faint"
-                >
-                  <GroupAccordion group={item.group}>
+                <AccordionItem key={item.group.id} value={item.group.id}>
+                  <AccordionTrigger>{item.group.name}</AccordionTrigger>
+                  <AccordionContent className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      {item.group.description}
+                    </p>
                     <EndpointList list={item.list} groupId={item.group.id} />
-                  </GroupAccordion>
-                </li>
+                  </AccordionContent>
+                </AccordionItem>
               ))}
-            </ul>
+            </Accordion>
           )}
           {!!listUngrouped.length && (
             <EndpointList list={listUngrouped} groupId={UN_GROUP_ID} />
@@ -195,10 +205,7 @@ const EndpointList: React.FC<EndpointListProps> = ({
   return (
     <ul
       ref={ref}
-      className={classnames(
-        'grid grid-cols-1 lg:grid-cols-2 gap-6 py-2',
-        className
-      )}
+      className={classnames('grid grid-cols-1 lg:grid-cols-2 gap-6', className)}
     >
       {list.map((item) => (
         <li key={item.id} data-id={item.id} className="cursor-grab">
