@@ -1,6 +1,10 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import { Button } from '~/components/ui/button';
 import { Props as LayoutProps } from '~/layouts';
-import { Theme, THEME } from '~/types/oas';
+import {
+  useAppThemeGlobalStateSet,
+  useAppThemeGlobalStateValue,
+} from '~/store';
 import { getTokens, Tokens } from '~/utils/colorSystem';
 import Mode from './mode';
 import Preview from './preview';
@@ -10,12 +14,16 @@ import Tones from './tones';
 export type Props = Parameters<LayoutProps['renderBody']>[0];
 const Body: React.FC<Props> = ({ className = '' }) => {
   // Theme
-  const [theme, setTheme] = useState<Theme>(THEME.RED);
+  const theme = useAppThemeGlobalStateValue();
+  const setTheme = useAppThemeGlobalStateSet();
   const handleThemeRequestChange = useCallback<
     ThemeSelectProps['onRequestChange']
-  >((theme) => {
-    setTheme(theme);
-  }, []);
+  >(
+    (theme) => {
+      setTheme(theme);
+    },
+    [setTheme]
+  );
 
   // tokens
   const tokens = useMemo<Tokens>(() => getTokens(theme), [theme]);

@@ -71,7 +71,10 @@ const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
   return (
     <>
       {style}
-      <div id="root" className={cn('relative', `theme-${theme}`)}>
+      <div
+        id="root"
+        className={cn('relative', `theme-${theme.replace(/\s/g, '-')}`)}
+      >
         <div>{children}</div>
         <DrawerWrapper className="fixed inset-0 z-wrapper-drawer" />
         <ModalWrapper className="fixed inset-0 z-wrapper-modal" />
