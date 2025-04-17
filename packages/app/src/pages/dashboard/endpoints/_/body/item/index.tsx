@@ -1,21 +1,26 @@
-import classNames from 'classnames';
+import {
+  EllipsisVertical,
+  Pencil,
+  Info as InfoIcon,
+  QrCode,
+  Trash,
+  ChevronRight,
+} from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Props as BaseProps } from '~/components';
-import Skelton from '~/components/Skelton';
-import Button, { Props as ButtonProps } from '~/components/button';
-import IconButton from '~/components/button/icon';
-import Error from '~/components/error/';
-import InformationCircleIcon from '~/components/icon/informationCircle/outline';
-import MoreIcon from '~/components/icon/more/outline';
-import PencilIcon from '~/components/icon/pencil/outline';
-import QrcodeIcon from '~/components/icon/qrcode/outline';
-import TerminalIcon from '~/components/icon/terminal/outline';
-import TrashIcon from '~/components/icon/trash/outline';
+import { Badge } from '~/components/ui/badge';
+import { Button } from '~/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from '~/components/ui/card';
+import { Dialog, DialogTrigger } from '~/components/ui/dialog';
+import { Skeleton } from '~/components/ui/skeleton';
 import { BaseError } from '~/errors';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
-import Modal, { useModal } from '~/portals/modal';
-import Popover, { usePopover } from '~/portals/popover';
 import { Authentication, COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document } from '~/types/oas';
 import EditEndpoint from './edit';
@@ -24,6 +29,12 @@ import Qrcode from './qrcode';
 import Signin from './signin/';
 import Signout, { Props as SignoutProps } from './signout/';
 import Thumbnail from './thumbnail/';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export type Props = {
   endpoint: Endpoint;
@@ -92,16 +103,7 @@ const Item: React.FC<Props> = ({ endpoint }) => {
     error,
   ]);
 
-  return (
-    <article
-      className={classNames('p-5 border rounded-lg h-full', {
-        'bg-thm-background border-thm-on-background-low': !error,
-        'bg-thm-surface border-transparent': !!error,
-      })}
-    >
-      {content}
-    </article>
-  );
+  return content;
 };
 export default Item;
 
@@ -115,37 +117,13 @@ const _Item: React.FC<{
   const { t } = useTranslation();
   const { navigate, removeEndpoint } = useEndpoint();
 
-  const menuPopover = usePopover<HTMLDivElement>();
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
-  const editModal = useModal({});
-  const infoModal = useModal({});
-  const qrcodeModal = useModal({});
-
-  const handleMenuClick = useCallback(() => {
-    menuPopover.open();
-  }, [menuPopover]);
-
-  const handleEditClick = useCallback<ButtonProps['onClick']>(() => {
-    menuPopover.close();
-    editModal.open();
-  }, [menuPopover, editModal]);
-
-  const handleInfoClick = useCallback<ButtonProps['onClick']>(() => {
-    menuPopover.close();
-    infoModal.open();
-  }, [menuPopover, infoModal]);
-
-  const handleQrcodeClick = useCallback<ButtonProps['onClick']>(() => {
-    menuPopover.close();
-    qrcodeModal.open();
-  }, [menuPopover, qrcodeModal]);
-
-  const handleRemoveClick = useCallback<ButtonProps['onClick']>(() => {
-    menuPopover.close();
+  const handleRemoveClick = useCallback(() => {
     removeEndpoint(endpoint.id);
-  }, [endpoint, removeEndpoint, menuPopover]);
+  }, [endpoint, removeEndpoint]);
 
-  const handleEnterClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleEnterClick = useCallback(() => {
     navigate(endpoint);
   }, [endpoint, navigate]);
 
@@ -154,51 +132,80 @@ const _Item: React.FC<{
   }, [onRequestRefresh]);
 
   return (
-    <>
-      <div className="flex flex-col h-full">
-        <div className="flex justify-between items-center gap-2.5">
-          {/* thumbnail */}
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-3">
           <Thumbnail
             className="flex-none w-10 h-10"
             endpoint={endpoint}
             document={document || undefined}
           />
-          <div className="text-thm-on-background text-base font-bold break-all grow">
-            {endpoint.id}
-          </div>
-          {/* Popover icon */}
-          <div className="flex-none">
-            <div ref={menuPopover.targetRef}>
-              <IconButton
-                on={COLOR_SYSTEM.BACKGROUND}
-                onClick={handleMenuClick}
-              >
-                <MoreIcon />
-              </IconButton>
-            </div>
-          </div>
+          <div className="text-xl font-bold break-all grow">{endpoint.id}</div>
+          {/* TODO: ステータス表示 */}
+          {!!error && <Badge variant="destructive">error</Badge>}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <EllipsisVertical />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+                <DialogTrigger asChild>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <Pencil />
+                    {t('endpointEditButtonLabel')}
+                  </DropdownMenuItem>
+                </DialogTrigger>
+                <EditEndpoint
+                  endpoint={endpoint}
+                  onOpenChange={setEditDialogOpen}
+                />
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <InfoIcon />
+                    {t('endpointInformationButtonLabel')}
+                  </DropdownMenuItem>
+                </DialogTrigger>
+                <Info endpoint={endpoint} document={document || undefined} />
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <QrCode />
+                    {t('endpointQRCodeShareButtonLabel')}
+                  </DropdownMenuItem>
+                </DialogTrigger>
+                <Qrcode endpoint={endpoint} />
+              </Dialog>
+              <DropdownMenuItem onClick={handleRemoveClick}>
+                <Trash />
+                {t('removeEndpointButtonLabel')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-        {/* Info */}
-        <div className="flex flex-col mt-4">
-          <div className="text-thm-on-background-low text-xxs break-all font-bold">
-            {document?.info.title || authentication?.oas.info.title || '---'}
-          </div>
-          <div className="text-thm-on-background-low text-xxs break-all">
-            {endpoint.url}
-          </div>
+      </CardHeader>
+      <CardContent>
+        <div className="text-muted-foreground text-xxs break-all font-bold">
+          {document?.info.title || authentication?.oas.info.title || '---'}
         </div>
-        <div className="mt-4 grow flex items-end">
+        <div className="text-muted-foreground text-xxs break-all">
+          {endpoint.url}
+        </div>
+      </CardContent>
+      <CardFooter>
+        <div className="w-full flex items-center justify-end gap-2">
           {!!authentication && (
             <>
               {document ? (
-                <div className="grow gap-2 flex items-center justify-end">
-                  <Button
-                    className="grow max-w-50%"
-                    cs={COLOR_SYSTEM.PRIMARY}
-                    IconRight={TerminalIcon}
-                    label={t('enterEndpoint')}
-                    onClick={handleEnterClick}
-                  />
+                <>
+                  <Button onClick={handleEnterClick}>
+                    {t('enterEndpoint')}
+                    <ChevronRight />
+                  </Button>
                   {authentication.list.find(
                     (item) => item.type === 'signout'
                   ) && (
@@ -208,107 +215,18 @@ const _Item: React.FC<{
                       onSignout={handleSignout}
                     />
                   )}
-                </div>
+                </>
               ) : (
-                <div className="flex-1">
-                  <Signin endpoint={endpoint} authentication={authentication} />
-                </div>
+                <Signin endpoint={endpoint} authentication={authentication} />
               )}
             </>
           )}
-          {!!error && (
-            <Error.renewal
-              className="grow"
-              on={COLOR_SYSTEM.SURFACE}
-              error={error}
-            />
-          )}
         </div>
-      </div>
-      {/* Menu */}
-      <Popover {...menuPopover.bind}>
-        <div>
-          <Button
-            variant="text"
-            on={COLOR_SYSTEM.SURFACE}
-            Icon={PencilIcon}
-            label={t('endpointEditButtonLabel')}
-            onClick={handleEditClick}
-          />
-        </div>
-        <div>
-          <Button
-            variant="text"
-            on={COLOR_SYSTEM.SURFACE}
-            Icon={InformationCircleIcon}
-            label={t('endpointInformationButtonLabel')}
-            onClick={handleInfoClick}
-          />
-        </div>
-        <div>
-          <Button
-            variant="text"
-            on={COLOR_SYSTEM.SURFACE}
-            Icon={QrcodeIcon}
-            label={t('endpointQRCodeShareButtonLabel')}
-            onClick={handleQrcodeClick}
-          />
-        </div>
-        <div>
-          <Button
-            variant="text"
-            on={COLOR_SYSTEM.SURFACE}
-            Icon={TrashIcon}
-            label={t('removeEndpointButtonLabel')}
-            onClick={handleRemoveClick}
-          />
-        </div>
-      </Popover>
-      {/* Edit */}
-      <Modal {...editModal.bind}>
-        <EditEndpoint
-          onAdd={editModal.close}
-          onCancel={editModal.close}
-          endpoint={endpoint}
-        />
-      </Modal>
-      {/* Info */}
-      <Modal {...infoModal.bind}>
-        <Info endpoint={endpoint} document={document || undefined} />
-      </Modal>
-      {/* QRCode */}
-      <Modal {...qrcodeModal.bind}>
-        <Qrcode endpoint={endpoint} />
-      </Modal>
-    </>
+      </CardFooter>
+    </Card>
   );
 };
 
-const SkeltonItem: React.FC<BaseProps> = ({ on }) => {
-  return (
-    <div className="flex flex-col h-full">
-      <div className="flex justify-between items-center gap-2.5">
-        <Skelton className="w-10 h-10" on={on} variant="rounded" />
-        <Skelton className="text-base w-full flex-1" on={on} variant="text" />
-      </div>
-      <div className="flex flex-col mt-6 space-y-1">
-        <Skelton className="text-xxs" on={on} variant="text" />
-        <Skelton className="text-xxs" on={on} variant="text" />
-      </div>
-      <div className="flex justify-center gap-4 mt-2">
-        <div className="flex basis-15 flex-col items-center gap-1">
-          <Skelton className="w-11 h-11" on={on} variant="circular" />
-          <Skelton className="w-full text-xs" on={on} variant="text" />
-        </div>
-        <div className="flex basis-15 flex-col items-center gap-1">
-          <Skelton className="w-11 h-11" on={on} variant="circular" />
-          <Skelton className="w-full text-xs" on={on} variant="text" />
-        </div>
-        <div className="flex basis-15 flex-col items-center gap-1">
-          <Skelton className="w-11 h-11" on={on} variant="circular" />
-          <Skelton className="w-full text-xs" on={on} variant="text" />
-        </div>
-      </div>
-    </div>
-  );
+const SkeltonItem: React.FC<BaseProps> = () => {
+  return <Skeleton className="h-[206px] rounded-xl" />;
 };

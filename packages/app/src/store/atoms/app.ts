@@ -25,5 +25,5 @@ export const screen = atom<Screen>({
 
 export const theme = atom<Theme>({
   key: `${NAME}.${KEY.THEME}`,
-  default: THEME.BLUE,
+  default: 'default',
 });

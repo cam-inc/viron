@@ -110,7 +110,7 @@ export const THEME = {
   NEON_ROSE: 'neon rose',
   ELECTRIC_CRIMSON: 'electric crimson',
 } as const;
-export type Theme = (typeof THEME)[keyof typeof THEME];
+export type Theme = (typeof THEME)[keyof typeof THEME] | 'default';
 
 // [extended] Common setting for page contents that are type of table.
 export type X_Number = {

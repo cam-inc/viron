@@ -1,14 +1,13 @@
+import { LogOut } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
-import Button, { Props as ButtonProps } from '~/components/button';
 import Error, { useError } from '~/components/error';
-import LogoutIcon from '~/components/icon/logout/outline';
 import Request from '~/components/request';
+import { Button } from '~/components/ui/button';
 import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
 import Drawer, { useDrawer } from '~/portals/drawer';
 import { Authentication, COLOR_SYSTEM, Endpoint } from '~/types';
 import { RequestValue } from '~/types/oas';
-
 export type Props = {
   endpoint: Endpoint;
   authentication: Authentication;
@@ -25,7 +24,7 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
   const setError = error.setError;
 
   const drawer = useDrawer();
-  const handleClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleClick = useCallback(() => {
     drawer.open();
   }, [drawer]);
 
@@ -50,14 +49,10 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
 
   return (
     <>
-      <Button
-        variant="outlined"
-        className="grow max-w-50%"
-        on={COLOR_SYSTEM.BACKGROUND}
-        IconRight={LogoutIcon}
-        label={t('signout')}
-        onClick={handleClick}
-      />
+      <Button variant="outline" onClick={handleClick}>
+        {t('signout')}
+        <LogOut />
+      </Button>
       <Drawer {...drawer.bind}>
         <Request
           on={COLOR_SYSTEM.SURFACE}

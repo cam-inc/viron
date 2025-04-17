@@ -1,40 +1,43 @@
 import { PageProps, graphql } from 'gatsby';
-import React, { useCallback } from 'react';
+import React from 'react';
+import { AppSidebar } from '~/components/app-sidebar';
 import Metadata from '~/components/metadata';
+import { Separator } from '~/components/ui/separator';
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from '~/components/ui/sidebar';
+import { useTranslation } from '~/hooks/i18n';
 import useTheme from '~/hooks/theme';
-import Layout, { Props as LayoutProps } from '~/layouts/index';
-import { useAppScreenGlobalStateValue } from '~/store';
-import Appbar from '../_/appBar';
-import Navigation from '../_/navigation';
 import Body from './_/body';
 
 type Props = PageProps;
 const DashboardGroupsPage: React.FC<Props> = () => {
   useTheme();
-  const { lg } = useAppScreenGlobalStateValue();
-
-  const renderAppBar = useCallback<NonNullable<LayoutProps['renderAppBar']>>(
-    (args) => <Appbar {...args} />,
-    []
-  );
-
-  const renderNavigation = useCallback<
-    NonNullable<LayoutProps['renderNavigation']>
-  >((args) => <Navigation {...args} />, []);
-
-  const renderBody = useCallback<LayoutProps['renderBody']>(
-    (args) => <Body {...args} />,
-    []
-  );
+  const { t } = useTranslation();
 
   return (
     <>
       <Metadata title="Dashboard" />
-      <Layout
-        renderAppBar={lg ? undefined : renderAppBar}
-        renderNavigation={renderNavigation}
-        renderBody={renderBody}
-      />
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <header className="group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 flex h-12 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear">
+            <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
+              <SidebarTrigger className="-ml-1" />
+              <Separator
+                orientation="vertical"
+                className="mx-2 data-[orientation=vertical]:h-4"
+              />
+              <h1 className="text-base font-medium">
+                {t('internalPagePaths.groups')}
+              </h1>
+            </div>
+          </header>
+          <Body className="flex-1" />
+        </SidebarInset>
+      </SidebarProvider>
     </>
   );
 };

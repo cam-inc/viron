@@ -1,9 +1,18 @@
-import classnames from 'classnames';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
-import ChevronDownIcon from '~/components/icon/chevronDown/outline';
-import ChevronRightIcon from '~/components/icon/chevronRight/outline';
-import FolderIcon from '~/components/icon/folder/outline';
-import FolderOpenIcon from '~/components/icon/folderOpen/outline';
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from '~/components/ui/collapsible';
+import {
+  SidebarGroup,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+} from '~/components/ui/sidebar';
 import { Page, PageId } from '~/types/oas';
 
 type Partial = {
@@ -74,13 +83,17 @@ const _Pages: React.FC<Props> = ({ pages, selectedPageId, onSelect }) => {
   }, [pages]);
 
   return (
-    <GroupOrPage
-      pages={pages}
-      depth={0}
-      list={tree.children}
-      selectedPageId={selectedPageId}
-      onSelect={onSelect}
-    />
+    <SidebarGroup>
+      <SidebarMenu>
+        <GroupOrPage
+          pages={pages}
+          depth={0}
+          list={tree.children}
+          selectedPageId={selectedPageId}
+          onSelect={onSelect}
+        />
+      </SidebarMenu>
+    </SidebarGroup>
   );
 };
 export default _Pages;
@@ -93,7 +106,7 @@ const GroupOrPage: React.FC<{
   onSelect: (pageId: PageId) => void;
 }> = ({ pages, depth, list, selectedPageId, onSelect }) => {
   return (
-    <ul>
+    <>
       {list.map((item, idx) => {
         let content: JSX.Element;
         if (typeof item === 'string') {
@@ -116,13 +129,10 @@ const GroupOrPage: React.FC<{
             />
           );
         }
-        return (
-          <li className="pt-1" key={idx}>
-            {content}
-          </li>
-        );
+
+        return <SidebarMenuItem>{content}</SidebarMenuItem>;
       })}
-    </ul>
+    </>
   );
 };
 
@@ -137,42 +147,32 @@ const Group: React.FC<{
   const handleClick = () => {
     setIsOpened((currVal) => !currVal);
   };
-
   return (
-    <div>
-      <button
-        className="rounded text-start p-1.5 w-full text-thm-on-surface-low text-xs flex items-center justify-between gap-1 hover:bg-thm-on-surface-faint focus-visible:ring-2 ring-thm-on-surface-low focus:outline-none"
-        onClick={handleClick}
-      >
-        {isOpened ? (
-          <ChevronDownIcon className="w-[1.25em] h-[1.25em] flex-none" />
-        ) : (
-          <ChevronRightIcon className="w-[1.25em] h-[1.25em] flex-none" />
-        )}
-        {isOpened ? (
-          <FolderOpenIcon className="w-[1.5em] h-[1.5em] flex-none" />
-        ) : (
-          <FolderIcon className="w-[1.5em] h-[1.5em] flex-none" />
-        )}
-        <span className="w-0 flex-1 truncate font-bold">{partial.group}</span>
-      </button>
-      <div
-        className={classnames(
-          'ml-3 border-l border-thm-on-surface-slight pl-1',
-          {
-            hidden: !isOpened,
-          }
-        )}
-      >
-        <GroupOrPage
-          pages={pages}
-          depth={depth + 1}
-          list={partial.children}
-          selectedPageId={selectedPageId}
-          onSelect={onSelect}
-        />
-      </div>
-    </div>
+    <Collapsible defaultOpen className="group/collapsible">
+      <SidebarMenuItem>
+        <CollapsibleTrigger className="flex justify-between items-center w-full gap-2">
+          {partial.group}
+          {isOpened ? (
+            <ChevronDown className="w-[1.25em] h-[1.25em] flex-none" />
+          ) : (
+            <ChevronRight className="w-[1.25em] h-[1.25em] flex-none" />
+          )}
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <SidebarMenuSub className="pr-0 mr-0">
+            <SidebarMenuSubItem>
+              <GroupOrPage
+                pages={pages}
+                depth={depth + 1}
+                list={partial.children}
+                selectedPageId={selectedPageId}
+                onSelect={onSelect}
+              />
+            </SidebarMenuSubItem>
+          </SidebarMenuSub>
+        </CollapsibleContent>
+      </SidebarMenuItem>
+    </Collapsible>
   );
 };
 
@@ -186,17 +186,8 @@ const _Page: React.FC<{
   };
 
   return (
-    <button
-      className={classnames(
-        'rounded text-start py-1.5 px-3 w-full text-xs focus-visible:ring-2 ring-thm-on-surface-low focus:outline-none truncate',
-        {
-          'text-thm-on-surface-faint bg-thm-on-surface-low': isSelected,
-          'text-thm-on-surface-low hover:bg-thm-on-surface-faint': !isSelected,
-        }
-      )}
-      onClick={handleClick}
-    >
+    <SidebarMenuButton isActive={isSelected} onClick={handleClick}>
       {page.title}
-    </button>
+    </SidebarMenuButton>
   );
 };

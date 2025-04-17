@@ -1,38 +1,27 @@
 import { PageProps, graphql } from 'gatsby';
+import { Frown } from 'lucide-react';
 import React, { useCallback } from 'react';
+import { AppSidebar } from '~/components/app-sidebar';
 import Metadata from '~/components/metadata';
+import { SidebarInset, SidebarProvider } from '~/components/ui/sidebar';
 import useTheme from '~/hooks/theme';
-import Layout, { Props as LayoutProps } from '~/layouts';
-import AppBar from './_/appBar';
-import Body from './_/body';
-import Navigation from './_/navigation';
 
 type Props = PageProps;
 const NotfoundPage: React.FC<Props> = () => {
   useTheme();
 
-  const renderAppBar = useCallback<NonNullable<LayoutProps['renderAppBar']>>(
-    (args) => <AppBar {...args} />,
-    []
-  );
-
-  const renderNavigation = useCallback<
-    NonNullable<LayoutProps['renderNavigation']>
-  >((args) => <Navigation {...args} />, []);
-
-  const renderBody = useCallback<LayoutProps['renderBody']>(
-    (args) => <Body {...args} />,
-    []
-  );
-
   return (
     <>
       <Metadata title="NotFound" />
-      <Layout
-        renderAppBar={renderAppBar}
-        renderNavigation={renderNavigation}
-        renderBody={renderBody}
-      />
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset className="justify-center">
+          <div className="flex flex-col items-center gap-2">
+            <Frown className="size-6" />
+            <h1 className="text-xl font-bold">Page Not Found...</h1>
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
     </>
   );
 };

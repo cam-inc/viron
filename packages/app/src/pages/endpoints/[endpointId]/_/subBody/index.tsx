@@ -1,18 +1,15 @@
-import classnames from 'classnames';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Tabs, { Props as TabsProps } from '~/components/tabs';
-import { Props as LayoutProps } from '~/layouts';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document, Content } from '~/types/oas';
 import _Content, { Props as ContentProps } from '../content';
 
-type Props = Parameters<NonNullable<LayoutProps['renderSubBody']>>[0] & {
+type Props = {
   endpoint: Endpoint;
   document: Document;
   contents: Content[];
 } & Pick<ContentProps, 'onPin' | 'onUnpin'>;
 const Body: React.FC<Props> = ({
-  className,
   endpoint,
   document,
   contents,
@@ -48,7 +45,7 @@ const Body: React.FC<Props> = ({
   }, []);
 
   return (
-    <div className={classnames('h-full flex flex-col', className)}>
+    <div className="h-full flex flex-col">
       <div className="flex-none overflow-x-scroll overscroll-x-contain">
         <Tabs
           on={COLOR_SYSTEM.BACKGROUND}

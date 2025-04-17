@@ -4,14 +4,11 @@ import ArrowLeftIcon from '~/components/icon/arrowLeft/outline';
 import Link from '~/components/link';
 import Logo from '~/components/logo';
 import Navigation, { Props as NavigationProps } from '~/components/navigation';
-import { Props as LayoutProps } from '~/layouts';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document } from '~/types/oas';
 import Pages, { Props as PagesProps } from './pages';
 
-export type Props = Parameters<
-  NonNullable<LayoutProps['renderNavigation']>
->[0] & {
+export type Props = {
   pages: PagesProps['pages'];
   selectedPageId: PagesProps['selectedPageId'];
   onPageSelect: PagesProps['onSelect'];
@@ -24,40 +21,35 @@ const _Navigation: React.FC<Props> = ({
   onPageSelect,
   document,
   endpoint,
-  className,
-  closeNavigation,
 }) => {
   const handlePageSelect = useCallback<Props['onPageSelect']>(
     (...args) => {
-      closeNavigation();
       onPageSelect(...args);
     },
-    [closeNavigation, onPageSelect]
+    [onPageSelect]
   );
 
   const renderHead = useCallback<
     NonNullable<NavigationProps['renderHead']>
   >(() => {
-    // Endpoint Info.
-    const thumbnail = document.info['x-thumbnail'] ? (
-      <img
-        className="object-contain rounded"
-        src={document.info['x-thumbnail']}
-      />
-    ) : (
-      <Logo
-        className="w-6 h-6"
-        left="text-thm-on-background"
-        right="text-thm-on-background-low"
-      />
-    );
     return (
       <div className="m-1">
         <Link className="group focus:outline-none" to="/dashboard/endpoints">
           <article className="flex justify-start items-center py-3 px-3 gap-2 group-focus:ring-4 ring-thm-on-surface-low hover:bg-thm-on-surface-faint rounded">
             <ArrowLeftIcon className="w-4 h-4 flex-none group-hover:animate-move-left-and-back group-focus:animate-move-left-and-back" />
             <div className="flex-none w-6 h-6 flex justify-center">
-              {thumbnail}
+              {document.info['x-thumbnail'] ? (
+                <img
+                  className="object-contain rounded"
+                  src={document.info['x-thumbnail']}
+                />
+              ) : (
+                <Logo
+                  className="w-6 h-6"
+                  left="text-thm-on-background"
+                  right="text-thm-on-background-low"
+                />
+              )}
             </div>
             <div className="flex-1 w-0">
               <h1 className="text-xxs font-bold text-thm-on-surface-low truncate">
@@ -89,7 +81,7 @@ const _Navigation: React.FC<Props> = ({
   return (
     <Navigation
       on={COLOR_SYSTEM.SURFACE}
-      className={classnames(className, 'h-full')}
+      className={classnames('h-full')}
       renderHead={renderHead}
       renderBody={renderBody}
     />

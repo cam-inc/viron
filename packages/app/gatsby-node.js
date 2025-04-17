@@ -1,3 +1,5 @@
+const path = require('path');
+
 exports.onCreateWebpackConfig = ({ actions }) => {
   actions.setWebpackConfig({
     resolve: {
@@ -5,6 +7,11 @@ exports.onCreateWebpackConfig = ({ actions }) => {
         // Necesary for using Tailwind JIT mode.
         // @see: https://www.gatsbyjs.com/docs/how-to/local-development/troubleshooting-common-errors/#issues-with-fs-resolution
         fs: false,
+      },
+      /** @see https://ui.shadcn.com/docs/installation/gatsby */
+      alias: {
+        '@/components': path.resolve(__dirname, 'src/components'),
+        '@/lib/utils': path.resolve(__dirname, 'src/lib/utils'),
       },
     },
   });

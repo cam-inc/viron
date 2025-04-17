@@ -1,10 +1,36 @@
-import React, { useCallback, useMemo } from 'react';
-import Button, { Props as ButtonProps } from '~/components/button';
-import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/outline';
-import Table, { Props as TableProps } from '~/components/table';
-import Popover, { usePopover } from '~/portals/popover';
+import {
+  CircleEllipsis,
+  XCircle,
+  ChevronRightIcon,
+  ChevronDownIcon,
+  ClipboardCopyIcon,
+  ArrowDownUp,
+  ArrowDownAZ,
+  ArrowUpZA,
+} from 'lucide-react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Props as BaseProps } from '~/components';
+import Cell from '~/components/table/cell';
+import { Button } from '~/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '~/components/ui/table';
+import Drawer, { useDrawer } from '~/portals/drawer'; // TODO: Use Dropdown component
+import PopoverPortal, { usePopover } from '~/portals/popover';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
-import { Document, Content, SORT, Sort } from '~/types/oas';
+import {
+  Document,
+  Content,
+  SORT,
+  Sort,
+  TableColumn,
+  Schema,
+} from '~/types/oas';
 import {
   extractTableColumns,
   getTableRows,
@@ -13,6 +39,13 @@ import {
 import { UseBaseReturn } from '../../hooks/useBase';
 import { UseDescendantsReturn } from '../../hooks/useDescendants';
 import Descendant, { Props as DescendantProps } from '../../parts/descendant';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+
+type Data = Record<string, any>;
 
 type Props = {
   endpoint: Endpoint;
@@ -38,7 +71,7 @@ const ContentTable: React.FC<Props> = ({
   sortState,
 }) => {
   const [sorts, setSorts] = sortState;
-  const columns = useMemo<TableProps['columns']>(() => {
+  const columns = useMemo<TableColumn[]>(() => {
     const extractTableColumnsResult = extractTableColumns(document, content);
     if (extractTableColumnsResult.isFailure()) {
       return [];
@@ -57,12 +90,15 @@ const ContentTable: React.FC<Props> = ({
       });
   }, [document, content, base, sorts]);
 
-  const dataSource = useMemo<TableProps['dataSource']>(
+  const dataSource = useMemo<Data[]>(
     () => getTableRows(document, content, base.data),
     [document, content, base]
   );
 
-  const renderActions = useCallback<NonNullable<TableProps['renderActions']>>(
+  const drawer = useDrawer();
+  const [selectedRowData, setSelectedRowData] = useState<Data>();
+
+  const renderActions = useCallback<NonNullable<(data: Data) => JSX.Element>>(
     (data) => {
       return (
         <Operations
@@ -84,10 +120,8 @@ const ContentTable: React.FC<Props> = ({
     ]
   );
 
-  const handleRequestSortChange = useCallback<
-    NonNullable<TableProps['onRequestSortChange']>
-  >(
-    (key, sort) => {
+  const handleRequestSortChange = useCallback(
+    (key: TableColumn['key'], sort: Sort) => {
       const newSorts = {
         ...sorts,
         [key]: sort,
@@ -106,13 +140,134 @@ const ContentTable: React.FC<Props> = ({
 
   return (
     <>
-      <Table
-        on={COLOR_SYSTEM.BACKGROUND}
-        columns={columns}
-        dataSource={dataSource}
-        renderActions={descendants.length ? renderActions : undefined}
-        onRequestSortChange={handleRequestSortChange}
-      />
+      <div className="border-b border-x">
+        <div className="overflow-x-auto">
+          <Table className="relative">
+            <TableHeader>
+              <TableRow>
+                {columns.map((column) => {
+                  if (!column.isSortable) {
+                    return (
+                      <TableHead key={column.key}>{column.name}</TableHead>
+                    );
+                  }
+                  return (
+                    <TableHead key={column.key}>
+                      <Button
+                        variant="ghost"
+                        className="flex items-center gap-2"
+                        onClick={() => {
+                          switch (column.sort) {
+                            case SORT.ASC:
+                              handleRequestSortChange(column.key, SORT.DESC);
+                              break;
+                            case SORT.DESC:
+                              handleRequestSortChange(column.key, SORT.NONE);
+                              break;
+                            case SORT.NONE:
+                              handleRequestSortChange(column.key, SORT.ASC);
+                              break;
+                            default:
+                              break;
+                          }
+                        }}
+                      >
+                        <span>{column.name}</span>
+                        {column.sort === SORT.NONE && (
+                          <ArrowDownUp className="size-4 text-muted-foreground" />
+                        )}
+                        {column.sort === SORT.ASC && (
+                          <ArrowDownAZ className="size-4" />
+                        )}
+                        {column.sort === SORT.DESC && (
+                          <ArrowUpZA className="size-4" />
+                        )}
+                      </Button>
+                    </TableHead>
+                  );
+                })}
+                {0 < descendants.length && (
+                  <TableHead className="text-right sticky right-0 bg-thm-background" />
+                )}
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {dataSource.map((data, rowIndex) => (
+                <>
+                  <TableRow
+                    key={rowIndex}
+                    className="cursor-pointer"
+                    onClick={() => {
+                      setSelectedRowData(data);
+                      drawer.open();
+                    }}
+                  >
+                    {columns.map((column, columnIndex) => {
+                      if (column.schema.type === 'object') {
+                        console.dir(data[column.key], { depth: null });
+                        return (
+                          <TableCell>
+                            {data[column.key] ? (
+                              <Popover>
+                                <PopoverTrigger
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 px-2 space-x-0.5"
+                                  >
+                                    Show Details
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-fit max-w-[100vw]">
+                                  <pre className="bg-muted p-3 rounded-md overflow-auto text-sm">
+                                    <code>
+                                      {JSON.stringify(
+                                        data[column.key],
+                                        null,
+                                        2
+                                      )}
+                                    </code>
+                                  </pre>
+                                </PopoverContent>
+                              </Popover>
+                            ) : null}
+                          </TableCell>
+                        );
+                      }
+                      return (
+                        <TableCell>
+                          <Cell
+                            on={COLOR_SYSTEM.BACKGROUND}
+                            schema={column.schema}
+                            value={data[column.key]}
+                          />
+                        </TableCell>
+                      );
+                    })}
+                    {0 < descendants.length && (
+                      <TableCell className="text-right sticky right-0 bg-thm-background">
+                        {renderActions(data)}
+                      </TableCell>
+                    )}
+                  </TableRow>
+                </>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+      {selectedRowData && (
+        <Drawer {...drawer.bind}>
+          <RowData
+            on={COLOR_SYSTEM.BACKGROUND}
+            rowData={selectedRowData}
+            columns={columns}
+            close={drawer.close}
+          />
+        </Drawer>
+      )}
     </>
   );
 };
@@ -135,13 +290,6 @@ const Operations: React.FC<OperationsProps> = ({
   onOperationFail,
 }) => {
   const popover = usePopover<HTMLDivElement>();
-  const handleButtonClick = useCallback<ButtonProps['onClick']>(
-    (_, event) => {
-      event?.stopPropagation();
-      popover.open();
-    },
-    [popover]
-  );
   const handleDescendantClick = useCallback<
     NonNullable<DescendantProps['onClick']>
   >(() => {
@@ -152,13 +300,17 @@ const Operations: React.FC<OperationsProps> = ({
     <>
       <div ref={popover.targetRef}>
         <Button
-          variant="text"
-          on={COLOR_SYSTEM.SURFACE}
-          Icon={DotsCircleHorizontalIcon}
-          onClick={handleButtonClick}
-        />
+          variant="ghost"
+          className="h-8 w-8"
+          onClick={(e) => {
+            e.stopPropagation();
+            popover.open();
+          }}
+        >
+          <CircleEllipsis className="h-4 w-4" />
+        </Button>
       </div>
-      <Popover {...popover.bind}>
+      <PopoverPortal {...popover.bind}>
         <ul>
           {descendants.map((descendant, idx) => (
             <li key={idx}>
@@ -174,7 +326,138 @@ const Operations: React.FC<OperationsProps> = ({
             </li>
           ))}
         </ul>
-      </Popover>
+      </PopoverPortal>
     </>
+  );
+};
+
+const RowData: React.FC<
+  BaseProps & {
+    rowData: Data;
+    columns: TableColumn[];
+    close: () => void;
+  }
+> = ({ on, rowData, columns, close }) => {
+  return (
+    <div className="px-10 py-10 flex flex-col h-full w-full">
+      <Button variant="ghost" className="mr-0 ml-auto" onClick={close}>
+        <XCircle className="h-4 w-4" />
+      </Button>
+      <div className="flex-1 overflow-scroll space-y-10">
+        {Object.keys(rowData).map((objectKey, index) => (
+          <Accordion
+            key={index}
+            on={on}
+            schema={columns.find((column) => column.key === objectKey)?.schema}
+            data={rowData}
+            objectKey={objectKey}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const Accordion: React.FC<
+  BaseProps & {
+    schema?: Schema;
+    data: Data;
+    objectKey: string;
+  }
+> = ({ on, schema, data, objectKey }) => {
+  const [isOpened, setIsOpened] = useState<boolean>(true);
+  const handleCopyClick = useCallback(() => {
+    globalThis.navigator.clipboard.writeText(data[objectKey]);
+  }, [data, objectKey]);
+
+  const displayValue = (value: string | number | boolean) => {
+    switch (typeof value) {
+      case 'string':
+        return value;
+      case 'number':
+        return value.toLocaleString();
+      case 'boolean':
+        return String(value).toUpperCase();
+    }
+  };
+
+  const previewValue = (value: string | number | boolean) => {
+    switch (schema?.format) {
+      case 'uri-image':
+        return (
+          <>
+            {typeof value === 'string' && (
+              <div className="size-96">
+                <img
+                  className="block size-full object-contain"
+                  src={value}
+                  alt={objectKey}
+                />
+              </div>
+            )}
+          </>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div>
+      <div className="inline-flex items-center gap-1 whitespace-nowrap">
+        <Button
+          variant="ghost"
+          className="mr-0 ml-auto"
+          onClick={() => {
+            setIsOpened((prev) => !prev);
+          }}
+        >
+          {isOpened ? (
+            <ChevronDownIcon className="h-4 w-4" />
+          ) : (
+            <ChevronRightIcon className="h-4 w-4" />
+          )}
+        </Button>
+        <div className={`text-sm text-thm-on-${on}`}>
+          <span className="font-bold">{objectKey}</span>
+          {schema?.description && (
+            <span className="ml-2 text-thm-on-surface-low">
+              {schema.description}
+            </span>
+          )}
+        </div>
+      </div>
+      {isOpened && (
+        <div className="ml-5 pl-4 border-l border-thm-on-surface-slight flex flex-col items-start space-y-4">
+          {data[objectKey] && typeof data[objectKey] === 'object' ? (
+            Object.keys(data[objectKey]).map((childObjectKey, index) => (
+              <Accordion
+                key={index}
+                on={on}
+                schema={schema?.properties?.[childObjectKey]}
+                data={data[objectKey]}
+                objectKey={childObjectKey}
+              />
+            ))
+          ) : (
+            <>
+              <div className="bg-thm-on-background-slight rounded-lg px-2.5 p-3 inline-flex items-center whitespace-nowrap mr-5">
+                <span className={`mr-2 text-xs text-thm-on-${on}`}>
+                  {displayValue(data[objectKey])}
+                </span>
+                <Button
+                  variant="ghost"
+                  className="mr-0 ml-auto"
+                  onClick={handleCopyClick}
+                >
+                  <ClipboardCopyIcon className="h-4 w-4" />
+                </Button>
+              </div>
+              {previewValue(data[objectKey])}
+            </>
+          )}
+        </div>
+      )}
+    </div>
   );
 };

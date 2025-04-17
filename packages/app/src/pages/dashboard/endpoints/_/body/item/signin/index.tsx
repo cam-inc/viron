@@ -1,13 +1,26 @@
+import { ChevronRight, Mail, KeyRound } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
-import IconButton, { Props as ButtonProps } from '~/components/button/icon';
-import Error, { useError } from '~/components/error/';
+import { useError } from '~/components/error/';
 import GoogleLogo from '~/components/google';
-import Key from '~/components/icon/key/outline';
-import Mail from '~/components/icon/mail/outline';
 import Request from '~/components/request';
+import { Button } from '~/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '~/components/ui/dialog';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '~/components/ui/sheet';
 import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
-import Drawer, { useDrawer } from '~/portals/drawer';
+import { useToast } from '~/hooks/use-toast';
 import { Authentication, AuthConfig, COLOR_SYSTEM, Endpoint } from '~/types/';
 import { RequestValue } from '~/types/oas';
 
@@ -30,77 +43,83 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
     [authentication]
   );
 
-  const drawerOidc = useDrawer();
-  const handleOidcClick = useCallback<ButtonProps['onClick']>(() => {
-    drawerOidc.open();
-  }, [drawerOidc]);
-
-  const drawerOAuth = useDrawer();
-  const handleOAuthClick = useCallback<ButtonProps['onClick']>(() => {
-    drawerOAuth.open();
-  }, [drawerOAuth]);
-
-  const drawerEmail = useDrawer();
-  const handleEmailClick = useCallback<ButtonProps['onClick']>(() => {
-    drawerEmail.open();
-  }, [drawerEmail]);
-
   return (
     <div className="flex justify-center gap-4">
-      {authConfigEmail && (
-        <>
-          <label className="flex basis-15 flex-col items-center gap-1">
-            <IconButton
-              className="border border-thm-on-background-low"
-              on={COLOR_SYSTEM.BACKGROUND}
-              onClick={handleEmailClick}
-              rounded
-            >
-              <Mail />
-            </IconButton>
-            <span className="text-xs">{t('email')}</span>
-          </label>
-          <Drawer {...drawerEmail.bind}>
-            <Email endpoint={endpoint} authentication={authentication} />
-          </Drawer>
-        </>
-      )}
-      {authConfigOAuth && (
-        <>
-          <label className="flex basis-15 flex-col items-center gap-1">
-            <IconButton
-              className="border border-thm-on-background-low"
-              on={COLOR_SYSTEM.BACKGROUND}
-              onClick={handleOAuthClick}
-              rounded
-            >
-              <GoogleLogo />
-            </IconButton>
-            <span className="text-xs">{t('oAuth')}</span>
-          </label>
-          <Drawer {...drawerOAuth.bind}>
-            <OAuth endpoint={endpoint} authentication={authentication} />
-          </Drawer>
-        </>
-      )}
-      {authConfigOidc && (
-        <>
-          <label className="flex basis-15 flex-col items-center gap-1">
-            <IconButton
-              className="border border-thm-on-background-low"
-              on={COLOR_SYSTEM.BACKGROUND}
-              onClick={handleOidcClick}
-              rounded
-            >
-              <Key />
-            </IconButton>
-            <span className="text-xs">{t('oidc')}</span>
-          </label>
-          <Drawer {...drawerOidc.bind}>
-            <Oidc endpoint={endpoint} authentication={authentication} />
-          </Drawer>
-        </>
-      )}
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button>
+            {t('enterEndpoint')}
+            <ChevronRight />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="w-[400px]">
+          <DialogHeader>
+            <DialogTitle>{t('signin')}</DialogTitle>
+          </DialogHeader>
+          <div className="flex gap-4 py-4 justify-center items-center">
+            {authConfigEmail && (
+              <Sheet>
+                <div className="flex flex-col items-center gap-1 basis-15">
+                  <SheetTrigger className="h-[42px] w-[42px] rounded-full border border-border flex items-center justify-center">
+                    <Mail className="h-5 w-5" />
+                  </SheetTrigger>
+                  <div className="text-xs">{t('email')}</div>
+                </div>
+                <SheetContent>
+                  <SheetHeader>
+                    <SheetTitle>{t('email')}</SheetTitle>
+                  </SheetHeader>
+                  <div className="py-4">
+                    <Email
+                      endpoint={endpoint}
+                      authentication={authentication}
+                    />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            )}
+            {authConfigOAuth && (
+              <Sheet>
+                <div className="flex flex-col items-center gap-1 basis-15">
+                  <SheetTrigger className="h-[42px] w-[42px]">
+                    <GoogleLogo />
+                  </SheetTrigger>
+                  <div className="text-xs">{t('oAuth')}</div>
+                </div>
+                <SheetContent>
+                  <SheetHeader>
+                    <SheetTitle>{t('oAuth')}</SheetTitle>
+                  </SheetHeader>
+                  <div className="py-4">
+                    <OAuth
+                      endpoint={endpoint}
+                      authentication={authentication}
+                    />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            )}
+            {authConfigOidc && (
+              <Sheet>
+                <div className="flex flex-col items-center gap-1 basis-15">
+                  <SheetTrigger className="h-[42px] w-[42px] rounded-full border border-border flex items-center justify-center">
+                    <KeyRound className="h-5 w-5" />
+                  </SheetTrigger>
+                  <div className="text-xs">{t('oidc')}</div>
+                </div>
+                <SheetContent>
+                  <SheetHeader>
+                    <SheetTitle>{t('oidc')}</SheetTitle>
+                  </SheetHeader>
+                  <div className="py-4">
+                    <Oidc endpoint={endpoint} authentication={authentication} />
+                  </div>
+                </SheetContent>
+              </Sheet>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
@@ -111,6 +130,8 @@ const Oidc: React.FC<{
   authentication: Authentication;
 }> = ({ endpoint, authentication }) => {
   const { prepareSigninOidc } = useEndpoint();
+  const { t } = useTranslation();
+  const { toast } = useToast();
   const signinOidc = useMemo<
     ReturnType<UseEndpointReturn['prepareSigninOidc']>
   >(
@@ -128,29 +149,29 @@ const Oidc: React.FC<{
       const result = await signinOidc.execute(requestValue);
       if (result.error) {
         setError(result.error);
-        return;
       }
     },
     [setError, signinOidc]
   );
 
-  if (signinOidc.error) {
-    return <Error on={COLOR_SYSTEM.BACKGROUND} error={signinOidc.error} />;
+  if (signinOidc.error || error.bind.error) {
+    toast({
+      variant: 'destructive',
+      title: t('error'),
+    });
+    return null;
   }
 
   return (
-    <>
-      <Request
-        on={COLOR_SYSTEM.SURFACE}
-        className="h-full"
-        endpoint={signinOidc.endpoint}
-        document={signinOidc.document}
-        defaultValues={signinOidc.defaultValues}
-        request={signinOidc.request}
-        onSubmit={handleSubmit}
-      />
-      <Error.renewal {...error.bind} withModal={true} />
-    </>
+    <Request
+      on={COLOR_SYSTEM.SURFACE}
+      className="h-full"
+      endpoint={signinOidc.endpoint}
+      document={signinOidc.document}
+      defaultValues={signinOidc.defaultValues}
+      request={signinOidc.request}
+      onSubmit={handleSubmit}
+    />
   );
 };
 
@@ -159,6 +180,8 @@ const OAuth: React.FC<{
   authentication: Authentication;
 }> = ({ endpoint, authentication }) => {
   const { prepareSigninOAuth } = useEndpoint();
+  const { t } = useTranslation();
+  const { toast } = useToast();
   const signinOAuth = useMemo<
     ReturnType<UseEndpointReturn['prepareSigninOAuth']>
   >(
@@ -176,29 +199,29 @@ const OAuth: React.FC<{
       const result = await signinOAuth.execute(requestValue);
       if (result.error) {
         setError(result.error);
-        return;
       }
     },
     [setError, signinOAuth]
   );
 
-  if (signinOAuth.error) {
-    return <Error on={COLOR_SYSTEM.BACKGROUND} error={signinOAuth.error} />;
+  if (signinOAuth.error || error.bind.error) {
+    toast({
+      variant: 'destructive',
+      title: t('error'),
+    });
+    return null;
   }
 
   return (
-    <>
-      <Request
-        on={COLOR_SYSTEM.SURFACE}
-        className="h-full"
-        endpoint={signinOAuth.endpoint}
-        document={signinOAuth.document}
-        defaultValues={signinOAuth.defaultValues}
-        request={signinOAuth.request}
-        onSubmit={handleSubmit}
-      />
-      <Error.renewal {...error.bind} withModal={true} />
-    </>
+    <Request
+      on={COLOR_SYSTEM.SURFACE}
+      className="h-full"
+      endpoint={signinOAuth.endpoint}
+      document={signinOAuth.document}
+      defaultValues={signinOAuth.defaultValues}
+      request={signinOAuth.request}
+      onSubmit={handleSubmit}
+    />
   );
 };
 
@@ -207,6 +230,8 @@ const Email: React.FC<{
   authentication: Authentication;
 }> = ({ endpoint, authentication }) => {
   const { prepareSigninEmail, navigate } = useEndpoint();
+  const { t } = useTranslation();
+  const { toast } = useToast();
   const signinEmail = useMemo<
     ReturnType<UseEndpointReturn['prepareSigninEmail']>
   >(
@@ -231,22 +256,23 @@ const Email: React.FC<{
     [endpoint, navigate, signinEmail, setError]
   );
 
-  if (signinEmail.error) {
-    return <Error on={COLOR_SYSTEM.BACKGROUND} error={signinEmail.error} />;
+  if (signinEmail.error || error.bind.error) {
+    toast({
+      variant: 'destructive',
+      title: t('error'),
+    });
+    return null;
   }
 
   return (
-    <>
-      <Request
-        on={COLOR_SYSTEM.SURFACE}
-        endpoint={signinEmail.endpoint}
-        document={signinEmail.document}
-        defaultValues={signinEmail.defaultValues}
-        request={signinEmail.request}
-        onSubmit={handleSubmit}
-        className="h-full"
-      />
-      <Error.renewal {...error.bind} withModal={true} />
-    </>
+    <Request
+      on={COLOR_SYSTEM.SURFACE}
+      endpoint={signinEmail.endpoint}
+      document={signinEmail.document}
+      defaultValues={signinEmail.defaultValues}
+      request={signinEmail.request}
+      onSubmit={handleSubmit}
+      className="h-full"
+    />
   );
 };
