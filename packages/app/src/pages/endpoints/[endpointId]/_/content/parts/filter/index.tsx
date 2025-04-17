@@ -110,9 +110,9 @@ const Filter: React.FC<Props> = ({ base }) => {
                       }}
                     >
                       {item.isActive ? (
-                        <LightbulbOff className="h-4 w-4" />
-                      ) : (
                         <Lightbulb className="h-4 w-4" />
+                      ) : (
+                        <LightbulbOff className="h-4 w-4" />
                       )}
                       {item.name}
                     </Button>

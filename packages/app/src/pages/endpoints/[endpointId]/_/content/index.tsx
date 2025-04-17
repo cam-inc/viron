@@ -11,11 +11,10 @@ import { BaseError } from '~/errors';
 import Sibling from '~/pages/endpoints/[endpointId]/_/content/parts/sibling';
 import { useAppScreenGlobalStateValue } from '~/store';
 import { Endpoint, COLOR_SYSTEM } from '~/types';
-import { Document, Content } from '~/types/oas';
+import { Document, Content, ContentId } from '~/types/oas';
 import useContent from './hooks/useContent';
 import Body from './parts/body';
 import Filter from './parts/filter';
-import Head, { Props as HeadProps } from './parts/head';
 import Pin from './parts/pin';
 import Refresh from './parts/refresh';
 import Search from './parts/search';
@@ -30,9 +29,9 @@ export type Props = {
   endpoint: Endpoint;
   document: Document;
   content: Content;
-  isPinned: HeadProps['isPinned'];
-  onPin: HeadProps['onPin'];
-  onUnpin: HeadProps['onUnpin'];
+  isPinned: boolean;
+  onPin: (contentId: ContentId) => void;
+  onUnpin: (contentId: ContentId) => void;
 };
 const _Content: React.FC<Props> = ({
   endpoint,
@@ -67,20 +66,6 @@ const _Content: React.FC<Props> = ({
       id={content.id}
       className="border border-thm-on-background-low rounded-lg overflow-hidden"
     >
-      <Head
-        className="py-2 px-3 text-thm-on-background bg-thm-on-background-slight rounded-t-lg"
-        endpoint={endpoint}
-        document={document}
-        content={content}
-        base={base}
-        siblings={siblings}
-        isOpened={isOpened}
-        onOpen={handleOpen}
-        onClose={handleClose}
-        isPinned={isPinned}
-        onPin={onPin}
-        onUnpin={onUnpin}
-      />
       <div className="flex justify-between items-center p-4 border-b bg-muted/30">
         <button
           className="font-medium flex items-center gap-1"

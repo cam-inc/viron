@@ -4,10 +4,12 @@ import {
   ChevronRightIcon,
   ChevronDownIcon,
   ClipboardCopyIcon,
+  ArrowDownUp,
+  ArrowDownAZ,
+  ArrowUpZA,
 } from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Props as BaseProps } from '~/components';
-import TableOld, { Props as TableProps, Data } from '~/components/table';
 import Cell from '~/components/table/cell';
 import { Button } from '~/components/ui/button';
 import {
@@ -18,8 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
-import Drawer, { useDrawer } from '~/portals/drawer';
-// TODO: Use Dropdown component
+import Drawer, { useDrawer } from '~/portals/drawer'; // TODO: Use Dropdown component
 import PopoverPortal, { usePopover } from '~/portals/popover';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
 import {
@@ -43,6 +44,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+
+type Data = Record<string, any>;
 
 type Props = {
   endpoint: Endpoint;
@@ -68,7 +71,7 @@ const ContentTable: React.FC<Props> = ({
   sortState,
 }) => {
   const [sorts, setSorts] = sortState;
-  const columns = useMemo<TableProps['columns']>(() => {
+  const columns = useMemo<TableColumn[]>(() => {
     const extractTableColumnsResult = extractTableColumns(document, content);
     if (extractTableColumnsResult.isFailure()) {
       return [];
@@ -87,7 +90,7 @@ const ContentTable: React.FC<Props> = ({
       });
   }, [document, content, base, sorts]);
 
-  const dataSource = useMemo<TableProps['dataSource']>(
+  const dataSource = useMemo<Data[]>(
     () => getTableRows(document, content, base.data),
     [document, content, base]
   );
@@ -95,7 +98,7 @@ const ContentTable: React.FC<Props> = ({
   const drawer = useDrawer();
   const [selectedRowData, setSelectedRowData] = useState<Data>();
 
-  const renderActions = useCallback<NonNullable<TableProps['renderActions']>>(
+  const renderActions = useCallback<NonNullable<(data: Data) => JSX.Element>>(
     (data) => {
       return (
         <Operations
@@ -117,10 +120,8 @@ const ContentTable: React.FC<Props> = ({
     ]
   );
 
-  const handleRequestSortChange = useCallback<
-    NonNullable<TableProps['onRequestSortChange']>
-  >(
-    (key, sort) => {
+  const handleRequestSortChange = useCallback(
+    (key: TableColumn['key'], sort: Sort) => {
       const newSorts = {
         ...sorts,
         [key]: sort,
@@ -145,7 +146,45 @@ const ContentTable: React.FC<Props> = ({
             <TableHeader>
               <TableRow>
                 {columns.map((column) => {
-                  return <TableHead>{column.name}</TableHead>;
+                  if (!column.isSortable) {
+                    return (
+                      <TableHead key={column.key}>{column.name}</TableHead>
+                    );
+                  }
+                  return (
+                    <TableHead key={column.key}>
+                      <Button
+                        variant="ghost"
+                        className="flex items-center gap-2"
+                        onClick={() => {
+                          switch (column.sort) {
+                            case SORT.ASC:
+                              handleRequestSortChange(column.key, SORT.DESC);
+                              break;
+                            case SORT.DESC:
+                              handleRequestSortChange(column.key, SORT.NONE);
+                              break;
+                            case SORT.NONE:
+                              handleRequestSortChange(column.key, SORT.ASC);
+                              break;
+                            default:
+                              break;
+                          }
+                        }}
+                      >
+                        <span>{column.name}</span>
+                        {column.sort === SORT.NONE && (
+                          <ArrowDownUp className="size-4 text-muted-foreground" />
+                        )}
+                        {column.sort === SORT.ASC && (
+                          <ArrowDownAZ className="size-4" />
+                        )}
+                        {column.sort === SORT.DESC && (
+                          <ArrowUpZA className="size-4" />
+                        )}
+                      </Button>
+                    </TableHead>
+                  );
                 })}
                 {0 < descendants.length && (
                   <TableHead className="text-right sticky right-0 bg-thm-background" />
@@ -208,9 +247,7 @@ const ContentTable: React.FC<Props> = ({
                       );
                     })}
                     {0 < descendants.length && (
-                      //   TODO: on
-                      //   <div className="text-thm-on-${on} text-xs">{content}</div>
-                      <TableCell className="text-right text-thm-on-${on} sticky right-0 bg-thm-background">
+                      <TableCell className="text-right sticky right-0 bg-thm-background">
                         {renderActions(data)}
                       </TableCell>
                     )}
@@ -221,13 +258,6 @@ const ContentTable: React.FC<Props> = ({
           </Table>
         </div>
       </div>
-      <TableOld
-        on={COLOR_SYSTEM.BACKGROUND}
-        columns={columns}
-        dataSource={dataSource}
-        renderActions={descendants.length ? renderActions : undefined}
-        onRequestSortChange={handleRequestSortChange}
-      />
       {selectedRowData && (
         <Drawer {...drawer.bind}>
           <RowData
@@ -357,11 +387,13 @@ const Accordion: React.FC<
         return (
           <>
             {typeof value === 'string' && (
-              <img
-                className="block w-20 h-20 object-cover rounded-lg"
-                src={value}
-                alt={objectKey}
-              />
+              <div className="size-96">
+                <img
+                  className="block size-full object-contain"
+                  src={value}
+                  alt={objectKey}
+                />
+              </div>
             )}
           </>
         );
