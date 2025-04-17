@@ -4,15 +4,14 @@ import Button, { Props as ButtonProps } from '~/components/button';
 import Head from '~/components/head';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
-import { Props as LayoutProps } from '~/layouts/index';
 import Modal, { useModal } from '~/portals/modal';
 import { COLOR_SYSTEM } from '~/types';
 import Menu from '../../../_/menu';
 import Add, { Props as AddProps } from './add/';
 import Item from './item';
 
-export type Props = Parameters<LayoutProps['renderBody']>[0];
-const Body: React.FC<Props> = ({ className, style }) => {
+export type Props = { className?: string };
+const Body: React.FC<Props> = ({ className }) => {
   const { t } = useTranslation();
   const { groupList } = useEndpoint();
 
@@ -30,7 +29,7 @@ const Body: React.FC<Props> = ({ className, style }) => {
 
   return (
     <>
-      <div className={className} style={style}>
+      <div className={className}>
         <div className="max-w-[1252px] mx-auto px-4 lg:px-8">
           {/* Head */}
           <div>
