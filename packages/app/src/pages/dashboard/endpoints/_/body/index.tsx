@@ -42,7 +42,7 @@ const Body: React.FC<Props> = ({ className }) => {
                 {t('addEndpointButtonLabel')}
               </Button>
             </DialogTrigger>
-            <Add onOpenChange={setAddEndpointDialogOpen} />
+            <Add onAdd={() => setAddEndpointDialogOpen(false)} />
           </Dialog>
           <Menu />
         </div>

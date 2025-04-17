@@ -36,9 +36,9 @@ import { endpointId, url } from '~/utils/v8n';
 const FORM_ID = 'add-endpoint-form';
 
 export type Props = {
-  onOpenChange: (open: boolean) => void;
+  onAdd: () => void;
 };
-const AddEndpoint: React.FC<Props> = ({ onOpenChange }) => {
+const AddEndpoint: React.FC<Props> = ({ onAdd }) => {
   const { t } = useTranslation();
   const { groupList, connect, addEndpoint } = useEndpoint();
 
@@ -81,9 +81,9 @@ const AddEndpoint: React.FC<Props> = ({ onOpenChange }) => {
           return;
         }
         clearErrors();
-        onOpenChange(false);
+        onAdd();
       }),
-    [_handleSubmit, connect, addEndpoint, clearErrors, onOpenChange, setError]
+    [_handleSubmit, connect, addEndpoint, clearErrors, onAdd, setError]
   );
 
   return (

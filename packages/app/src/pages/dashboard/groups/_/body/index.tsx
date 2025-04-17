@@ -1,75 +1,55 @@
-import { PlusIcon } from '@heroicons/react/outline';
-import React, { useCallback } from 'react';
-import Button, { Props as ButtonProps } from '~/components/button';
-import Head from '~/components/head';
+import { Plus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Button } from '~/components/ui/button';
+import { Dialog, DialogTrigger } from '~/components/ui/dialog';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
-import Modal, { useModal } from '~/portals/modal';
-import { COLOR_SYSTEM } from '~/types';
-import Menu from '../../../_/menu';
-import Add, { Props as AddProps } from './add/';
+import { cn } from '~/lib/utils';
+import Add from './add/';
 import Item from './item';
 
 export type Props = { className?: string };
 const Body: React.FC<Props> = ({ className }) => {
   const { t } = useTranslation();
   const { groupList } = useEndpoint();
-
-  // Add modal.
-  const modal = useModal({});
-  const handleAddClick = useCallback<ButtonProps['onClick']>(() => {
-    modal.open();
-  }, [modal.open]);
-  const handleAddAdd = useCallback<AddProps['onAdd']>(() => {
-    modal.close();
-  }, [modal.close]);
-  const handleAddCancel = useCallback<AddProps['onCancel']>(() => {
-    modal.close();
-  }, [modal.close]);
+  const [addGroupDialogOpen, setAddGroupDialogOpen] = useState(false);
 
   return (
-    <>
-      <div className={className}>
-        <div className="max-w-[1252px] mx-auto px-4 lg:px-8">
-          {/* Head */}
-          <div>
-            <div className="py-6 lg:py-10 flex justify-between items-center">
-              <Head
-                on={COLOR_SYSTEM.BACKGROUND}
-                title={<div>{t('dashboard.groups.title')}</div>}
-                description={t('dashboard.groups.description')}
-              />
-              <div className="flex items-center space-x-4">
-                <Button
-                  variant="outlined"
-                  cs={COLOR_SYSTEM.PRIMARY}
-                  label={t('addGroupButtonLabel')}
-                  Icon={PlusIcon}
-                  onClick={handleAddClick}
-                />
-                <Menu />
-              </div>
-            </div>
-          </div>
-          {/* Body */}
-          <div className="">
-            <ul className="">
-              {groupList.map((group) => (
-                <li
-                  key={group.id}
-                  className="border-b border-dashed border-thm-on-background-faint pb-2 mb-2 last:border-none last:mb-0 last:pb-0"
-                >
-                  <Item group={group} />
-                </li>
-              ))}
-            </ul>
-          </div>
+    <div className={cn('flex flex-col py-4 md:py-6 px-4 lg:px-6', className)}>
+      {/* Head */}
+      <div className="flex justify-end items-center">
+        <div className="flex items-center gap-2">
+          <Dialog
+            open={addGroupDialogOpen}
+            onOpenChange={setAddGroupDialogOpen}
+          >
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <Plus />
+                {t('addGroupButtonLabel')}
+              </Button>
+            </DialogTrigger>
+            <Add
+              onAdd={() => setAddGroupDialogOpen(false)}
+              onCancel={() => setAddGroupDialogOpen(false)}
+            />
+          </Dialog>
         </div>
       </div>
-      <Modal {...modal.bind}>
-        <Add onAdd={handleAddAdd} onCancel={handleAddCancel} />
-      </Modal>
-    </>
+      {/* Body */}
+      <div className="">
+        <ul className="">
+          {groupList.map((group) => (
+            <li
+              key={group.id}
+              className="border-b border-dashed border-thm-on-background-faint pb-2 mb-2 last:border-none last:mb-0 last:pb-0"
+            >
+              <Item group={group} />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 };
 export default Body;
