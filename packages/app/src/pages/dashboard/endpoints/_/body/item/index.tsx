@@ -16,6 +16,7 @@ import {
   CardFooter,
   CardHeader,
 } from '~/components/ui/card';
+import { Dialog, DialogTrigger } from '~/components/ui/dialog';
 import { Skeleton } from '~/components/ui/skeleton';
 import { BaseError } from '~/errors';
 import { useEndpoint } from '~/hooks/endpoint';
@@ -121,10 +122,6 @@ const _Item: React.FC<{
   const infoModal = useModal({});
   const qrcodeModal = useModal({});
 
-  const handleEditClick = useCallback(() => {
-    editModal.open();
-  }, [editModal]);
-
   const handleInfoClick = useCallback(() => {
     infoModal.open();
   }, [infoModal]);
@@ -167,10 +164,19 @@ const _Item: React.FC<{
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem onClick={handleEditClick}>
-                  <Pencil />
-                  {t('endpointEditButtonLabel')}
-                </DropdownMenuItem>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                      <Pencil />
+                      {t('endpointEditButtonLabel')}
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <EditEndpoint
+                    onAdd={editModal.close}
+                    onCancel={editModal.close}
+                    endpoint={endpoint}
+                  />
+                </Dialog>
                 <DropdownMenuItem onClick={handleInfoClick}>
                   <InfoIcon />
                   {t('endpointInformationButtonLabel')}
@@ -228,14 +234,6 @@ const _Item: React.FC<{
           </div>
         </CardFooter>
       </Card>
-      {/* Edit */}
-      <Modal {...editModal.bind}>
-        <EditEndpoint
-          onAdd={editModal.close}
-          onCancel={editModal.close}
-          endpoint={endpoint}
-        />
-      </Modal>
       {/* Info */}
       <Modal {...infoModal.bind}>
         <Info endpoint={endpoint} document={document || undefined} />

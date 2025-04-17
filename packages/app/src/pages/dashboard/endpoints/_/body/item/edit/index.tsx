@@ -2,14 +2,13 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import React, { useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import { SIZE as BUTTON_SIZE } from '~/components/button';
 import Button, { Props as ButtonProps } from '~/components/button';
-import Head from '~/components/head';
 import Select from '~/components/select';
 import Textinput from '~/components/textinput';
+import { DialogContent, DialogHeader } from '~/components/ui/dialog';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
-import { ClassName, COLOR_SYSTEM, Endpoint, EndpointGroup } from '~/types';
+import { COLOR_SYSTEM, Endpoint, EndpointGroup } from '~/types';
 import { endpointId, url } from '~/utils/v8n';
 
 export type Props = {
@@ -75,13 +74,9 @@ const EditEndpoint: React.FC<Props> = ({ onAdd, onCancel, endpoint }) => {
   }, []);
 
   return (
-    <div>
+    <DialogContent>
+      <DialogHeader>{t('editEndpoint.title')}</DialogHeader>
       <form className="space-y-8" onSubmit={handleSubmit}>
-        <Head
-          className="pb-3 mb-8 border-b border-thm-on-surface-faint"
-          on={COLOR_SYSTEM.SURFACE}
-          title={t('editEndpoint.title')}
-        />
         <div>{formState.errors.manual?.message}</div>
         <div className="space-y-8">
           <Textinput.renewal
@@ -146,7 +141,7 @@ const EditEndpoint: React.FC<Props> = ({ onAdd, onCancel, endpoint }) => {
           />
         </div>
       </form>
-    </div>
+    </DialogContent>
   );
 };
 export default EditEndpoint;
