@@ -24,7 +24,7 @@ Below is a quick guide to code contribution.
 
 1. Fork and clone the repo to your local machine.
 2. Copy the .env.template file located at the root of the project and rename it to .env.
-3. Open .env and choose the datastore that aligns best with your environment and level of expertise.
+3. Open the .env file and choose the datastore—either mysql or mongo—that best suits your environment and expertise.
 4. Create a new branch from `develop` with a meaningful name for the task you work on.
 5. Setup by running: `npm install`.
 6. Do your work following the `styleguide` of each package; read the readme.md files in each package directory.
