@@ -21,7 +21,6 @@
   <img src="./arts/ui/modal.png" align="top" style="width:20%;" />
 </div>
 
-
 <br />
 
 <div align="center">
@@ -57,7 +56,6 @@
   <img src="./arts/theme/p_6.png" align="top" width="40%"/>
 </div>
 
-
 ## What is Viron
 
 Viron is a **web-based** administration tool, which
@@ -81,13 +79,13 @@ OpenAPI Specification, a.k.a. `OAS`, is a `YAML` or `JSON` file that defines an 
 
 Viron evaluates and leverages OAS documents, interprets those above, and then constructs a **GUI** for you.
 
-## Viron is For Those Who:
+## Viron is For Those Who
 
 - have a `RESTful` administration API server.
 - do not have time to make an administration website `from scratch`.
 - have good knowledge of OpenAPI Specification.
 
-## Viron is NOT For Those Who:
+## Viron is NOT For Those Who
 
 - require a complex administration website that an OAS document `can not define`.
 - have a GraphQL administration API server.

@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import Error from '~/components/error';
+import Error, { useError } from '~/components/error';
 import Spinner from '~/components/spinner';
 import { Props as TableProps } from '~/components/table';
+import { BaseError } from '~/errors';
 import { ClassName, COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document, Content, CONTENT_TYPE } from '~/types/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
@@ -33,10 +34,18 @@ const Body: React.FC<Props> = ({
     [base]
   );
 
-  const handleDescendantOperationFail = useCallback((error: Error) => {
-    // TODO: error handling
-    console.log(error);
-  }, []);
+  const error = useError({
+    on: COLOR_SYSTEM.SURFACE,
+    withModal: true,
+  });
+  const setError = error.setError;
+
+  const handleDescendantOperationFail = useCallback(
+    (error: BaseError) => {
+      setError(error);
+    },
+    [setError]
+  );
 
   // HOTFIX: TableContent 内部でStateを持つと、sort の値を変更した際に
   // TableContent が unmount されて state を保持できないため、
@@ -89,6 +98,11 @@ const Body: React.FC<Props> = ({
     sortState,
   ]);
 
-  return <div className={className}>{elm}</div>;
+  return (
+    <>
+      <div className={className}>{elm}</div>
+      <Error.renewal {...error.bind} withModal />
+    </>
+  );
 };
 export default Body;

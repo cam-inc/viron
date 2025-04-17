@@ -36,22 +36,21 @@ Translate all copied files as you like.
 ### For JSX files
 
 ```console
-$ npm run write-translations:ja --workspace=@viron/website
+npm run write-translations:ja --workspace=@viron/website
 ```
 
 Execute this command to extract and initialize the JSON translation files for Japanese. Then translate them into Japanese. This task is mandatory every time you edit jsx files.
 
-
 ## Local Development
 
 ```console
-$ npm run develop --workspace=@viron/website
+npm run dev --workspace=@viron/website
 ```
 
 This command starts a local development server and open up a browser window. Most changes are reflected live without having to restart the server.
 
 ```console
-$ npm run develop:ja --workspace=@viron/website
+npm run dev:ja --workspace=@viron/website
 ```
 
 This command does the same above but locale is set to Japanese.
@@ -59,13 +58,13 @@ This command does the same above but locale is set to Japanese.
 ## Testing Builds Locally
 
 ```console
-$ npm run build --workspace=@viron/website
+npm run build --workspace=@viron/website
 ```
 
 This command generates static content into the `build` directory and can be served using any static contents hosting service.
 
 ```console
-$ npm run serve --workspace=@viron/website
+npm run serve --workspace=@viron/website
 ```
 
 This command serves generated static content in the `build` directory.
