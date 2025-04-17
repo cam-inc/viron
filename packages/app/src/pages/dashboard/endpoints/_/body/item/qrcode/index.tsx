@@ -1,6 +1,6 @@
 import { AlertCircle, Copy } from 'lucide-react';
 import qrcode from 'qrcode';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert';
 import { Button } from '~/components/ui/button';
 import {
@@ -19,34 +19,30 @@ type Props = {
 const QRCode: React.FC<Props> = ({ endpoint }) => {
   const { t } = useTranslation();
   const [error, setError] = useState<BaseError | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [data, setData] = useState<string>('');
-
-  useEffect(() => {
-    // canvasがmountされてから実行したい
-    // TODO: canvasがmountされてから実行する方法に修正
-    setTimeout(() => {
-      const canvasElement = canvasRef.current;
-      if (!canvasElement) {
-        return;
-      }
-      const data = `${
-        new URL(location.href).origin
-      }/endpointimport?endpoint=${encodeURIComponent(
-        JSON.stringify(endpoint)
-      )}`;
-      qrcode.toCanvas(canvasElement, data, function (error) {
-        if (error) {
-          setError(new BaseError(error.message));
-        }
-      });
-      setData(data);
-    }, 1000);
-  }, [endpoint]);
 
   const handleCopyClick = useCallback(() => {
     globalThis.navigator.clipboard.writeText(data);
   }, [data]);
+
+  const canvasRefCallback = useCallback(
+    (canvasElement: HTMLCanvasElement | null) => {
+      if (canvasElement) {
+        const data = `${
+          new URL(location.href).origin
+        }/endpointimport?endpoint=${encodeURIComponent(
+          JSON.stringify(endpoint)
+        )}`;
+        qrcode.toCanvas(canvasElement, data, function (error) {
+          if (error) {
+            setError(new BaseError(error.message));
+          }
+        });
+        setData(data);
+      }
+    },
+    [endpoint]
+  );
 
   return (
     <DialogContent>
@@ -61,7 +57,7 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
         </Alert>
       )}
       <div className="flex flex-col items-center justify-center gap-4">
-        <canvas ref={canvasRef} />
+        <canvas ref={canvasRefCallback} />
         <Button onClick={handleCopyClick}>
           <Copy />
           {t('endpointQRCodeShare.copyUrlButtonLabel')}
