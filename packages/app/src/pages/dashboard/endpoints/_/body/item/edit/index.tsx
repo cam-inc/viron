@@ -9,6 +9,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
+  DialogTitle,
 } from '~/components/ui/dialog';
 import {
   Form,
@@ -102,7 +103,9 @@ const EditEndpoint: React.FC<Props> = ({ onOpenChange, endpoint }) => {
 
   return (
     <DialogContent>
-      <DialogHeader>{t('editEndpoint.title')}</DialogHeader>
+      <DialogHeader>
+        <DialogTitle>{t('editEndpoint.title')}</DialogTitle>
+      </DialogHeader>
       <Form {...form}>
         <form id={FORM_ID} className="space-y-8" onSubmit={handleSubmit}>
           {formState.errors.manual?.message && (

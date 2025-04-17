@@ -8,7 +8,11 @@ import License from '~/components/license';
 import Link from '~/components/link';
 import Server from '~/components/server';
 import { Badge } from '~/components/ui/badge';
-import { DialogContent, DialogHeader } from '~/components/ui/dialog';
+import {
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '~/components/ui/dialog';
 import { useTranslation } from '~/hooks/i18n';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document } from '~/types/oas';
@@ -23,7 +27,9 @@ const Info: React.FC<Props> = ({ endpoint, document }) => {
 
   return (
     <DialogContent>
-      <DialogHeader>{t('endpointInformation.title')}</DialogHeader>
+      <DialogHeader>
+        <DialogTitle>{t('endpointInformation.title')}</DialogTitle>
+      </DialogHeader>
       <div className="flex gap-4 items-center">
         <Thumbnail
           className="w-12 h-12 flex-none"

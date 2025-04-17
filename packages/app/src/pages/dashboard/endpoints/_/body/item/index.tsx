@@ -21,7 +21,6 @@ import { Skeleton } from '~/components/ui/skeleton';
 import { BaseError } from '~/errors';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
-import Modal, { useModal } from '~/portals/modal';
 import { Authentication, COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document } from '~/types/oas';
 import EditEndpoint from './edit';
@@ -120,17 +119,6 @@ const _Item: React.FC<{
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
-  const infoModal = useModal({});
-  const qrcodeModal = useModal({});
-
-  const handleInfoClick = useCallback(() => {
-    infoModal.open();
-  }, [infoModal]);
-
-  const handleQrcodeClick = useCallback(() => {
-    qrcodeModal.open();
-  }, [qrcodeModal]);
-
   const handleRemoveClick = useCallback(() => {
     removeEndpoint(endpoint.id);
   }, [endpoint, removeEndpoint]);
@@ -144,110 +132,100 @@ const _Item: React.FC<{
   }, [onRequestRefresh]);
 
   return (
-    <>
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <Thumbnail
-              className="flex-none w-10 h-10"
-              endpoint={endpoint}
-              document={document || undefined}
-            />
-            <div className="text-xl font-bold break-all grow">
-              {endpoint.id}
-            </div>
-            {/* TODO: ステータス表示 */}
-            {!!error && <Badge variant="destructive">error</Badge>}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <EllipsisVertical />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                      <Pencil />
-                      {t('endpointEditButtonLabel')}
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <EditEndpoint
-                    endpoint={endpoint}
-                    onOpenChange={setEditDialogOpen}
-                  />
-                </Dialog>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                      <InfoIcon />
-                      {t('endpointInformationButtonLabel')}
-                    </DropdownMenuItem>
-                  </DialogTrigger>
-                  <Info endpoint={endpoint} document={document || undefined} />
-                </Dialog>
-                <DropdownMenuItem onClick={handleQrcodeClick}>
-                  <QrCode />
-                  {t('endpointQRCodeShareButtonLabel')}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleRemoveClick}>
-                  <Trash />
-                  {t('removeEndpointButtonLabel')}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="text-muted-foreground text-xxs break-all font-bold">
-            {document?.info.title || authentication?.oas.info.title || '---'}
-          </div>
-          <div className="text-muted-foreground text-xxs break-all">
-            {endpoint.url}
-          </div>
-        </CardContent>
-        <CardFooter>
-          <div className="w-full flex items-center justify-end gap-2">
-            {!!authentication && (
-              <>
-                {document ? (
-                  <>
-                    <Button onClick={handleEnterClick}>
-                      {t('enterEndpoint')}
-                      <ChevronRight />
-                    </Button>
-                    {authentication.list.find(
-                      (item) => item.type === 'signout'
-                    ) && (
-                      <Signout
-                        endpoint={endpoint}
-                        authentication={authentication}
-                        onSignout={handleSignout}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <div className="flex-1">
-                    <Signin
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-3">
+          <Thumbnail
+            className="flex-none w-10 h-10"
+            endpoint={endpoint}
+            document={document || undefined}
+          />
+          <div className="text-xl font-bold break-all grow">{endpoint.id}</div>
+          {/* TODO: ステータス表示 */}
+          {!!error && <Badge variant="destructive">error</Badge>}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <EllipsisVertical />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+                <DialogTrigger asChild>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <Pencil />
+                    {t('endpointEditButtonLabel')}
+                  </DropdownMenuItem>
+                </DialogTrigger>
+                <EditEndpoint
+                  endpoint={endpoint}
+                  onOpenChange={setEditDialogOpen}
+                />
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <InfoIcon />
+                    {t('endpointInformationButtonLabel')}
+                  </DropdownMenuItem>
+                </DialogTrigger>
+                <Info endpoint={endpoint} document={document || undefined} />
+              </Dialog>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <QrCode />
+                    {t('endpointQRCodeShareButtonLabel')}
+                  </DropdownMenuItem>
+                </DialogTrigger>
+                <Qrcode endpoint={endpoint} />
+              </Dialog>
+              <DropdownMenuItem onClick={handleRemoveClick}>
+                <Trash />
+                {t('removeEndpointButtonLabel')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="text-muted-foreground text-xxs break-all font-bold">
+          {document?.info.title || authentication?.oas.info.title || '---'}
+        </div>
+        <div className="text-muted-foreground text-xxs break-all">
+          {endpoint.url}
+        </div>
+      </CardContent>
+      <CardFooter>
+        <div className="w-full flex items-center justify-end gap-2">
+          {!!authentication && (
+            <>
+              {document ? (
+                <>
+                  <Button onClick={handleEnterClick}>
+                    {t('enterEndpoint')}
+                    <ChevronRight />
+                  </Button>
+                  {authentication.list.find(
+                    (item) => item.type === 'signout'
+                  ) && (
+                    <Signout
                       endpoint={endpoint}
                       authentication={authentication}
+                      onSignout={handleSignout}
                     />
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        </CardFooter>
-      </Card>
-      {/* Info */}
-      <Modal {...infoModal.bind}>
-        <Info endpoint={endpoint} document={document || undefined} />
-      </Modal>
-      {/* QRCode */}
-      <Modal {...qrcodeModal.bind}>
-        <Qrcode endpoint={endpoint} />
-      </Modal>
-    </>
+                  )}
+                </>
+              ) : (
+                <div className="flex-1">
+                  <Signin endpoint={endpoint} authentication={authentication} />
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </CardFooter>
+    </Card>
   );
 };
 
