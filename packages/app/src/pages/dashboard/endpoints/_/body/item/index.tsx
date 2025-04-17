@@ -118,7 +118,8 @@ const _Item: React.FC<{
   const { t } = useTranslation();
   const { navigate, removeEndpoint } = useEndpoint();
 
-  const editModal = useModal({});
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+
   const infoModal = useModal({});
   const qrcodeModal = useModal({});
 
@@ -164,7 +165,7 @@ const _Item: React.FC<{
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <Dialog>
+                <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
                   <DialogTrigger asChild>
                     <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                       <Pencil />
@@ -172,9 +173,8 @@ const _Item: React.FC<{
                     </DropdownMenuItem>
                   </DialogTrigger>
                   <EditEndpoint
-                    onAdd={editModal.close}
-                    onCancel={editModal.close}
                     endpoint={endpoint}
+                    onOpenChange={setEditDialogOpen}
                   />
                 </Dialog>
                 <DropdownMenuItem onClick={handleInfoClick}>

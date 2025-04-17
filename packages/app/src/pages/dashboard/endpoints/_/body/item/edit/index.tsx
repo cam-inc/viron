@@ -1,23 +1,45 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import React, { useCallback, useMemo } from 'react';
+import { AlertCircle } from 'lucide-react';
+import React, { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import Button, { Props as ButtonProps } from '~/components/button';
-import Select from '~/components/select';
-import Textinput from '~/components/textinput';
-import { DialogContent, DialogHeader } from '~/components/ui/dialog';
+import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert';
+import { Button } from '~/components/ui/button';
+import {
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+} from '~/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '~/components/ui/form';
+import { Input } from '~/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/ui/select';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
-import { COLOR_SYSTEM, Endpoint, EndpointGroup } from '~/types';
+import { Endpoint } from '~/types';
 import { endpointId, url } from '~/utils/v8n';
 
+const FORM_ID = 'edit-endpoint-form';
+
 export type Props = {
-  onAdd: () => void;
-  onCancel: () => void;
+  onOpenChange: (open: boolean) => void;
   endpoint: Endpoint;
 };
 
-const EditEndpoint: React.FC<Props> = ({ onAdd, onCancel, endpoint }) => {
+const EditEndpoint: React.FC<Props> = ({ onOpenChange, endpoint }) => {
   const { t } = useTranslation();
   const { groupList, connect, editEndpoint } = useEndpoint();
 
@@ -30,17 +52,18 @@ const EditEndpoint: React.FC<Props> = ({ onAdd, onCancel, endpoint }) => {
     []
   );
 
+  const form = useForm<
+    Pick<Endpoint, 'id' | 'url' | 'groupId'> & { manual?: string }
+  >({
+    resolver: yupResolver(schema),
+    defaultValues: endpoint,
+  });
   const {
-    register,
     handleSubmit: _handleSubmit,
     formState,
     setError,
     clearErrors,
-    watch,
-  } = useForm<Pick<Endpoint, 'id' | 'url' | 'groupId'> & { manual?: string }>({
-    resolver: yupResolver(schema),
-    defaultValues: endpoint,
-  });
+  } = form;
   const handleSubmit = useMemo(
     () =>
       _handleSubmit(async (data) => {
@@ -64,83 +87,98 @@ const EditEndpoint: React.FC<Props> = ({ onAdd, onCancel, endpoint }) => {
         }
 
         clearErrors();
-        onAdd();
+        onOpenChange(false);
       }),
-    [_handleSubmit, connect, editEndpoint, clearErrors, onAdd, setError]
+    [
+      _handleSubmit,
+      connect,
+      editEndpoint,
+      endpoint.id,
+      clearErrors,
+      onOpenChange,
+      setError,
+    ]
   );
-
-  const handleCreateClick = useCallback<ButtonProps['onClick']>(() => {
-    // nothing to do...
-  }, []);
 
   return (
     <DialogContent>
       <DialogHeader>{t('editEndpoint.title')}</DialogHeader>
-      <form className="space-y-8" onSubmit={handleSubmit}>
-        <div>{formState.errors.manual?.message}</div>
-        <div className="space-y-8">
-          <Textinput.renewal
-            type="text"
-            label={t('editEndpoint.idInputLabel')}
-            on={COLOR_SYSTEM.SURFACE}
-            error={formState.errors.id}
-            render={(bind) => (
-              <input placeholder={endpoint.id} {...bind} {...register('id')} />
+      <Form {...form}>
+        <form id={FORM_ID} className="space-y-8" onSubmit={handleSubmit}>
+          {formState.errors.manual?.message && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>
+                {formState.errors.manual.message}
+              </AlertDescription>
+            </Alert>
+          )}
+          <FormField
+            control={form.control}
+            name="id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('editEndpoint.idInputLabel')}</FormLabel>
+                <FormControl>
+                  <Input placeholder={endpoint.id} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
           />
-          <Textinput.renewal
-            type="text"
-            label={t('editEndpoint.urlInputLabel')}
-            on={COLOR_SYSTEM.SURFACE}
-            error={formState.errors.url}
-            render={(bind) => (
-              <input
-                placeholder={endpoint.url}
-                {...bind}
-                {...register('url')}
-              />
+          <FormField
+            control={form.control}
+            name="url"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('editEndpoint.urlInputLabel')}</FormLabel>
+                <FormControl>
+                  <Input placeholder={endpoint.url} {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
           />
-          <Select.renewal<EndpointGroup>
-            on={COLOR_SYSTEM.SURFACE}
-            label={t('editEndpoint.groupInputLabel')}
-            description={t('editEndpoint.groupInputDescription')}
-            list={groupList}
-            Select={({ id, className, children }) => (
-              <select
-                id={id}
-                className={className}
-                value={watch('groupId')}
-                {...register('groupId')}
-              >
-                {children}
-              </select>
-            )}
-            Option={({ className, data }) => (
-              <option className={className} value={data.id}>
-                {data.name}
-              </option>
-            )}
-            OptionBlank={({ className }) => (
-              <option className={className}>-</option>
+          <FormField
+            control={form.control}
+            name="groupId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('editEndpoint.groupInputLabel')}</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {/** @see https://github.com/radix-ui/primitives/issues/1569 */}
+                      <SelectItem value={undefined as any}>-</SelectItem>
+                      {groupList.map((group) => (
+                        <SelectItem key={group.id} value={group.id}>
+                          {group.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormDescription>
+                  {t('editEndpoint.groupInputDescription')}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
             )}
           />
-        </div>
-        <div className="flex justify-end gap-4">
-          <Button
-            variant="text"
-            on={COLOR_SYSTEM.SURFACE}
-            label={t('editEndpoint.cancelButtonLabel')}
-            onClick={onCancel}
-          />
-          <Button
-            type="submit"
-            cs={COLOR_SYSTEM.PRIMARY}
-            label={t('editEndpoint.updateButtonLabel')}
-            onClick={handleCreateClick}
-          />
-        </div>
-      </form>
+        </form>
+      </Form>
+      <DialogFooter>
+        <Button form={FORM_ID} type="submit">
+          {t('editEndpoint.updateButtonLabel')}
+        </Button>
+      </DialogFooter>
     </DialogContent>
   );
 };
