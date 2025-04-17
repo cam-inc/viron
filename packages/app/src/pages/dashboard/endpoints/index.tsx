@@ -35,7 +35,7 @@ const DashboardEndpointsPage: React.FC<Props> = () => {
               </h1>
             </div>
           </header>
-          <Body />
+          <Body className="flex-1" />
         </SidebarInset>
       </SidebarProvider>
     </>

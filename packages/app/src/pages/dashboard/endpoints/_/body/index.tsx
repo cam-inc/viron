@@ -1,24 +1,23 @@
 import classnames from 'classnames';
+import { Plus } from 'lucide-react';
 import React, { PropsWithChildren, useEffect, useRef } from 'react';
 import Sortable from 'sortablejs';
-import Button from '~/components/button';
 import EndpointsEmptyIcon from '~/components/endpoinitsEmptyIcon';
-import Head from '~/components/head';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
-import PlusIcon from '~/components/icon/plus/outline';
+import { Button } from '~/components/ui/button';
 import { UN_GROUP_ID } from '~/constants';
 import { useEndpoint, useEndpointGroupToggle } from '~/hooks/endpoint';
 import { Trans, useTranslation } from '~/hooks/i18n';
-import { Props as LayoutProps } from '~/layouts/';
+import { cn } from '~/lib/utils';
 import Modal, { useModal } from '~/portals/modal';
 import { COLOR_SYSTEM, Endpoint, EndpointGroup } from '~/types';
 import Menu from '../../../_/menu';
 import Add from './add/';
 import Item from './item/';
 
-export type Props = Record<string, never>;
-const Body: React.FC<Props> = () => {
+export type Props = { className?: string };
+const Body: React.FC<Props> = ({ className }) => {
   const { t } = useTranslation();
   const { listByGroup, listUngrouped } = useEndpoint();
   // Add modal.
@@ -26,65 +25,53 @@ const Body: React.FC<Props> = () => {
 
   return (
     <>
-      <div>
-        <div className="max-w-[1252px] mx-auto px-4 lg:px-8">
-          {/* Head */}
-          <div>
-            <div className="py-6 lg:py-10 flex justify-between items-center">
-              <Head
+      <div className={cn('flex flex-col py-4 md:py-6 px-4 lg:px-6', className)}>
+        {/* Head */}
+        <div className="flex justify-end items-center">
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={modal.open}>
+              <Plus />
+              {t('addEndpointButtonLabel')}
+            </Button>
+            <Menu />
+          </div>
+        </div>
+        {/* Body */}
+        <div className="space-y-2">
+          {!!listByGroup.length && (
+            <ul>
+              {listByGroup.map((item) => (
+                <li
+                  key={item.group.id}
+                  className="py-1 border-b border-thm-on-background-faint"
+                >
+                  <GroupAccordion group={item.group}>
+                    <EndpointList list={item.list} groupId={item.group.id} />
+                  </GroupAccordion>
+                </li>
+              ))}
+            </ul>
+          )}
+          {!!listUngrouped.length && (
+            <EndpointList list={listUngrouped} groupId={UN_GROUP_ID} />
+          )}
+          {!listByGroup.length && !listUngrouped.length && (
+            <div className="flex flex-col justify-center items-center py-30 gap-6">
+              <EndpointsEmptyIcon
+                className="w-[182px] text-thm-on-background-slight"
                 on={COLOR_SYSTEM.BACKGROUND}
-                title={<div>{t('dashboard.endpoints.title')}</div>}
-                description={t('dashboard.endpoints.description')}
               />
-              <div className="flex items-center space-x-4">
-                <Button
-                  variant="outlined"
-                  cs={COLOR_SYSTEM.PRIMARY}
-                  label={t('addEndpointButtonLabel')}
-                  Icon={PlusIcon}
-                  onClick={modal.open}
+              <p className="text-center text-thm-on-background-low">
+                <Trans
+                  t={t}
+                  i18nKey="dashboard.endpoints.emptyMessage"
+                  components={{
+                    br: <br />,
+                  }}
                 />
-                <Menu />
-              </div>
+              </p>
             </div>
-          </div>
-          {/* Body */}
-          <div className="space-y-2">
-            {!!listByGroup.length && (
-              <ul>
-                {listByGroup.map((item) => (
-                  <li
-                    key={item.group.id}
-                    className="py-1 border-b border-thm-on-background-faint"
-                  >
-                    <GroupAccordion group={item.group}>
-                      <EndpointList list={item.list} groupId={item.group.id} />
-                    </GroupAccordion>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {!!listUngrouped.length && (
-              <EndpointList list={listUngrouped} groupId={UN_GROUP_ID} />
-            )}
-            {!listByGroup.length && !listUngrouped.length && (
-              <div className="flex flex-col justify-center items-center py-30 gap-6">
-                <EndpointsEmptyIcon
-                  className="w-[182px] text-thm-on-background-slight"
-                  on={COLOR_SYSTEM.BACKGROUND}
-                />
-                <p className="text-center text-thm-on-background-low">
-                  <Trans
-                    t={t}
-                    i18nKey="dashboard.endpoints.emptyMessage"
-                    components={{
-                      br: <br />,
-                    }}
-                  />
-                </p>
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </div>
       <Modal {...modal.bind}>
