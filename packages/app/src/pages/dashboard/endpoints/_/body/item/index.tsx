@@ -217,9 +217,7 @@ const _Item: React.FC<{
                   )}
                 </>
               ) : (
-                <div className="flex-1">
-                  <Signin endpoint={endpoint} authentication={authentication} />
-                </div>
+                <Signin endpoint={endpoint} authentication={authentication} />
               )}
             </>
           )}
