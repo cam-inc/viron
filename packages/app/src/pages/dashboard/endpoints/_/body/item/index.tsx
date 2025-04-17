@@ -159,7 +159,7 @@ const _Item: React.FC<{
               {endpoint.id}
             </div>
             {/* TODO: ステータス表示 */}
-            <Badge variant="destructive">error</Badge>
+            {!!error && <Badge variant="destructive">error</Badge>}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
