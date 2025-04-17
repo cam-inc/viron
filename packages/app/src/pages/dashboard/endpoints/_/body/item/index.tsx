@@ -177,10 +177,15 @@ const _Item: React.FC<{
                     onOpenChange={setEditDialogOpen}
                   />
                 </Dialog>
-                <DropdownMenuItem onClick={handleInfoClick}>
-                  <InfoIcon />
-                  {t('endpointInformationButtonLabel')}
-                </DropdownMenuItem>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                      <InfoIcon />
+                      {t('endpointInformationButtonLabel')}
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <Info endpoint={endpoint} document={document || undefined} />
+                </Dialog>
                 <DropdownMenuItem onClick={handleQrcodeClick}>
                   <QrCode />
                   {t('endpointQRCodeShareButtonLabel')}
