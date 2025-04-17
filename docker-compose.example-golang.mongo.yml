@@ -1,10 +1,7 @@
-version: '3.8'
-
 services:
-
   example_golang:
-    build: 
-      context: '.'
+    build:
+      context: "."
       dockerfile: Dockerfile.example-golang
     restart: always
     depends_on:
@@ -24,7 +21,6 @@ services:
       - $PWD/packages/golang/go.sum:/viron/packages/go.sum
       - $PWD/packages/golang:/viron/packages/golang
     command: bash -c "go mod tidy && go run /viron/example/golang/cmd/main.go"
-
 
   mongo:
     extends:

@@ -15,7 +15,7 @@ const main = async (): Promise<void> => {
    */
   server.listen(app.get('port'), () => {
     logger.info(
-      '@viron/example/nodejs is running at https://localhost:%d in %s mode',
+      '@viron/example/nodejs is running at https://local-api.viron.work:%d in %s mode',
       app.get('port'),
       app.get('env')
     );
