@@ -22,7 +22,7 @@ const CellForTypeString: React.FC<Props> = ({ on, schema, value }) => {
           </a>
         );
       case 'uri-image':
-        return <img className="block" src={value} />;
+        return <img className="block" src={value} alt="" />;
       default:
         return (
           <div className={classnames(`text-sm text-thm-on-${on}`)}>{value}</div>

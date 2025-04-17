@@ -318,6 +318,25 @@ const Accordion: React.FC<
     }
   };
 
+  const previewValue = (value: string | number | boolean) => {
+    switch (schema?.format) {
+      case 'uri-image':
+        return (
+          <>
+            {typeof value === 'string' && (
+              <img
+                className="block w-20 h-20 object-cover rounded-lg"
+                src={value}
+                alt={objectKey}
+              />
+            )}
+          </>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div>
       <div className="inline-flex items-center gap-1 whitespace-nowrap">
@@ -337,7 +356,7 @@ const Accordion: React.FC<
         </div>
       </div>
       {isOpened && (
-        <div className="ml-5 pl-4 border-l border-thm-on-surface-slight">
+        <div className="ml-5 pl-4 border-l border-thm-on-surface-slight flex flex-col items-start space-y-4">
           {data[objectKey] && typeof data[objectKey] === 'object' ? (
             Object.keys(data[objectKey]).map((childObjectKey, index) => (
               <Accordion
@@ -349,18 +368,21 @@ const Accordion: React.FC<
               />
             ))
           ) : (
-            <div className="bg-thm-on-background-slight rounded-lg px-2.5 p-3 inline-flex items-center whitespace-nowrap mr-5">
-              <span className={`mr-2 text-xs text-thm-on-${on}`}>
-                {displayValue(data[objectKey])}
-              </span>
-              <Button
-                size="sm"
-                variant="text"
-                on={on}
-                Icon={ClipboardCopyIcon}
-                onClick={handleCopyClick}
-              />
-            </div>
+            <>
+              <div className="bg-thm-on-background-slight rounded-lg px-2.5 p-3 inline-flex items-center whitespace-nowrap mr-5">
+                <span className={`mr-2 text-xs text-thm-on-${on}`}>
+                  {displayValue(data[objectKey])}
+                </span>
+                <Button
+                  size="sm"
+                  variant="text"
+                  on={on}
+                  Icon={ClipboardCopyIcon}
+                  onClick={handleCopyClick}
+                />
+              </div>
+              {previewValue(data[objectKey])}
+            </>
           )}
         </div>
       )}

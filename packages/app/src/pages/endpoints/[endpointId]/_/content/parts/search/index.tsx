@@ -1,12 +1,17 @@
+import { Search as SearchIcon } from 'lucide-react';
 import React, { useCallback } from 'react';
-import Button, { Props as ButtonProps } from '~/components/button';
-import SearchIcon from '~/components/icon/search/outline';
 import Request from '~/components/request';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '~/components/ui/tooltip';
 import Drawer, { useDrawer } from '~/portals/drawer';
-import Popover, { usePopover } from '~/portals/popover';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document, RequestValue } from '~/types/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
+import { Button } from '@/components/ui/button';
 
 export type Props = {
   endpoint: Endpoint;
@@ -15,10 +20,6 @@ export type Props = {
 };
 const Search: React.FC<Props> = ({ endpoint, document, base }) => {
   const drawer = useDrawer();
-  const handleButtonClick = useCallback<ButtonProps['onClick']>(() => {
-    drawer.open();
-  }, [drawer]);
-
   const handleRequestSubmit = useCallback(
     (requestValue: RequestValue) => {
       drawer.close();
@@ -27,28 +28,26 @@ const Search: React.FC<Props> = ({ endpoint, document, base }) => {
     [drawer, base]
   );
 
-  const popover = usePopover<HTMLDivElement>();
-  const handleMouseEnter = useCallback(() => {
-    popover.open();
-  }, [popover]);
-  const handleMouseLeave = useCallback(() => {
-    popover.close();
-  }, [popover]);
-
   return (
     <>
-      <div
-        ref={popover.targetRef}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        <Button
-          variant="text"
-          on={COLOR_SYSTEM.SURFACE}
-          Icon={SearchIcon}
-          onClick={handleButtonClick}
-        />
-      </div>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger>
+            <Button
+              variant="ghost"
+              className="h-8 w-8"
+              onClick={() => {
+                drawer.open();
+              }}
+            >
+              <SearchIcon className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <div className="text-thm-on-surface whitespace-nowrap">Search</div>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <Drawer {...drawer.bind}>
         <Request
           on={COLOR_SYSTEM.SURFACE}
@@ -60,9 +59,6 @@ const Search: React.FC<Props> = ({ endpoint, document, base }) => {
           className="h-full"
         />
       </Drawer>
-      <Popover {...popover.bind}>
-        <div className="text-thm-on-surface whitespace-nowrap">Search</div>
-      </Popover>
     </>
   );
 };
