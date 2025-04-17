@@ -7,8 +7,6 @@ export default (document: Document | null = null): void => {
   useEffect(() => {
     if (document?.info['x-theme']) {
       setTheme(document.info['x-theme']);
-    } else {
-      setTheme(THEME.BLUE);
     }
   }, [document, setTheme]);
 };

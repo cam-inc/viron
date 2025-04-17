@@ -29,6 +29,7 @@ export const THEME_HUE: Record<Theme, Hue> = {
   [THEME.BRUTAL_PINK]: 315,
   [THEME.NEON_ROSE]: 330,
   [THEME.ELECTRIC_CRIMSON]: 345,
+  default: 240,
 } as const;
 export type ThemeHue = (typeof THEME_HUE)[keyof typeof THEME_HUE];
 

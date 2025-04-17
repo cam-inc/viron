@@ -73,7 +73,9 @@ const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
       {style}
       <div
         id="root"
-        className={cn('relative', `theme-${theme.replace(/\s/g, '-')}`)}
+        className={cn('relative', {
+          [`theme-${theme.replace(/\s/g, '-')}`]: theme !== 'default',
+        })}
       >
         <div>{children}</div>
         <DrawerWrapper className="fixed inset-0 z-wrapper-drawer" />
