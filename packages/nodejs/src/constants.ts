@@ -15,6 +15,7 @@ export const AUTH_CONFIG_TYPE = {
   OIDC_CALLBACK: 'oidccallback',
   SIGNOUT: 'signout',
 } as const;
+
 export type AuthConfigType =
   (typeof AUTH_CONFIG_TYPE)[keyof typeof AUTH_CONFIG_TYPE];
 
@@ -24,8 +25,17 @@ export const AUTH_CONFIG_PROVIDER = {
   OIDC: 'oidc',
   SIGNOUT: 'signout',
 } as const;
+
 export type AuthConfigProvider =
   (typeof AUTH_CONFIG_PROVIDER)[keyof typeof AUTH_CONFIG_PROVIDER];
+
+export const AUTH_CONFIG_MODE = {
+  NAVIGATE: 'navigate',
+  CORS: 'cors',
+} as const;
+
+export type AuthConfigMode =
+  (typeof AUTH_CONFIG_MODE)[keyof typeof AUTH_CONFIG_MODE];
 
 export const STORE_TYPE = {
   MYSQL: 'mysql',

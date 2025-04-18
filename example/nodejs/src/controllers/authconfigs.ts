@@ -1,6 +1,7 @@
 import {
   domainsAuthConfig,
   API_METHOD,
+  AUTH_CONFIG_MODE,
   AUTH_CONFIG_TYPE,
   AUTH_CONFIG_PROVIDER,
   EMAIL_SIGNIN_PATH,
@@ -49,6 +50,7 @@ export const listVironAuthconfigs = async (
             defaultRequestBodyValue: {
               clientId: ctx.config.auth.googleOAuth2.clientId,
             },
+            mode: AUTH_CONFIG_MODE.CORS,
           },
           {
             provider: AUTH_CONFIG_PROVIDER.GOOGLE,
@@ -78,6 +80,7 @@ export const listVironAuthconfigs = async (
             defaultRequestBodyValue: {
               clientId: ctx.config.auth.oidc.clientId,
             },
+            mode: AUTH_CONFIG_MODE.CORS,
           },
           {
             provider: AUTH_CONFIG_PROVIDER.OIDC,
@@ -92,6 +95,7 @@ export const listVironAuthconfigs = async (
         ]
       : []),
   ];
+
   const result = genAuthConfigs(
     authConfigDefinitions,
     context.req._context.apiDefinition

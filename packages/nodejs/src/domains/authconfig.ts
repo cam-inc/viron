@@ -1,4 +1,5 @@
 import {
+  AuthConfigMode,
   AuthConfigProvider,
   AuthConfigType,
   ApiMethod,
@@ -17,6 +18,7 @@ export interface AuthConfig {
   defaultParametersValue?: Record<string, any>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   defaultRequestBodyValue?: any;
+  mode?: AuthConfigMode;
 }
 
 export type AuthConfigs = AuthConfig[];
@@ -35,6 +37,7 @@ export interface AuthConfigDefinition {
   defaultParametersValue?: Record<string, any>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   defaultRequestBodyValue?: any;
+  mode?: AuthConfigMode;
 }
 
 export type AuthConfigDefinitions = AuthConfigDefinition[];
@@ -47,7 +50,8 @@ const genAuthConfig = (
   oas: VironOpenAPIObject,
   defaultParametersValue?: Record<string, unknown>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  defaultRequestBodyValue?: any
+  defaultRequestBodyValue?: any,
+  mode?: AuthConfigMode
 ): AuthConfig => {
   const operationObject = findOperation(path, method, oas);
   if (!operationObject) {
@@ -65,6 +69,7 @@ const genAuthConfig = (
       ...operationObject[OAS_X_AUTHCONFIG_DEFAULT_REQUESTBODY],
       ...defaultRequestBodyValue,
     },
+    mode,
   };
 };
 
@@ -81,6 +86,7 @@ export const genAuthConfigs = (
         path,
         defaultParametersValue,
         defaultRequestBodyValue,
+        mode,
       } = def;
       ret.list.push(
         genAuthConfig(
@@ -90,7 +96,8 @@ export const genAuthConfigs = (
           path,
           oas,
           defaultParametersValue,
-          defaultRequestBodyValue
+          defaultRequestBodyValue,
+          mode
         )
       );
       ret.paths[path] = ret.paths[path] ?? {};

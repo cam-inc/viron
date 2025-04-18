@@ -30,7 +30,7 @@ export const signinEmail = async (context: RouteContext): Promise<void> => {
   context.res.status(204).end();
 };
 
-// OIDCの認証画面へリダイレクト
+// OIDCの認証画面 URL を返却
 export const oidcAuthorization = async (
   context: RouteContext
 ): Promise<void> => {
@@ -54,12 +54,17 @@ export const oidcAuthorization = async (
 
   // CookieにOIDCのStateとPKCE用のCodeVerifierをセット
   const cookies = [
-    genOidcStateCookie(state),
-    genOidcCodeVerifierCookie(codeVerifier),
+    genOidcStateCookie(state, { partitioned: true }),
+    genOidcCodeVerifierCookie(codeVerifier, { partitioned: true }),
   ];
-  context.res.setHeader(HTTP_HEADER.SET_COOKIE, cookies);
-  context.res.setHeader(HTTP_HEADER.LOCATION, authorizationUrl);
-  context.res.status(301).end();
+
+  context.res
+    .status(200)
+    .set(HTTP_HEADER.SET_COOKIE, cookies)
+    .set(HTTP_HEADER.LOCATION, authorizationUrl)
+    .json({
+      authorizationUrl,
+    });
 };
 
 // OIDCのコールバック
@@ -81,7 +86,7 @@ export const oidcCallback = async (context: RouteContext): Promise<void> => {
   const token = await domainsAuth.signinOidc(
     context.req,
     client,
-    codeVerifier as string,
+    codeVerifier,
     redirectUri,
     params,
     ctx.config.auth.oidc,
@@ -91,6 +96,7 @@ export const oidcCallback = async (context: RouteContext): Promise<void> => {
     HTTP_HEADER.SET_COOKIE,
     genAuthorizationCookie(token, {
       maxAge: ctx.config.auth.jwt.expirationSec,
+      partitioned: true,
     })
   );
   context.origRes.clearCookie(COOKIE_KEY.OIDC_STATE);
@@ -99,7 +105,7 @@ export const oidcCallback = async (context: RouteContext): Promise<void> => {
   context.res.status(204).end();
 };
 
-// GoogleOAuth2の認可画面へリダイレクト
+// GoogleOAuth2の認可画面を返却
 export const oauth2GoogleAuthorization = async (
   context: RouteContext
 ): Promise<void> => {
@@ -111,10 +117,15 @@ export const oauth2GoogleAuthorization = async (
     state,
     ctx.config.auth.googleOAuth2
   );
-
-  context.res.setHeader(HTTP_HEADER.SET_COOKIE, genOAuthStateCookie(state));
-  context.res.setHeader(HTTP_HEADER.LOCATION, authorizationUrl);
-  context.res.status(301).end();
+  context.res
+    .status(200)
+    .set(
+      HTTP_HEADER.SET_COOKIE,
+      genOAuthStateCookie(state, { partitioned: true })
+    )
+    .json({
+      authorizationUrl,
+    });
 };
 
 // GoogleOAuth2のコールバック
@@ -139,6 +150,7 @@ export const oauth2GoogleCallback = async (
     HTTP_HEADER.SET_COOKIE,
     genAuthorizationCookie(token, {
       maxAge: ctx.config.auth.jwt.expirationSec,
+      partitioned: true,
     })
   );
   context.res.status(204).end();

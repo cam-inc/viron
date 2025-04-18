@@ -14,22 +14,11 @@ export const genCookie = (
   options?: CookieSerializeOptions
 ): string => {
   const opts = Object.assign({}, options);
-  if (opts.httpOnly === undefined) {
-    opts.httpOnly = true;
-  }
-  if (!opts.path) {
-    opts.path = '/';
-  }
-  if (opts.secure === undefined) {
-    opts.secure = true;
-  }
-  if (!opts.sameSite) {
-    opts.sameSite = 'none';
-  }
-  // TODO: Set to true by default after all 3pcd support is complete
-  // if (opts.partitioned === undefined) {
-  //   opts.partitioned = true;
-  // }
+  opts.httpOnly ??= true;
+  opts.path ??= '/';
+  opts.secure ??= true;
+  opts.sameSite ??= 'none';
+  opts.partitioned ??= false;
   return serialize(key, value, opts);
 };
 
