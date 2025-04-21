@@ -147,9 +147,6 @@ module.exports = {
     return safelist;
   })(),
   theme: {
-    // screens: {
-    //   lg: '640px',
-    // }, // TODO: shadcnと干渉する。デグレしているので、治す
     extend: {
       keyframes: {
         'move-left-and-back': {
