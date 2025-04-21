@@ -23,11 +23,16 @@ export const signout = async (context: RouteContext): Promise<void> => {
 export const signinEmail = async (context: RouteContext): Promise<void> => {
   const { email, password } = context.requestBody;
   const token = await domainsAuth.signinEmail(context.req, email, password);
-  context.res.setHeader(
-    HTTP_HEADER.SET_COOKIE,
-    genAuthorizationCookie(token, { maxAge: ctx.config.auth.jwt.expirationSec })
-  );
-  context.res.status(204).end();
+  context.res
+    .header(
+      HTTP_HEADER.SET_COOKIE,
+      genAuthorizationCookie(token, {
+        maxAge: ctx.config.auth.jwt.expirationSec,
+        partitioned: true,
+      })
+    )
+    .status(204)
+    .end();
 };
 
 // OIDCの認証画面 URL を返却
@@ -58,13 +63,9 @@ export const oidcAuthorization = async (
     genOidcCodeVerifierCookie(codeVerifier, { partitioned: true }),
   ];
 
-  context.res
-    .status(200)
-    .set(HTTP_HEADER.SET_COOKIE, cookies)
-    .set(HTTP_HEADER.LOCATION, authorizationUrl)
-    .json({
-      authorizationUrl,
-    });
+  context.res.header(HTTP_HEADER.SET_COOKIE, cookies).json({
+    authorizationUrl,
+  });
 };
 
 // OIDCのコールバック
@@ -92,7 +93,7 @@ export const oidcCallback = async (context: RouteContext): Promise<void> => {
     ctx.config.auth.oidc,
     ctx.config.auth.multipleAuthUser
   );
-  context.res.setHeader(
+  context.res.header(
     HTTP_HEADER.SET_COOKIE,
     genAuthorizationCookie(token, {
       maxAge: ctx.config.auth.jwt.expirationSec,
@@ -118,8 +119,7 @@ export const oauth2GoogleAuthorization = async (
     ctx.config.auth.googleOAuth2
   );
   context.res
-    .status(200)
-    .set(
+    .header(
       HTTP_HEADER.SET_COOKIE,
       genOAuthStateCookie(state, { partitioned: true })
     )
@@ -146,12 +146,14 @@ export const oauth2GoogleCallback = async (
     ctx.config.auth.googleOAuth2,
     ctx.config.auth.multipleAuthUser
   );
-  context.res.setHeader(
-    HTTP_HEADER.SET_COOKIE,
-    genAuthorizationCookie(token, {
-      maxAge: ctx.config.auth.jwt.expirationSec,
-      partitioned: true,
-    })
-  );
-  context.res.status(204).end();
+  context.res
+    .header(
+      HTTP_HEADER.SET_COOKIE,
+      genAuthorizationCookie(token, {
+        maxAge: ctx.config.auth.jwt.expirationSec,
+        partitioned: true,
+      })
+    )
+    .status(204)
+    .end();
 };
