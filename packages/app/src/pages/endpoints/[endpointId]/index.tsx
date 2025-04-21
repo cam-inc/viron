@@ -30,7 +30,6 @@ import Pages from '~/pages/endpoints/[endpointId]/_/navigation/pages';
 import { useEndpointListItemGlobalStateValue } from '~/store';
 import { COLOR_SYSTEM } from '~/types';
 import { Document, Info } from '~/types/oas';
-import { Props as BodyProps } from './_/body';
 import Content from './_/content';
 import { Props as NavigationProps } from './_/navigation';
 import SubBody from './_/subBody';
@@ -131,8 +130,8 @@ const EndpointPage: React.FC<Props> = ({ params }) => {
     [_navigate, pinnedContentIds]
   );
 
-  const handleContentPin = useCallback<BodyProps['onPin']>(
-    (contentId) => {
+  const handleContentPin = useCallback(
+    (contentId: string) => {
       if (!selectedPageId) {
         return;
       }
@@ -141,8 +140,8 @@ const EndpointPage: React.FC<Props> = ({ params }) => {
     [selectedPageId, pinnedContentIds, _navigate]
   );
 
-  const handleContentUnpin = useCallback<BodyProps['onUnpin']>(
-    (contentId) => {
+  const handleContentUnpin = useCallback(
+    (contentId: string) => {
       if (!selectedPageId) {
         return;
       }

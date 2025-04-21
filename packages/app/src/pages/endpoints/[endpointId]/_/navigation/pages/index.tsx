@@ -1,5 +1,5 @@
-import { ChevronDown, ChevronRight } from 'lucide-react';
-import React, { useMemo, useState } from 'react';
+import { ChevronRight, Folder } from 'lucide-react';
+import React, { useMemo } from 'react';
 import {
   Collapsible,
   CollapsibleTrigger,
@@ -7,11 +7,12 @@ import {
 } from '~/components/ui/collapsible';
 import {
   SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarMenuSub,
-  SidebarMenuSubItem,
 } from '~/components/ui/sidebar';
 import { Page, PageId } from '~/types/oas';
 
@@ -84,110 +85,74 @@ const _Pages: React.FC<Props> = ({ pages, selectedPageId, onSelect }) => {
 
   return (
     <SidebarGroup>
-      <SidebarMenu>
-        <GroupOrPage
-          pages={pages}
-          depth={0}
-          list={tree.children}
-          selectedPageId={selectedPageId}
-          onSelect={onSelect}
-        />
-      </SidebarMenu>
+      <SidebarGroupLabel>Pages</SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {tree?.children?.map((item, index) => (
+            <Tree
+              pages={pages}
+              key={index}
+              item={item}
+              onSelect={onSelect}
+              selectedPageId={selectedPageId}
+            />
+          ))}
+        </SidebarMenu>
+      </SidebarGroupContent>
     </SidebarGroup>
   );
 };
 export default _Pages;
 
-const GroupOrPage: React.FC<{
+const Tree: React.FC<{
   pages: Page[];
-  depth: number;
-  list: Partial['children'];
-  selectedPageId: PageId;
+  item: string | Partial;
   onSelect: (pageId: PageId) => void;
-}> = ({ pages, depth, list, selectedPageId, onSelect }) => {
-  return (
-    <>
-      {list.map((item, idx) => {
-        let content: JSX.Element;
-        if (typeof item === 'string') {
-          const page = pages.find((p) => p.id === item) as Page;
-          content = (
-            <_Page
-              page={page}
-              isSelected={item === selectedPageId}
-              onSelect={onSelect}
-            />
-          );
-        } else {
-          content = (
-            <Group
-              pages={pages}
-              depth={depth}
-              partial={item}
-              selectedPageId={selectedPageId}
-              onSelect={onSelect}
-            />
-          );
-        }
+  selectedPageId?: string;
+}> = ({ pages, item, onSelect, selectedPageId }) => {
+  const page = pages?.find((p) => p.id === item);
 
-        return <SidebarMenuItem>{content}</SidebarMenuItem>;
-      })}
-    </>
-  );
-};
+  if (typeof item === 'string') {
+    return (
+      <SidebarMenuButton
+        className="data-[active=true]:bg-transparent"
+        onClick={() => {
+          page?.id && onSelect(page.id);
+        }}
+        isActive={selectedPageId === page?.id}
+      >
+        {item}
+      </SidebarMenuButton>
+    );
+  }
 
-const Group: React.FC<{
-  pages: Page[];
-  depth: number;
-  partial: Partial;
-  selectedPageId: PageId;
-  onSelect: (pageId: PageId) => void;
-}> = ({ pages, depth, partial, selectedPageId, onSelect }) => {
-  const [isOpened, setIsOpened] = useState<boolean>(true);
-  const handleClick = () => {
-    setIsOpened((currVal) => !currVal);
-  };
   return (
-    <Collapsible defaultOpen className="group/collapsible">
-      <SidebarMenuItem>
-        <CollapsibleTrigger className="flex justify-between items-center w-full gap-2">
-          {partial.group}
-          {isOpened ? (
-            <ChevronDown className="w-[1.25em] h-[1.25em] flex-none" />
-          ) : (
-            <ChevronRight className="w-[1.25em] h-[1.25em] flex-none" />
-          )}
+    <SidebarMenuItem>
+      <Collapsible
+        className="group/collapsible [&[data-state=open]>button>svg:first-child]:rotate-90"
+        defaultOpen={true}
+      >
+        <CollapsibleTrigger asChild>
+          <SidebarMenuButton>
+            <ChevronRight className="transition-transform" />
+            <Folder />
+            {item.group}
+          </SidebarMenuButton>
         </CollapsibleTrigger>
         <CollapsibleContent>
           <SidebarMenuSub className="pr-0 mr-0">
-            <SidebarMenuSubItem>
-              <GroupOrPage
+            {item.children.map((subItem, index) => (
+              <Tree
+                key={index}
+                item={subItem}
                 pages={pages}
-                depth={depth + 1}
-                list={partial.children}
-                selectedPageId={selectedPageId}
                 onSelect={onSelect}
+                selectedPageId={selectedPageId}
               />
-            </SidebarMenuSubItem>
+            ))}
           </SidebarMenuSub>
         </CollapsibleContent>
-      </SidebarMenuItem>
-    </Collapsible>
-  );
-};
-
-const _Page: React.FC<{
-  page: Page;
-  isSelected: boolean;
-  onSelect: (pageId: PageId) => void;
-}> = ({ page, isSelected, onSelect }) => {
-  const handleClick = () => {
-    onSelect(page.id);
-  };
-
-  return (
-    <SidebarMenuButton isActive={isSelected} onClick={handleClick}>
-      {page.title}
-    </SidebarMenuButton>
+      </Collapsible>
+    </SidebarMenuItem>
   );
 };
