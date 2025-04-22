@@ -576,9 +576,19 @@ export const useEndpoint = (): UseEndpointReturn => {
           set(KEY.OIDC_ENDPOINT_ID, endpoint.id);
           let href: string;
           if (authConfig.mode === 'cors') {
-            const { authorizationUrl } = await globalThis
-              .fetch(requestInfo, { mode: 'cors', credentials: 'include' })
-              .then((res) => res.json());
+            const [response, responseError] = await promiseErrorHandler(
+              globalThis.fetch(requestInfo, {
+                mode: 'cors',
+                credentials: 'include',
+              })
+            );
+            // Could not establish a network connection to the endpoint.
+            if (responseError) {
+              return {
+                error: new NetworkError(responseError.message),
+              };
+            }
+            const { authorizationUrl } = await response.json();
             href = authorizationUrl;
           } else {
             href = requestInfo.toString();
@@ -660,9 +670,19 @@ export const useEndpoint = (): UseEndpointReturn => {
         set(KEY.OAUTH_ENDPOINT_ID, endpoint.id);
         let href: string;
         if (authConfig.mode === 'cors') {
-          const { authorizationUrl } = await globalThis
-            .fetch(requestInfo, { mode: 'cors', credentials: 'include' })
-            .then((res) => res.json());
+          const [response, responseError] = await promiseErrorHandler(
+            globalThis.fetch(requestInfo, {
+              mode: 'cors',
+              credentials: 'include',
+            })
+          );
+          // Could not establish a network connection to the endpoint.
+          if (responseError) {
+            return {
+              error: new NetworkError(responseError.message),
+            };
+          }
+          const { authorizationUrl } = await response.json();
           href = authorizationUrl;
         } else {
           href = requestInfo.toString();
