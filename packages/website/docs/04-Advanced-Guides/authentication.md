@@ -43,11 +43,17 @@ There are four types of authentication: `email`, `oauth`, `oauthcallback`, `oidc
 {
   "type": "email" | "oauth" | "oauthcallback" | "oidc" | "oidccallback" | "signout";
   "provider": string;
-  "operatioId": string; // Used to determine how to send a request.
+  "operationId": string; // Used to determine how to send a request.
+  "mode"?: 'navigate' | 'cors'; // Used to determine how to open the endpoint. Applicable only when the type is 'oauth' or 'oidc'.
   "defaultParametersValue"?: any;
   "defaultRequestBodyValue"?: any;
 }
 ```
+
+:::tip
+The recommended value for mode is generally `cors`. This ensures that cookies are issued with the Partitioned attribute, enabling secure authentication across different domains.
+
+However, this may not apply if you're self-hosting Viron and the endpoints are not cross-origin.
 
 ### `email`
 
@@ -109,6 +115,7 @@ Those types of authentication are for [the Authorization Code Grant of the OAuth
     {
       "type": "oauth",
       "operationId": "signinOAuth",
+      "mode": "cors",
       "defaultParametersValue": {
         "redirectUri": "${oauthRedirectURI}" // An environmental variable
       }
@@ -185,6 +192,7 @@ Those types of authentication are for [the Authorization Code Flow of the OpenID
     {
       "type": "oidc",
       "operationId": "signinOidc",
+      "mode": "cors",
       "defaultParametersValue": {
         "redirectUri": "${oidcRedirectURI}" // An environmental variable
       }
