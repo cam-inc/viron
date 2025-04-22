@@ -47,18 +47,20 @@
     "changelog:version": "changeset version",
     "build": "turbo run build",
     "clean": "turbo run clean",
-    "dev": "turbo run dev",
+    "dev": "dotenv -e .env -- turbo run dev example",
+    "dev-app": "dotenv -e .env -- turbo run @viron/app#dev example",
+    "dev-website": "turbo run @viron/website#dev",
+    "example": "dotenv -e .env -- docker compose up",
     "format": "turbo run format",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "check-types": "turbo run check-types",
-    "example-nodejs:docker-compose:up:mongo": "docker-compose -f ./docker-compose.example-nodejs.mongo.yml up --build --force-recreate",
-    "example-nodejs:docker-compose:up:mysql": "docker-compose -f ./docker-compose.example-nodejs.mysql.yml up --build --force-recreate"
+    "check-types": "turbo run check-types"
   },
   "devDependencies": {
     "@changesets/cli": "^2.20.0",
     "@commitlint/cli": "^16.1.0",
     "@commitlint/config-conventional": "^16.0.0",
+    "dotenv-cli": "^8.0.0",
     "husky": "^9.1.7",
     "turbo": "^2.5.0"
   },

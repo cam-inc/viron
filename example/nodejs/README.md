@@ -11,26 +11,28 @@ Provides an Example API environment using `docker-compose`.
 - Docker for Desktop. [Download site](https://www.docker.com/products/docker-desktop)
 
 #### Cert Files
+
 Get `viron.crt`, `viron.csr` and `viron.key` files and place them under the `example/[lang]/cert` directory.
 
 #### .env
 
-```bash
+```shell
 cp -ip .env.template .env
 ```
+
 and, put secrets of your project.
 
 ### Run
 
 #### Use MySQL
 
-```bash
+```shell
 npm run docker-compose:up:mysql
 ```
 
 #### Use Mongo
 
-```bash
+```shell
 npm run docker-compose:up:mongo
 ```
 
@@ -74,6 +76,8 @@ npm run docker-compose:up:mongo
 
 #### To build with force recreation
 
-```
-"example-nodejs:docker-compose:up:mongo": "docker-compose -f ./docker-compose.example-nodejs.mongo.yml up --build --force-recreate"
+Try recreating it from the repository root using the following command.
+
+```shell
+npm run example --  --build --force-recreate
 ```
