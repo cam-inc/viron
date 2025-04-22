@@ -54,6 +54,8 @@ There are four types of authentication: `email`, `oauth`, `oauthcallback`, `oidc
 The recommended value for mode is generally `cors`. When cors is set, the endpoint is responsible for adding the `Partitioned` attribute to all issued cookies in order to enable third-party cookies across different domains.
 
 This does not apply if you're self-hosting Viron and the endpoints are not cross-origin.
+
+For backward compatibility, if mode is not specified, it behaves the same as navigate.
 :::
 
 ### `email`
@@ -151,8 +153,24 @@ Those types of authentication are for [the Authorization Code Grant of the OAuth
             }
           ],
           "responses": {
+            "200": {
+              "description": "Returns the authorization URL if mode is cors.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "authorizationUrl": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  }
+                }
+              }
+            },
             "301": {
-              "description": "Redirect to the authorization endpoint."
+-             "description": "Redirect to the authorization endpoint if mode is navigate."
             }
           }
         }
@@ -228,8 +246,24 @@ Those types of authentication are for [the Authorization Code Flow of the OpenID
             }
           ],
           "responses": {
+            "200": {
+              "description": "Returns the authorization URL if mode is cors.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "authorizationUrl": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  }
+                }
+              }
+            },
             "301": {
-              "description": "Redirect to the authorization endpoint."
+-             "description": "Redirect to the authorization endpoint if mode is navigate."
             }
           }
         }
