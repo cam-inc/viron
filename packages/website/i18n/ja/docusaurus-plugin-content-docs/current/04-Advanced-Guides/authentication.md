@@ -51,9 +51,11 @@ There are four types of authentication: `email`, `oauth`, `oauthcallback`, `oidc
 ```
 
 :::tip
-mode は基本的に `cors` が望ましいでしょう。発行される Cookie に `Partitioned` 属性が付与され、異なるドメイン間での安全な認証が可能です。
+mode は基本的に `cors` が望ましいでしょう。cors を設定した場合、異なるドメイン間でのサードパーティクッキーを有効にするため、エンドポイントは発行する各種 Cookie に `Partitioned` 属性を付与する責任を持ちます。
 
 Viron をセルフホスティングしており、エンドポイント間が CORS にならない場合は、その限りではありません。
+
+:::
 
 ### `email`
 

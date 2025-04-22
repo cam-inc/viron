@@ -51,9 +51,10 @@ There are four types of authentication: `email`, `oauth`, `oauthcallback`, `oidc
 ```
 
 :::tip
-The recommended value for mode is generally `cors`. This ensures that cookies are issued with the Partitioned attribute, enabling secure authentication across different domains.
+The recommended value for mode is generally `cors`. When cors is set, the endpoint is responsible for adding the `Partitioned` attribute to all issued cookies in order to enable third-party cookies across different domains.
 
-However, this may not apply if you're self-hosting Viron and the endpoints are not cross-origin.
+This does not apply if you're self-hosting Viron and the endpoints are not cross-origin.
+:::
 
 ### `email`
 
