@@ -43,11 +43,20 @@ There are four types of authentication: `email`, `oauth`, `oauthcallback`, `oidc
 {
   "type": "email" | "oauth" | "oauthcallback" | "oidc" | "oidccallback" | "signout";
   "provider": string;
-  "operatioId": string; // Used to determine how to send a request.
+  "operationId": string; // Used to determine how to send a request.
+  "mode"?: 'navigate' | 'cors'; // Used to determine how to open the endpoint. Applicable only when the type is 'oauth' or 'oidc'.
   "defaultParametersValue"?: any;
   "defaultRequestBodyValue"?: any;
 }
 ```
+
+:::tip
+The recommended value for mode is generally `cors`. When cors is set, the endpoint is responsible for adding the `Partitioned` attribute to all issued cookies in order to enable third-party cookies across different domains.
+
+This does not apply if you're self-hosting Viron and the endpoints are not cross-origin.
+
+For backward compatibility, if mode is not specified, it behaves the same as navigate.
+:::
 
 ### `email`
 
@@ -109,6 +118,7 @@ Those types of authentication are for [the Authorization Code Grant of the OAuth
     {
       "type": "oauth",
       "operationId": "signinOAuth",
+      "mode": "cors",
       "defaultParametersValue": {
         "redirectUri": "${oauthRedirectURI}" // An environmental variable
       }
@@ -143,8 +153,24 @@ Those types of authentication are for [the Authorization Code Grant of the OAuth
             }
           ],
           "responses": {
+            "200": {
+              "description": "Returns the authorization URL if mode is cors.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "authorizationUrl": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  }
+                }
+              }
+            },
             "301": {
-              "description": "Redirect to the authorization endpoint."
+-             "description": "Redirect to the authorization endpoint if mode is navigate."
             }
           }
         }
@@ -185,6 +211,7 @@ Those types of authentication are for [the Authorization Code Flow of the OpenID
     {
       "type": "oidc",
       "operationId": "signinOidc",
+      "mode": "cors",
       "defaultParametersValue": {
         "redirectUri": "${oidcRedirectURI}" // An environmental variable
       }
@@ -219,8 +246,24 @@ Those types of authentication are for [the Authorization Code Flow of the OpenID
             }
           ],
           "responses": {
+            "200": {
+              "description": "Returns the authorization URL if mode is cors.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "authorizationUrl": {
+                        "type": "string",
+                        "format": "uri"
+                      }
+                    }
+                  }
+                }
+              }
+            },
             "301": {
-              "description": "Redirect to the authorization endpoint."
+-             "description": "Redirect to the authorization endpoint if mode is navigate."
             }
           }
         }

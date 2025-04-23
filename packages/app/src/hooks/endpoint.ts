@@ -117,7 +117,7 @@ export type UseEndpointReturn = {
         defaultValues: RequestValue;
         execute: (
           requestValue: RequestValue
-        ) => Promise<{ error: BaseError } | { error: null }>;
+        ) => Promise<{ error: BaseError | null }>;
       };
   prepareSigninOAuth: (
     endpoint: Endpoint,
@@ -133,7 +133,7 @@ export type UseEndpointReturn = {
         defaultValues: RequestValue;
         execute: (
           requestValue: RequestValue
-        ) => Promise<{ error: BaseError } | { error: null }>;
+        ) => Promise<{ error: BaseError | null }>;
       };
   prepareSigninOAuthCallback: (
     endpoint: Endpoint,
@@ -574,7 +574,26 @@ export const useEndpoint = (): UseEndpointReturn => {
         );
         try {
           set(KEY.OIDC_ENDPOINT_ID, endpoint.id);
-          globalThis.location.href = requestInfo.toString();
+          let href: string;
+          if (authConfig.mode === 'cors') {
+            const [response, responseError] = await promiseErrorHandler(
+              globalThis.fetch(requestInfo, {
+                mode: 'cors',
+                credentials: 'include',
+              })
+            );
+            // Could not establish a network connection to the endpoint.
+            if (responseError) {
+              return {
+                error: new NetworkError(responseError.message),
+              };
+            }
+            const { authorizationUrl } = await response.json();
+            href = authorizationUrl;
+          } else {
+            href = requestInfo.toString();
+          }
+          globalThis.location.href = href;
         } catch (e: unknown) {
           remove(KEY.OIDC_ENDPOINT_ID);
           let message = '';
@@ -640,6 +659,7 @@ export const useEndpoint = (): UseEndpointReturn => {
         request.operation,
         requestValue
       );
+
       const requestInfo = constructRequestInfo(
         endpoint,
         authentication.oas,
@@ -648,7 +668,26 @@ export const useEndpoint = (): UseEndpointReturn => {
       );
       try {
         set(KEY.OAUTH_ENDPOINT_ID, endpoint.id);
-        globalThis.location.href = requestInfo.toString();
+        let href: string;
+        if (authConfig.mode === 'cors') {
+          const [response, responseError] = await promiseErrorHandler(
+            globalThis.fetch(requestInfo, {
+              mode: 'cors',
+              credentials: 'include',
+            })
+          );
+          // Could not establish a network connection to the endpoint.
+          if (responseError) {
+            return {
+              error: new NetworkError(responseError.message),
+            };
+          }
+          const { authorizationUrl } = await response.json();
+          href = authorizationUrl;
+        } else {
+          href = requestInfo.toString();
+        }
+        globalThis.location.href = href;
       } catch (e: unknown) {
         remove(KEY.OAUTH_ENDPOINT_ID);
         let message = '';

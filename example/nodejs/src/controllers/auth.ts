@@ -23,14 +23,19 @@ export const signout = async (context: RouteContext): Promise<void> => {
 export const signinEmail = async (context: RouteContext): Promise<void> => {
   const { email, password } = context.requestBody;
   const token = await domainsAuth.signinEmail(context.req, email, password);
-  context.res.setHeader(
-    HTTP_HEADER.SET_COOKIE,
-    genAuthorizationCookie(token, { maxAge: ctx.config.auth.jwt.expirationSec })
-  );
-  context.res.status(204).end();
+  context.res
+    .header(
+      HTTP_HEADER.SET_COOKIE,
+      genAuthorizationCookie(token, {
+        maxAge: ctx.config.auth.jwt.expirationSec,
+        partitioned: true,
+      })
+    )
+    .status(204)
+    .end();
 };
 
-// OIDCの認証画面へリダイレクト
+// OIDCの認証画面 URL を返却
 export const oidcAuthorization = async (
   context: RouteContext
 ): Promise<void> => {
@@ -54,12 +59,13 @@ export const oidcAuthorization = async (
 
   // CookieにOIDCのStateとPKCE用のCodeVerifierをセット
   const cookies = [
-    genOidcStateCookie(state),
-    genOidcCodeVerifierCookie(codeVerifier),
+    genOidcStateCookie(state, { partitioned: true }),
+    genOidcCodeVerifierCookie(codeVerifier, { partitioned: true }),
   ];
-  context.res.setHeader(HTTP_HEADER.SET_COOKIE, cookies);
-  context.res.setHeader(HTTP_HEADER.LOCATION, authorizationUrl);
-  context.res.status(301).end();
+
+  context.res.header(HTTP_HEADER.SET_COOKIE, cookies).json({
+    authorizationUrl,
+  });
 };
 
 // OIDCのコールバック
@@ -81,16 +87,17 @@ export const oidcCallback = async (context: RouteContext): Promise<void> => {
   const token = await domainsAuth.signinOidc(
     context.req,
     client,
-    codeVerifier as string,
+    codeVerifier,
     redirectUri,
     params,
     ctx.config.auth.oidc,
     ctx.config.auth.multipleAuthUser
   );
-  context.res.setHeader(
+  context.res.header(
     HTTP_HEADER.SET_COOKIE,
     genAuthorizationCookie(token, {
       maxAge: ctx.config.auth.jwt.expirationSec,
+      partitioned: true,
     })
   );
   context.origRes.clearCookie(COOKIE_KEY.OIDC_STATE);
@@ -99,7 +106,7 @@ export const oidcCallback = async (context: RouteContext): Promise<void> => {
   context.res.status(204).end();
 };
 
-// GoogleOAuth2の認可画面へリダイレクト
+// GoogleOAuth2の認可画面を返却
 export const oauth2GoogleAuthorization = async (
   context: RouteContext
 ): Promise<void> => {
@@ -111,10 +118,14 @@ export const oauth2GoogleAuthorization = async (
     state,
     ctx.config.auth.googleOAuth2
   );
-
-  context.res.setHeader(HTTP_HEADER.SET_COOKIE, genOAuthStateCookie(state));
-  context.res.setHeader(HTTP_HEADER.LOCATION, authorizationUrl);
-  context.res.status(301).end();
+  context.res
+    .header(
+      HTTP_HEADER.SET_COOKIE,
+      genOAuthStateCookie(state, { partitioned: true })
+    )
+    .json({
+      authorizationUrl,
+    });
 };
 
 // GoogleOAuth2のコールバック
@@ -135,11 +146,14 @@ export const oauth2GoogleCallback = async (
     ctx.config.auth.googleOAuth2,
     ctx.config.auth.multipleAuthUser
   );
-  context.res.setHeader(
-    HTTP_HEADER.SET_COOKIE,
-    genAuthorizationCookie(token, {
-      maxAge: ctx.config.auth.jwt.expirationSec,
-    })
-  );
-  context.res.status(204).end();
+  context.res
+    .header(
+      HTTP_HEADER.SET_COOKIE,
+      genAuthorizationCookie(token, {
+        maxAge: ctx.config.auth.jwt.expirationSec,
+        partitioned: true,
+      })
+    )
+    .status(204)
+    .end();
 };
