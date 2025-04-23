@@ -52,7 +52,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthenticationRedirect'
+                $ref: '#/components/schemas/OidcAuthorizationUrl'
         '301':
           description: Redirect to OIDC Authorization URL.
       x-authconfig-default-parameters:
@@ -93,7 +93,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthenticationRedirect'
+                $ref: '#/components/schemas/GoogleAuthorizationUrl'
         '301':
           description: Redirect to Google OAuth URL.
       x-authconfig-default-parameters:
@@ -199,9 +199,20 @@ components:
         - redirectUri
         - clientId
 
-    AuthenticationRedirect:
+    GoogleAuthorizationUrl:
       type: object
       properties:
         authorizationUrl:
           type: string
           format: uri
+      required:
+        - authorizationUrl
+
+    OidcAuthorizationUrl:
+      type: object
+      properties:
+        authorizationUrl:
+          type: string
+          format: uri
+      required:
+        - authorizationUrl
