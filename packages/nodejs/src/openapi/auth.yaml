@@ -42,7 +42,7 @@ paths:
       tags:
         - auth
       summary: redirect to oidc idp authorization
-      description: OIDCのidp 認証画面へリダイレクトする
+      description: OIDCの idp 認証画面へリダイレクトするための情報、ステータスを返却する
       parameters:
         - $ref: '#/components/parameters/RedirectUriQueryParam'
         - $ref: '#/components/parameters/ClientIdQueryParam'
@@ -52,11 +52,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  authorizationUrl:
-                    type: string
-                    format: uri
+                $ref: '#/components/schemas/AuthenticationRedirect'
         '301':
           description: Redirect to OIDC Authorization URL.
       x-authconfig-default-parameters:
@@ -87,7 +83,7 @@ paths:
       tags:
         - auth
       summary: redirect to google oauth
-      description: GoogleのOAuth認可画面へリダイレクトする
+      description: Google の OAuth 認証画面へリダイレクトするための情報、ステータスを返却する
       parameters:
         - $ref: '#/components/parameters/RedirectUriQueryParam'
         - $ref: '#/components/parameters/ClientIdQueryParam'
@@ -97,11 +93,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  authorizationUrl:
-                    type: string
-                    format: uri
+                $ref: '#/components/schemas/AuthenticationRedirect'
         '301':
           description: Redirect to Google OAuth URL.
       x-authconfig-default-parameters:
@@ -206,3 +198,10 @@ components:
         - state
         - redirectUri
         - clientId
+
+    AuthenticationRedirect:
+      type: object
+      properties:
+        authorizationUrl:
+          type: string
+          format: uri
