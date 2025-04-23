@@ -16,7 +16,7 @@ paths:
       summary: list auth configs
       description: 認証設定を取得する
       responses:
-        200:
+        '200':
           description: OK
           content:
             application/json:
@@ -68,6 +68,13 @@ components:
           description: クライアントからリクエストする際のリクエストボディ
           type: object
           properties: {}
+        mode:
+          description: クライアントが認証を開始する方法を指定する (cors または navigate)
+          type: string
+          enum:
+            - cors
+            - navigate
+          example: cors
       required:
         - provider
         - type
