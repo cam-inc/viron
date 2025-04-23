@@ -16,7 +16,7 @@ paths:
       summary: signout of viron
       description: Vironからログアウトする
       responses:
-        204:
+        '204':
           description: OK
 
   /email/signin:
@@ -33,7 +33,7 @@ paths:
             schema:
               $ref: '#/components/schemas/SigninEmailPayload'
       responses:
-        204:
+        '204':
           description: No Content
 
   /oidc/authorization:
@@ -47,7 +47,17 @@ paths:
         - $ref: '#/components/parameters/RedirectUriQueryParam'
         - $ref: '#/components/parameters/ClientIdQueryParam'
       responses:
-        301:
+        '200':
+          description: authorization url を返却し、アプリケーション側にリダイレクトを促す
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authorizationUrl:
+                    type: string
+                    format: uri
+        '301':
           description: Redirect to OIDC Authorization URL.
       x-authconfig-default-parameters:
         redirectUri: '${oidcRedirectURI}'
@@ -66,7 +76,7 @@ paths:
             schema:
               $ref: '#/components/schemas/OidcCallbackPayload'
       responses:
-        204:
+        '204':
           description: No Content.
       x-authconfig-default-requestBody:
         redirectUri: '${oidcRedirectURI}'
@@ -82,7 +92,17 @@ paths:
         - $ref: '#/components/parameters/RedirectUriQueryParam'
         - $ref: '#/components/parameters/ClientIdQueryParam'
       responses:
-        301:
+        '200':
+          description: authorization url を返却し、アプリケーション側にリダイレクトを促す
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authorizationUrl:
+                    type: string
+                    format: uri
+        '301':
           description: Redirect to Google OAuth URL.
       x-authconfig-default-parameters:
         redirectUri: '${oauthRedirectURI}'
@@ -101,7 +121,7 @@ paths:
             schema:
               $ref: '#/components/schemas/OAuth2GoogleCallbackPayload'
       responses:
-        204:
+        '204':
           description: No Content.
       x-authconfig-default-requestBody:
         redirectUri: '${oauthRedirectURI}'
