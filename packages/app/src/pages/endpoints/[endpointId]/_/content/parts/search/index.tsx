@@ -1,5 +1,5 @@
 import { SearchIcon } from 'lucide-react';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import Request from '~/components/request';
 import {
   Tooltip,
@@ -7,11 +7,16 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
-import Drawer, { useDrawer } from '~/portals/drawer';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document, RequestValue } from '~/types/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
 import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 
 export type Props = {
   endpoint: Endpoint;
@@ -19,36 +24,35 @@ export type Props = {
   base: UseBaseReturn;
 };
 const Search: React.FC<Props> = ({ endpoint, document, base }) => {
-  const drawer = useDrawer();
+  const [open, setOpen] = useState(false);
   const handleRequestSubmit = useCallback(
     (requestValue: RequestValue) => {
-      drawer.close();
+      setOpen(false);
       base.fetch(requestValue);
     },
-    [drawer, base]
+    [base]
   );
 
   return (
-    <>
+    <Sheet open={open} onOpenChange={setOpen}>
       <TooltipProvider>
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button
               variant="ghost"
               className="h-8 w-8"
-              onClick={() => {
-                drawer.open();
-              }}
+              onClick={() => setOpen(true)}
             >
               <SearchIcon className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>
-            <div className="text-thm-on-surface whitespace-nowrap">Search</div>
-          </TooltipContent>
+          <TooltipContent>Search</TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <Drawer {...drawer.bind}>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Search</SheetTitle>
+        </SheetHeader>
         <Request
           on={COLOR_SYSTEM.SURFACE}
           endpoint={endpoint}
@@ -58,8 +62,8 @@ const Search: React.FC<Props> = ({ endpoint, document, base }) => {
           onSubmit={handleRequestSubmit}
           className="h-full"
         />
-      </Drawer>
-    </>
+      </SheetContent>
+    </Sheet>
   );
 };
 export default Search;

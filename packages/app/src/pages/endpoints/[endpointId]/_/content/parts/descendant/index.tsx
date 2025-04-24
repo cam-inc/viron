@@ -1,12 +1,17 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import Request from '~/components/request';
 import { BaseError } from '~/errors';
-import Drawer, { useDrawer } from '~/portals/drawer';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document, RequestValue } from '~/types/oas';
-import Action from '../action';
 import { UseDescendantsReturn } from '../../hooks/useDescendants';
-
+import Action from '../action';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 export type Props = {
   endpoint: Endpoint;
   document: Document;
@@ -16,7 +21,6 @@ export type Props = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onOperationSuccess: (data: any) => void;
   onOperationFail: (error: BaseError) => void;
-  onClick?: () => void;
 };
 const Descendant: React.FC<Props> = ({
   endpoint,
@@ -25,21 +29,13 @@ const Descendant: React.FC<Props> = ({
   data,
   onOperationSuccess,
   onOperationFail,
-  onClick,
 }) => {
   const [isPending, setIsPending] = useState<boolean>(false);
-  const drawer = useDrawer();
-  const handleClick = useCallback(() => {
-    if (isPending) {
-      return;
-    }
-    drawer.open();
-    onClick?.();
-  }, [drawer, isPending, onClick]);
+  const [open, setOpen] = useState<boolean>(false);
 
   const handleRequestSubmit = useCallback(
     async (requestValue: RequestValue) => {
-      drawer.close();
+      setOpen(false);
       setIsPending(true);
       const { data, error } = await descendant.fetch(requestValue);
       setIsPending(false);
@@ -50,13 +46,30 @@ const Descendant: React.FC<Props> = ({
         onOperationFail(error);
       }
     },
-    [drawer, descendant, onOperationSuccess, onOperationFail]
+    [descendant, onOperationSuccess, onOperationFail]
   );
 
+  const label = useMemo<string>(() => {
+    const { operation } = descendant.request;
+    if (operation.summary) {
+      return operation.summary;
+    }
+    return operation.operationId || descendant.request.method;
+  }, [descendant]);
+
   return (
-    <>
-      <Action request={descendant.request} onClick={handleClick} />
-      <Drawer {...drawer.bind}>
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>
+        <Action
+          disabled={isPending}
+          request={descendant.request}
+          label={label}
+        />
+      </SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>{label}</SheetTitle>
+        </SheetHeader>
         <Request
           on={COLOR_SYSTEM.SURFACE}
           endpoint={endpoint}
@@ -66,8 +79,8 @@ const Descendant: React.FC<Props> = ({
           onSubmit={handleRequestSubmit}
           className="h-full"
         />
-      </Drawer>
-    </>
+      </SheetContent>
+    </Sheet>
   );
 };
 export default Descendant;

@@ -297,7 +297,6 @@ module.exports = {
         'wrapper-notification': 9,
         'wrapper-popover': 8,
         'wrapper-modal': 7,
-        'wrapper-drawer': 6,
         'layout-systembar': 5,
         'layout-navigation': 4,
         'layout-appbar': 3,

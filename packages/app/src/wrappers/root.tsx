@@ -29,7 +29,6 @@ import '~/styles/global.css';
 import { ClassName, COLOR_SYSTEM } from '~/types';
 import { Theme } from '~/types/oas';
 import { getCustomProperties } from '~/utils/colorSystem';
-import DrawerWrapper from '~/wrappers/drawer';
 import ModalWrapper from '~/wrappers/modal';
 import NotificationWrapper from '~/wrappers/notification';
 import PopoverWrapper from '~/wrappers/popover';
@@ -78,7 +77,6 @@ const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
         })}
       >
         <div>{children}</div>
-        <DrawerWrapper className="fixed inset-0 z-wrapper-drawer" />
         <ModalWrapper className="fixed inset-0 z-wrapper-modal" />
         <PopoverWrapper className="fixed inset-0 z-wrapper-popover" />
         <NotificationWrapper className="fixed left-0 right-0 bottom-0 pr-4 pb-4 z-wrapper-notification" />

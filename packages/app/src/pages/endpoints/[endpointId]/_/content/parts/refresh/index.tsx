@@ -18,24 +18,20 @@ const Refresh: React.FC<Props> = ({ base }) => {
   }, [base]);
 
   return (
-    <>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger>
-            <Button
-              variant="ghost"
-              className="h-8 w-8"
-              onClick={handleButtonClick}
-            >
-              <RefreshCwIcon className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <div className="text-thm-on-surface">Refresh</div>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            className="h-8 w-8"
+            onClick={handleButtonClick}
+          >
+            <RefreshCwIcon className="h-4 w-4" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Refresh</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 export default Refresh;

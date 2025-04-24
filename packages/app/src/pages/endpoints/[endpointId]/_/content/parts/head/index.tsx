@@ -81,11 +81,6 @@ const Head: React.FC<Props> = ({
   const handleSiblingsButtonClick = useCallback(() => {
     popoverSiblings.open();
   }, [popoverSiblings]);
-  const handleSiblingClick = useCallback<
-    NonNullable<SiblingProps['onClick']>
-  >(() => {
-    popoverSiblings.hide();
-  }, [popoverSiblings]);
 
   return (
     <>
@@ -147,7 +142,6 @@ const Head: React.FC<Props> = ({
               sibling={sibling}
               onOperationSuccess={handleSiblingOperationSuccess}
               onOperationFail={handleSiblingOperationFail}
-              onClick={handleSiblingClick}
             />
           </div>
         ))}

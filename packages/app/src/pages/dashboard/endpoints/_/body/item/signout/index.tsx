@@ -5,9 +5,16 @@ import Request from '~/components/request';
 import { Button } from '~/components/ui/button';
 import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
-import Drawer, { useDrawer } from '~/portals/drawer';
 import { Authentication, COLOR_SYSTEM, Endpoint } from '~/types';
 import { RequestValue } from '~/types/oas';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+
 export type Props = {
   endpoint: Endpoint;
   authentication: Authentication;
@@ -22,11 +29,6 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
   );
   const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
   const setError = error.setError;
-
-  const drawer = useDrawer();
-  const handleClick = useCallback(() => {
-    drawer.open();
-  }, [drawer]);
 
   const handleSubmit = useCallback(
     async (requestValue: RequestValue) => {
@@ -43,17 +45,27 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
     [signout, onSignout, setError]
   );
 
-  if (signout.error) {
-    return <Error on={COLOR_SYSTEM.BACKGROUND} error={signout.error} />;
+  if (signout.error || error.bind.error) {
+    return (
+      <Error
+        on={COLOR_SYSTEM.BACKGROUND}
+        error={signout.error ?? error.bind.error}
+      />
+    );
   }
 
   return (
-    <>
-      <Button variant="outline" onClick={handleClick}>
-        {t('signout')}
-        <LogOutIcon />
-      </Button>
-      <Drawer {...drawer.bind}>
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="outline">
+          {t('signout')}
+          <LogOutIcon />
+        </Button>
+      </SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>{t('signout')}</SheetTitle>
+        </SheetHeader>
         <Request
           on={COLOR_SYSTEM.SURFACE}
           className="h-full"
@@ -63,9 +75,8 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
           defaultValues={signout.defaultValues}
           onSubmit={handleSubmit}
         />
-      </Drawer>
-      <Error.renewal {...error.bind} withModal={true} />
-    </>
+      </SheetContent>
+    </Sheet>
   );
 };
 export default Signout;

@@ -1,6 +1,5 @@
 import {
   CircleEllipsisIcon,
-  XCircleIcon,
   ChevronRightIcon,
   ChevronDownIcon,
   ClipboardCopyIcon,
@@ -20,7 +19,6 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
-import Drawer, { useDrawer } from '~/portals/drawer'; // TODO: Use Dropdown component
 import PopoverPortal, { usePopover } from '~/portals/popover';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
 import {
@@ -44,6 +42,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 
 type Data = Record<string, any>;
 
@@ -95,9 +101,6 @@ const ContentTable: React.FC<Props> = ({
     [document, content, base]
   );
 
-  const drawer = useDrawer();
-  const [selectedRowData, setSelectedRowData] = useState<Data>();
-
   const renderActions = useCallback<NonNullable<(data: Data) => JSX.Element>>(
     (data) => {
       return (
@@ -139,74 +142,65 @@ const ContentTable: React.FC<Props> = ({
   );
 
   return (
-    <>
-      <div className="border-b border-x">
-        <div className="overflow-x-auto">
-          <Table className="relative">
-            <TableHeader>
-              <TableRow>
-                {columns.map((column) => {
-                  if (!column.isSortable) {
-                    return (
-                      <TableHead key={column.key}>{column.name}</TableHead>
-                    );
-                  }
-                  return (
-                    <TableHead key={column.key}>
-                      <Button
-                        variant="ghost"
-                        className="flex items-center gap-2"
-                        onClick={() => {
-                          switch (column.sort) {
-                            case SORT.ASC:
-                              handleRequestSortChange(column.key, SORT.DESC);
-                              break;
-                            case SORT.DESC:
-                              handleRequestSortChange(column.key, SORT.NONE);
-                              break;
-                            case SORT.NONE:
-                              handleRequestSortChange(column.key, SORT.ASC);
-                              break;
-                            default:
-                              break;
-                          }
-                        }}
-                      >
-                        <span>{column.name}</span>
-                        {column.sort === SORT.NONE && (
-                          <ArrowDownUpIcon className="size-4 text-muted-foreground" />
-                        )}
-                        {column.sort === SORT.ASC && (
-                          <ArrowDownAZIcon className="size-4" />
-                        )}
-                        {column.sort === SORT.DESC && (
-                          <ArrowUpZAIcon className="size-4" />
-                        )}
-                      </Button>
-                    </TableHead>
-                  );
-                })}
-                {0 < descendants.length && (
-                  <TableHead className="text-right sticky right-0 bg-thm-background" />
-                )}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {dataSource.map((data, rowIndex) => (
-                <>
-                  <TableRow
-                    key={rowIndex}
-                    className="cursor-pointer"
-                    onClick={() => {
-                      setSelectedRowData(data);
-                      drawer.open();
-                    }}
-                  >
-                    {columns.map((column, columnIndex) => {
+    <div className="border-b border-x">
+      <div className="overflow-x-auto">
+        <Table className="relative">
+          <TableHeader>
+            <TableRow>
+              {columns.map((column) => {
+                if (!column.isSortable) {
+                  return <TableHead key={column.key}>{column.name}</TableHead>;
+                }
+                return (
+                  <TableHead key={column.key}>
+                    <Button
+                      variant="ghost"
+                      className="flex items-center gap-2"
+                      onClick={() => {
+                        switch (column.sort) {
+                          case SORT.ASC:
+                            handleRequestSortChange(column.key, SORT.DESC);
+                            break;
+                          case SORT.DESC:
+                            handleRequestSortChange(column.key, SORT.NONE);
+                            break;
+                          case SORT.NONE:
+                            handleRequestSortChange(column.key, SORT.ASC);
+                            break;
+                          default:
+                            break;
+                        }
+                      }}
+                    >
+                      <span>{column.name}</span>
+                      {column.sort === SORT.NONE && (
+                        <ArrowDownUpIcon className="size-4 text-muted-foreground" />
+                      )}
+                      {column.sort === SORT.ASC && (
+                        <ArrowDownAZIcon className="size-4" />
+                      )}
+                      {column.sort === SORT.DESC && (
+                        <ArrowUpZAIcon className="size-4" />
+                      )}
+                    </Button>
+                  </TableHead>
+                );
+              })}
+              {0 < descendants.length && (
+                <TableHead className="text-right sticky right-0 bg-thm-background" />
+              )}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {dataSource.map((data, rowIndex) => (
+              <Sheet key={rowIndex}>
+                <SheetTrigger asChild>
+                  <TableRow className="cursor-pointer">
+                    {columns.map((column) => {
                       if (column.schema.type === 'object') {
                         console.dir(data[column.key], { depth: null });
                         return (
-                          <TableCell>
+                          <TableCell key={column.key}>
                             {data[column.key] ? (
                               <Popover>
                                 <PopoverTrigger
@@ -237,7 +231,7 @@ const ContentTable: React.FC<Props> = ({
                         );
                       }
                       return (
-                        <TableCell>
+                        <TableCell key={column.key}>
                           <Cell
                             on={COLOR_SYSTEM.BACKGROUND}
                             schema={column.schema}
@@ -252,23 +246,28 @@ const ContentTable: React.FC<Props> = ({
                       </TableCell>
                     )}
                   </TableRow>
-                </>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+                </SheetTrigger>
+
+                <SheetContent>
+                  <SheetHeader>
+                    <SheetTitle>Are you absolutely sure?</SheetTitle>
+                    <SheetDescription>
+                      This action cannot be undone. This will permanently delete
+                      your account and remove your data from our servers.
+                    </SheetDescription>
+                  </SheetHeader>
+                  <RowData
+                    on={COLOR_SYSTEM.BACKGROUND}
+                    rowData={data}
+                    columns={columns}
+                  />
+                </SheetContent>
+              </Sheet>
+            ))}
+          </TableBody>
+        </Table>
       </div>
-      {selectedRowData && (
-        <Drawer {...drawer.bind}>
-          <RowData
-            on={COLOR_SYSTEM.BACKGROUND}
-            rowData={selectedRowData}
-            columns={columns}
-            close={drawer.close}
-          />
-        </Drawer>
-      )}
-    </>
+    </div>
   );
 };
 export default ContentTable;
@@ -290,11 +289,6 @@ const Operations: React.FC<OperationsProps> = ({
   onOperationFail,
 }) => {
   const popover = usePopover<HTMLDivElement>();
-  const handleDescendantClick = useCallback<
-    NonNullable<DescendantProps['onClick']>
-  >(() => {
-    popover.hide();
-  }, [popover]);
 
   return (
     <>
@@ -321,7 +315,6 @@ const Operations: React.FC<OperationsProps> = ({
                 data={data}
                 onOperationSuccess={onOperationSuccess}
                 onOperationFail={onOperationFail}
-                onClick={handleDescendantClick}
               />
             </li>
           ))}
@@ -335,14 +328,10 @@ const RowData: React.FC<
   BaseProps & {
     rowData: Data;
     columns: TableColumn[];
-    close: () => void;
   }
-> = ({ on, rowData, columns, close }) => {
+> = ({ on, rowData, columns }) => {
   return (
     <div className="px-10 py-10 flex flex-col h-full w-full">
-      <Button variant="ghost" className="mr-0 ml-auto" onClick={close}>
-        <XCircleIcon className="h-4 w-4" />
-      </Button>
       <div className="flex-1 overflow-scroll space-y-10">
         {Object.keys(rowData).map((objectKey, index) => (
           <Accordion
