@@ -1,7 +1,7 @@
 import classnames from 'classnames';
 import React, { useCallback } from 'react';
 import { Props as BaseProps } from '~/components';
-import Button, { Props as ButtonProps } from '~/components/button';
+import { Button } from '../ui/button';
 
 export type Props = BaseProps & {
   list: Omit<ItemProps, 'on' | 'className' | 'onClick'>[];
@@ -77,10 +77,10 @@ type ItemProps = BaseProps & {
   isActive: boolean;
   onClick: (id: ItemProps['id']) => void;
 };
-export const Item: React.FC<ItemProps> = ({ on, id, label, onClick }) => {
-  const handleClick = useCallback<ButtonProps['onClick']>(() => {
+export const Item: React.FC<ItemProps> = ({ id, label, onClick }) => {
+  const handleClick = useCallback(() => {
     onClick(id);
   }, [id, onClick]);
 
-  return <Button on={on} label={label} onClick={handleClick} />;
+  return <Button onClick={handleClick}>{label}</Button>;
 };

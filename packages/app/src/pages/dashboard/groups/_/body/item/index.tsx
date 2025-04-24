@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
-import Button, { Props as ButtonProps } from '~/components/button';
 import Head from '~/components/head';
 import ArrowDownIcon from '~/components/icon/arrowCircleDown/outline';
 import ArrowUpIcon from '~/components/icon/arrowCircleUp/outline';
 import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/outline';
 import TrashIcon from '~/components/icon/trash/outline';
+import { Button } from '~/components/ui/button';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
 import Modal, { useModal } from '~/portals/modal';
@@ -19,23 +19,23 @@ const Item: React.FC<Props> = ({ group }) => {
   const { t } = useTranslation();
 
   const menuPopover = usePopover<HTMLDivElement>();
-  const handleMenuClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleMenuClick = useCallback(() => {
     menuPopover.open();
   }, [menuPopover]);
 
-  const handleUpClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleUpClick = useCallback(() => {
     ascendGroup(group.id);
     menuPopover.close();
   }, [group, ascendGroup, menuPopover]);
 
-  const handleDownClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleDownClick = useCallback(() => {
     descendGroup(group.id);
     menuPopover.close();
   }, [group, descendGroup, menuPopover]);
 
   const removeConfirmationModal = useModal({});
 
-  const handleRemoveClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleRemoveClick = useCallback(() => {
     removeConfirmationModal.open();
   }, [removeConfirmationModal]);
 
@@ -68,13 +68,10 @@ const Item: React.FC<Props> = ({ group }) => {
         </div>
         <div className="flex-none flex items-center gap-2">
           <div ref={menuPopover.targetRef}>
-            <Button
-              variant="text"
-              on={COLOR_SYSTEM.BACKGROUND}
-              Icon={DotsCircleHorizontalIcon}
-              label={t('menuButtonLabel')}
-              onClick={handleMenuClick}
-            />
+            <Button variant="ghost" onClick={handleMenuClick}>
+              <DotsCircleHorizontalIcon />
+              {t('menuButtonLabel')}
+            </Button>
           </div>
           {/*
              TODO: 編集機能。
@@ -85,29 +82,21 @@ const Item: React.FC<Props> = ({ group }) => {
             onClick={handleEditClick}
           />
        */}
-          <Button
-            on={COLOR_SYSTEM.BACKGROUND}
-            label={t('removeButtonLabel')}
-            Icon={TrashIcon}
-            onClick={handleRemoveClick}
-          />
+          <Button onClick={handleRemoveClick}>
+            <TrashIcon />
+            {t('removeButtonLabel')}
+          </Button>
         </div>
       </div>
       <Popover {...menuPopover.bind}>
-        <Button
-          variant="text"
-          on={COLOR_SYSTEM.BACKGROUND}
-          label={t('moveUpButtonLabel')}
-          Icon={ArrowUpIcon}
-          onClick={handleUpClick}
-        />
-        <Button
-          variant="text"
-          on={COLOR_SYSTEM.BACKGROUND}
-          label={t('moveDownButtonLabel')}
-          Icon={ArrowDownIcon}
-          onClick={handleDownClick}
-        />
+        <Button variant="ghost" onClick={handleUpClick}>
+          <ArrowUpIcon />
+          {t('moveUpButtonLabel')}
+        </Button>
+        <Button variant="ghost" onClick={handleDownClick}>
+          <ArrowDownIcon />
+          {t('moveDownButtonLabel')}
+        </Button>
       </Popover>
       <Modal {...removeConfirmationModal.bind}>
         <RemoveConfirmation
@@ -130,11 +119,11 @@ const RemoveConfirmation: React.FC<RemoveConfirmationProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const handleCancelClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleCancelClick = useCallback(() => {
     onRequestCancel();
   }, [onRequestCancel]);
 
-  const handleRemoveClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleRemoveClick = useCallback(() => {
     onRequestRemove();
   }, [onRequestRemove]);
 
@@ -146,17 +135,10 @@ const RemoveConfirmation: React.FC<RemoveConfirmationProps> = ({
         description={t('removeModal.description')}
       />
       <div className="flex justify-end gap-2">
-        <Button
-          variant="outlined"
-          on={COLOR_SYSTEM.SURFACE}
-          label={t('cancelButtonLabel')}
-          onClick={handleCancelClick}
-        />
-        <Button
-          cs={COLOR_SYSTEM.PRIMARY}
-          label={t('removeButtonLabel')}
-          onClick={handleRemoveClick}
-        />
+        <Button variant="outline" onClick={handleCancelClick}>
+          {t('cancelButtonLabel')}
+        </Button>
+        <Button onClick={handleRemoveClick}>{t('removeButtonLabel')}</Button>
       </div>
     </div>
   );

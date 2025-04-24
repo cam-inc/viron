@@ -6,10 +6,9 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import IconButton from '~/components/button/icon';
 import CloseIcon from '~/components/icon/close/fill';
+import { Button } from '~/components/ui/button';
 import Portal, { TARGET } from '~/portals';
-import { COLOR_SYSTEM } from '~/types';
 
 type Props = {
   isOpened: boolean;
@@ -63,13 +62,13 @@ const Modal: React.FC<PropsWithChildren<Props>> = ({
           >
             <div className="relative min-h-0 flex-1 bg-thm-surface shadow-01dp px-8 pt-8 pb-10 rounded-2xl overflow-y-scroll overscroll-y-contain">
               <div className="absolute top-2 right-2">
-                <IconButton
-                  on={COLOR_SYSTEM.BACKGROUND}
+                <Button
                   type="button"
+                  size="icon"
                   onClick={handleCloseButtonClick}
                 >
                   <CloseIcon />
-                </IconButton>
+                </Button>
               </div>
               {children}
             </div>

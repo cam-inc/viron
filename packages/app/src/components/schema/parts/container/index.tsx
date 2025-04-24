@@ -2,12 +2,12 @@ import classnames from 'classnames';
 import React, { useCallback, useMemo, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Props as BaseProps } from '~/components';
-import Button, { Props as ButtonProps } from '~/components/button';
 import BulbOutlineIcon from '~/components/icon/bulb/outline';
 import BulbSolidIcon from '~/components/icon/bulb/solid';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import InformationCircleIcon from '~/components/icon/informationCircle/outline';
+import { Button } from '~/components/ui/button';
 import { Schema } from '~/types/oas';
 import { UseActiveReturn, useError } from '../../hooks';
 import Info from '../../parts/info';
@@ -40,20 +40,20 @@ const Container: React.FC<Props> = ({
     return splitted[splitted.length - 1];
   }, [name]);
   const [isOpened, setIsOpened] = useState<boolean>(isActive);
-  const handleArrowClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleArrowClick = useCallback(() => {
     if (!isActive) {
       return;
     }
     setIsOpened(!isOpened);
   }, [isOpened, isActive]);
 
-  const handleBulbClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleBulbClick = useCallback(() => {
     switchActive();
     setIsOpened(!isActive);
   }, [switchActive, isActive]);
 
   const [isInfoOpened, setIsInfoOpened] = useState<boolean>(false);
-  const handleInfoClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleInfoClick = useCallback(() => {
     setIsInfoOpened(!isInfoOpened);
     // open body element when changing to true.
     if (!isInfoOpened) {
@@ -67,23 +67,17 @@ const Container: React.FC<Props> = ({
       //return <AiFillBulb className="inline" />;
     }
     return (
-      <Button
-        variant="text"
-        on={on}
-        Icon={isActive ? BulbSolidIcon : BulbOutlineIcon}
-        onClick={handleBulbClick}
-      />
+      <Button variant="ghost" size="icon" onClick={handleBulbClick}>
+        {isActive ? <BulbSolidIcon /> : <BulbOutlineIcon />}
+      </Button>
     );
   }, [on, required, isActive, handleBulbClick]);
 
   const arrowIcon = useMemo<JSX.Element>(
     () => (
-      <Button
-        variant="text"
-        on={on}
-        Icon={isOpened ? ChevronDownIcon : ChevronRightIcon}
-        onClick={handleArrowClick}
-      />
+      <Button variant="ghost" size="icon" onClick={handleArrowClick}>
+        {isOpened ? <ChevronDownIcon /> : <ChevronRightIcon />}
+      </Button>
     ),
     [on, isOpened, handleArrowClick]
   );
@@ -102,12 +96,9 @@ const Container: React.FC<Props> = ({
         {renderHeadItem?.()}
         {activeIcon}
         {isActive && (
-          <Button
-            variant="text"
-            on={on}
-            Icon={InformationCircleIcon}
-            onClick={handleInfoClick}
-          />
+          <Button variant="ghost" size="icon" onClick={handleInfoClick}>
+            <InformationCircleIcon />
+          </Button>
         )}
         <div className="text-sm">{displayName}</div>
         {schema.deprecated && <div className="font-bold">deprecated</div>}

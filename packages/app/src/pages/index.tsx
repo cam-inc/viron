@@ -1,12 +1,12 @@
 import { PageProps, graphql } from 'gatsby';
 import { ChevronDown, ExternalLinkIcon } from 'lucide-react';
 import React, { useCallback } from 'react';
-import Button from '~/components/button';
 import GithubIcon from '~/components/icon/github/solid';
 import LanguageIcon from '~/components/icon/language/outline';
 import Link from '~/components/link';
 import Logo from '~/components/logo';
 import Metadata from '~/components/metadata';
+import { Button } from '~/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +18,6 @@ import { URL } from '~/constants';
 import { useTranslation, useI18n, Trans } from '~/hooks/i18n';
 import useTheme from '~/hooks/theme';
 import { useAppScreenGlobalStateValue } from '~/store';
-import { COLOR_SYSTEM } from '~/types';
 import pkg from '../../package.json';
 
 type Props = PageProps;
@@ -56,12 +55,9 @@ const HomePage: React.FC<Props> = () => {
       <article className="lg:max-w-[400px] px-10 mx-auto">
         <h1 className="text-lg font-bold mb-4">{t('welcomeMessage')}</h1>
         <p className="mb-6 text-sm leading-relaxed">{t('description')}</p>
-        <Button
-          className="w-full"
-          cs={COLOR_SYSTEM.PRIMARY}
-          label={t('startButtonLabel')}
-          onClick={handleDashboardButtonClick}
-        />
+        <Button className="w-full" onClick={handleDashboardButtonClick}>
+          {t('startButtonLabel')}
+        </Button>
         <div className="text-xs mt-20 [&>ul]:flex [&>ul]:gap-x-4 [&>ul]:gap-y-2 [&>ul]:flex-wrap space-y-4">
           <ul>
             <NavigationListItem

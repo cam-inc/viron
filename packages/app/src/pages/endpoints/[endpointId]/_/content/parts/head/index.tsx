@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
-import Button, { Props as ButtonProps } from '~/components/button';
 import Error, { useError } from '~/components/error';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/outline';
+import { Button } from '~/components/ui/button';
 import { BaseError } from '~/errors/index';
 import Popover, { usePopover } from '~/portals/popover';
 import { useAppScreenGlobalStateValue } from '~/store';
@@ -80,7 +80,7 @@ const Head: React.FC<Props> = ({
   }, [content, isPinned, onPin, onUnpin]);
 
   const popoverSiblings = usePopover<HTMLDivElement>();
-  const handleSiblingsButtonClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleSiblingsButtonClick = useCallback(() => {
     popoverSiblings.open();
   }, [popoverSiblings]);
   const handleSiblingClick = useCallback<
@@ -107,12 +107,9 @@ const Head: React.FC<Props> = ({
             <div className="flex-none">
               <div className="flex items-center gap-2">
                 <div ref={popoverSiblings.targetRef}>
-                  <Button
-                    variant="text"
-                    on={COLOR_SYSTEM.BACKGROUND}
-                    Icon={DotsCircleHorizontalIcon}
-                    onClick={handleSiblingsButtonClick}
-                  />
+                  <Button variant="ghost" onClick={handleSiblingsButtonClick}>
+                    <DotsCircleHorizontalIcon />
+                  </Button>
                 </div>
               </div>
             </div>

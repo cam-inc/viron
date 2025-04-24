@@ -2,15 +2,13 @@ import classnames from 'classnames';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Props as BaseProps } from '~/components';
-import { SIZE as BUTTON_SIZE } from '~/components/button';
-import Button, { Props as ButtonProps } from '~/components/button';
 import ChevronDownIcon from '~/components/icon/chevronDown/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import Operation from '~/components/operation';
 import Schema from '~/components/schema';
 import { useEliminate } from '~/components/schema/hooks';
 import { useTranslation } from '~/hooks/i18n';
-import { COLOR_SYSTEM, Endpoint } from '~/types/index';
+import { Endpoint } from '~/types/index';
 import {
   Document,
   Request,
@@ -18,6 +16,7 @@ import {
   Schema as SchemaType,
 } from '~/types/oas';
 import { pickContentType } from '~/utils/oas';
+import { Button } from '../ui/button';
 
 export type Props = BaseProps & {
   endpoint: Endpoint;
@@ -64,13 +63,11 @@ const _Request: React.FC<Props> = ({
 
   // Common head open status.
   const [isCommonHeadOpened, setIsCommonHeadOpened] = useState<boolean>(true);
-  const handleCommonHeadOpenerClick = useCallback<
-    ButtonProps['onClick']
-  >(() => {
+  const handleCommonHeadOpenerClick = useCallback(() => {
     setIsCommonHeadOpened((currVal) => !currVal);
   }, []);
 
-  const handleSubmitClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleSubmitClick = useCallback(() => {
     // Do nothing.
   }, []);
 
@@ -90,11 +87,16 @@ const _Request: React.FC<Props> = ({
           <div className={`flex-none bg-on-thm-${on}-faint`}>
             <div className="flex items-center h-[22px]">
               <Button
-                variant="text"
-                on={on}
-                Icon={isCommonHeadOpened ? ChevronDownIcon : ChevronRightIcon}
+                variant="ghost"
+                size="icon"
                 onClick={handleCommonHeadOpenerClick}
-              />
+              >
+                {isCommonHeadOpened ? (
+                  <ChevronDownIcon />
+                ) : (
+                  <ChevronRightIcon />
+                )}
+              </Button>
             </div>
           </div>
           <div className="flex-1">
@@ -189,13 +191,9 @@ const _Request: React.FC<Props> = ({
         <div
           className={`flex-none p-2 border-t-2 border-thm-on-${on}-faint flex justify-end gap-2`}
         >
-          <Button
-            type="submit"
-            cs={COLOR_SYSTEM.PRIMARY}
-            size={BUTTON_SIZE.BASE}
-            label={t('submitButtonLabel')}
-            onClick={handleSubmitClick}
-          />
+          <Button type="submit" onClick={handleSubmitClick}>
+            {t('submitButtonLabel')}
+          </Button>
         </div>
       </form>
     </div>

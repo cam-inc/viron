@@ -2,12 +2,11 @@ import classnames from 'classnames';
 import _ from 'lodash';
 import React, { useCallback, useMemo } from 'react';
 import { Props as BaseProps } from '~/components';
-import Button, { Props as ButtonProps } from '~/components/button';
 import ChevronDoubleLeftIcon from '~/components/icon/chevronDoubleLeft/outline';
 import ChevronDoubleRightIcon from '~/components/icon/chevronDoubleRight/outline';
 import ChevronLeftIcon from '~/components/icon/chevronLeft/outline';
 import ChevronRightIcon from '~/components/icon/chevronRight/outline';
-import { COLOR_SYSTEM } from '~/types';
+import { Button } from '../ui/button';
 
 export type Props = BaseProps & {
   current: number;
@@ -21,11 +20,11 @@ const Pagination: React.FC<Props> = ({
   max,
   onRequestChange,
 }) => {
-  const handleFirstClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleFirstClick = useCallback(() => {
     onRequestChange(1);
   }, [onRequestChange]);
 
-  const handlePrevClick = useCallback<ButtonProps['onClick']>(() => {
+  const handlePrevClick = useCallback(() => {
     let num: number = current - 1;
     if (num < 1) {
       num = 1;
@@ -33,7 +32,7 @@ const Pagination: React.FC<Props> = ({
     onRequestChange(num);
   }, [current, onRequestChange]);
 
-  const handleNextClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleNextClick = useCallback(() => {
     let num: number = current + 1;
     if (max < num) {
       num = max;
@@ -41,14 +40,12 @@ const Pagination: React.FC<Props> = ({
     onRequestChange(num);
   }, [current, max, onRequestChange]);
 
-  const handleLastClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleLastClick = useCallback(() => {
     onRequestChange(max);
   }, [max, onRequestChange]);
 
-  const handlePageClick = useCallback<
-    ButtonProps<number>['onClick'] | ButtonProps<number>['onClick']
-  >(
-    (page) => {
+  const handlePageClick = useCallback(
+    (page: number) => {
       onRequestChange(page);
     },
     [onRequestChange]
@@ -70,56 +67,37 @@ const Pagination: React.FC<Props> = ({
     <div className={classnames(`text-thm-on-${on}`, className)}>
       <div className="flex items-center">
         <div className="flex-none mr-2 last:mr-0">
-          <Button
-            variant="text"
-            on={on}
-            Icon={ChevronDoubleLeftIcon}
-            onClick={handleFirstClick}
-          />
+          <Button variant="ghost" size="icon" onClick={handleFirstClick}>
+            <ChevronDoubleLeftIcon />
+          </Button>
         </div>
         <div className="flex-none mr-2 last:mr-0">
-          <Button
-            variant="text"
-            on={on}
-            Icon={ChevronLeftIcon}
-            onClick={handlePrevClick}
-          />
+          <Button variant="ghost" size="icon" onClick={handlePrevClick}>
+            <ChevronLeftIcon />
+          </Button>
         </div>
         {pages.map((page) => (
           <div key={page} className="flex-none mr-2 last:mr-0">
             {page === current ? (
-              <Button<number>
-                cs={COLOR_SYSTEM.PRIMARY}
-                data={page}
-                label={page.toString()}
-                onClick={handlePageClick}
-              />
+              <Button onClick={() => handlePageClick(page)}>
+                {page.toString()}
+              </Button>
             ) : (
-              <Button<number>
-                variant="text"
-                on={on}
-                data={page}
-                label={page.toString()}
-                onClick={handlePageClick}
-              />
+              <Button variant="ghost" onClick={() => handlePageClick(page)}>
+                {page.toString()}
+              </Button>
             )}
           </div>
         ))}
         <div className="flex-none mr-2 last:mr-0">
-          <Button
-            variant="text"
-            on={on}
-            Icon={ChevronRightIcon}
-            onClick={handleNextClick}
-          />
+          <Button variant="ghost" size="icon" onClick={handleNextClick}>
+            <ChevronRightIcon />
+          </Button>
         </div>
         <div className="flex-none mr-2 last:mr-0">
-          <Button
-            variant="text"
-            on={on}
-            Icon={ChevronDoubleRightIcon}
-            onClick={handleLastClick}
-          />
+          <Button variant="ghost" size="icon" onClick={handleLastClick}>
+            <ChevronDoubleRightIcon />
+          </Button>
         </div>
       </div>
     </div>

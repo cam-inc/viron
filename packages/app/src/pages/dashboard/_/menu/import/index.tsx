@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
-import Button from '~/components/button';
 import Error, { useError } from '~/components/error';
 import ImportIcon from '~/components/icon/import/outline';
+import { Button } from '~/components/ui/button';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
 import Modal, { useModal } from '~/portals/modal';
@@ -40,14 +40,10 @@ const Import: React.FC<Props> = ({ className = '' }) => {
 
   return (
     <>
-      <Button
-        variant="text"
-        className={className}
-        on={COLOR_SYSTEM.SURFACE}
-        label={t('importEndpoints')}
-        Icon={ImportIcon}
-        onClick={handleButtonClick}
-      />
+      <Button variant="ghost" className={className} onClick={handleButtonClick}>
+        <ImportIcon />
+        {t('importEndpoints')}
+      </Button>
       <input {..._import.bind} />
       <Modal {...modal.bind}>
         <Targets
