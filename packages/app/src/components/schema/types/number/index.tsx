@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import React, { useMemo } from 'react';
-import Numberinput from '~/components/numberinput';
 import Select from '~/components/select';
+import { Input } from '~/components/ui/input';
 import { getRegisterOptions } from '~/utils/oas/v8n';
 import { useDynamicEnum } from '../../hooks';
 import { Props } from '../../index';
@@ -88,15 +88,7 @@ const SchemaOfTypeNumber: React.FC<Props> = ({
   }
 
   return (
-    <>
-      <Numberinput
-        on={on}
-        isFloat
-        render={function (bind) {
-          return <input {...bind} {...register(name, registerOptions)} />;
-        }}
-      />
-    </>
+    <Input type="number" step="any" {...register(name, registerOptions)} />
   );
 };
 export default SchemaOfTypeNumber;
