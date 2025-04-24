@@ -1,5 +1,12 @@
 # @viron/app
 
+## 2.16.0
+
+### Minor Changes
+
+- 6882c978: Design a new sign-in flow in preparation for the upcoming deprecation of third-party cookies.
+- 5382259a: Display errors in descendant operations
+
 ## 2.15.0
 
 ### Minor Changes
