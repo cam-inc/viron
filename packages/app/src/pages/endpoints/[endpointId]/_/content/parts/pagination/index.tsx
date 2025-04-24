@@ -1,7 +1,5 @@
-import _ from 'lodash';
 import React, { useCallback } from 'react';
 import Pagination, { Props as PaginationProps } from '~/components/pagination';
-import { COLOR_SYSTEM } from '~/types';
 import { Document } from '~/types/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
 
@@ -29,9 +27,8 @@ const _Pagination: React.FC<Props> = ({ base }) => {
   return (
     <div>
       <Pagination
-        on={COLOR_SYSTEM.SURFACE}
-        current={base.pagination.currentPage}
-        max={base.pagination.maxPage}
+        currentPage={base.pagination.currentPage}
+        total={base.pagination.maxPage}
         onRequestChange={handlePaginationRequestChange}
       />
     </div>
