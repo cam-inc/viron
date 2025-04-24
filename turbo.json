@@ -8,12 +8,13 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".cache/**", ".docusaurus/**"]
     },
-    "dev": {
+    "@viron/app#dev": {
+      "with": ["//#example"],
       "dependsOn": ["@viron/linter#build", "@viron/lib#build"],
       "cache": false
     },
     "//#example": {
-      "env": ["EXAMPLE_MODE", "COMPOSE_FILE"]
+      "cache": false
     },
     "format": {},
     "lint": {},
