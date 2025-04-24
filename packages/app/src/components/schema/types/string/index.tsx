@@ -6,8 +6,8 @@ import Base64Reader, {
 } from '~/components/base64Reader';
 import FileReader, { Props as FileReaderProps } from '~/components/fileReader';
 import Select from '~/components/select';
-import Textarea from '~/components/textarea';
 import Textinput from '~/components/textinput';
+import { Textarea } from '~/components/ui/textarea';
 import Wyswyg, { Props as WyswygProps } from '~/components/wyswyg';
 import { getRegisterOptions } from '~/utils/oas/v8n';
 import { useAutocomplete, useDynamicEnum, useNameForError } from '../../hooks';
@@ -188,14 +188,7 @@ const SchemaOfTypeString: React.FC<Props> = ({
   }
 
   if (schema.format === 'multiline') {
-    return (
-      <Textarea
-        on={on}
-        render={function (bind) {
-          return <textarea {...bind} {...register(name, registerOptions)} />;
-        }}
-      />
-    );
+    return <Textarea {...register(name, registerOptions)} />;
   }
 
   return (
