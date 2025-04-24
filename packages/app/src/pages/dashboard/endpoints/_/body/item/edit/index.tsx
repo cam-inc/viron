@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircleIcon } from 'lucide-react';
 import React, { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -110,7 +110,7 @@ const EditEndpoint: React.FC<Props> = ({ onOpenChange, endpoint }) => {
         <form id={FORM_ID} className="space-y-4 py-4" onSubmit={handleSubmit}>
           {formState.errors.manual?.message && (
             <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
+              <AlertCircleIcon className="h-4 w-4" />
               <AlertTitle>Error</AlertTitle>
               <AlertDescription>
                 {formState.errors.manual.message}

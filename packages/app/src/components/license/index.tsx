@@ -1,9 +1,10 @@
 import classnames from 'classnames';
+import { GraduationCapIcon } from 'lucide-react';
 import React from 'react';
 import { Props as BaseProps } from '~/components';
-import AcademicCapIcon from '~/components/icon/academicCap/outline';
 import Link from '~/components/link';
 import { License } from '~/types/oas';
+
 type Props = BaseProps & {
   data: License;
 };
@@ -18,7 +19,7 @@ const _License: React.FC<Props> = ({ on, className = '', data }) => {
         <div
           className={`flex gap-1 items-center text-xs text-thm-on-${on} group-hover:underline group-active:text-thm-on-${on}-low group-focus:ring-2 group-focus:ring-thm-on-${on}`}
         >
-          <AcademicCapIcon className="w-em" />
+          <GraduationCapIcon className="w-em" />
           <div>{data.name}</div>
         </div>
       </Link>
@@ -32,7 +33,7 @@ const _License: React.FC<Props> = ({ on, className = '', data }) => {
         className
       )}
     >
-      <AcademicCapIcon className="w-em" />
+      <GraduationCapIcon className="w-em" />
       <div>{data.name}</div>
     </div>
   );

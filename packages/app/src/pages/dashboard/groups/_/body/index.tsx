@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react';
+import { PlusIcon } from 'lucide-react';
 import React, { useState } from 'react';
 import { Button } from '~/components/ui/button';
 import { Dialog, DialogTrigger } from '~/components/ui/dialog';
@@ -25,7 +25,7 @@ const Body: React.FC<Props> = ({ className }) => {
           >
             <DialogTrigger asChild>
               <Button variant="outline">
-                <Plus />
+                <PlusIcon />
                 {t('addGroupButtonLabel')}
               </Button>
             </DialogTrigger>

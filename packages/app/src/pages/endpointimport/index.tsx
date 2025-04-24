@@ -1,5 +1,5 @@
 import { PageProps, graphql } from 'gatsby';
-import { QrCode } from 'lucide-react';
+import { QrCodeIcon } from 'lucide-react';
 import { parse } from 'query-string';
 import React, { useCallback, useState, useEffect } from 'react';
 import { AppSidebar } from '~/components/app-sidebar';
@@ -76,7 +76,7 @@ const EndpointImportPagge: React.FC<Props> = ({ location }) => {
             <div className="flex flex-col items-center gap-2 justify-center">
               <div className="flex flex-col items-center gap-2 font-medium">
                 <div className="flex h-8 w-8 items-center justify-center rounded-md">
-                  <QrCode className="size-6" />
+                  <QrCodeIcon className="size-6" />
                 </div>
               </div>
               <h1 className="text-xl font-bold">

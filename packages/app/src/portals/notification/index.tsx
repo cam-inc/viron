@@ -1,4 +1,5 @@
 import classnames from 'classnames';
+import { XIcon } from 'lucide-react';
 import React, {
   PropsWithChildren,
   useCallback,
@@ -6,7 +7,6 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import XCircleIcon from '~/components/icon/xCircle/outline';
 import Portal, { TARGET } from '~/portals';
 
 type Props = {
@@ -66,7 +66,7 @@ const Notification: React.FC<PropsWithChildren<Props>> = ({
         >
           <div className="flex justify-end mb-2">
             <button onClick={handleCloseButtonClick}>
-              <XCircleIcon className="text-lg text-thm-on-surface" />
+              <XIcon className="text-lg text-thm-on-surface" />
             </button>
           </div>
           <div>{children}</div>

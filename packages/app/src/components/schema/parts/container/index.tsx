@@ -1,12 +1,14 @@
 import classnames from 'classnames';
+import {
+  LightbulbIcon,
+  LightbulbOffIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+  InfoIcon,
+} from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Props as BaseProps } from '~/components';
-import BulbOutlineIcon from '~/components/icon/bulb/outline';
-import BulbSolidIcon from '~/components/icon/bulb/solid';
-import ChevronDownIcon from '~/components/icon/chevronDown/outline';
-import ChevronRightIcon from '~/components/icon/chevronRight/outline';
-import InformationCircleIcon from '~/components/icon/informationCircle/outline';
 import { Button } from '~/components/ui/button';
 import { Schema } from '~/types/oas';
 import { UseActiveReturn, useError } from '../../hooks';
@@ -68,7 +70,7 @@ const Container: React.FC<Props> = ({
     }
     return (
       <Button variant="ghost" size="icon" onClick={handleBulbClick}>
-        {isActive ? <BulbSolidIcon /> : <BulbOutlineIcon />}
+        {isActive ? <LightbulbIcon /> : <LightbulbOffIcon />}
       </Button>
     );
   }, [on, required, isActive, handleBulbClick]);
@@ -97,7 +99,7 @@ const Container: React.FC<Props> = ({
         {activeIcon}
         {isActive && (
           <Button variant="ghost" size="icon" onClick={handleInfoClick}>
-            <InformationCircleIcon />
+            <InfoIcon />
           </Button>
         )}
         <div className="text-sm">{displayName}</div>

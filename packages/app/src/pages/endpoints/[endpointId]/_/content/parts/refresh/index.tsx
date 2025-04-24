@@ -1,4 +1,4 @@
-import { RefreshCw } from 'lucide-react';
+import { RefreshCwIcon } from 'lucide-react';
 import React, { useCallback } from 'react';
 import {
   Tooltip,
@@ -27,7 +27,7 @@ const Refresh: React.FC<Props> = ({ base }) => {
               className="h-8 w-8"
               onClick={handleButtonClick}
             >
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCwIcon className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>

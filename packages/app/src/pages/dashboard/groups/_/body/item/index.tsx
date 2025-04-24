@@ -1,9 +1,11 @@
+import {
+  CircleArrowDownIcon,
+  ArrowUpIcon,
+  MenuIcon,
+  TrashIcon,
+} from 'lucide-react';
 import React, { useCallback } from 'react';
 import Head from '~/components/head';
-import ArrowDownIcon from '~/components/icon/arrowCircleDown/outline';
-import ArrowUpIcon from '~/components/icon/arrowCircleUp/outline';
-import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/outline';
-import TrashIcon from '~/components/icon/trash/outline';
 import { Button } from '~/components/ui/button';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
@@ -69,7 +71,7 @@ const Item: React.FC<Props> = ({ group }) => {
         <div className="flex-none flex items-center gap-2">
           <div ref={menuPopover.targetRef}>
             <Button variant="ghost" onClick={handleMenuClick}>
-              <DotsCircleHorizontalIcon />
+              <MenuIcon />
               {t('menuButtonLabel')}
             </Button>
           </div>
@@ -94,7 +96,7 @@ const Item: React.FC<Props> = ({ group }) => {
           {t('moveUpButtonLabel')}
         </Button>
         <Button variant="ghost" onClick={handleDownClick}>
-          <ArrowDownIcon />
+          <CircleArrowDownIcon />
           {t('moveDownButtonLabel')}
         </Button>
       </Popover>

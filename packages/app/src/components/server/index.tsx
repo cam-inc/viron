@@ -1,8 +1,8 @@
 import classnames from 'classnames';
+import { ServerIcon } from 'lucide-react';
 import React, { useCallback } from 'react';
 import { Props as BaseProps } from '~/components';
 import CommonMark from '~/components/commonMark';
-import ServerIcon from '~/components/icon/server/outline';
 import Popover, { usePopover } from '~/portals/popover';
 import { Server } from '~/types/oas';
 

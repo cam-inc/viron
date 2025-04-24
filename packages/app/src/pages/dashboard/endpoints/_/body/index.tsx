@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import { Plus } from 'lucide-react';
+import { PlusIcon } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import Sortable from 'sortablejs';
 import {
@@ -37,7 +37,7 @@ const Body: React.FC<Props> = ({ className }) => {
           >
             <DialogTrigger asChild>
               <Button variant="outline">
-                <Plus />
+                <PlusIcon />
                 {t('addEndpointButtonLabel')}
               </Button>
             </DialogTrigger>

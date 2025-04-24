@@ -1,8 +1,8 @@
 import classnames from 'classnames';
+import { FileTextIcon } from 'lucide-react';
 import React, { useCallback } from 'react';
 import { Props as BaseProps } from '~/components';
 import CommonMark from '~/components/commonMark';
-import DocumentTextIcon from '~/components/icon/documentText/outline';
 import Link from '~/components/link';
 import Popover, { usePopover } from '~/portals/popover';
 import { ExternalDocumentation } from '~/types/oas';
@@ -31,7 +31,7 @@ const ExternalDocs: React.FC<Props> = ({ on, data, className = '' }) => {
           <div
             className={`flex gap-1 items-center text-xs text-thm-on-${on} group-hover:underline group-active:text-thm-on-${on}-low group-focus:ring-2 group-focus:ring-thm-on-${on}`}
           >
-            <DocumentTextIcon className="w-em" />
+            <FileTextIcon className="w-em" />
             <div>External Docs</div>
           </div>
         </Link>

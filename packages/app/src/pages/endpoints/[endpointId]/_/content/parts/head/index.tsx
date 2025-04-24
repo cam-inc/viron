@@ -1,8 +1,6 @@
+import { ChevronDownIcon, ChevronRightIcon, MenuIcon } from 'lucide-react';
 import React, { useCallback } from 'react';
 import Error, { useError } from '~/components/error';
-import ChevronDownIcon from '~/components/icon/chevronDown/outline';
-import ChevronRightIcon from '~/components/icon/chevronRight/outline';
-import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/outline';
 import { Button } from '~/components/ui/button';
 import { BaseError } from '~/errors/index';
 import Popover, { usePopover } from '~/portals/popover';
@@ -107,8 +105,12 @@ const Head: React.FC<Props> = ({
             <div className="flex-none">
               <div className="flex items-center gap-2">
                 <div ref={popoverSiblings.targetRef}>
-                  <Button variant="ghost" onClick={handleSiblingsButtonClick}>
-                    <DotsCircleHorizontalIcon />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleSiblingsButtonClick}
+                  >
+                    <MenuIcon />
                   </Button>
                 </div>
               </div>

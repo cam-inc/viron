@@ -1,4 +1,4 @@
-import { ChevronRight, Folder } from 'lucide-react';
+import { ChevronRightIcon, FolderIcon } from 'lucide-react';
 import React, { useMemo } from 'react';
 import {
   Collapsible,
@@ -134,8 +134,8 @@ const Tree: React.FC<{
       >
         <CollapsibleTrigger asChild>
           <SidebarMenuButton>
-            <ChevronRight className="transition-transform" />
-            <Folder />
+            <ChevronRightIcon className="transition-transform" />
+            <FolderIcon />
             {item.group}
           </SidebarMenuButton>
         </CollapsibleTrigger>

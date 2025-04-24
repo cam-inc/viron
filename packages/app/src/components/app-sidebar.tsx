@@ -1,10 +1,10 @@
 import {
-  Home,
-  Group,
-  FileText,
-  Rocket,
-  CircleHelp,
-  Github,
+  HomeIcon,
+  GroupIcon,
+  FileTextIcon,
+  RocketIcon,
+  CircleHelpIcon,
+  GithubIcon,
 } from 'lucide-react';
 import * as React from 'react';
 import { INTERNAL_PAGE_PATHS, URL } from '~/constants';
@@ -34,34 +34,34 @@ const data = {
     {
       title: 'internalPagePaths.dashboard',
       to: INTERNAL_PAGE_PATHS.ENDPOINTS,
-      icon: Home,
+      icon: HomeIcon,
     },
     {
       title: 'internalPagePaths.groups',
       to: INTERNAL_PAGE_PATHS.GROUPS,
-      icon: Group,
+      icon: GroupIcon,
     },
   ],
   navSecondary: [
     {
       title: 'documentation',
       to: URL.DOCUMENTATION,
-      icon: FileText,
+      icon: FileTextIcon,
     },
     {
       title: 'releaseNotes',
       to: URL.RELEASE_NOTES,
-      icon: Rocket,
+      icon: RocketIcon,
     },
     {
       title: 'help',
       to: URL.HELP,
-      icon: CircleHelp,
+      icon: CircleHelpIcon,
     },
     {
       title: 'service.github',
       to: URL.GITHUB,
-      icon: Github,
+      icon: GithubIcon,
     },
   ],
 };

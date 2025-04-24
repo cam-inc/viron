@@ -1,4 +1,4 @@
-import { LogOut } from 'lucide-react';
+import { LogOutIcon } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
 import Error, { useError } from '~/components/error';
 import Request from '~/components/request';
@@ -51,7 +51,7 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
     <>
       <Button variant="outline" onClick={handleClick}>
         {t('signout')}
-        <LogOut />
+        <LogOutIcon />
       </Button>
       <Drawer {...drawer.bind}>
         <Request

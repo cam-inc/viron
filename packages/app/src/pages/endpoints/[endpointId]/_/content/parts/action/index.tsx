@@ -1,3 +1,4 @@
+// TODO: lucide-reactに移行する
 import { IconType } from '@react-icons/all-files';
 import { BiAddToQueue } from '@react-icons/all-files/bi/BiAddToQueue';
 import { BiBandAid } from '@react-icons/all-files/bi/BiBandAid';

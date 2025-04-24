@@ -1,10 +1,11 @@
 import classnames from 'classnames';
+import { PhoneIcon } from 'lucide-react';
 import React, { useMemo } from 'react';
 import { Props as BaseProps } from '~/components';
-import PhoneIcon from '~/components/icon/phone/outline';
 import Link from '~/components/link';
 import { URL } from '~/types';
 import { Contact } from '~/types/oas';
+
 type Props = BaseProps & {
   data: Contact;
 };

@@ -1,10 +1,10 @@
 import {
-  EllipsisVertical,
-  Pencil,
-  Info as InfoIcon,
-  QrCode,
-  Trash,
-  ChevronRight,
+  EllipsisVerticalIcon,
+  PencilIcon,
+  InfoIcon,
+  QrCodeIcon,
+  TrashIcon,
+  ChevronRightIcon,
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Props as BaseProps } from '~/components';
@@ -146,14 +146,14 @@ const _Item: React.FC<{
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
-                <EllipsisVertical />
+                <EllipsisVerticalIcon />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
                 <DialogTrigger asChild>
                   <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                    <Pencil />
+                    <PencilIcon />
                     {t('endpointEditButtonLabel')}
                   </DropdownMenuItem>
                 </DialogTrigger>
@@ -174,14 +174,14 @@ const _Item: React.FC<{
               <Dialog>
                 <DialogTrigger asChild>
                   <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                    <QrCode />
+                    <QrCodeIcon />
                     {t('endpointQRCodeShareButtonLabel')}
                   </DropdownMenuItem>
                 </DialogTrigger>
                 <Qrcode endpoint={endpoint} />
               </Dialog>
               <DropdownMenuItem onClick={handleRemoveClick}>
-                <Trash />
+                <TrashIcon />
                 {t('removeEndpointButtonLabel')}
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -204,7 +204,7 @@ const _Item: React.FC<{
                 <>
                   <Button onClick={handleEnterClick}>
                     {t('enterEndpoint')}
-                    <ChevronRight />
+                    <ChevronRightIcon />
                   </Button>
                   {authentication.list.find(
                     (item) => item.type === 'signout'

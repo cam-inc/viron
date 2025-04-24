@@ -1,10 +1,12 @@
 import classnames from 'classnames';
+import {
+  CircleArrowDownIcon,
+  CircleCheckIcon,
+  ImportIcon,
+  AlertTriangleIcon,
+} from 'lucide-react';
 import React, { useCallback, useState } from 'react';
 import Head from '~/components/head';
-import ArrowCircleDownIcon from '~/components/icon/arrowCircleDown/outline';
-import CheckCircleIcon from '~/components/icon/checkCircle/outline';
-import ColorSwatchIcon from '~/components/icon/colorSwatch/outline';
-import ExclamationIcon from '~/components/icon/exclamation/outline';
 import Spinner from '~/components/spinner';
 import { Button } from '~/components/ui/button';
 import { BaseError } from '~/errors';
@@ -22,7 +24,7 @@ const Targets: React.FC<Props> = ({ endpointList }) => {
         on={COLOR_SYSTEM.BACKGROUND}
         title={
           <div className="flex items-center gap-2">
-            <ColorSwatchIcon className="w-em" />
+            <ImportIcon className="w-em" />
             <div>Import Endpoints</div>
           </div>
         }
@@ -88,9 +90,9 @@ const Target: React.FC<{
           >
             <div>
               {error ? (
-                <ExclamationIcon className="w-8" />
+                <AlertTriangleIcon className="w-8" />
               ) : (
-                <CheckCircleIcon className="w-8" />
+                <CircleCheckIcon className="w-8" />
               )}
             </div>
           </div>
@@ -100,7 +102,7 @@ const Target: React.FC<{
               <Spinner className="w-4" on={COLOR_SYSTEM.SURFACE} />
             ) : (
               <Button onClick={handleImportClick}>
-                <ArrowCircleDownIcon />
+                <CircleArrowDownIcon />
                 Import
               </Button>
             )}

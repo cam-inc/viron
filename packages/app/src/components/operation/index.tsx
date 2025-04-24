@@ -1,10 +1,9 @@
 import classnames from 'classnames';
+import { TriangleAlertIcon, TagIcon } from 'lucide-react';
 import React from 'react';
 import { Props as BaseProps } from '~/components';
 import CommonMark from '~/components/commonMark';
 import ExternalDocs from '~/components/externalDocs';
-import ExclamationIcon from '~/components/icon/exclamation/outline';
-import TagIcon from '~/components/icon/tag/outline';
 import Server from '~/components/server';
 import { Document, Operation } from '~/types/oas';
 
@@ -19,7 +18,7 @@ const _Operation: React.FC<Props> = ({ on, operation, className = '' }) => {
         {operation.deprecated && (
           <div className="flex">
             <div className="flex gap-2 items-center p-2 bg-error text-thm-on-error rounded text-xs">
-              <ExclamationIcon className="w-em" />
+              <TriangleAlertIcon className="w-em" />
               <div>deprecated</div>
             </div>
           </div>

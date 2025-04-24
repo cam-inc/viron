@@ -1,9 +1,8 @@
 import classnames from 'classnames';
+import { ChevronDownIcon, ChevronRightIcon } from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Props as BaseProps } from '~/components';
-import ChevronDownIcon from '~/components/icon/chevronDown/outline';
-import ChevronRightIcon from '~/components/icon/chevronRight/outline';
 import Operation from '~/components/operation';
 import Schema from '~/components/schema';
 import { useEliminate } from '~/components/schema/hooks';

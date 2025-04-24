@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import {
   ChevronDownIcon,
   ChevronRightIcon,
-  CircleEllipsis,
+  CircleEllipsisIcon,
 } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
 import Error, { useError } from '~/components/error';
@@ -91,7 +91,7 @@ const _Content: React.FC<Props> = ({
             <Popover>
               <PopoverTrigger onClick={(e) => e.stopPropagation()}>
                 <Button variant="ghost" className="h-8 w-8">
-                  <CircleEllipsis className="h-4 w-4" />
+                  <CircleEllipsisIcon className="h-4 w-4" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-fit max-w-[100vw]">

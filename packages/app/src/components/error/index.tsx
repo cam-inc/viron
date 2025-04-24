@@ -1,8 +1,7 @@
 import classnames from 'classnames';
+import { TriangleAlertIcon, InfoIcon } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Props as BaseProps } from '~/components';
-import ExclamationIcon from '~/components/icon/exclamation/outline';
-import InformationCircleIcon from '~/components/icon/informationCircle/outline';
 import { BaseError } from '~/errors';
 import { Trans, useTranslation } from '~/hooks/i18n';
 import Modal, { useModal } from '~/portals/modal/';
@@ -124,7 +123,7 @@ const _Error: React.FC<Props> & {
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2">
           <div className="flex-none">
-            <ExclamationIcon className="w-8" />
+            <TriangleAlertIcon className="w-8" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-base font-bold">{error.name}</div>
@@ -173,7 +172,7 @@ const _ErrorRenewal: React.FC<Props> = ({ className = '', on, error }) => {
           className={`flex items-center pb-3 gap-1 border-b border-thm-on-${on}-slight`}
         >
           <div className="flex-none">
-            <InformationCircleIcon className="w-6 text-thm-error" />
+            <InfoIcon className="w-6 text-thm-error" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-lg font-bold text-thm-error">{error.name}</div>

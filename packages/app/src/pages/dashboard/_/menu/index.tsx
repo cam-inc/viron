@@ -1,4 +1,4 @@
-import { EllipsisVertical } from 'lucide-react';
+import { EllipsisVerticalIcon } from 'lucide-react';
 import React from 'react';
 import Export from './export';
 import Import from './import';
@@ -15,7 +15,7 @@ const Menu: React.FC = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="icon">
-          <EllipsisVertical />
+          <EllipsisVerticalIcon />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>

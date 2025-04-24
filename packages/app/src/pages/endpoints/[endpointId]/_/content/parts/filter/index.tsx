@@ -1,4 +1,9 @@
-import { Funnel, FunnelPlus, Lightbulb, LightbulbOff } from 'lucide-react';
+import {
+  FunnelIcon,
+  FunnelPlusIcon,
+  LightbulbIcon,
+  LightbulbOffIcon,
+} from 'lucide-react';
 import React, { useCallback } from 'react';
 import Head from '~/components/head';
 import { Button } from '~/components/ui/button';
@@ -66,7 +71,7 @@ const Filter: React.FC<Props> = ({ base }) => {
                     drawer.open();
                   }}
                 >
-                  <FunnelPlus className="h-4 w-4" />
+                  <FunnelPlusIcon className="h-4 w-4" />
                 </Button>
               ) : (
                 <Button
@@ -76,7 +81,7 @@ const Filter: React.FC<Props> = ({ base }) => {
                     drawer.open();
                   }}
                 >
-                  <Funnel className="h-4 w-4" />
+                  <FunnelIcon className="h-4 w-4" />
                 </Button>
               )}
             </TooltipTrigger>
@@ -110,9 +115,9 @@ const Filter: React.FC<Props> = ({ base }) => {
                       }}
                     >
                       {item.isActive ? (
-                        <Lightbulb className="h-4 w-4" />
+                        <LightbulbIcon className="h-4 w-4" />
                       ) : (
-                        <LightbulbOff className="h-4 w-4" />
+                        <LightbulbOffIcon className="h-4 w-4" />
                       )}
                       {item.name}
                     </Button>

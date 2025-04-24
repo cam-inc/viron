@@ -1,12 +1,12 @@
 import {
-  CircleEllipsis,
-  XCircle,
+  CircleEllipsisIcon,
+  XCircleIcon,
   ChevronRightIcon,
   ChevronDownIcon,
   ClipboardCopyIcon,
-  ArrowDownUp,
-  ArrowDownAZ,
-  ArrowUpZA,
+  ArrowDownUpIcon,
+  ArrowDownAZIcon,
+  ArrowUpZAIcon,
 } from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Props as BaseProps } from '~/components';
@@ -174,13 +174,13 @@ const ContentTable: React.FC<Props> = ({
                       >
                         <span>{column.name}</span>
                         {column.sort === SORT.NONE && (
-                          <ArrowDownUp className="size-4 text-muted-foreground" />
+                          <ArrowDownUpIcon className="size-4 text-muted-foreground" />
                         )}
                         {column.sort === SORT.ASC && (
-                          <ArrowDownAZ className="size-4" />
+                          <ArrowDownAZIcon className="size-4" />
                         )}
                         {column.sort === SORT.DESC && (
-                          <ArrowUpZA className="size-4" />
+                          <ArrowUpZAIcon className="size-4" />
                         )}
                       </Button>
                     </TableHead>
@@ -307,7 +307,7 @@ const Operations: React.FC<OperationsProps> = ({
             popover.open();
           }}
         >
-          <CircleEllipsis className="h-4 w-4" />
+          <CircleEllipsisIcon className="h-4 w-4" />
         </Button>
       </div>
       <PopoverPortal {...popover.bind}>
@@ -341,7 +341,7 @@ const RowData: React.FC<
   return (
     <div className="px-10 py-10 flex flex-col h-full w-full">
       <Button variant="ghost" className="mr-0 ml-auto" onClick={close}>
-        <XCircle className="h-4 w-4" />
+        <XCircleIcon className="h-4 w-4" />
       </Button>
       <div className="flex-1 overflow-scroll space-y-10">
         {Object.keys(rowData).map((objectKey, index) => (

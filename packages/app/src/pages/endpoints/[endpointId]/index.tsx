@@ -1,10 +1,10 @@
 import { useLocation } from '@reach/router';
 import { graphql, PageProps } from 'gatsby';
 import _ from 'lodash';
+import { ArrowLeftIcon } from 'lucide-react';
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import CommonMark from '~/components/commonMark';
-import ArrowLeftIcon from '~/components/icon/arrowLeft/outline';
 import Link from '~/components/link';
 import Logo from '~/components/logo';
 import Metadata from '~/components/metadata';

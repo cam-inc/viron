@@ -1,8 +1,11 @@
 import { PageProps, graphql } from 'gatsby';
-import { ChevronDown, ExternalLinkIcon } from 'lucide-react';
+import {
+  ChevronDownIcon,
+  ExternalLinkIcon,
+  GithubIcon,
+  LanguagesIcon,
+} from 'lucide-react';
 import React, { useCallback } from 'react';
-import GithubIcon from '~/components/icon/github/solid';
-import LanguageIcon from '~/components/icon/language/outline';
 import Link from '~/components/link';
 import Logo from '~/components/logo';
 import Metadata from '~/components/metadata';
@@ -88,10 +91,10 @@ const HomePage: React.FC<Props> = () => {
             <DropdownMenuTrigger>
               <button className="py-1 pr-1 flex items-center gap-1 text-thm-on-surface hover:underline active:text-thm-on-surface-low outline-thm-outline rounded-sm">
                 <div className="p-0.5">
-                  <LanguageIcon className="w-[1.42em] h-[1.42em]" />
+                  <LanguagesIcon className="w-[1.42em] h-[1.42em]" />
                 </div>
                 {t(`language.${currentLanguage}`)}
-                <ChevronDown className="size-em" />
+                <ChevronDownIcon className="size-em" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>

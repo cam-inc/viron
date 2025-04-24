@@ -1,4 +1,4 @@
-import { AlertCircle, Copy } from 'lucide-react';
+import { AlertCircleIcon, CopyIcon } from 'lucide-react';
 import qrcode from 'qrcode';
 import React, { useCallback, useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert';
@@ -51,7 +51,7 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
       </DialogHeader>
       {error && (
         <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
+          <AlertCircleIcon className="h-4 w-4" />
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error.message}</AlertDescription>
         </Alert>
@@ -59,7 +59,7 @@ const QRCode: React.FC<Props> = ({ endpoint }) => {
       <div className="flex flex-col items-center justify-center gap-4">
         <canvas ref={canvasRefCallback} />
         <Button onClick={handleCopyClick}>
-          <Copy />
+          <CopyIcon />
           {t('endpointQRCodeShare.copyUrlButtonLabel')}
         </Button>
       </div>

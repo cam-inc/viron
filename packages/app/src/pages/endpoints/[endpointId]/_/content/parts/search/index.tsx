@@ -1,4 +1,4 @@
-import { Search as SearchIcon } from 'lucide-react';
+import { SearchIcon } from 'lucide-react';
 import React, { useCallback } from 'react';
 import Request from '~/components/request';
 import {

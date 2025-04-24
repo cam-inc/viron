@@ -1,4 +1,4 @@
-import { Pin as PinIcon, PinOff as PinOffIcon } from 'lucide-react';
+import { PinIcon, PinOffIcon } from 'lucide-react';
 import React from 'react';
 import {
   Tooltip,

@@ -1,8 +1,7 @@
 import _ from 'lodash';
+import { CirclePlusIcon, CircleMinusIcon } from 'lucide-react';
 import React, { useCallback, useEffect } from 'react';
 import { Validate } from 'react-hook-form';
-import MinusIcon from '~/components/icon/minusCircle/outline';
-import PlusIcon from '~/components/icon/plusCircle/outline';
 import _Schema from '~/components/schema';
 import { Button } from '~/components/ui/button';
 import { useTranslation } from '~/hooks/i18n';
@@ -105,7 +104,7 @@ const SchemaOfTypeArray: React.FC<Props> = ({
     <div className="space-y-2">
       {!!(data || []).length && (
         <Button variant="ghost" onClick={handlePrependClick}>
-          <PlusIcon />
+          <CirclePlusIcon />
           {t('prependButtonLabel')}
         </Button>
       )}
@@ -132,7 +131,7 @@ const SchemaOfTypeArray: React.FC<Props> = ({
             activeRef={activeRef}
             renderHeadItem={() => (
               <Button variant="ghost" onClick={() => handleRemoveClick(index)}>
-                <MinusIcon />
+                <CircleMinusIcon />
                 {t('removeButtonLabel')}
               </Button>
             )}
@@ -142,14 +141,14 @@ const SchemaOfTypeArray: React.FC<Props> = ({
               variant="ghost"
               onClick={() => handleInsertClick(index + 1)}
             >
-              <PlusIcon />
+              <CirclePlusIcon />
               {t('insertButtonLabel')}
             </Button>
           )}
         </React.Fragment>
       ))}
       <Button variant="ghost" onClick={handleAppendClick}>
-        <PlusIcon />
+        <CirclePlusIcon />
         {t('appendButtonLabel')}
       </Button>
     </div>

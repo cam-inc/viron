@@ -1,9 +1,8 @@
-import { Tag } from 'lucide-react';
+import { TagIcon, ExternalLinkIcon } from 'lucide-react';
 import React from 'react';
 import CommonMark from '~/components/commonMark';
 import Contact from '~/components/contact';
 import ExternalDocs from '~/components/externalDocs';
-import ExternalLinkIcon from '~/components/icon/externalLink/outline';
 import License from '~/components/license';
 import Link from '~/components/link';
 import Server from '~/components/server';
@@ -54,7 +53,7 @@ const Info: React.FC<Props> = ({ endpoint, document }) => {
               <dd className="w-3/4">
                 {document.info['x-tags']?.map((tag) => (
                   <Badge variant="outline" key={tag}>
-                    <Tag className="h-3 w-3 mr-1.5" />
+                    <TagIcon className="h-3 w-3 mr-1.5" />
                     {tag}
                   </Badge>
                 )) ?? '-'}

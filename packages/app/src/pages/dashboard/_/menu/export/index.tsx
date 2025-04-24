@@ -1,6 +1,6 @@
+import { DownloadIcon } from 'lucide-react';
 import React, { useCallback } from 'react';
 import Error, { useError } from '~/components/error';
-import ExportIcon from '~/components/icon/export/outline';
 import { Button } from '~/components/ui/button';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
@@ -22,7 +22,7 @@ const Export: React.FC<Props> = ({ className = '' }) => {
   return (
     <>
       <Button variant="ghost" className={className} onClick={handleClick}>
-        <ExportIcon />
+        <DownloadIcon />
         {t('exportEndpoints')}
       </Button>
       <Error.renewal {...error.bind} withModal={true} />

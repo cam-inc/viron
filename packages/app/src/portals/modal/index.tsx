@@ -1,4 +1,5 @@
 import classnames from 'classnames';
+import { XIcon } from 'lucide-react';
 import React, {
   PropsWithChildren,
   useCallback,
@@ -6,7 +7,6 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import CloseIcon from '~/components/icon/close/fill';
 import { Button } from '~/components/ui/button';
 import Portal, { TARGET } from '~/portals';
 
@@ -67,7 +67,7 @@ const Modal: React.FC<PropsWithChildren<Props>> = ({
                   size="icon"
                   onClick={handleCloseButtonClick}
                 >
-                  <CloseIcon />
+                  <XIcon />
                 </Button>
               </div>
               {children}

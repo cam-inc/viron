@@ -1,4 +1,4 @@
-import { ChevronRight, Mail, KeyRound } from 'lucide-react';
+import { ChevronRightIcon, MailIcon, KeyRoundIcon } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
 import { useError } from '~/components/error/';
 import GoogleLogo from '~/components/google';
@@ -49,7 +49,7 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
         <DialogTrigger asChild>
           <Button>
             {t('enterEndpoint')}
-            <ChevronRight />
+            <ChevronRightIcon />
           </Button>
         </DialogTrigger>
         <DialogContent className="w-[400px]">
@@ -61,7 +61,7 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
               <Sheet>
                 <div className="flex flex-col items-center gap-1 basis-15">
                   <SheetTrigger className="h-[42px] w-[42px] rounded-full border border-border flex items-center justify-center">
-                    <Mail className="h-5 w-5" />
+                    <MailIcon className="h-5 w-5" />
                   </SheetTrigger>
                   <div className="text-xs">{t('email')}</div>
                 </div>
@@ -103,7 +103,7 @@ const Signin: React.FC<Props> = ({ endpoint, authentication }) => {
               <Sheet>
                 <div className="flex flex-col items-center gap-1 basis-15">
                   <SheetTrigger className="h-[42px] w-[42px] rounded-full border border-border flex items-center justify-center">
-                    <KeyRound className="h-5 w-5" />
+                    <KeyRoundIcon className="h-5 w-5" />
                   </SheetTrigger>
                   <div className="text-xs">{t('oidc')}</div>
                 </div>

@@ -1,6 +1,6 @@
 import { PageProps, graphql } from 'gatsby';
-import { Frown } from 'lucide-react';
-import React, { useCallback } from 'react';
+import { FrownIcon } from 'lucide-react';
+import React from 'react';
 import { AppSidebar } from '~/components/app-sidebar';
 import Metadata from '~/components/metadata';
 import { SidebarInset, SidebarProvider } from '~/components/ui/sidebar';
@@ -17,7 +17,7 @@ const NotfoundPage: React.FC<Props> = () => {
         <AppSidebar />
         <SidebarInset className="justify-center">
           <div className="flex flex-col items-center gap-2">
-            <Frown className="size-6" />
+            <FrownIcon className="size-6" />
             <h1 className="text-xl font-bold">Page Not Found...</h1>
           </div>
         </SidebarInset>
