@@ -31,7 +31,6 @@ import { useEndpointListItemGlobalStateValue } from '~/store';
 import { COLOR_SYSTEM } from '~/types';
 import { Document, Info } from '~/types/oas';
 import Content from './_/content';
-import { Props as NavigationProps } from './_/navigation';
 import SubBody from './_/subBody';
 
 const splitter = ',';
@@ -123,8 +122,8 @@ const EndpointPage: React.FC<Props> = ({ params }) => {
     });
   }, [location.search]);
 
-  const handlePageSelect = useCallback<NavigationProps['onPageSelect']>(
-    (pageId) => {
+  const handlePageSelect = useCallback(
+    (pageId: string) => {
       _navigate(pageId, pinnedContentIds);
     },
     [_navigate, pinnedContentIds]

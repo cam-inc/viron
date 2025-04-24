@@ -2,7 +2,6 @@ import classnames from 'classnames';
 import { Plus } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import Sortable from 'sortablejs';
-import EndpointsEmptyIcon from '~/components/endpoinitsEmptyIcon';
 import {
   Accordion,
   AccordionContent,
@@ -15,7 +14,7 @@ import { UN_GROUP_ID } from '~/constants';
 import { useEndpoint } from '~/hooks/endpoint';
 import { Trans, useTranslation } from '~/hooks/i18n';
 import { cn } from '~/lib/utils';
-import { COLOR_SYSTEM, Endpoint } from '~/types';
+import { Endpoint } from '~/types';
 import Menu from '../../../_/menu';
 import Add from './add/';
 import Item from './item/';
@@ -72,10 +71,6 @@ const Body: React.FC<Props> = ({ className }) => {
         )}
         {!listByGroup.length && !listUngrouped.length && (
           <div className="flex flex-col justify-center items-center py-30 gap-6">
-            <EndpointsEmptyIcon
-              className="w-[182px] text-thm-on-background-slight"
-              on={COLOR_SYSTEM.BACKGROUND}
-            />
             <p className="text-center text-thm-on-background-low">
               <Trans
                 t={t}
