@@ -4,7 +4,7 @@ run-as: root
 phases:
   install:
     runtime-versions:
-      nodejs: 18
+      nodejs: latest
 
   pre_build:
     commands:
@@ -19,7 +19,6 @@ phases:
       - echo Building app...
       - cd $CODEBUILD_SRC_DIR/packages/app
       - npm run build:prefix
-
 
 artifacts:
   files:
