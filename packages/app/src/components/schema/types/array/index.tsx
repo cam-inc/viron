@@ -131,11 +131,7 @@ const SchemaOfTypeArray: React.FC<Props> = ({
             isDeepActive={isDeepActive}
             activeRef={activeRef}
             renderHeadItem={() => (
-              <Button
-                variant="ghost"
-                className="block"
-                onClick={() => handleRemoveClick(index)}
-              >
+              <Button variant="ghost" onClick={() => handleRemoveClick(index)}>
                 <MinusIcon />
                 {t('removeButtonLabel')}
               </Button>
@@ -144,7 +140,6 @@ const SchemaOfTypeArray: React.FC<Props> = ({
           {index < (data || []).length - 1 && (
             <Button
               variant="ghost"
-              className="block"
               onClick={() => handleInsertClick(index + 1)}
             >
               <PlusIcon />
@@ -153,7 +148,7 @@ const SchemaOfTypeArray: React.FC<Props> = ({
           )}
         </React.Fragment>
       ))}
-      <Button variant="ghost" className="block" onClick={handleAppendClick}>
+      <Button variant="ghost" onClick={handleAppendClick}>
         <PlusIcon />
         {t('appendButtonLabel')}
       </Button>

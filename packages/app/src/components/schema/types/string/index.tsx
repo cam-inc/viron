@@ -6,7 +6,7 @@ import Base64Reader, {
 } from '~/components/base64Reader';
 import FileReader, { Props as FileReaderProps } from '~/components/fileReader';
 import Select from '~/components/select';
-import Textinput from '~/components/textinput';
+import { Input } from '~/components/ui/input';
 import { Textarea } from '~/components/ui/textarea';
 import Wyswyg, { Props as WyswygProps } from '~/components/wyswyg';
 import { getRegisterOptions } from '~/utils/oas/v8n';
@@ -193,8 +193,7 @@ const SchemaOfTypeString: React.FC<Props> = ({
 
   return (
     <>
-      <Textinput
-        on={on}
+      <Input
         type={(function () {
           if (schema.format === 'email') {
             return 'email';
@@ -204,10 +203,8 @@ const SchemaOfTypeString: React.FC<Props> = ({
           }
           return 'text';
         })()}
-        autocompleteId={autocompleteId}
-        render={function (bind) {
-          return <input {...bind} {...register(name, registerOptions)} />;
-        }}
+        list={autocompleteId}
+        {...register(name, registerOptions)}
       />
       {isAutocompleteEnabled && (
         <datalist id={autocompleteId}>
