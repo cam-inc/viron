@@ -11,10 +11,12 @@
     "@viron/app#dev": {
       "with": ["//#example"],
       "dependsOn": ["@viron/linter#build", "@viron/lib#build"],
-      "cache": false
+      "cache": false,
+      "persistent": true
     },
     "//#example": {
-      "cache": false
+      "cache": false,
+      "persistent": true
     },
     "format": {},
     "lint": {},
