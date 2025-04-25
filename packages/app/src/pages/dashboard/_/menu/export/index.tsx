@@ -25,7 +25,7 @@ const Export: React.FC<Props> = ({ className = '' }) => {
         <DownloadIcon />
         {t('exportEndpoints')}
       </Button>
-      <Error.renewal {...error.bind} withModal={true} />
+      <Error {...error.bind} withModal={true} />
     </>
   );
 };

@@ -97,7 +97,7 @@ const Body: React.FC<Props> = ({
   return (
     <>
       <div className={className}>{elm}</div>
-      <Error.renewal {...error.bind} withModal />
+      <Error {...error.bind} withModal />
     </>
   );
 };

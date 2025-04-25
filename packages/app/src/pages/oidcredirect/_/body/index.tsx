@@ -119,7 +119,7 @@ const Body: React.FC<Props> = ({ search }) => {
         defaultValues={signinOidcCallback.defaultValues}
         onSubmit={handleSubmit}
       />
-      <Error.renewal {...error.bind} withModal={true} />
+      <Error {...error.bind} withModal={true} />
     </div>
   );
 };

@@ -93,7 +93,7 @@ const EndpointImportPagge: React.FC<Props> = ({ location }) => {
               </div>
             </div>
           )}
-          <Error.renewal {...error.bind} withModal />
+          <Error {...error.bind} withModal />
         </SidebarInset>
       </SidebarProvider>
     </>

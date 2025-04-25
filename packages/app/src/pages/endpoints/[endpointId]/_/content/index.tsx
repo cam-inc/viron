@@ -132,7 +132,7 @@ const _Content: React.FC<Props> = ({
           )}
         </div>
       </div>
-      <Error.renewal {...error.bind} withModal={true} />
+      <Error {...error.bind} withModal={true} />
       <Body
         className={classnames({
           hidden: !isOpened,

@@ -146,7 +146,7 @@ const Head: React.FC<Props> = ({
           </div>
         ))}
       </Popover>
-      <Error.renewal {...error.bind} withModal={true} />
+      <Error {...error.bind} withModal={true} />
     </>
   );
 };

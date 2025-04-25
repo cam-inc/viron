@@ -83,7 +83,7 @@ const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
         <ProgressWrapper className="fixed inset-0 z-wrapper-progress" />
         <Splash isActive={!isLaunched} className="fixed inset-0 z-splash" />
       </div>
-      <Error.renewal {...error.bind} withModal={true} />
+      <Error {...error.bind} withModal={true} />
     </>
   );
 };
