@@ -19,7 +19,6 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
-import PopoverPortal, { usePopover } from '~/portals/popover';
 import { COLOR_SYSTEM, Endpoint } from '~/types';
 import {
   Document,
@@ -38,6 +37,12 @@ import { UseBaseReturn } from '../../hooks/useBase';
 import { UseDescendantsReturn } from '../../hooks/useDescendants';
 import Descendant, { Props as DescendantProps } from '../../parts/descendant';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -45,7 +50,6 @@ import {
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -250,11 +254,7 @@ const ContentTable: React.FC<Props> = ({
 
                 <SheetContent>
                   <SheetHeader>
-                    <SheetTitle>Are you absolutely sure?</SheetTitle>
-                    <SheetDescription>
-                      This action cannot be undone. This will permanently delete
-                      your account and remove your data from our servers.
-                    </SheetDescription>
+                    <SheetTitle>Data</SheetTitle>
                   </SheetHeader>
                   <RowData
                     on={COLOR_SYSTEM.BACKGROUND}
@@ -288,39 +288,34 @@ const Operations: React.FC<OperationsProps> = ({
   onOperationSuccess,
   onOperationFail,
 }) => {
-  const popover = usePopover<HTMLDivElement>();
-
   return (
-    <>
-      <div ref={popover.targetRef}>
-        <Button
-          variant="ghost"
-          className="h-8 w-8"
-          onClick={(e) => {
-            e.stopPropagation();
-            popover.open();
-          }}
-        >
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8">
           <CircleEllipsisIcon className="h-4 w-4" />
         </Button>
-      </div>
-      <PopoverPortal {...popover.bind}>
-        <ul>
-          {descendants.map((descendant, idx) => (
-            <li key={idx}>
-              <Descendant
-                endpoint={endpoint}
-                document={document}
-                descendant={descendant}
-                data={data}
-                onOperationSuccess={onOperationSuccess}
-                onOperationFail={onOperationFail}
-              />
-            </li>
-          ))}
-        </ul>
-      </PopoverPortal>
-    </>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        {descendants.map((descendant, idx) => (
+          <DropdownMenuItem
+            key={idx}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
+          >
+            <Descendant
+              endpoint={endpoint}
+              document={document}
+              descendant={descendant}
+              data={data}
+              onOperationSuccess={onOperationSuccess}
+              onOperationFail={onOperationFail}
+            />
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

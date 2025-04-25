@@ -29,7 +29,6 @@ import '~/styles/global.css';
 import { ClassName, COLOR_SYSTEM } from '~/types';
 import { Theme } from '~/types/oas';
 import { getCustomProperties } from '~/utils/colorSystem';
-import PopoverWrapper from '~/wrappers/popover';
 import ProgressWrapper from '~/wrappers/progress';
 
 type Props = {
@@ -75,7 +74,6 @@ const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
         })}
       >
         <div>{children}</div>
-        <PopoverWrapper className="fixed inset-0 z-wrapper-popover" />
         <ProgressWrapper className="fixed inset-0 z-wrapper-progress" />
         <Splash isActive={!isLaunched} className="fixed inset-0 z-splash" />
       </div>

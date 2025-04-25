@@ -1,47 +1,40 @@
-import classnames from 'classnames';
 import { FileTextIcon } from 'lucide-react';
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Props as BaseProps } from '~/components';
 import CommonMark from '~/components/commonMark';
 import Link from '~/components/link';
-import Popover, { usePopover } from '~/portals/popover';
 import { ExternalDocumentation } from '~/types/oas';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 type Props = BaseProps & {
   data: ExternalDocumentation;
 };
-const ExternalDocs: React.FC<Props> = ({ on, data, className = '' }) => {
-  const popover = usePopover<HTMLDivElement>();
-  const handleMouseEnter = useCallback(() => {
-    popover.open();
-  }, [popover]);
-  const handleMouseLeave = useCallback(() => {
-    popover.close();
-  }, [popover]);
-
+const ExternalDocs: React.FC<Props> = ({ on, data }) => {
   return (
-    <>
-      <div
-        className={classnames(className)}
-        ref={popover.targetRef}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        <Link className="group focus-outline-none" to={data.url}>
-          <div
-            className={`flex gap-1 items-center text-xs text-thm-on-${on} group-hover:underline group-active:text-thm-on-${on}-low group-focus:ring-2 group-focus:ring-thm-on-${on}`}
-          >
-            <FileTextIcon className="w-em" />
-            <div>External Docs</div>
-          </div>
-        </Link>
-      </div>
-      {data.description && (
-        <Popover {...popover.bind}>
-          <CommonMark on={on} data={data.description} />
-        </Popover>
-      )}
-    </>
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Link className="group focus-outline-none" to={data.url}>
+            <div
+              className={`flex gap-1 items-center text-xs text-thm-on-${on} group-hover:underline group-active:text-thm-on-${on}-low group-focus:ring-2 group-focus:ring-thm-on-${on}`}
+            >
+              <FileTextIcon className="w-em" />
+              <div>External Docs</div>
+            </div>
+          </Link>
+        </TooltipTrigger>
+        {data.description && (
+          <TooltipContent>
+            <CommonMark on={on} data={data.description} />
+          </TooltipContent>
+        )}
+      </Tooltip>
+    </TooltipProvider>
   );
 };
 export default ExternalDocs;

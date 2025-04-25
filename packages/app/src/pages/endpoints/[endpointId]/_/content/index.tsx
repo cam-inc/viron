@@ -20,10 +20,11 @@ import Refresh from './parts/refresh';
 import Search from './parts/search';
 import Tail from './parts/tail';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export type Props = {
   endpoint: Endpoint;
@@ -88,15 +89,20 @@ const _Content: React.FC<Props> = ({
         </button>
         <div className="flex items-center gap-2">
           {0 < siblings.length && (
-            <Popover>
-              <PopoverTrigger onClick={(e) => e.stopPropagation()}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8">
                   <CircleEllipsisIcon className="h-4 w-4" />
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-fit max-w-[100vw]">
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
                 {siblings.map((sibling, idx) => (
-                  <div key={idx}>
+                  <DropdownMenuItem
+                    key={idx}
+                    onSelect={(e) => {
+                      e.preventDefault();
+                    }}
+                  >
                     <Sibling
                       endpoint={endpoint}
                       document={document}
@@ -108,10 +114,10 @@ const _Content: React.FC<Props> = ({
                         setError(err);
                       }}
                     />
-                  </div>
+                  </DropdownMenuItem>
                 ))}
-              </PopoverContent>
-            </Popover>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
           {base.filter.enabled && (
             <Filter document={document} content={content} base={base} />

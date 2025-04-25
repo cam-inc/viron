@@ -101,6 +101,7 @@ const HomePage: React.FC<Props> = () => {
               <DropdownMenuRadioGroup value={currentLanguage}>
                 {languages.map((language) => (
                   <DropdownMenuRadioItem
+                    key={language}
                     value={language}
                     onClick={() => changeLanguage(language)}
                   >

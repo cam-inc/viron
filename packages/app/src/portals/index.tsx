@@ -3,11 +3,9 @@ import ReactDOM from 'react-dom';
 import { BaseError } from '~/errors';
 import { isBrowser } from '~/utils';
 import { error } from '~/utils/logger';
-import { ID as POPOVER_WRAPPER_ID } from '~/wrappers/popover';
 import { ID as PROGRESS_WRAPPER_ID } from '~/wrappers/progress';
 
 export const TARGET = {
-  POPOVER: POPOVER_WRAPPER_ID,
   PROGRESS: PROGRESS_WRAPPER_ID,
 } as const;
 export type Target = (typeof TARGET)[keyof typeof TARGET];
