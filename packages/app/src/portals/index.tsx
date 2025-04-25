@@ -3,12 +3,10 @@ import ReactDOM from 'react-dom';
 import { BaseError } from '~/errors';
 import { isBrowser } from '~/utils';
 import { error } from '~/utils/logger';
-import { ID as NOTIFICATION_WRAPPER_ID } from '~/wrappers/notification';
 import { ID as POPOVER_WRAPPER_ID } from '~/wrappers/popover';
 import { ID as PROGRESS_WRAPPER_ID } from '~/wrappers/progress';
 
 export const TARGET = {
-  NOTIFICATION: NOTIFICATION_WRAPPER_ID,
   POPOVER: POPOVER_WRAPPER_ID,
   PROGRESS: PROGRESS_WRAPPER_ID,
 } as const;
