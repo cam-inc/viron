@@ -80,7 +80,7 @@ export function AppSidebar() {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild className="">
+            <SidebarMenuButton asChild>
               <Link to="/" className="flex items-center gap-1">
                 <Logo
                   left="text-thm-on-surface-high"

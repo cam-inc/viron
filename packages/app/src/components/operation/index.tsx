@@ -55,7 +55,7 @@ const _Operation: React.FC<Props> = ({ on, operation, className = '' }) => {
           <div className="flex items-center gap-2">
             {operation.servers.map((server, idx) => (
               <React.Fragment key={idx}>
-                <Server className="" on={on} server={server} />
+                <Server on={on} server={server} />
               </React.Fragment>
             ))}
           </div>

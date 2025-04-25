@@ -37,8 +37,8 @@ const Body: React.FC<Props> = ({ className }) => {
         </div>
       </div>
       {/* Body */}
-      <div className="">
-        <ul className="">
+      <div>
+        <ul>
           {groupList.map((group) => (
             <li
               key={group.id}

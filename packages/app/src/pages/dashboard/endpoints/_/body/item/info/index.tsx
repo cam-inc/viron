@@ -68,7 +68,7 @@ const Info: React.FC<Props> = ({ endpoint, document }) => {
               <dd className="w-3/4">{document.info['x-theme'] ?? '-'}</dd>
             </div>
           </dl>
-          <div className="">
+          <div>
             {document.info.description && (
               <div className="my-4">
                 <CommonMark
