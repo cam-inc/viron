@@ -293,7 +293,6 @@ module.exports = {
       },
       zIndex: {
         splash: 11,
-        'wrapper-progress': 10,
         'layout-systembar': 5,
         'layout-navigation': 4,
         'layout-appbar': 3,
