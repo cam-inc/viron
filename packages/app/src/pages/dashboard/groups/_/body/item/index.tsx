@@ -4,14 +4,22 @@ import {
   MenuIcon,
   TrashIcon,
 } from 'lucide-react';
-import React, { useCallback } from 'react';
-import Head from '~/components/head';
+import React, { useCallback, useState } from 'react';
 import { Button } from '~/components/ui/button';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
-import Modal, { useModal } from '~/portals/modal';
 import Popover, { usePopover } from '~/portals/popover';
-import { COLOR_SYSTEM, EndpointGroup } from '~/types';
+import { EndpointGroup } from '~/types';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 export type Props = {
   group: EndpointGroup;
@@ -19,6 +27,7 @@ export type Props = {
 const Item: React.FC<Props> = ({ group }) => {
   const { removeGroup, ascendGroup, descendGroup } = useEndpoint();
   const { t } = useTranslation();
+  const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
 
   const menuPopover = usePopover<HTMLDivElement>();
   const handleMenuClick = useCallback(() => {
@@ -35,24 +44,10 @@ const Item: React.FC<Props> = ({ group }) => {
     menuPopover.close();
   }, [group, descendGroup, menuPopover]);
 
-  const removeConfirmationModal = useModal({});
-
-  const handleRemoveClick = useCallback(() => {
-    removeConfirmationModal.open();
-  }, [removeConfirmationModal]);
-
-  const handleRemoveConfirmationRequestCancel = useCallback<
-    RemoveConfirmationProps['onRequestCancel']
-  >(() => {
-    removeConfirmationModal.close();
-  }, [removeConfirmationModal]);
-
-  const handleRemoveConfirmationRequestRemove = useCallback<
-    RemoveConfirmationProps['onRequestRemove']
-  >(() => {
-    removeConfirmationModal.close();
+  const handleRemoveConfirmationRequestRemove = useCallback(() => {
+    setRemoveDialogOpen(false);
     removeGroup(group.id);
-  }, [group, removeGroup, removeConfirmationModal]);
+  }, [group, removeGroup]);
 
   return (
     <>
@@ -75,19 +70,32 @@ const Item: React.FC<Props> = ({ group }) => {
               {t('menuButtonLabel')}
             </Button>
           </div>
-          {/*
-             TODO: 編集機能。
-          <OnButton
-            on={COLOR_SYSTEM.BACKGROUND}
-            label="Edit"
-            Icon={PencilIcon}
-            onClick={handleEditClick}
-          />
-       */}
-          <Button onClick={handleRemoveClick}>
-            <TrashIcon />
-            {t('removeButtonLabel')}
-          </Button>
+          <Dialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <TrashIcon />
+                {t('removeButtonLabel')}
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{t('removeModal.title')}</DialogTitle>
+                <DialogDescription>
+                  {t('removeModal.description')}
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button type="button" variant="secondary">
+                    {t('cancelButtonLabel')}
+                  </Button>
+                </DialogClose>
+                <Button onClick={handleRemoveConfirmationRequestRemove}>
+                  {t('removeButtonLabel')}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
       <Popover {...menuPopover.bind}>
@@ -100,48 +108,7 @@ const Item: React.FC<Props> = ({ group }) => {
           {t('moveDownButtonLabel')}
         </Button>
       </Popover>
-      <Modal {...removeConfirmationModal.bind}>
-        <RemoveConfirmation
-          onRequestCancel={handleRemoveConfirmationRequestCancel}
-          onRequestRemove={handleRemoveConfirmationRequestRemove}
-        />
-      </Modal>
     </>
   );
 };
 export default Item;
-
-type RemoveConfirmationProps = {
-  onRequestCancel: () => void;
-  onRequestRemove: () => void;
-};
-const RemoveConfirmation: React.FC<RemoveConfirmationProps> = ({
-  onRequestCancel,
-  onRequestRemove,
-}) => {
-  const { t } = useTranslation();
-
-  const handleCancelClick = useCallback(() => {
-    onRequestCancel();
-  }, [onRequestCancel]);
-
-  const handleRemoveClick = useCallback(() => {
-    onRequestRemove();
-  }, [onRequestRemove]);
-
-  return (
-    <div className="space-y-8">
-      <Head
-        on={COLOR_SYSTEM.SURFACE}
-        title={t('removeModal.title')}
-        description={t('removeModal.description')}
-      />
-      <div className="flex justify-end gap-2">
-        <Button variant="outline" onClick={handleCancelClick}>
-          {t('cancelButtonLabel')}
-        </Button>
-        <Button onClick={handleRemoveClick}>{t('removeButtonLabel')}</Button>
-      </div>
-    </div>
-  );
-};

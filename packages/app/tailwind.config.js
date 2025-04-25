@@ -296,7 +296,6 @@ module.exports = {
         'wrapper-progress': 10,
         'wrapper-notification': 9,
         'wrapper-popover': 8,
-        'wrapper-modal': 7,
         'layout-systembar': 5,
         'layout-navigation': 4,
         'layout-appbar': 3,

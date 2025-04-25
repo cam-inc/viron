@@ -4,16 +4,22 @@ import Error, { useError } from '~/components/error';
 import { Button } from '~/components/ui/button';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
-import Modal, { useModal } from '~/portals/modal';
 import { ClassName, COLOR_SYSTEM, Distribution } from '~/types';
 import Targets from './targets';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 type Props = {
   className?: ClassName;
 };
 const Import: React.FC<Props> = ({ className = '' }) => {
   const { t } = useTranslation();
-  const modal = useModal({});
+  const [open, setOpen] = useState(false);
   const error = useError({
     on: COLOR_SYSTEM.SURFACE,
     withModal: true,
@@ -29,14 +35,14 @@ const Import: React.FC<Props> = ({ className = '' }) => {
     _import.execute((result) => {
       if (result.error) {
         error.setError(result.error);
-        modal.close();
+        setOpen(false);
       } else {
         error.setError(null);
         setDistribution(result.data);
-        modal.open();
+        setOpen(true);
       }
     });
-  }, [_import, modal, error]);
+  }, [_import, error]);
 
   return (
     <>
@@ -45,12 +51,20 @@ const Import: React.FC<Props> = ({ className = '' }) => {
         {t('importEndpoints')}
       </Button>
       <input {..._import.bind} />
-      <Modal {...modal.bind}>
-        <Targets
-          endpointList={distribution.endpointList || []}
-          endpointGroupList={distribution.endpointGroupList || []}
-        />
-      </Modal>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Import Endpoints</DialogTitle>
+            <DialogDescription>
+              Click import button to add an endpoint into your dashboard.
+            </DialogDescription>
+          </DialogHeader>
+          <Targets
+            endpointList={distribution.endpointList || []}
+            endpointGroupList={distribution.endpointGroupList || []}
+          />
+        </DialogContent>
+      </Dialog>
       <Error {...error.bind} withModal={true} />
     </>
   );

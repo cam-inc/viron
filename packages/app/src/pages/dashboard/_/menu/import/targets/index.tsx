@@ -19,28 +19,16 @@ export type Props = {
 };
 const Targets: React.FC<Props> = ({ endpointList }) => {
   return (
-    <div>
-      <Head
-        on={COLOR_SYSTEM.BACKGROUND}
-        title={
-          <div className="flex items-center gap-2">
-            <ImportIcon className="w-em" />
-            <div>Import Endpoints</div>
-          </div>
-        }
-        description="Click import button to add an endpoint into your dashboard."
-      />
-      <ul className="flex flex-col">
-        {endpointList.map((endpoint, idx) => (
-          <li
-            key={idx}
-            className="py-4 border-b last:border-b-0 border-dotted border-thm-on-surface-slight"
-          >
-            <Target endpoint={endpoint} />
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ul className="flex flex-col">
+      {endpointList.map((endpoint, idx) => (
+        <li
+          key={idx}
+          className="py-4 border-b last:border-b-0 border-dotted border-thm-on-surface-slight"
+        >
+          <Target endpoint={endpoint} />
+        </li>
+      ))}
+    </ul>
   );
 };
 export default Targets;
