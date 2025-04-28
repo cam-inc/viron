@@ -20,28 +20,17 @@ Please submit a [GitHub issue](https://github.com/cam-inc/viron/issues/new?assig
 
 We apply the monorepo architecture; see each workspace's `README.md` for details.
 
-Use the npm command's option `--workspace` with a workspace name to execute workspace-specific npm scripts, like:
-
-```
-$ npm run develop --workspace=@viron/app
-$ npm run build --workspace=@viron/app --workspace=@viron/lib
-```
-
-Use the `--workspaces` option to execute a npm script on each workspace.
-
-```
-$ npm run test --workspaces
-```
-
 Below is a quick guide to code contribution.
 
 1. Fork and clone the repo to your local machine.
-2. Create a new branch from `develop` with a meaningful name for the task you work on.
-3. Setup by running: `npm install . --legacy-peer-deps`. (**Important**: npm version >= 7.9.0)
-4. Do your work following the `styleguide` of each package; read the readme.md files in each package directory.
-5. Add changelog intentions by running `npm run changelog:intent`.
-6. Push your branch.
-7. Submit a pull request to the upstream repository.
+2. Copy the .env.template file located at the root of the project and rename it to .env.
+3. Open the .env file and choose the datastore—either mysql or mongo—that best suits your environment and expertise.
+4. Create a new branch from `develop` with a meaningful name for the task you work on.
+5. Setup by running: `npm install`.
+6. Do your work following the `styleguide` of each package; read the readme.md files in each package directory.
+7. Add changelog intentions by running `npm run changelog:intent`.
+8. Push your branch.
+9. Submit a pull request to the upstream repository.
 
 ## Code of Conduct
 

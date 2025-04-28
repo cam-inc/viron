@@ -1,0 +1,27 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "clean": {
+      "cache": false
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".cache/**", ".docusaurus/**"]
+    },
+    "@viron/app#dev": {
+      "with": ["//#example"],
+      "dependsOn": ["@viron/linter#build", "@viron/lib#build"],
+      "cache": false,
+      "persistent": true
+    },
+    "//#example": {
+      "cache": false,
+      "persistent": true
+    },
+    "format": {},
+    "lint": {},
+    "check-types": {},
+    "test": {},
+    "pre-push": {}
+  }
+}

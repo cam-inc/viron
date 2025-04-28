@@ -4,7 +4,7 @@ run-as: root
 phases:
   install:
     runtime-versions:
-      nodejs: 18
+      nodejs: latest
 
   pre_build:
     commands:

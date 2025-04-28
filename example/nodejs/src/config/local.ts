@@ -41,17 +41,17 @@ export const get = (mode: Mode): Config => {
     },
     cors: {
       allowOrigins: [
-        'https://localhost:8000',
         'https://viron.work',
         'https://snapshot.viron.work',
+        'https://local.viron.work:8000',
       ],
     },
     csrf: {
-      host: 'example.viron.work:3000',
+      host: 'local-api.viron.work:3000',
       allowOrigins: [
-        'https://localhost:8000',
         'https://viron.work',
         'https://snapshot.viron.work',
+        'https://local.viron.work:8000',
       ],
       ignorePaths: [
         '/ping',

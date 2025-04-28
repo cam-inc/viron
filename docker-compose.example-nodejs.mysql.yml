@@ -1,11 +1,8 @@
-version: '3.8'
-
 services:
-
   example:
-    build: 
-      context: '.'
-      dockerfile: Dockerfile.example-nodejs
+    build:
+      context: "."
+      dockerfile: example/nodejs/Dockerfile
     restart: always
     depends_on:
       - mysql
@@ -25,6 +22,15 @@ services:
     command: run dev
 
   mysql:
-    extends:
-      file: example/nodejs/docker-compose.mysql.yml
-      service: mysql
+    image: mysql:8.0
+    restart: always
+    ports:
+      - 3306:3306
+    volumes:
+      - $PWD/example/nodejs/data/mysql/db:/var/lib/mysql
+    env_file: $PWD/example/nodejs/mysql.env
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci --default-authentication-plugin=mysql_native_password
+    networks:
+      default:
+        aliases:
+          - viron.example.nodejs

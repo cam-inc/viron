@@ -1,6 +1,7 @@
 {
   "name": "@viron/app",
-  "version": "2.15.0",
+  "version": "2.16.0",
+  "private": true,
   "engines": {
     "node": ">=18.14.0",
     "npm": ">=9.3.1"
@@ -11,36 +12,26 @@
     "not dead"
   ],
   "scripts": {
-    "pre-commit": "run-s lint:staged test:static test:unit",
     "pre-push": "npm run ci:local",
-    "preflight": "npm install --legacy-peer-deps",
-    "develop": "gatsby develop --https -p 8000",
+    "dev": "gatsby develop --https -p 8000 --host local.viron.work --open",
     "build": "gatsby build",
     "build:prefix": "gatsby build --prefix-paths",
     "serve": "gatsby serve -p 9000",
-    "serve:prefix": "gatsby serve -p 9000 --prefix-paths",
-    "launch": "run-s build serve",
-    "launch:prefix": "run-s build:prefix serve:prefix",
+    "launch": "npm run build && npm run serve",
     "clean": "gatsby clean",
-    "format": "run-p format:*",
-    "format:tjs": "prettier --write \"**/*.{js,jsx,ts,tsx}\"",
-    "lint": "npm run lint:tjs",
-    "lint:tjs": "eslint \"**/*.{js,jsx,ts,tsx}\"",
-    "lint:staged": "lint-staged",
-    "test": "run-s test:static test:unit test:e2e",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx}\"",
+    "lint": "eslint \"**/*.{js,jsx,ts,tsx}\"",
     "test:e2e": "cypress run",
     "test:e2e:open": "cypress open",
     "test:e2e:record": "cypress run --record",
     "test:unit": "jest --passWithNoTests",
-    "test:static": "tsc",
+    "check-types": "tsc",
     "ci:local": "START_SERVER_AND_TEST_INSECURE=1 CYPRESS_BASE_URL=http://localhost:9000 start-server-and-test launch http://localhost:9000 test:e2e",
     "ci:local:record": "START_SERVER_AND_TEST_INSECURE=1 CYPRESS_BASE_URL=http://localhost:9000 start-server-and-test launch http://localhost:9000 test:e2e:record",
     "ci:development": "CYPRESS_BASE_URL=https://viron.work npm run test:e2e",
     "ci:development:record": "CYPRESS_BASE_URL=https://viron.work npm run test:e2e:record",
     "ci:production": "CYPRESS_BASE_URL=https://viron.app npm run test:e2e",
-    "ci:production:record": "CYPRESS_BASE_URL=https://viron.app npm run test:e2e:record",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "ci:production:record": "CYPRESS_BASE_URL=https://viron.app npm run test:e2e:record"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
@@ -48,6 +39,7 @@
       "eslint"
     ]
   },
+  "//": "style-to-object is an unnecessary dependency due to a Gatsby-Docusaurus version mismatch; we plan to remove it.",
   "dependencies": {
     "@ark-ui/react": "^0.13.1",
     "@editorjs/editorjs": "^2.22.1",
@@ -77,7 +69,6 @@
     "jsonpath-plus": "^5.0.7",
     "lodash": "^4.17.21",
     "markdown-it": "^12.2.0",
-    "npm-run-all": "^4.1.5",
     "postcss": "^8.4.31",
     "postcss-preset-env": "^7.0.1",
     "qrcode": "^1.5.1",
@@ -93,6 +84,7 @@
     "recoil": "^0.7.7",
     "sortablejs": "^1.15.0",
     "store2": "^2.12.0",
+    "style-to-object": "0.4.4",
     "swr": "^1.1.0",
     "tailwindcss": "^3.3.2",
     "webpack": "^5.24.4",
@@ -101,10 +93,6 @@
   "devDependencies": {
     "@babel/core": "^7.13.10",
     "@hookform/devtools": "^3.0.1",
-    "@storybook/addon-actions": "^6.1.21",
-    "@storybook/addon-essentials": "^6.1.21",
-    "@storybook/addon-links": "^6.1.21",
-    "@storybook/react": "^6.5.16",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.4.0",
     "@types/classnames": "^2.2.11",

@@ -1,8 +1,9 @@
 {
   "name": "@viron/lib",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "scripts": {
-    "build": "npm run clean && tsc --project tsconfig.json && cp -fr src/openapi dist/",
+    "prebuild": "npm run clean",
+    "build": "tsc --project tsconfig.json && cp -fr src/openapi dist/",
     "clean": "rm -rf dist && rm -f tsconfig.tsbuildinfo",
     "coverage": "jest --coverage",
     "format": "npm run format:prettier",
@@ -10,7 +11,6 @@
     "lint": "npm run lint:ts",
     "lint:ts": "eslint \"**/*.ts\"",
     "lint:ts:fix": "eslint --fix \"**/*.ts\"",
-    "pre-commit": "lint-staged",
     "pre-push": "npm run test",
     "test": "jest -c ./jest.config.ts",
     "test:watch": "jest --watch"
@@ -57,7 +57,6 @@
     "eslint-plugin-jest": "^27.2.2",
     "eslint-plugin-prettier": "^4.0.0",
     "jest": "^29.6.1",
-    "lint-staged": "^12.3.1",
     "mongodb-memory-server": "^8.2.0",
     "openapi3-ts": "2.0.1",
     "prettier": "^2.2.1",
@@ -67,12 +66,6 @@
   },
   "engines": {
     "node": ">=14"
-  },
-  "lint-staged": {
-    "**/*.{js,ts}": [
-      "prettier --write --loglevel warn",
-      "eslint"
-    ]
   },
   "license": "MIT"
 }

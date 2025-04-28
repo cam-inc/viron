@@ -1,11 +1,8 @@
-version: '3.8'
-
 services:
-
   example:
-    build: 
-      context: '.'
-      dockerfile: Dockerfile.example-nodejs
+    build:
+      context: "."
+      dockerfile: example/nodejs/Dockerfile
     restart: always
     depends_on:
       - mongo
@@ -25,6 +22,14 @@ services:
     command: run dev
 
   mongo:
-    extends:
-      file: example/nodejs/docker-compose.mongo.yml
-      service: mongo
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - $PWD/example/nodejs/data/mongo/db:/data/db
+    env_file: $PWD/example/nodejs/mongo.env
+    networks:
+      default:
+        aliases:
+          - viron.example.nodejs

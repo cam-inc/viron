@@ -4,6 +4,7 @@
     "type": "git",
     "url": "git+https://github.com/cam-inc/viron.git"
   },
+  "private": true,
   "keywords": [
     "management",
     "console",
@@ -23,6 +24,14 @@
     {
       "name": "fkei",
       "email": "kei.topaz@gmail.com"
+    },
+    {
+      "name": "ejithon",
+      "url": "https://github.com/ejithon"
+    },
+    {
+      "name": "t4y3",
+      "url": "https://github.com/t4y3"
     }
   ],
   "license": "MIT",
@@ -31,39 +40,36 @@
   },
   "homepage": "https://github.com/cam-inc/viron#readme",
   "scripts": {
-    "prepare": "which husky && husky install || echo skip.",
-    "pre-commit": "npm run pre-commit --workspaces",
-    "pre-push": "npm run pre-push --workspaces",
+    "prepare": "husky || true",
+    "pre-commit": "lint-staged",
+    "pre-push": "turbo run pre-push",
     "changelog:intent": "changeset add",
     "changelog:version": "changeset version",
-    "build": "npm run build --workspaces",
-    "clean": "npm run clean --workspaces",
-    "format": "npm run format --workspaces",
-    "lint": "npm run lint --workspacess",
-    "test": "npm run test --workspaces",
-    "example-nodejs:docker-compose:up:mongo": "docker-compose -f ./docker-compose.example-nodejs.mongo.yml up --build --force-recreate",
-    "example-nodejs:docker-compose:up:mysql": "docker-compose -f ./docker-compose.example-nodejs.mysql.yml up --build --force-recreate"
+    "build": "turbo run build",
+    "clean": "turbo run clean",
+    "dev": "dotenv -e .env -- turbo run @viron/app#dev",
+    "dev-website": "turbo run @viron/website#dev",
+    "example": "docker compose up",
+    "format": "turbo run format",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "check-types": "turbo run check-types"
   },
   "devDependencies": {
     "@changesets/cli": "^2.20.0",
     "@commitlint/cli": "^16.1.0",
     "@commitlint/config-conventional": "^16.0.0",
-    "husky": "^8.0.3"
+    "dotenv-cli": "^8.0.0",
+    "husky": "^9.1.7",
+    "turbo": "^2.5.0"
   },
   "workspaces": [
-    "packages/app",
-    "packages/linter",
-    "packages/nodejs",
-    "packages/website",
-    "example/nodejs"
+    "packages/*",
+    "example/*"
   ],
   "engines": {
-    "node": ">=18.14.0",
-    "npm": ">=9.3.1"
+    "node": ">=22.14.0",
+    "npm": ">=10.9.2"
   },
-  "private": true,
-  "volta": {
-    "node": "18.14.0",
-    "npm": "9.3.1"
-  }
+  "packageManager": "npm@10.9.2"
 }
