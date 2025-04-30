@@ -8,7 +8,7 @@
 [![Read the Docs](https://img.shields.io/readthedocs/pip.svg)](https://discovery.viron.plus/docs/introduction/)
 [![GitHub last commit](https://img.shields.io/github/last-commit/cam-inc/viron.svg)]()
 
-### 📣 Notice of Repository Structure Change
+# 📣 Notice of Repository Structure Change
 
 The Golang component has been migrated to a separate repository ([viron-go](https://github.com/cam-inc/viron-go)). If you are using the Go implementation, please refer to that repository.
 
