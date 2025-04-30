@@ -23,7 +23,7 @@ module.exports = {
     "scope-enum": [
       2,
       "always",
-      ["all", "example", "app", "linter", "nodejs", "website", "golang"],
+      ["all", "example", "app", "linter", "nodejs", "website"],
     ],
   },
 };
