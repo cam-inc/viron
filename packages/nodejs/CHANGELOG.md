@@ -1,5 +1,11 @@
 # @viron/nodejs
 
+## 2.6.0
+
+### Minor Changes
+
+- 6882c978: Design a new sign-in flow in preparation for the upcoming deprecation of third-party cookies.
+
 ## 2.5.0
 
 ### Minor Changes

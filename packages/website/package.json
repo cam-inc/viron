@@ -1,6 +1,7 @@
 {
   "name": "@viron/website",
   "version": "0.5.0",
+  "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
     "dev": "docusaurus start --port 4000",
