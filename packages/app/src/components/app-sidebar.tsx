@@ -11,13 +11,7 @@ import { INTERNAL_PAGE_PATHS, URL } from '~/constants';
 import { useI18n, useTranslation } from '~/hooks/i18n';
 import Link from './link';
 import Logo from './logo';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './ui/select';
+import { Select, SelectItem } from './ui/select';
 import {
   Sidebar,
   SidebarContent,
@@ -127,16 +121,11 @@ export function AppSidebar() {
               ))}
               <SidebarMenuItem>
                 <Select value={currentLanguage} onValueChange={changeLanguage}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {languages.map((language) => (
-                      <SelectItem key={language} value={language}>
-                        {t(`language.${language}`)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
+                  {languages.map((language) => (
+                    <SelectItem key={language} value={language}>
+                      {t(`language.${language}`)}
+                    </SelectItem>
+                  ))}
                 </Select>
               </SidebarMenuItem>
             </SidebarMenu>

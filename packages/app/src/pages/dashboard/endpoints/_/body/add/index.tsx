@@ -21,13 +21,7 @@ import {
   FormMessage,
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
+import { Select, SelectItem } from '~/components/ui/select';
 import { useEndpoint } from '~/hooks/endpoint';
 import { useTranslation } from '~/hooks/i18n';
 import { Endpoint } from '~/types';
@@ -145,18 +139,12 @@ const AddEndpoint: React.FC<Props> = ({ onAdd }) => {
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {/** @see https://github.com/radix-ui/primitives/issues/1569 */}
-                      <SelectItem value={undefined as any}>-</SelectItem>
-                      {groupList.map((group) => (
-                        <SelectItem key={group.id} value={group.id}>
-                          {group.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
+                    <SelectItem value="">-</SelectItem>
+                    {groupList.map((group) => (
+                      <SelectItem key={group.id} value={group.id}>
+                        {group.name}
+                      </SelectItem>
+                    ))}
                   </Select>
                 </FormControl>
                 <FormDescription>

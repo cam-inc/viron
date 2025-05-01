@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react';
-import Select from '~/components/select';
-import { COLOR_SYSTEM } from '~/types';
+import { Select, SelectItem } from '~/components/ui/select';
 import { Theme, THEME } from '~/types/oas';
 
 export type Props = {
@@ -18,20 +17,13 @@ const ThemeSelect: React.FC<Props> = ({ theme, onRequestChange }) => {
 
   return (
     <div>
-      <Select<Theme>
-        on={COLOR_SYSTEM.BACKGROUND}
-        list={Object.values(THEME)}
-        Select={({ className, children }) => (
-          <select className={className} value={theme} onChange={handleChange}>
-            {children}
-          </select>
-        )}
-        Option={({ className, data }) => (
-          <option className={className} value={data}>
-            {data}
-          </option>
-        )}
-      />
+      <Select value={theme} onChange={handleChange}>
+        {Object.values(THEME).map((item, idx) => (
+          <SelectItem key={idx} value={item}>
+            {item}
+          </SelectItem>
+        ))}
+      </Select>
     </div>
   );
 };

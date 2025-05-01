@@ -5,8 +5,8 @@ import Base64Reader, {
   Props as Base64ReaderProps,
 } from '~/components/base64Reader';
 import FileReader, { Props as FileReaderProps } from '~/components/fileReader';
-import Select from '~/components/select';
 import { Input } from '~/components/ui/input';
+import { Select, SelectItem } from '~/components/ui/select';
 import { Textarea } from '~/components/ui/textarea';
 import Wyswyg, { Props as WyswygProps } from '~/components/wyswyg';
 import { getRegisterOptions } from '~/utils/oas/v8n';
@@ -125,61 +125,27 @@ const SchemaOfTypeString: React.FC<Props> = ({
 
   if (isDynamicEnumEnabled) {
     return (
-      <Select<string>
-        on={on}
-        list={dynamicEnumList}
-        Select={function ({ className, children }) {
-          return (
-            <select className={className} {...register(name, registerOptions)}>
-              {children}
-            </select>
-          );
-        }}
-        Option={function ({ className, data }) {
-          return (
-            <option className={className} value={data}>
-              {data}
-            </option>
-          );
-        }}
-        OptionBlank={function ({ className }) {
-          return (
-            <option className={className} value={undefined}>
-              ---
-            </option>
-          );
-        }}
-      />
+      <Select {...register(name, registerOptions)}>
+        <SelectItem value={undefined}>---</SelectItem>
+        {dynamicEnumList.map((item, idx) => (
+          <SelectItem key={idx} value={item}>
+            {item}
+          </SelectItem>
+        ))}
+      </Select>
     );
   }
 
   if (schema.enum) {
     return (
-      <Select<string>
-        on={on}
-        list={schema.enum}
-        Select={function ({ className, children }) {
-          return (
-            <select className={className} {...register(name, registerOptions)}>
-              {children}
-            </select>
-          );
-        }}
-        Option={function ({ className, data }) {
-          return (
-            <option className={className} value={data}>
-              {data}
-            </option>
-          );
-        }}
-        OptionBlank={function ({ className }) {
-          return (
-            <option className={className} value={undefined}>
-              ---
-            </option>
-          );
-        }}
-      />
+      <Select {...register(name, registerOptions)}>
+        <SelectItem value={undefined}>---</SelectItem>
+        {schema.enum.map((item, idx) => (
+          <SelectItem key={idx} value={item}>
+            {item}
+          </SelectItem>
+        ))}
+      </Select>
     );
   }
 

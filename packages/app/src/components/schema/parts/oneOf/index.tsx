@@ -1,20 +1,19 @@
-import _ from 'lodash';
 import React, { useCallback, useMemo, useState } from 'react';
-import Select from '~/components/select';
+import { Select, SelectItem } from '~/components/ui/select';
 import { Schema } from '~/types/oas';
 import { Props } from '../../index';
 import SchemaOfTypeArray from '../../types/array';
 import SchemaOfTypeBoolean from '../../types/boolean';
 import SchemaOfTypeInteger from '../../types/integer';
 import SchemaOfTypeNumber from '../../types/number';
-import SchemaOfTypeString from '../../types/string';
 import SchemaOfTypeObject from '../../types/object';
+import SchemaOfTypeString from '../../types/string';
 
 type Data = Schema & {
   id: string;
 };
 const OneOf: React.FC<Props> = (props) => {
-  const { on, name, setValue, schema } = props;
+  const { name, setValue, schema } = props;
 
   const [selectedSchemaId, setSelectedSchemaId] = useState<Data['id']>('');
 
@@ -64,29 +63,14 @@ const OneOf: React.FC<Props> = (props) => {
 
   return (
     <div>
-      <Select<Data>
-        on={on}
-        list={list}
-        Select={({ className, children }) => (
-          <select
-            className={className}
-            value={selectedSchemaId}
-            onChange={handleSelectChange}
-          >
-            {children}
-          </select>
-        )}
-        Option={({ className, data }) => (
-          <option className={className} value={data.id}>
-            {data.title}
-          </option>
-        )}
-        OptionBlank={({ className }) => (
-          <option className={className} value="">
-            -
-          </option>
-        )}
-      />
+      <Select value={selectedSchemaId} onChange={handleSelectChange}>
+        <SelectItem value="">-</SelectItem>
+        {list.map((item) => (
+          <SelectItem key={item.id} value={item.id}>
+            {item.title}
+          </SelectItem>
+        ))}
+      </Select>
       {component}
     </div>
   );
