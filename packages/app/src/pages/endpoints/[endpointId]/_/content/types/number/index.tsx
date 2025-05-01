@@ -18,9 +18,7 @@ const ContentNumber: React.FC<Props> = ({ document, base }) => {
 
   return (
     <div className="flex justify-end p-2">
-      <div className="text-2xl font-bold text-thm-on-surface">
-        {result.value.toLocaleString()}
-      </div>
+      <div className="text-2xl font-bold">{result.value.toLocaleString()}</div>
     </div>
   );
 };

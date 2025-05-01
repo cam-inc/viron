@@ -1,4 +1,3 @@
-import classnames from 'classnames';
 import _ from 'lodash';
 import React, { useMemo } from 'react';
 import { Props as BaseProps } from '~/components';
@@ -36,6 +35,6 @@ const Cell: React.FC<Props> = ({ on, schema, value }) => {
     }
   }, [on, schema, value]);
 
-  return <div className="text-thm-on-${on} text-xs">{content}</div>;
+  return <div className="text-xs">{content}</div>;
 };
 export default Cell;

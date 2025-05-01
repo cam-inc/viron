@@ -1,8 +1,8 @@
+import { Loader2Icon } from 'lucide-react';
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useState } from 'react';
 import Error, { useError } from '~/components/error';
 import Request from '~/components/request';
-import Spinner from '~/components/spinner';
 import { BaseError } from '~/errors';
 import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
 import { KEY, get } from '~/storage';
@@ -94,7 +94,7 @@ const Body: React.FC<Props> = ({ search }) => {
   if (isPending) {
     return (
       <div className="p-4 flex justify-center items-center h-full">
-        <Spinner className="w-8" on={COLOR_SYSTEM.BACKGROUND} />
+        <Loader2Icon className="size-8 animate-spin" />
       </div>
     );
   }

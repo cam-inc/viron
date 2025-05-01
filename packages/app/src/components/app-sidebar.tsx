@@ -76,10 +76,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link to="/" className="flex items-center gap-1">
-                <Logo
-                  left="text-thm-on-surface-high"
-                  right="text-thm-on-surface"
-                />
+                <Logo />
                 <div className="text-xl font-bold">Viron</div>
               </Link>
             </SidebarMenuButton>

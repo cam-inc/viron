@@ -7,11 +7,11 @@ const Select = React.forwardRef<
   React.ComponentProps<'select'> & {
     onValueChange?: (value: string) => void;
   }
->(({ className, onChange, ...props }, ref) => {
+>(({ className, onChange, onValueChange, ...props }, ref) => {
   const _onChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     onChange?.(event);
     const value = event.target.value;
-    props.onValueChange?.(value);
+    onValueChange?.(value);
   };
   return (
     <select

@@ -15,10 +15,7 @@ const Thumbnail: React.FC<Props> = ({ document, className }) => {
     if (!thumbnail) {
       return (
         <div className="h-full flex items-center">
-          <Logo
-            left="text-thm-on-background"
-            right="text-thm-on-background-low"
-          />
+          <Logo />
         </div>
       );
     }

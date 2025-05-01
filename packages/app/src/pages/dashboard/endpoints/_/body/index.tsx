@@ -71,7 +71,7 @@ const Body: React.FC<Props> = ({ className }) => {
         )}
         {!listByGroup.length && !listUngrouped.length && (
           <div className="flex flex-col justify-center items-center py-30 gap-6">
-            <p className="text-center text-thm-on-background-low">
+            <p className="text-center text-muted-foreground">
               <Trans
                 t={t}
                 i18nKey="dashboard.endpoints.emptyMessage"

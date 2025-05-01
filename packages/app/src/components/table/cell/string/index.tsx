@@ -1,4 +1,3 @@
-import classnames from 'classnames';
 import React, { useMemo } from 'react';
 import { Props as BaseProps } from '~/components';
 import { Schema } from '~/types/oas';
@@ -7,13 +6,13 @@ export type Props = BaseProps & {
   schema: Schema;
   value: string;
 };
-const CellForTypeString: React.FC<Props> = ({ on, schema, value }) => {
+const CellForTypeString: React.FC<Props> = ({ schema, value }) => {
   const content = useMemo<JSX.Element>(() => {
     switch (schema.format) {
       case 'uri':
         return (
           <a
-            className={classnames(`text-sm text-thm-on-${on} underline`)}
+            className="text-sm underline"
             href={value}
             target="_blank"
             rel="noopener noreferrer"
@@ -32,11 +31,9 @@ const CellForTypeString: React.FC<Props> = ({ on, schema, value }) => {
           </div>
         );
       default:
-        return (
-          <div className={classnames(`text-sm text-thm-on-${on}`)}>{value}</div>
-        );
+        return <div className="text-sm">{value}</div>;
     }
-  }, [on, schema, value]);
+  }, [schema, value]);
   return <div className="whitespace-nowrap">{content}</div>;
 };
 export default CellForTypeString;

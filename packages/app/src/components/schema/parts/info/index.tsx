@@ -10,10 +10,7 @@ export type Props = BaseProps & {
 const Info: React.FC<Props> = ({ on, schema, className = '' }) => {
   return (
     <div
-      className={classnames(
-        `p-1 text-xxs bg-thm-on-${on}-faint text-thm-on-${on}`,
-        className
-      )}
+      className={classnames(`p-1 text-xxs bg-muted text-foreground`, className)}
     >
       <div>type: {schema.type}</div>
       {schema.title && <div>{schema.title}</div>}

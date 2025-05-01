@@ -191,7 +191,7 @@ const ContentTable: React.FC<Props> = ({
                 );
               })}
               {0 < descendants.length && (
-                <TableHead className="text-right sticky right-0 bg-thm-background" />
+                <TableHead className="text-right sticky right-0 bg-background" />
               )}
             </TableRow>
           </TableHeader>
@@ -245,7 +245,7 @@ const ContentTable: React.FC<Props> = ({
                       );
                     })}
                     {0 < descendants.length && (
-                      <TableCell className="text-right sticky right-0 bg-thm-background">
+                      <TableCell className="text-right sticky right-0 bg-background">
                         {renderActions(data)}
                       </TableCell>
                     )}
@@ -402,17 +402,17 @@ const Accordion: React.FC<
             <ChevronRightIcon className="h-4 w-4" />
           )}
         </Button>
-        <div className={`text-sm text-thm-on-${on}`}>
+        <div className="text-sm">
           <span className="font-bold">{objectKey}</span>
           {schema?.description && (
-            <span className="ml-2 text-thm-on-surface-low">
+            <span className="ml-2 text-muted-foreground">
               {schema.description}
             </span>
           )}
         </div>
       </div>
       {isOpened && (
-        <div className="ml-5 pl-4 border-l border-thm-on-surface-slight flex flex-col items-start space-y-4">
+        <div className="ml-5 pl-4 border-l border-border flex flex-col items-start space-y-4">
           {data[objectKey] && typeof data[objectKey] === 'object' ? (
             Object.keys(data[objectKey]).map((childObjectKey, index) => (
               <Accordion
@@ -425,8 +425,8 @@ const Accordion: React.FC<
             ))
           ) : (
             <>
-              <div className="bg-thm-on-background-slight rounded-lg px-2.5 p-3 inline-flex items-center whitespace-nowrap mr-5">
-                <span className={`mr-2 text-xs text-thm-on-${on}`}>
+              <div className="bg-muted/50 rounded-lg px-2.5 p-3 inline-flex items-center whitespace-nowrap mr-5">
+                <span className="mr-2 text-xs">
                   {displayValue(data[objectKey])}
                 </span>
                 <Button

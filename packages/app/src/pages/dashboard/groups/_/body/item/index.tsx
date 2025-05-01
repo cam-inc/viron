@@ -43,13 +43,13 @@ const Item: React.FC<Props> = ({ group }) => {
   }, [group, removeGroup]);
 
   return (
-    <div className="flex items-center gap-2 p-2 hover:bg-thm-on-background-faint">
+    <div className="flex items-center gap-2 p-2 hover:bg-muted/50">
       <div className="flex-1">
         <div className="text-base font-bold">{group.name}</div>
         <div className="flex items-center gap-2">
-          <div className="text-xs text-thm-on-background-low">{group.id}</div>
+          <div className="text-xs text-muted-foreground">{group.id}</div>
           {group.description && (
-            <div className="text-sm text-thm-on-background-low">
+            <div className="text-sm text-muted-foreground">
               {group.description}
             </div>
           )}

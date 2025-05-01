@@ -1,11 +1,10 @@
 import { PageProps, graphql } from 'gatsby';
-import { QrCodeIcon } from 'lucide-react';
+import { Loader2Icon, QrCodeIcon } from 'lucide-react';
 import { parse } from 'query-string';
 import React, { useCallback, useState, useEffect } from 'react';
 import { AppSidebar } from '~/components/app-sidebar';
 import Error, { useError } from '~/components/error';
 import Metadata from '~/components/metadata';
-import Spinner from '~/components/spinner';
 import { SidebarInset, SidebarProvider } from '~/components/ui/sidebar';
 import { BaseError } from '~/errors';
 import { useEndpoint } from '~/hooks/endpoint';
@@ -70,7 +69,7 @@ const EndpointImportPagge: React.FC<Props> = ({ location }) => {
         <SidebarInset className="justify-center">
           {isPending ? (
             <div className="flex justify-center">
-              <Spinner className="size-8" on={COLOR_SYSTEM.BACKGROUND} />
+              <Loader2Icon className="size-8 animate-spin" />
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2 justify-center">

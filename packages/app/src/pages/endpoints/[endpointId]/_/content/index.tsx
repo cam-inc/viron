@@ -65,7 +65,7 @@ const _Content: React.FC<Props> = ({
   return (
     <div
       id={content.id}
-      className="border border-thm-on-background-low rounded-lg overflow-hidden"
+      className="border border-border rounded-lg overflow-hidden"
     >
       <div className="flex justify-between items-center p-4 border-b bg-muted/30">
         <button
@@ -78,7 +78,7 @@ const _Content: React.FC<Props> = ({
             }
           }}
         >
-          <span className="text-thm-on-background-low">
+          <span>
             {isOpened ? (
               <ChevronDownIcon className="size-4" />
             ) : (
@@ -150,7 +150,7 @@ const _Content: React.FC<Props> = ({
         descendants={descendants}
       />
       <Tail
-        className={classnames('p-2 border-t border-thm-on-background-slight', {
+        className={classnames('p-2 border-t border-border', {
           hidden: !isOpened,
         })}
         document={document}

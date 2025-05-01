@@ -1,22 +1,11 @@
 import { PageProps, graphql } from 'gatsby';
-import {
-  ChevronDownIcon,
-  ExternalLinkIcon,
-  GithubIcon,
-  LanguagesIcon,
-} from 'lucide-react';
+import { ExternalLinkIcon, GithubIcon } from 'lucide-react';
 import React, { useCallback } from 'react';
 import Link from '~/components/link';
 import Logo from '~/components/logo';
 import Metadata from '~/components/metadata';
 import { Button } from '~/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-} from '~/components/ui/dropdown-menu';
+import { Select, SelectItem } from '~/components/ui/select';
 import { URL } from '~/constants';
 import { useTranslation, useI18n, Trans } from '~/hooks/i18n';
 import useTheme from '~/hooks/theme';
@@ -37,19 +26,13 @@ const HomePage: React.FC<Props> = () => {
 
   const renderBody = useCallback(() => {
     const poster = (
-      <div className="text-thm-on-background flex flex-col items-center justify-center">
-        <Logo
-          className="w-24"
-          left="text-thm-on-background-high"
-          right="text-thm-on-background"
-        />
-        <div className="text-2xl mt-8 font-bold mb-2 text-thm-on-background-high">
-          {t('catchphrase')}
-        </div>
+      <div className="flex flex-col items-center justify-center">
+        <Logo className="w-24" />
+        <div className="text-2xl mt-8 font-bold mb-2">{t('catchphrase')}</div>
         <p className="text-center mt-3 text-xs">
           <Trans t={t} i18nKey="subCatchphrase" components={{ br: <br /> }} />
         </p>
-        <div className="text-xxs mt-6 text-thm-on-background-low">
+        <div className="text-xxs mt-6 text-muted-foreground">
           {t('version', { version: pkg.version })}
         </div>
       </div>
@@ -86,31 +69,17 @@ const HomePage: React.FC<Props> = () => {
               to={URL.GITHUB}
             />
           </ul>
-          {/* TODO: navigation languagesと共通化 */}
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <button className="py-1 pr-1 flex items-center gap-1 text-thm-on-surface hover:underline active:text-thm-on-surface-low outline-thm-outline rounded-sm">
-                <div className="p-0.5">
-                  <LanguagesIcon className="w-[1.42em] h-[1.42em]" />
-                </div>
-                {t(`language.${currentLanguage}`)}
-                <ChevronDownIcon className="size-em" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuRadioGroup value={currentLanguage}>
-                {languages.map((language) => (
-                  <DropdownMenuRadioItem
-                    key={language}
-                    value={language}
-                    onClick={() => changeLanguage(language)}
-                  >
-                    {t(`language.${language}`)}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Select
+            className="w-max"
+            value={currentLanguage}
+            onValueChange={changeLanguage}
+          >
+            {languages.map((language) => (
+              <SelectItem key={language} value={language}>
+                {t(`language.${language}`)}
+              </SelectItem>
+            ))}
+          </Select>
         </div>
       </article>
     );
@@ -124,7 +93,7 @@ const HomePage: React.FC<Props> = () => {
               {poster}
             </div>
             {/* Right Side */}
-            <div className="py-8 bg-thm-surface text-thm-on-surface flex-1 flex items-center justify-center">
+            <div className="py-8 bg-muted flex-1 flex items-center justify-center">
               {direction}
             </div>
           </div>
@@ -133,9 +102,7 @@ const HomePage: React.FC<Props> = () => {
             <div className="pt-19 pb-16 flex items-stretch justify-center ">
               {poster}
             </div>
-            <div className="py-8 bg-thm-surface text-thm-on-surface grow">
-              {direction}
-            </div>
+            <div className="py-8 bg-muted grow">{direction}</div>
           </div>
         )}
       </div>
@@ -165,13 +132,12 @@ const NavigationListItem: React.FC<{
   const { t } = useTranslation();
   return (
     <li key={to}>
-      <Link
-        className="py-1 pr-1 flex gap-1 items-center text-thm-on-surface hover:underline active:text-thm-on-surface-low outline-thm-outline rounded-sm"
-        to={to}
-      >
-        <div className="p-0.5 [&>*]:w-[1.42em] [&>*]:h-[1.42em]">{icon}</div>
-        <div>{t(label)}</div>
-      </Link>
+      <Button size="sm" asChild variant="link">
+        <Link to={to}>
+          {icon}
+          {t(label)}
+        </Link>
+      </Button>
     </li>
   );
 };

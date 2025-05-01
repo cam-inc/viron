@@ -75,15 +75,13 @@ const _Request: React.FC<Props> = ({
       <form className="h-full flex flex-col" onSubmit={_handleSubmit}>
         {/* Custom Head */}
         {renderHead && (
-          <div className={`flex-none p-2 border-b-2 border-thm-on-${on}-faint`}>
+          <div className={`flex-none p-2 border-b-2 border-border`}>
             {renderHead()}
           </div>
         )}
         {/* Common Head */}
-        <div
-          className={`flex-none flex gap-2 border-b-2 p-2 text-thm-on-${on} border-thm-on-${on}-faint`}
-        >
-          <div className={`flex-none bg-on-thm-${on}-faint`}>
+        <div className={`flex-none flex gap-2 border-b-2 p-2 border-border`}>
+          <div className="flex-none">
             <div className="flex items-center h-[22px]">
               <Button
                 variant="ghost"
@@ -104,7 +102,7 @@ const _Request: React.FC<Props> = ({
               <div>{request.path}</div>
             </div>
             {isCommonHeadOpened && (
-              <div className={`pt-2 mt-2 border-t border-thm-on-${on}-faint`}>
+              <div className={`pt-2 mt-2 border-t border-border`}>
                 <Operation
                   on={on}
                   document={document}
@@ -188,7 +186,7 @@ const _Request: React.FC<Props> = ({
         </div>
         {/* Tail */}
         <div
-          className={`flex-none p-2 border-t-2 border-thm-on-${on}-faint flex justify-end gap-2`}
+          className={`flex-none p-2 border-t-2 border-border flex justify-end gap-2`}
         >
           <Button type="submit" onClick={handleSubmitClick}>
             {t('submitButtonLabel')}

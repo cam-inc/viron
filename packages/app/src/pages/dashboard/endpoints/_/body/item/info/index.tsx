@@ -7,6 +7,7 @@ import License from '~/components/license';
 import Link from '~/components/link';
 import Server from '~/components/server';
 import { Badge } from '~/components/ui/badge';
+import { Button } from '~/components/ui/button';
 import {
   DialogContent,
   DialogHeader,
@@ -79,15 +80,12 @@ const Info: React.FC<Props> = ({ endpoint, document }) => {
             )}
             <div className="flex flex-col items-start gap-1">
               {document.info.termsOfService && (
-                <Link
-                  className="group focus:outline-none"
-                  to={document.info.termsOfService}
-                >
-                  <div className="flex gap-1 items-center text-xs text-thm-on-surface group-hover:underline group-active:text-thm-on-surface-low group-focus:ring-2 group-focus:ring-thm-on-surface">
-                    <ExternalLinkIcon className="w-em" />
-                    <div>terms of service</div>
-                  </div>
-                </Link>
+                <Button asChild variant="link">
+                  <Link to={document.info.termsOfService}>
+                    <ExternalLinkIcon />
+                    terms of service
+                  </Link>
+                </Button>
               )}
               {document.info.contact && (
                 <Contact

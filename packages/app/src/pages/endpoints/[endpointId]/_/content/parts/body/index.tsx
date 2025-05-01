@@ -1,6 +1,6 @@
+import { Loader2Icon } from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import Error, { useError } from '~/components/error';
-import Spinner from '~/components/spinner';
 import { BaseError } from '~/errors';
 import { ClassName, COLOR_SYSTEM, Endpoint } from '~/types';
 import { Document, Content, CONTENT_TYPE, TableColumn } from '~/types/oas';
@@ -57,7 +57,7 @@ const Body: React.FC<Props> = ({
     if (base.isPending) {
       return (
         <div className="p-10 flex items-center justify-center">
-          <Spinner className="w-4" on={COLOR_SYSTEM.SURFACE} />
+          <Loader2Icon className="size-4 animate-spin" />
         </div>
       );
     }

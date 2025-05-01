@@ -1,12 +1,8 @@
 import classnames from 'classnames';
 import { PluginOptions } from 'gatsby';
 import _ from 'lodash';
-import React, {
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useMemo,
-} from 'react';
+import { Loader2Icon } from 'lucide-react';
+import React, { PropsWithChildren, useCallback, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { HelmetProvider } from 'react-helmet-async';
@@ -16,9 +12,7 @@ import { HelmetProvider } from 'react-helmet-async';
 //import tailwindConfig from '../../tailwind.config';
 import Error, { useError } from '~/components/error';
 import ErrorBoundary from '~/components/errorBoundary';
-import Spinner from '~/components/spinner';
 import { UnhandledError } from '~/errors';
-import { cn } from '~/lib/utils';
 import {
   GlobalStateProvider,
   useAppIsLaunchedGlobalState,
@@ -27,8 +21,6 @@ import {
 } from '~/store';
 import '~/styles/global.css';
 import { ClassName, COLOR_SYSTEM } from '~/types';
-import { Theme } from '~/types/oas';
-import { getCustomProperties } from '~/utils/colorSystem';
 
 type Props = {
   pluginOptions: PluginOptions;
@@ -57,7 +49,7 @@ export default RootWrapper;
 
 const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
   // Entry point.
-  const { launch, isLaunched, style, error, theme } = useRoot();
+  const { launch, isLaunched, error } = useRoot();
 
   useEffect(() => {
     launch();
@@ -65,13 +57,7 @@ const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
 
   return (
     <>
-      {style}
-      <div
-        id="root"
-        className={cn('relative', {
-          [`theme-${theme.replace(/\s/g, '-')}`]: theme !== 'default',
-        })}
-      >
+      <div id="root" className="relative">
         <div>{children}</div>
         <Splash isActive={!isLaunched} className="fixed inset-0 z-splash" />
       </div>
@@ -83,9 +69,7 @@ const Root: React.FC<PropsWithChildren<Props>> = ({ children }) => {
 type UseRootReturn = {
   launch: () => Promise<void>;
   isLaunched: boolean;
-  style: JSX.Element;
   error: ReturnType<typeof useError>;
-  theme: Theme;
 };
 const useRoot = (): UseRootReturn => {
   const [isLaunched, setIsLaunched] = useAppIsLaunchedGlobalState();
@@ -100,14 +84,13 @@ const useRoot = (): UseRootReturn => {
   }, [isLaunched, setIsLaunched]);
 
   // Watch theme.
-  const style = useMemo(() => {
-    const customProperties = getCustomProperties(theme);
-    let str = 'body{';
-    Object.entries(customProperties).forEach(([key, value]) => {
-      str = `${str}${key}:${value};`;
-    });
-    str = `${str}}`;
-    return <style>{str}</style>;
+  useEffect(() => {
+    document.body.classList.remove(
+      ...Array.from(document.body.classList).filter((cls) =>
+        cls.startsWith('theme-')
+      )
+    );
+    document.body.classList.add(`theme-${theme.replace(/\s/g, '-')}`);
   }, [theme]);
 
   // Watch screen size.
@@ -180,8 +163,6 @@ const useRoot = (): UseRootReturn => {
   return {
     launch,
     isLaunched,
-    theme,
-    style,
     error,
   };
 };
@@ -193,7 +174,7 @@ const Splash: React.FC<{ isActive: boolean; className?: ClassName }> = ({
   return (
     <div
       className={classnames(
-        'flex items-center justify-center bg-thm-surface transition',
+        'flex items-center justify-center bg-background transition',
         {
           'opacity-100 scale-100 pointer-events-auto': isActive,
           'opacity-0 scale-110 pointer-events-none': !isActive,
@@ -201,7 +182,7 @@ const Splash: React.FC<{ isActive: boolean; className?: ClassName }> = ({
         className
       )}
     >
-      <Spinner className="flex-none w-12" on={COLOR_SYSTEM.SURFACE} />
+      <Loader2Icon className="size-12 animate-spin" />
     </div>
   );
 };

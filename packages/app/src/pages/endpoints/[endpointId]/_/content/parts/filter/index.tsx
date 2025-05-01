@@ -105,7 +105,7 @@ const Filter: React.FC<Props> = ({ base }) => {
           </div>
         </div>
         {/* Tail */}
-        <div className="flex-none flex justify-end p-2 border-t-2 border-thm-on-surface-faint">
+        <div className="flex-none flex justify-end p-2 border-t-2 border-border">
           <Button variant="default" onClick={handleApplyClick}>
             Apply
           </Button>

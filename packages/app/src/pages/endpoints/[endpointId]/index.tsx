@@ -8,6 +8,7 @@ import CommonMark from '~/components/commonMark';
 import Link from '~/components/link';
 import Logo from '~/components/logo';
 import Metadata from '~/components/metadata';
+import { Button } from '~/components/ui/button';
 import {
   ResizableHandle,
   ResizablePanel,
@@ -196,36 +197,31 @@ const EndpointPage: React.FC<Props> = ({ params }) => {
       <SidebarProvider>
         <Sidebar variant="sidebar">
           <SidebarHeader>
-            <Link
-              className="group focus:outline-none"
-              to="/dashboard/endpoints"
-            >
-              <article className="flex justify-start items-center py-3 px-3 gap-2 group-focus:ring-4 ring-thm-on-surface-low hover:bg-thm-on-surface-faint rounded">
-                <ArrowLeftIcon className="w-4 h-4 flex-none" />
-                <div className="flex-none w-6 h-6 flex justify-center">
-                  {document?.info['x-thumbnail'] ? (
-                    <img
-                      className="object-contain rounded"
-                      src={document.info['x-thumbnail']}
-                    />
-                  ) : (
-                    <Logo
-                      className="w-6 h-6"
-                      left="text-thm-on-background"
-                      right="text-thm-on-background-low"
-                    />
-                  )}
-                </div>
-                <div className="flex-1 w-0">
-                  <h1 className="text-xxs font-bold text-thm-on-surface-low truncate">
-                    {endpoint?.id}
-                  </h1>
-                  <h2 className="text-xxs text-thm-on-surface-low truncate">
-                    {document?.info.title}
-                  </h2>
-                </div>
-              </article>
-            </Link>
+            <Button className="h-auto" asChild variant="ghost">
+              <Link to="/dashboard/endpoints">
+                <article className="w-full flex justify-start items-center gap-2">
+                  <ArrowLeftIcon className="w-4 h-4 flex-none" />
+                  <div className="flex-none w-6 h-6 flex justify-center">
+                    {document?.info['x-thumbnail'] ? (
+                      <img
+                        className="object-contain rounded"
+                        src={document.info['x-thumbnail']}
+                      />
+                    ) : (
+                      <Logo className="w-6 h-6" />
+                    )}
+                  </div>
+                  <div className="flex-1 w-0">
+                    <h1 className="text-xxs font-bold truncate">
+                      {endpoint?.id}
+                    </h1>
+                    <h2 className="text-xxs text-muted-foreground truncate">
+                      {document?.info.title}
+                    </h2>
+                  </div>
+                </article>
+              </Link>
+            </Button>
           </SidebarHeader>
           <SidebarContent>
             {selectedPageId && (

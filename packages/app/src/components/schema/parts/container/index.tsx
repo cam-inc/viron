@@ -5,10 +5,12 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
   InfoIcon,
+  AlertCircleIcon,
 } from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Props as BaseProps } from '~/components';
+import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert';
 import { Button } from '~/components/ui/button';
 import { Schema } from '~/types/oas';
 import { UseActiveReturn, useError } from '../../hooks';
@@ -88,7 +90,7 @@ const Container: React.FC<Props> = ({
 
   return (
     <div
-      className={classnames(`flex flex-col gap-2 text-xs text-thm-on-${on}`, {
+      className={classnames(`flex flex-col gap-2 text-xs`, {
         'opacity-25': !isActive,
       })}
     >
@@ -107,7 +109,7 @@ const Container: React.FC<Props> = ({
       </div>
       {/* Body */}
       <div
-        className={`flex-1 ml-4 pl-4 border-l border-thm-on-${on}-slight hover:border-thm-on-${on}-low`}
+        className={`flex-1 ml-4 pl-4 border-l border-border hover:border-primary`}
       >
         <div
           className={classnames('space-y-2', {
@@ -118,9 +120,11 @@ const Container: React.FC<Props> = ({
           {isInfoOpened && <Info on={on} schema={schema} />}
           {/* Error */}
           {error && (
-            <p className="font-bold p-1 bg-thm-error text-thm-on-error">
-              {error.message}
-            </p>
+            <Alert variant="destructive">
+              <AlertCircleIcon className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription> {error.message}</AlertDescription>
+            </Alert>
           )}
           {/* Children */}
           <div>{children}</div>

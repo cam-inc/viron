@@ -42,7 +42,7 @@ const Body: React.FC<Props> = ({ className }) => {
           {groupList.map((group) => (
             <li
               key={group.id}
-              className="border-b border-dashed border-thm-on-background-faint pb-2 mb-2 last:border-none last:mb-0 last:pb-0"
+              className="border-b border-dashed border-border pb-2 mb-2 last:border-none last:mb-0 last:pb-0"
             >
               <Item group={group} />
             </li>

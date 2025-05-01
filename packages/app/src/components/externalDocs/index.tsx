@@ -4,6 +4,7 @@ import { Props as BaseProps } from '~/components';
 import CommonMark from '~/components/commonMark';
 import Link from '~/components/link';
 import { ExternalDocumentation } from '~/types/oas';
+import { Button } from '@/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
@@ -19,14 +20,12 @@ const ExternalDocs: React.FC<Props> = ({ on, data }) => {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Link className="group focus-outline-none" to={data.url}>
-            <div
-              className={`flex gap-1 items-center text-xs text-thm-on-${on} group-hover:underline group-active:text-thm-on-${on}-low group-focus:ring-2 group-focus:ring-thm-on-${on}`}
-            >
+          <Button asChild variant="link">
+            <Link to={data.url}>
               <FileTextIcon className="w-em" />
-              <div>External Docs</div>
-            </div>
-          </Link>
+              External Docs
+            </Link>
+          </Button>
         </TooltipTrigger>
         {data.description && (
           <TooltipContent>
