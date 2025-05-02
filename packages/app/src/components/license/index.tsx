@@ -1,10 +1,10 @@
 import { GraduationCapIcon } from 'lucide-react';
 import React from 'react';
-import { Props as BaseProps } from '~/components';
-import Link from '~/components/link';
-import { Button } from '~/components/ui/button';
-import { cn } from '~/lib/utils';
-import { License } from '~/types/oas';
+import { Props as BaseProps } from '@/components';
+import Link from '@/components/link';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { License } from '@/types/oas';
 
 type Props = BaseProps & {
   data: License;

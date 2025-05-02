@@ -1,11 +1,11 @@
 import { AlertCircleIcon } from 'lucide-react';
 import React from 'react';
-import { Props as BaseProps } from '~/components';
-import CommonMark from '~/components/commonMark';
-import ExternalDocs from '~/components/externalDocs';
-import Server from '~/components/server';
-import { Badge } from '~/components/ui/badge';
-import { Document, Operation } from '~/types/oas';
+import { Props as BaseProps } from '@/components';
+import CommonMark from '@/components/commonMark';
+import ExternalDocs from '@/components/externalDocs';
+import Server from '@/components/server';
+import { Badge } from '@/components/ui/badge';
+import { Document, Operation } from '@/types/oas';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 
 type Props = BaseProps & {

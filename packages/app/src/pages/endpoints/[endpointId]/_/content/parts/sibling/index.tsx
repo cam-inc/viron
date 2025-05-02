@@ -1,10 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import Request from '~/components/request';
-import { BaseError } from '~/errors/index';
-import { COLOR_SYSTEM, Endpoint } from '~/types';
-import { Document, RequestValue } from '~/types/oas';
-import { UseSiblingsReturn } from '../../hooks/useSiblings';
-import Action from '../action';
+import Request from '@/components/request';
 import {
   Sheet,
   SheetContent,
@@ -12,6 +7,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { BaseError } from '@/errors/index';
+import { COLOR_SYSTEM, Endpoint } from '@/types';
+import { Document, RequestValue } from '@/types/oas';
+import { UseSiblingsReturn } from '../../hooks/useSiblings';
+import Action from '../action';
 
 export type Props = {
   endpoint: Endpoint;

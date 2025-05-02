@@ -1,7 +1,7 @@
 import React from 'react';
-import { Props as BaseProps } from '~/components';
-import Error from '~/components/error';
-import { BaseError } from '~/errors/index';
+import { Props as BaseProps } from '@/components';
+import Error from '@/components/error';
+import { BaseError } from '@/errors/index';
 
 type FallbackProps = {
   error: BaseError;

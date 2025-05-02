@@ -1,12 +1,12 @@
 import { PinIcon, PinOffIcon } from 'lucide-react';
 import React from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
   TooltipProvider,
-} from '~/components/ui/tooltip';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui/tooltip';
 
 export type Props = {
   isActive: boolean;

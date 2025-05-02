@@ -2,19 +2,19 @@ import classnames from 'classnames';
 import { ChevronDownIcon, ChevronRightIcon } from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Props as BaseProps } from '~/components';
-import Operation from '~/components/operation';
-import Schema from '~/components/schema';
-import { useEliminate } from '~/components/schema/hooks';
-import { useTranslation } from '~/hooks/i18n';
-import { Endpoint } from '~/types/index';
+import { Props as BaseProps } from '@/components';
+import Operation from '@/components/operation';
+import Schema from '@/components/schema';
+import { useEliminate } from '@/components/schema/hooks';
+import { useTranslation } from '@/hooks/i18n';
+import { Endpoint } from '@/types/index';
 import {
   Document,
   Request,
   RequestValue,
   Schema as SchemaType,
-} from '~/types/oas';
-import { pickContentType } from '~/utils/oas';
+} from '@/types/oas';
+import { pickContentType } from '@/utils/oas';
 import { Button } from '../ui/button';
 
 export type Props = BaseProps & {

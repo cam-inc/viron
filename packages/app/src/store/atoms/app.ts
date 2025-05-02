@@ -1,5 +1,5 @@
 import { atom } from 'recoil';
-import { Theme, THEME } from '~/types/oas';
+import { Theme, THEME } from '@/types/oas';
 
 const NAME = 'app';
 const KEY = {

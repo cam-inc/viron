@@ -1,21 +1,21 @@
 import { TagIcon, ExternalLinkIcon } from 'lucide-react';
 import React from 'react';
-import CommonMark from '~/components/commonMark';
-import Contact from '~/components/contact';
-import ExternalDocs from '~/components/externalDocs';
-import License from '~/components/license';
-import Link from '~/components/link';
-import Server from '~/components/server';
-import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
+import CommonMark from '@/components/commonMark';
+import Contact from '@/components/contact';
+import ExternalDocs from '@/components/externalDocs';
+import License from '@/components/license';
+import Link from '@/components/link';
+import Server from '@/components/server';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '~/components/ui/dialog';
-import { useTranslation } from '~/hooks/i18n';
-import { COLOR_SYSTEM, Endpoint } from '~/types';
-import { Document } from '~/types/oas';
+} from '@/components/ui/dialog';
+import { useTranslation } from '@/hooks/i18n';
+import { COLOR_SYSTEM, Endpoint } from '@/types';
+import { Document } from '@/types/oas';
 import Thumbnail from '../thumbnail';
 
 type Props = {

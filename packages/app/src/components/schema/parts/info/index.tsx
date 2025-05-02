@@ -1,8 +1,8 @@
 import classnames from 'classnames';
 import React from 'react';
-import { Props as BaseProps } from '~/components';
-import CommonMark from '~/components/commonMark';
-import { Schema } from '~/types/oas';
+import { Props as BaseProps } from '@/components';
+import CommonMark from '@/components/commonMark';
+import { Schema } from '@/types/oas';
 
 export type Props = BaseProps & {
   schema: Schema;

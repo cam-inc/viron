@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import _File from '~/components/file';
+import _File from '@/components/file';
 
 export type Props = {
   onChange: (file: File | null) => void;

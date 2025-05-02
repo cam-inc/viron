@@ -10,17 +10,17 @@ import { HelmetProvider } from 'react-helmet-async';
 //import { TailwindConfig } from 'tailwindcss/tailwind-config';
 // @ts-ignore
 //import tailwindConfig from '../../tailwind.config';
-import Error, { useError } from '~/components/error';
-import ErrorBoundary from '~/components/errorBoundary';
-import { UnhandledError } from '~/errors';
+import Error, { useError } from '@/components/error';
+import ErrorBoundary from '@/components/errorBoundary';
+import { UnhandledError } from '@/errors';
 import {
   GlobalStateProvider,
   useAppIsLaunchedGlobalState,
   useAppScreenGlobalStateSet,
   useAppThemeGlobalStateValue,
-} from '~/store';
-import '~/styles/global.css';
-import { ClassName, COLOR_SYSTEM } from '~/types';
+} from '@/store';
+import '@/styles/global.css';
+import { ClassName, COLOR_SYSTEM } from '@/types';
 
 type Props = {
   pluginOptions: PluginOptions;

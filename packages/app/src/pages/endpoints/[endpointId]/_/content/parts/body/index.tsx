@@ -1,9 +1,9 @@
 import { Loader2Icon } from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
-import Error, { useError } from '~/components/error';
-import { BaseError } from '~/errors';
-import { ClassName, COLOR_SYSTEM, Endpoint } from '~/types';
-import { Document, Content, CONTENT_TYPE, TableColumn } from '~/types/oas';
+import Error, { useError } from '@/components/error';
+import { BaseError } from '@/errors';
+import { ClassName, COLOR_SYSTEM, Endpoint } from '@/types';
+import { Document, Content, CONTENT_TYPE, TableColumn } from '@/types/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
 import { UseDescendantsReturn } from '../../hooks/useDescendants';
 import NumberContent from '../../types/number/index';

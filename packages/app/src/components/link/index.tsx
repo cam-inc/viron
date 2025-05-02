@@ -1,7 +1,7 @@
 // eslint-disable-next-line no-restricted-imports
 import { Link as I18nextLink } from 'gatsby-plugin-react-i18next';
 import React, { ComponentProps, forwardRef } from 'react';
-import { Props as BaseProps } from '~/components';
+import { Props as BaseProps } from '@/components';
 
 type Props = Omit<BaseProps, 'on'> &
   Pick<ComponentProps<typeof I18nextLink>, 'to' | 'language'>;

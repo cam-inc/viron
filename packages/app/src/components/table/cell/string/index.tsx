@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { Props as BaseProps } from '~/components';
-import { Schema } from '~/types/oas';
+import { Props as BaseProps } from '@/components';
+import { Schema } from '@/types/oas';
 
 export type Props = BaseProps & {
   schema: Schema;

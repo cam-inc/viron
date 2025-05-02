@@ -1,9 +1,9 @@
 import { PageProps, graphql } from 'gatsby';
 import React from 'react';
-import { AppSidebar } from '~/components/app-sidebar';
-import Metadata from '~/components/metadata';
-import { SidebarInset, SidebarProvider } from '~/components/ui/sidebar';
-import useTheme from '~/hooks/theme';
+import { AppSidebar } from '@/components/app-sidebar';
+import Metadata from '@/components/metadata';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import useTheme from '@/hooks/theme';
 import Body from './_/body';
 
 type Props = PageProps;

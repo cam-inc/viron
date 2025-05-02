@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import { BaseError, OASError, Result, Success, Failure } from '~/errors';
-import { Document } from '~/types/oas';
+import { BaseError, OASError, Result, Success, Failure } from '@/errors';
+import { Document } from '@/types/oas';
 
 export const validateResponseDataOfTypeNumber = (
   document: Document,

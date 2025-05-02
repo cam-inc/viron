@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Endpoint } from '~/types';
-import { Document, Content } from '~/types/oas';
-import _Content, { Props as ContentProps } from '../content';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Endpoint } from '@/types';
+import { Document, Content } from '@/types/oas';
+import _Content, { Props as ContentProps } from '../content';
 
 type Props = {
   endpoint: Endpoint;

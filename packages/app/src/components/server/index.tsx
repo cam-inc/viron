@@ -1,15 +1,15 @@
 import classnames from 'classnames';
 import { ServerIcon } from 'lucide-react';
 import React from 'react';
-import { Props as BaseProps } from '~/components';
-import CommonMark from '~/components/commonMark';
-import { Server } from '~/types/oas';
+import { Props as BaseProps } from '@/components';
+import CommonMark from '@/components/commonMark';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { Server } from '@/types/oas';
 
 type Props = BaseProps & {
   server: Server;

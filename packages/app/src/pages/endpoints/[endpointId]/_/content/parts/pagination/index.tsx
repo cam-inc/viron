@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
-import Pagination, { Props as PaginationProps } from '~/components/pagination';
-import { Document } from '~/types/oas';
+import Pagination, { Props as PaginationProps } from '@/components/pagination';
+import { Document } from '@/types/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
 
 type Props = {

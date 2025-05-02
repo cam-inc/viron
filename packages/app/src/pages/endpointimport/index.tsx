@@ -2,15 +2,15 @@ import { PageProps, graphql } from 'gatsby';
 import { Loader2Icon, QrCodeIcon } from 'lucide-react';
 import { parse } from 'query-string';
 import React, { useCallback, useState, useEffect } from 'react';
-import { AppSidebar } from '~/components/app-sidebar';
-import Error, { useError } from '~/components/error';
-import Metadata from '~/components/metadata';
-import { SidebarInset, SidebarProvider } from '~/components/ui/sidebar';
-import { BaseError } from '~/errors';
-import { useEndpoint } from '~/hooks/endpoint';
-import { useI18n } from '~/hooks/i18n';
-import useTheme from '~/hooks/theme';
-import { COLOR_SYSTEM, Endpoint } from '~/types';
+import { AppSidebar } from '@/components/app-sidebar';
+import Error, { useError } from '@/components/error';
+import Metadata from '@/components/metadata';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { BaseError } from '@/errors';
+import { useEndpoint } from '@/hooks/endpoint';
+import { useI18n } from '@/hooks/i18n';
+import useTheme from '@/hooks/theme';
+import { COLOR_SYSTEM, Endpoint } from '@/types';
 
 type Props = PageProps;
 const EndpointImportPagge: React.FC<Props> = ({ location }) => {

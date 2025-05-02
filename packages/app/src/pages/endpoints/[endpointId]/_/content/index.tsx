@@ -5,13 +5,19 @@ import {
   CircleEllipsisIcon,
 } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
-import Error, { useError } from '~/components/error';
-import { Button } from '~/components/ui/button';
-import { BaseError } from '~/errors';
-import Sibling from '~/pages/endpoints/[endpointId]/_/content/parts/sibling';
-import { useAppScreenGlobalStateValue } from '~/store';
-import { Endpoint, COLOR_SYSTEM } from '~/types';
-import { Document, Content, ContentId } from '~/types/oas';
+import Error, { useError } from '@/components/error';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { BaseError } from '@/errors';
+import Sibling from '@/pages/endpoints/[endpointId]/_/content/parts/sibling';
+import { useAppScreenGlobalStateValue } from '@/store';
+import { Endpoint, COLOR_SYSTEM } from '@/types';
+import { Document, Content, ContentId } from '@/types/oas';
 import useContent from './hooks/useContent';
 import Body from './parts/body';
 import Filter from './parts/filter';
@@ -19,12 +25,6 @@ import Pin from './parts/pin';
 import Refresh from './parts/refresh';
 import Search from './parts/search';
 import Tail from './parts/tail';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 
 export type Props = {
   endpoint: Endpoint;

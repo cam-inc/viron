@@ -1,8 +1,8 @@
 import classnames from 'classnames';
 import markdownit from 'markdown-it';
 import React, { useMemo } from 'react';
-import { Props as BaseProps } from '~/components';
-import { CommonMark } from '~/types/oas';
+import { Props as BaseProps } from '@/components';
+import { CommonMark } from '@/types/oas';
 
 type Props = BaseProps & {
   data: CommonMark;

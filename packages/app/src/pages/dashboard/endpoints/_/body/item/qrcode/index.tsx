@@ -1,16 +1,16 @@
 import { AlertCircleIcon, CopyIcon } from 'lucide-react';
 import qrcode from 'qrcode';
 import React, { useCallback, useState } from 'react';
-import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert';
-import { Button } from '~/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '~/components/ui/dialog';
-import { BaseError } from '~/errors';
-import { useTranslation } from '~/hooks/i18n';
-import { Endpoint } from '~/types';
+} from '@/components/ui/dialog';
+import { BaseError } from '@/errors';
+import { useTranslation } from '@/hooks/i18n';
+import { Endpoint } from '@/types';
 
 type Props = {
   endpoint: Endpoint;

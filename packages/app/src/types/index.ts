@@ -3,7 +3,7 @@ import {
   RequestRequestBodyValue,
   Document,
   OperationId,
-} from '~/types/oas';
+} from '@/types/oas';
 
 export const COLOR_SYSTEM = {
   PRIMARY: 'primary',

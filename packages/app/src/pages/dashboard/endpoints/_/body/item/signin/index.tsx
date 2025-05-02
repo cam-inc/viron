@@ -1,28 +1,28 @@
 import { ChevronRightIcon, MailIcon, KeyRoundIcon } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
-import { useError } from '~/components/error/';
-import GoogleLogo from '~/components/google';
-import Request from '~/components/request';
-import { Button } from '~/components/ui/button';
+import { useError } from '@/components/error/';
+import GoogleLogo from '@/components/google';
+import Request from '@/components/request';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '~/components/ui/dialog';
+} from '@/components/ui/dialog';
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '~/components/ui/sheet';
-import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
-import { useTranslation } from '~/hooks/i18n';
-import { useToast } from '~/hooks/use-toast';
-import { Authentication, AuthConfig, COLOR_SYSTEM, Endpoint } from '~/types/';
-import { RequestValue } from '~/types/oas';
+} from '@/components/ui/sheet';
+import { useEndpoint, UseEndpointReturn } from '@/hooks/endpoint';
+import { useTranslation } from '@/hooks/i18n';
+import { useToast } from '@/hooks/use-toast';
+import { Authentication, AuthConfig, COLOR_SYSTEM, Endpoint } from '@/types/';
+import { RequestValue } from '@/types/oas';
 
 export type Props = {
   endpoint: Endpoint;

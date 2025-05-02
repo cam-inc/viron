@@ -9,8 +9,8 @@ import { BiSticker } from '@react-icons/all-files/bi/BiSticker';
 import { BiTestTube } from '@react-icons/all-files/bi/BiTestTube';
 import { BiTrash } from '@react-icons/all-files/bi/BiTrash';
 import React, { forwardRef, useMemo } from 'react';
-import { Button, ButtonProps } from '~/components/ui/button';
-import { Method, METHOD, Request } from '~/types/oas';
+import { Button, ButtonProps } from '@/components/ui/button';
+import { Method, METHOD, Request } from '@/types/oas';
 
 type Props = {
   request: Request;

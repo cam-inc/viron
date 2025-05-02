@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import React, { useEffect } from 'react';
 import { Validate } from 'react-hook-form';
-import _Schema from '~/components/schema';
-import { getRegisterOptions } from '~/utils/oas/v8n';
+import _Schema from '@/components/schema';
+import { getRegisterOptions } from '@/utils/oas/v8n';
 import { useNameForError } from '../../hooks';
 import { Props } from '../../index';
 

@@ -1,8 +1,8 @@
 import React from 'react';
-import Error from '~/components/error';
-import { COLOR_SYSTEM } from '~/types';
-import { Document, Content } from '~/types/oas';
-import { validateResponseDataOfTypeNumber } from '~/utils/oas/content';
+import Error from '@/components/error';
+import { COLOR_SYSTEM } from '@/types';
+import { Document, Content } from '@/types/oas';
+import { validateResponseDataOfTypeNumber } from '@/utils/oas/content';
 import { UseBaseReturn } from '../../hooks/useBase';
 
 type Props = {

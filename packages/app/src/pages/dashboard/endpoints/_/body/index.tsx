@@ -7,14 +7,14 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '~/components/ui/accordion';
-import { Button } from '~/components/ui/button';
-import { Dialog, DialogTrigger } from '~/components/ui/dialog';
-import { UN_GROUP_ID } from '~/constants';
-import { useEndpoint } from '~/hooks/endpoint';
-import { Trans, useTranslation } from '~/hooks/i18n';
-import { cn } from '~/lib/utils';
-import { Endpoint } from '~/types';
+} from '@/components/ui/accordion';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import { UN_GROUP_ID } from '@/constants';
+import { useEndpoint } from '@/hooks/endpoint';
+import { Trans, useTranslation } from '@/hooks/i18n';
+import { cn } from '@/lib/utils';
+import { Endpoint } from '@/types';
 import Menu from '../../../_/menu';
 import Add from './add/';
 import Item from './item/';

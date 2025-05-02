@@ -51,7 +51,7 @@ module.exports = {
         ],
         pathGroups: [
           {
-            pattern: '[$|~]/**',
+            pattern: '@/**',
             group: 'internal',
           },
         ],
@@ -66,17 +66,17 @@ module.exports = {
           {
             group: ['gatsby', 'gatsby-plugin-react-i18next'],
             importNames: ['Link'],
-            message: 'Please use Link from `~/components/link` instead.',
+            message: 'Please use Link from `@/components/link` instead.',
           },
           {
             group: ['gatsby'],
             importNames: ['navigate'],
-            message: 'Please use useI8n from `~/hooks/i18n` instead.',
+            message: 'Please use useI8n from `@/hooks/i18n` instead.',
           },
           {
             group: ['react-i18next', 'gatsby-plugin-react-i18next'],
             importNames: ['useTranslation', 'useI18next'],
-            message: 'Please use useTranslation from `~/hooks/i18n` instead.',
+            message: 'Please use useTranslation from `@/hooks/i18n` instead.',
           },
         ],
       },

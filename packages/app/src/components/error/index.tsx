@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Props as BaseProps } from '~/components';
-import { BaseError } from '~/errors';
-import { Trans, useTranslation } from '~/hooks/i18n';
-import { error as logError, NAMESPACE } from '~/utils/logger';
-import { Textarea } from '../ui/textarea';
+import { Props as BaseProps } from '@/components';
 import {
   Card,
   CardContent,
@@ -18,6 +14,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { BaseError } from '@/errors';
+import { Trans, useTranslation } from '@/hooks/i18n';
+import { error as logError, NAMESPACE } from '@/utils/logger';
+import { Textarea } from '../ui/textarea';
 
 type Props = BaseProps & {
   error?: BaseError;

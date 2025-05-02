@@ -1,7 +1,7 @@
 import EditorJS, { EditorConfig, OutputData } from '@editorjs/editorjs';
 import classnames from 'classnames';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Props as BaseProps } from '~/components';
+import { Props as BaseProps } from '@/components';
 
 export type Props = BaseProps & {
   initialData?: OutputData;

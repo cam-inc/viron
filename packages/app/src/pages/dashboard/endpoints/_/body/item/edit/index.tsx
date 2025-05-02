@@ -3,14 +3,14 @@ import { AlertCircleIcon } from 'lucide-react';
 import React, { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert';
-import { Button } from '~/components/ui/button';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import {
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '~/components/ui/dialog';
+} from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -19,13 +19,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '~/components/ui/form';
-import { Input } from '~/components/ui/input';
-import { Select, SelectItem } from '~/components/ui/select';
-import { useEndpoint } from '~/hooks/endpoint';
-import { useTranslation } from '~/hooks/i18n';
-import { Endpoint } from '~/types';
-import { endpointId, url } from '~/utils/v8n';
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Select, SelectItem } from '@/components/ui/select';
+import { useEndpoint } from '@/hooks/endpoint';
+import { useTranslation } from '@/hooks/i18n';
+import { Endpoint } from '@/types';
+import { endpointId, url } from '@/utils/v8n';
 
 const FORM_ID = 'edit-endpoint-form';
 

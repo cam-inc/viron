@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Select, SelectItem } from '~/components/ui/select';
-import { Schema } from '~/types/oas';
+import { Select, SelectItem } from '@/components/ui/select';
+import { Schema } from '@/types/oas';
 import { Props } from '../../index';
 import SchemaOfTypeArray from '../../types/array';
 import SchemaOfTypeBoolean from '../../types/boolean';

@@ -5,15 +5,7 @@ import {
   LightbulbOffIcon,
 } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
-import { Button } from '~/components/ui/button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '~/components/ui/tooltip';
-import { Document, Content } from '~/types/oas';
-import { UseBaseReturn } from '../../hooks/useBase';
+import { Button } from '@/components/ui/button';
 import {
   Sheet,
   SheetContent,
@@ -21,6 +13,14 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { Document, Content } from '@/types/oas';
+import { UseBaseReturn } from '../../hooks/useBase';
 
 export type Props = {
   document: Document;

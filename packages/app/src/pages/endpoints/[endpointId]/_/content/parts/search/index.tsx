@@ -1,15 +1,6 @@
 import { SearchIcon } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
-import Request from '~/components/request';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '~/components/ui/tooltip';
-import { COLOR_SYSTEM, Endpoint } from '~/types';
-import { Document, RequestValue } from '~/types/oas';
-import { UseBaseReturn } from '../../hooks/useBase';
+import Request from '@/components/request';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -17,6 +8,15 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { COLOR_SYSTEM, Endpoint } from '@/types';
+import { Document, RequestValue } from '@/types/oas';
+import { UseBaseReturn } from '../../hooks/useBase';
 
 export type Props = {
   endpoint: Endpoint;

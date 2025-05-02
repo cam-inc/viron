@@ -7,34 +7,34 @@ import {
   ChevronRightIcon,
 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Props as BaseProps } from '~/components';
-import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
+import { Props as BaseProps } from '@/components';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
-} from '~/components/ui/card';
-import { Dialog, DialogTrigger } from '~/components/ui/dialog';
-import { Skeleton } from '~/components/ui/skeleton';
-import { BaseError } from '~/errors';
-import { useEndpoint } from '~/hooks/endpoint';
-import { useTranslation } from '~/hooks/i18n';
-import { Authentication, COLOR_SYSTEM, Endpoint } from '~/types';
-import { Document } from '~/types/oas';
-import EditEndpoint from './edit';
-import Info from './info';
-import Qrcode from './qrcode';
-import Signin from './signin/';
-import Signout, { Props as SignoutProps } from './signout/';
-import Thumbnail from './thumbnail/';
+} from '@/components/ui/card';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Skeleton } from '@/components/ui/skeleton';
+import { BaseError } from '@/errors';
+import { useEndpoint } from '@/hooks/endpoint';
+import { useTranslation } from '@/hooks/i18n';
+import { Authentication, COLOR_SYSTEM, Endpoint } from '@/types';
+import { Document } from '@/types/oas';
+import EditEndpoint from './edit';
+import Info from './info';
+import Qrcode from './qrcode';
+import Signin from './signin/';
+import Signout, { Props as SignoutProps } from './signout/';
+import Thumbnail from './thumbnail/';
 
 export type Props = {
   endpoint: Endpoint;

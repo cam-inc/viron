@@ -1,13 +1,13 @@
 import { RefreshCwIcon } from 'lucide-react';
 import React, { useCallback } from 'react';
+import { Button } from '@/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '~/components/ui/tooltip';
+} from '@/components/ui/tooltip';
 import { UseBaseReturn } from '../../hooks/useBase';
-import { Button } from '@/components/ui/button';
 
 export type Props = {
   base: UseBaseReturn;

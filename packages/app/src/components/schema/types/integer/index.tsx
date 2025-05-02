@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
-import { Input } from '~/components/ui/input';
-import { Select, SelectItem } from '~/components/ui/select';
-import { getRegisterOptions } from '~/utils/oas/v8n';
+import { Input } from '@/components/ui/input';
+import { Select, SelectItem } from '@/components/ui/select';
+import { getRegisterOptions } from '@/utils/oas/v8n';
 import { useDynamicEnum } from '../../hooks';
 import { Props } from '../../index';
 

@@ -1,10 +1,10 @@
 import { PlusIcon } from 'lucide-react';
 import React, { useState } from 'react';
-import { Button } from '~/components/ui/button';
-import { Dialog, DialogTrigger } from '~/components/ui/dialog';
-import { useEndpoint } from '~/hooks/endpoint';
-import { useTranslation } from '~/hooks/i18n';
-import { cn } from '~/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import { useEndpoint } from '@/hooks/endpoint';
+import { useTranslation } from '@/hooks/i18n';
+import { cn } from '@/lib/utils';
 import Add from './add/';
 import Item from './item';
 

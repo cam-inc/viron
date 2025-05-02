@@ -9,10 +9,10 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { Props as BaseProps } from '~/components';
-import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert';
-import { Button } from '~/components/ui/button';
-import { Schema } from '~/types/oas';
+import { Props as BaseProps } from '@/components';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Schema } from '@/types/oas';
 import { UseActiveReturn, useError } from '../../hooks';
 import Info from '../../parts/info';
 

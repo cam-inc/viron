@@ -3,13 +3,13 @@ import React, { useCallback, useMemo } from 'react';
 import { Validate } from 'react-hook-form';
 import Base64Reader, {
   Props as Base64ReaderProps,
-} from '~/components/base64Reader';
-import FileReader, { Props as FileReaderProps } from '~/components/fileReader';
-import { Input } from '~/components/ui/input';
-import { Select, SelectItem } from '~/components/ui/select';
-import { Textarea } from '~/components/ui/textarea';
-import Wyswyg, { Props as WyswygProps } from '~/components/wyswyg';
-import { getRegisterOptions } from '~/utils/oas/v8n';
+} from '@/components/base64Reader';
+import FileReader, { Props as FileReaderProps } from '@/components/fileReader';
+import { Input } from '@/components/ui/input';
+import { Select, SelectItem } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import Wyswyg, { Props as WyswygProps } from '@/components/wyswyg';
+import { getRegisterOptions } from '@/utils/oas/v8n';
 import { useAutocomplete, useDynamicEnum, useNameForError } from '../../hooks';
 import { Props } from '../../index';
 

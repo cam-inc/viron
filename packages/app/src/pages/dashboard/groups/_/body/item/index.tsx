@@ -1,9 +1,6 @@
 import { ArrowDownIcon, ArrowUpIcon, MenuIcon, TrashIcon } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
-import { Button } from '~/components/ui/button';
-import { useEndpoint } from '~/hooks/endpoint';
-import { useTranslation } from '~/hooks/i18n';
-import { EndpointGroup } from '~/types';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogClose,
@@ -20,6 +17,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useEndpoint } from '@/hooks/endpoint';
+import { useTranslation } from '@/hooks/i18n';
+import { EndpointGroup } from '@/types';
 
 export type Props = {
   group: EndpointGroup;

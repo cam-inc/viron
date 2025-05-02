@@ -1,10 +1,10 @@
 import { PageProps, graphql } from 'gatsby';
 import { FrownIcon } from 'lucide-react';
 import React from 'react';
-import { AppSidebar } from '~/components/app-sidebar';
-import Metadata from '~/components/metadata';
-import { SidebarInset, SidebarProvider } from '~/components/ui/sidebar';
-import useTheme from '~/hooks/theme';
+import { AppSidebar } from '@/components/app-sidebar';
+import Metadata from '@/components/metadata';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import useTheme from '@/hooks/theme';
 
 type Props = PageProps;
 const NotfoundPage: React.FC<Props> = () => {

@@ -7,11 +7,6 @@ import {
   GithubIcon,
 } from 'lucide-react';
 import * as React from 'react';
-import { INTERNAL_PAGE_PATHS, URL } from '~/constants';
-import { useI18n, useTranslation } from '~/hooks/i18n';
-import Link from './link';
-import Logo from './logo';
-import { Select, SelectItem } from './ui/select';
 import {
   Sidebar,
   SidebarContent,
@@ -22,6 +17,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { INTERNAL_PAGE_PATHS, URL } from '@/constants';
+import { useI18n, useTranslation } from '@/hooks/i18n';
+import Link from './link';
+import Logo from './logo';
+import { Select, SelectItem } from './ui/select';
 
 const data = {
   navMain: [

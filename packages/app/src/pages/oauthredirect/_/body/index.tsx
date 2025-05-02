@@ -1,14 +1,14 @@
 import { Loader2Icon } from 'lucide-react';
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useState } from 'react';
-import Error, { useError } from '~/components/error';
-import Request from '~/components/request';
-import { BaseError } from '~/errors';
-import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
-import { KEY, get } from '~/storage';
-import { useEndpointListItemGlobalStateValue } from '~/store';
-import { COLOR_SYSTEM, EndpointID } from '~/types';
-import { RequestValue } from '~/types/oas';
+import Error, { useError } from '@/components/error';
+import Request from '@/components/request';
+import { BaseError } from '@/errors';
+import { useEndpoint, UseEndpointReturn } from '@/hooks/endpoint';
+import { KEY, get } from '@/storage';
+import { useEndpointListItemGlobalStateValue } from '@/store';
+import { COLOR_SYSTEM, EndpointID } from '@/types';
+import { RequestValue } from '@/types/oas';
 
 export type Props = {
   search: string;

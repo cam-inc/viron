@@ -1,10 +1,10 @@
 import { PhoneIcon } from 'lucide-react';
 import React, { useMemo } from 'react';
-import { Props as BaseProps } from '~/components';
-import Link from '~/components/link';
-import { Button } from '~/components/ui/button';
-import { URL } from '~/types';
-import { Contact } from '~/types/oas';
+import { Props as BaseProps } from '@/components';
+import Link from '@/components/link';
+import { Button } from '@/components/ui/button';
+import { URL } from '@/types';
+import { Contact } from '@/types/oas';
 
 type Props = BaseProps & {
   data: Contact;

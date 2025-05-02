@@ -1,4 +1,4 @@
-import { HTTPStatusCode, HTTP_STATUS } from '~/constants/index';
+import { HTTPStatusCode, HTTP_STATUS } from '@/constants/index';
 
 export type Result<T, E extends BaseError> = Success<T, E> | Failure<T, E>;
 

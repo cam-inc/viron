@@ -1,15 +1,15 @@
 import { PageProps, graphql } from 'gatsby';
 import { ExternalLinkIcon, GithubIcon } from 'lucide-react';
 import React, { useCallback } from 'react';
-import Link from '~/components/link';
-import Logo from '~/components/logo';
-import Metadata from '~/components/metadata';
-import { Button } from '~/components/ui/button';
-import { Select, SelectItem } from '~/components/ui/select';
-import { URL } from '~/constants';
-import { useTranslation, useI18n, Trans } from '~/hooks/i18n';
-import useTheme from '~/hooks/theme';
-import { useAppScreenGlobalStateValue } from '~/store';
+import Link from '@/components/link';
+import Logo from '@/components/logo';
+import Metadata from '@/components/metadata';
+import { Button } from '@/components/ui/button';
+import { Select, SelectItem } from '@/components/ui/select';
+import { URL } from '@/constants';
+import { useTranslation, useI18n, Trans } from '@/hooks/i18n';
+import useTheme from '@/hooks/theme';
+import { useAppScreenGlobalStateValue } from '@/store';
 import pkg from '../../package.json';
 
 type Props = PageProps;

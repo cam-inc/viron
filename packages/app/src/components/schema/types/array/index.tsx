@@ -2,12 +2,12 @@ import _ from 'lodash';
 import { CirclePlusIcon, CircleMinusIcon } from 'lucide-react';
 import React, { useCallback, useEffect } from 'react';
 import { Validate } from 'react-hook-form';
-import _Schema from '~/components/schema';
-import { Button } from '~/components/ui/button';
-import { useTranslation } from '~/hooks/i18n';
-import { Schema } from '~/types/oas';
-import { getDefaultValue } from '~/utils/oas';
-import { getRegisterOptions } from '~/utils/oas/v8n';
+import _Schema from '@/components/schema';
+import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/hooks/i18n';
+import { Schema } from '@/types/oas';
+import { getDefaultValue } from '@/utils/oas';
+import { getRegisterOptions } from '@/utils/oas/v8n';
 import { useNameForError } from '../../hooks';
 import { Props } from '../../index';
 

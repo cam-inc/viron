@@ -1,9 +1,8 @@
 import { FileTextIcon } from 'lucide-react';
 import React from 'react';
-import { Props as BaseProps } from '~/components';
-import CommonMark from '~/components/commonMark';
-import Link from '~/components/link';
-import { ExternalDocumentation } from '~/types/oas';
+import { Props as BaseProps } from '@/components';
+import CommonMark from '@/components/commonMark';
+import Link from '@/components/link';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -11,6 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { ExternalDocumentation } from '@/types/oas';
 
 type Props = BaseProps & {
   data: ExternalDocumentation;

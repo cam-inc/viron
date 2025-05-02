@@ -8,34 +8,9 @@ import {
   ArrowUpZAIcon,
 } from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
-import { Props as BaseProps } from '~/components';
-import Cell from '~/components/table/cell';
-import { Button } from '~/components/ui/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '~/components/ui/table';
-import { COLOR_SYSTEM, Endpoint } from '~/types';
-import {
-  Document,
-  Content,
-  SORT,
-  Sort,
-  TableColumn,
-  Schema,
-} from '~/types/oas';
-import {
-  extractTableColumns,
-  getTableRows,
-  mergeTableSortRequestValue,
-} from '~/utils/oas';
-import { UseBaseReturn } from '../../hooks/useBase';
-import { UseDescendantsReturn } from '../../hooks/useDescendants';
-import Descendant, { Props as DescendantProps } from '../../parts/descendant';
+import { Props as BaseProps } from '@/components';
+import Cell from '@/components/table/cell';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,6 +29,31 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { COLOR_SYSTEM, Endpoint } from '@/types';
+import {
+  Document,
+  Content,
+  SORT,
+  Sort,
+  TableColumn,
+  Schema,
+} from '@/types/oas';
+import {
+  extractTableColumns,
+  getTableRows,
+  mergeTableSortRequestValue,
+} from '@/utils/oas';
+import { UseBaseReturn } from '../../hooks/useBase';
+import { UseDescendantsReturn } from '../../hooks/useDescendants';
+import Descendant, { Props as DescendantProps } from '../../parts/descendant';
 
 type Data = Record<string, any>;
 

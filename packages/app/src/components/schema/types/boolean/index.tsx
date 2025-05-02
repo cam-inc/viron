@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { Select, SelectItem } from '~/components/ui/select';
-import { getRegisterOptions } from '~/utils/oas/v8n';
+import { Select, SelectItem } from '@/components/ui/select';
+import { getRegisterOptions } from '@/utils/oas/v8n';
 import { Props } from '../../index';
 
 const SchemaOfTypeBoolean: React.FC<Props> = ({

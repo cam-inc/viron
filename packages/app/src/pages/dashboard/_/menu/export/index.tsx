@@ -1,10 +1,10 @@
 import { DownloadIcon } from 'lucide-react';
 import React, { useCallback } from 'react';
-import Error, { useError } from '~/components/error';
-import { Button } from '~/components/ui/button';
-import { useEndpoint } from '~/hooks/endpoint';
-import { useTranslation } from '~/hooks/i18n';
-import { ClassName, COLOR_SYSTEM } from '~/types';
+import Error, { useError } from '@/components/error';
+import { Button } from '@/components/ui/button';
+import { useEndpoint } from '@/hooks/endpoint';
+import { useTranslation } from '@/hooks/i18n';
+import { ClassName, COLOR_SYSTEM } from '@/types';
 
 type Props = {
   className?: ClassName;

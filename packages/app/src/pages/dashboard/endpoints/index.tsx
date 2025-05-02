@@ -1,15 +1,15 @@
 import { PageProps, graphql } from 'gatsby';
 import React from 'react';
-import { AppSidebar } from '~/components/app-sidebar';
-import Metadata from '~/components/metadata';
-import { Separator } from '~/components/ui/separator';
+import { AppSidebar } from '@/components/app-sidebar';
+import Metadata from '@/components/metadata';
+import { Separator } from '@/components/ui/separator';
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from '~/components/ui/sidebar';
-import { useTranslation } from '~/hooks/i18n';
-import useTheme from '~/hooks/theme';
+} from '@/components/ui/sidebar';
+import { useTranslation } from '@/hooks/i18n';
+import useTheme from '@/hooks/theme';
 import Body from './_/body/';
 
 type Props = PageProps;

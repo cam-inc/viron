@@ -4,17 +4,17 @@ import _ from 'lodash';
 import { ArrowLeftIcon } from 'lucide-react';
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import CommonMark from '~/components/commonMark';
-import Link from '~/components/link';
-import Logo from '~/components/logo';
-import Metadata from '~/components/metadata';
-import { Button } from '~/components/ui/button';
+import CommonMark from '@/components/commonMark';
+import Link from '@/components/link';
+import Logo from '@/components/logo';
+import Metadata from '@/components/metadata';
+import { Button } from '@/components/ui/button';
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-} from '~/components/ui/resizable';
-import { Separator } from '~/components/ui/separator';
+} from '@/components/ui/resizable';
+import { Separator } from '@/components/ui/separator';
 import {
   SidebarInset,
   SidebarTrigger,
@@ -22,15 +22,15 @@ import {
   SidebarHeader,
   SidebarContent,
   Sidebar,
-} from '~/components/ui/sidebar';
-import { BaseError } from '~/errors/index';
-import { useEndpoint } from '~/hooks/endpoint';
-import { useI18n } from '~/hooks/i18n';
-import useTheme from '~/hooks/theme';
-import Pages from '~/pages/endpoints/[endpointId]/_/navigation/pages';
-import { useEndpointListItemGlobalStateValue } from '~/store';
-import { COLOR_SYSTEM } from '~/types';
-import { Document, Info } from '~/types/oas';
+} from '@/components/ui/sidebar';
+import { BaseError } from '@/errors/index';
+import { useEndpoint } from '@/hooks/endpoint';
+import { useI18n } from '@/hooks/i18n';
+import useTheme from '@/hooks/theme';
+import Pages from '@/pages/endpoints/[endpointId]/_/navigation/pages';
+import { useEndpointListItemGlobalStateValue } from '@/store';
+import { COLOR_SYSTEM } from '@/types';
+import { Document, Info } from '@/types/oas';
 import Content from './_/content';
 import SubBody from './_/subBody';
 

@@ -1,11 +1,7 @@
 import { ImportIcon } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
-import Error, { useError } from '~/components/error';
-import { Button } from '~/components/ui/button';
-import { useEndpoint } from '~/hooks/endpoint';
-import { useTranslation } from '~/hooks/i18n';
-import { ClassName, COLOR_SYSTEM, Distribution } from '~/types';
-import Targets from './targets';
+import Error, { useError } from '@/components/error';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -13,6 +9,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { useEndpoint } from '@/hooks/endpoint';
+import { useTranslation } from '@/hooks/i18n';
+import { ClassName, COLOR_SYSTEM, Distribution } from '@/types';
+import Targets from './targets';
 
 type Props = {
   className?: ClassName;

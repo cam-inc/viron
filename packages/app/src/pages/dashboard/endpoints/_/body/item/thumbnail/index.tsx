@@ -1,8 +1,8 @@
 import classNames from 'classnames';
 import React, { useMemo, useState } from 'react';
-import Logo from '~/components/logo';
-import { Endpoint } from '~/types';
-import { Document } from '~/types/oas';
+import Logo from '@/components/logo';
+import { Endpoint } from '@/types';
+import { Document } from '@/types/oas';
 
 type Props = {
   endpoint: Endpoint;

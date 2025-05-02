@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import React, { useMemo } from 'react';
-import { Props as BaseProps } from '~/components';
-import { Schema } from '~/types/oas';
+import { Props as BaseProps } from '@/components';
+import { Schema } from '@/types/oas';
 import CellForTypeArray from './array';
 import CellForTypeBoolean from './boolean';
 import CellForTypeNullish from './nullish';

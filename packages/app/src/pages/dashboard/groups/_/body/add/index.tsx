@@ -2,14 +2,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Button } from '~/components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '~/components/ui/dialog';
+} from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -17,11 +17,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '~/components/ui/form';
-import { Input } from '~/components/ui/input';
-import { useEndpoint } from '~/hooks/endpoint';
-import { useTranslation } from '~/hooks/i18n';
-import { EndpointGroup } from '~/types';
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { useEndpoint } from '@/hooks/endpoint';
+import { useTranslation } from '@/hooks/i18n';
+import { EndpointGroup } from '@/types';
 
 const FORM_ID = 'add-group-form';
 

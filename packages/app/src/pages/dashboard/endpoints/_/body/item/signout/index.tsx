@@ -1,12 +1,8 @@
 import { LogOutIcon } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
-import Error, { useError } from '~/components/error';
-import Request from '~/components/request';
-import { Button } from '~/components/ui/button';
-import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
-import { useTranslation } from '~/hooks/i18n';
-import { Authentication, COLOR_SYSTEM, Endpoint } from '~/types';
-import { RequestValue } from '~/types/oas';
+import Error, { useError } from '@/components/error';
+import Request from '@/components/request';
+import { Button } from '@/components/ui/button';
 import {
   Sheet,
   SheetContent,
@@ -14,6 +10,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+import { useEndpoint, UseEndpointReturn } from '@/hooks/endpoint';
+import { useTranslation } from '@/hooks/i18n';
+import { Authentication, COLOR_SYSTEM, Endpoint } from '@/types';
+import { RequestValue } from '@/types/oas';
 
 export type Props = {
   endpoint: Endpoint;

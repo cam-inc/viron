@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { useAppThemeGlobalStateSet } from '~/store';
-import { Document } from '~/types/oas';
+import { useAppThemeGlobalStateSet } from '@/store';
+import { Document } from '@/types/oas';
 
 export default (document: Document | null = null): void => {
   const setTheme = useAppThemeGlobalStateSet();

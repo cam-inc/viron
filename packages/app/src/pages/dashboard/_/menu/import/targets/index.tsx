@@ -6,10 +6,10 @@ import {
   Loader2Icon,
 } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
-import { Button } from '~/components/ui/button';
-import { BaseError } from '~/errors';
-import { useEndpoint } from '~/hooks/endpoint';
-import { Endpoint, EndpointGroup } from '~/types';
+import { Button } from '@/components/ui/button';
+import { BaseError } from '@/errors';
+import { useEndpoint } from '@/hooks/endpoint';
+import { Endpoint, EndpointGroup } from '@/types';
 
 export type Props = {
   endpointList: Endpoint[];

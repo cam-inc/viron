@@ -4,7 +4,7 @@ import {
   Collapsible,
   CollapsibleTrigger,
   CollapsibleContent,
-} from '~/components/ui/collapsible';
+} from '@/components/ui/collapsible';
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -13,8 +13,8 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarMenuSub,
-} from '~/components/ui/sidebar';
-import { Page, PageId } from '~/types/oas';
+} from '@/components/ui/sidebar';
+import { Page, PageId } from '@/types/oas';
 
 type Partial = {
   group: string;
