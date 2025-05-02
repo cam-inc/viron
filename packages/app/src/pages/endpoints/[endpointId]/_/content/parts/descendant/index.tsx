@@ -8,7 +8,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { BaseError } from '@/errors';
-import { COLOR_SYSTEM, Endpoint } from '@/types';
+import { Endpoint } from '@/types';
 import { Document, RequestValue } from '@/types/oas';
 import { UseDescendantsReturn } from '../../hooks/useDescendants';
 import Action from '../action';
@@ -71,7 +71,6 @@ const Descendant: React.FC<Props> = ({
           <SheetTitle>{label}</SheetTitle>
         </SheetHeader>
         <Request
-          on={COLOR_SYSTEM.SURFACE}
           endpoint={endpoint}
           document={document}
           request={descendant.request}

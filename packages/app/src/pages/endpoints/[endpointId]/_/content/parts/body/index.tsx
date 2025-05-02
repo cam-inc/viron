@@ -2,7 +2,7 @@ import { Loader2Icon } from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import Error, { useError } from '@/components/error';
 import { BaseError } from '@/errors';
-import { ClassName, COLOR_SYSTEM, Endpoint } from '@/types';
+import { ClassName, Endpoint } from '@/types';
 import { Document, Content, CONTENT_TYPE, TableColumn } from '@/types/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
 import { UseDescendantsReturn } from '../../hooks/useDescendants';
@@ -34,7 +34,6 @@ const Body: React.FC<Props> = ({
   );
 
   const error = useError({
-    on: COLOR_SYSTEM.SURFACE,
     withModal: true,
   });
   const setError = error.setError;
@@ -62,7 +61,7 @@ const Body: React.FC<Props> = ({
       );
     }
     if (base.error) {
-      return <Error on={COLOR_SYSTEM.SURFACE} error={base.error} />;
+      return <Error error={base.error} />;
     }
     switch (content.type) {
       case CONTENT_TYPE.NUMBER:

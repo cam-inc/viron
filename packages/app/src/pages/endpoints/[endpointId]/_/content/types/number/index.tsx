@@ -1,6 +1,5 @@
 import React from 'react';
 import Error from '@/components/error';
-import { COLOR_SYSTEM } from '@/types';
 import { Document, Content } from '@/types/oas';
 import { validateResponseDataOfTypeNumber } from '@/utils/oas/content';
 import { UseBaseReturn } from '../../hooks/useBase';
@@ -13,7 +12,7 @@ type Props = {
 const ContentNumber: React.FC<Props> = ({ document, base }) => {
   const result = validateResponseDataOfTypeNumber(document, base.data);
   if (result.isFailure()) {
-    return <Error on={COLOR_SYSTEM.SURFACE} error={result.value} />;
+    return <Error error={result.value} />;
   }
 
   return (

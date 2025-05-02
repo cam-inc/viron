@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { useEndpoint } from '@/hooks/endpoint';
 import { useTranslation } from '@/hooks/i18n';
-import { ClassName, COLOR_SYSTEM, Distribution } from '@/types';
+import { ClassName, Distribution } from '@/types';
 import Targets from './targets';
 
 type Props = {
@@ -21,7 +21,6 @@ const Import: React.FC<Props> = ({ className = '' }) => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const error = useError({
-    on: COLOR_SYSTEM.SURFACE,
     withModal: true,
   });
   const [distribution, setDistribution] = useState<Distribution>({

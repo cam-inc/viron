@@ -14,7 +14,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { COLOR_SYSTEM, Endpoint } from '@/types';
+import { Endpoint } from '@/types';
 import { Document, RequestValue } from '@/types/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
 
@@ -54,7 +54,6 @@ const Search: React.FC<Props> = ({ endpoint, document, base }) => {
           <SheetTitle>Search</SheetTitle>
         </SheetHeader>
         <Request
-          on={COLOR_SYSTEM.SURFACE}
           endpoint={endpoint}
           document={document}
           request={base.request}

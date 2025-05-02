@@ -16,7 +16,7 @@ import {
 import { BaseError } from '@/errors';
 import Sibling from '@/pages/endpoints/[endpointId]/_/content/parts/sibling';
 import { useAppScreenGlobalStateValue } from '@/store';
-import { Endpoint, COLOR_SYSTEM } from '@/types';
+import { Endpoint } from '@/types';
 import { Document, Content, ContentId } from '@/types/oas';
 import useContent from './hooks/useContent';
 import Body from './parts/body';
@@ -49,7 +49,6 @@ const _Content: React.FC<Props> = ({
     content
   );
   const error = useError({
-    on: COLOR_SYSTEM.SURFACE,
     withModal: true,
   });
   const setError = error.setError;

@@ -26,7 +26,6 @@ export type Props = BaseProps & {
   renderHead?: () => JSX.Element | null;
 };
 const _Request: React.FC<Props> = ({
-  on,
   endpoint,
   document,
   request,
@@ -103,11 +102,7 @@ const _Request: React.FC<Props> = ({
             </div>
             {isCommonHeadOpened && (
               <div className={`pt-2 mt-2 border-t border-border`}>
-                <Operation
-                  on={on}
-                  document={document}
-                  operation={request.operation}
-                />
+                <Operation document={document} operation={request.operation} />
               </div>
             )}
           </div>
@@ -118,7 +113,6 @@ const _Request: React.FC<Props> = ({
             <Schema
               endpoint={endpoint}
               document={document}
-              on={on}
               name="parameters"
               schema={{
                 type: 'object',
@@ -162,7 +156,6 @@ const _Request: React.FC<Props> = ({
             <Schema
               endpoint={endpoint}
               document={document}
-              on={on}
               name="requestBody"
               schema={
                 request.operation.requestBody.content[

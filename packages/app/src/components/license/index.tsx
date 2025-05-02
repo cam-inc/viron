@@ -10,7 +10,7 @@ type Props = BaseProps & {
   data: License;
 };
 
-const _License: React.FC<Props> = ({ on, className = '', data }) => {
+const _License: React.FC<Props> = ({ className = '', data }) => {
   if (data.url) {
     return (
       <Button className={className} asChild variant="link">

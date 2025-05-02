@@ -37,7 +37,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { COLOR_SYSTEM, Endpoint } from '@/types';
+import { Endpoint } from '@/types';
 import {
   Document,
   Content,
@@ -237,7 +237,6 @@ const ContentTable: React.FC<Props> = ({
                       return (
                         <TableCell key={column.key}>
                           <Cell
-                            on={COLOR_SYSTEM.BACKGROUND}
                             schema={column.schema}
                             value={data[column.key]}
                           />
@@ -256,11 +255,7 @@ const ContentTable: React.FC<Props> = ({
                   <SheetHeader>
                     <SheetTitle>Data</SheetTitle>
                   </SheetHeader>
-                  <RowData
-                    on={COLOR_SYSTEM.BACKGROUND}
-                    rowData={data}
-                    columns={columns}
-                  />
+                  <RowData rowData={data} columns={columns} />
                 </SheetContent>
               </Sheet>
             ))}
@@ -324,14 +319,13 @@ const RowData: React.FC<
     rowData: Data;
     columns: TableColumn[];
   }
-> = ({ on, rowData, columns }) => {
+> = ({ rowData, columns }) => {
   return (
     <div className="px-10 py-10 flex flex-col h-full w-full">
       <div className="flex-1 overflow-scroll space-y-10">
         {Object.keys(rowData).map((objectKey, index) => (
           <Accordion
             key={index}
-            on={on}
             schema={columns.find((column) => column.key === objectKey)?.schema}
             data={rowData}
             objectKey={objectKey}
@@ -348,7 +342,7 @@ const Accordion: React.FC<
     data: Data;
     objectKey: string;
   }
-> = ({ on, schema, data, objectKey }) => {
+> = ({ schema, data, objectKey }) => {
   const [isOpened, setIsOpened] = useState<boolean>(true);
   const handleCopyClick = useCallback(() => {
     globalThis.navigator.clipboard.writeText(data[objectKey]);
@@ -417,7 +411,6 @@ const Accordion: React.FC<
             Object.keys(data[objectKey]).map((childObjectKey, index) => (
               <Accordion
                 key={index}
-                on={on}
                 schema={schema?.properties?.[childObjectKey]}
                 data={data[objectKey]}
                 objectKey={childObjectKey}

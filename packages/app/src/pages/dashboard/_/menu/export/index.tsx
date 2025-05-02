@@ -4,7 +4,7 @@ import Error, { useError } from '@/components/error';
 import { Button } from '@/components/ui/button';
 import { useEndpoint } from '@/hooks/endpoint';
 import { useTranslation } from '@/hooks/i18n';
-import { ClassName, COLOR_SYSTEM } from '@/types';
+import { ClassName } from '@/types';
 
 type Props = {
   className?: ClassName;
@@ -12,7 +12,7 @@ type Props = {
 const Export: React.FC<Props> = ({ className = '' }) => {
   const { t } = useTranslation();
   const { export: _export } = useEndpoint();
-  const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
+  const error = useError({ withModal: true });
 
   const handleClick = useCallback(() => {
     const result = _export();

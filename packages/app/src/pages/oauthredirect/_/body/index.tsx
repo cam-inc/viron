@@ -7,14 +7,14 @@ import { BaseError } from '@/errors';
 import { useEndpoint, UseEndpointReturn } from '@/hooks/endpoint';
 import { KEY, get } from '@/storage';
 import { useEndpointListItemGlobalStateValue } from '@/store';
-import { COLOR_SYSTEM, EndpointID } from '@/types';
+import { EndpointID } from '@/types';
 import { RequestValue } from '@/types/oas';
 
 export type Props = {
   search: string;
 };
 const Body: React.FC<Props> = ({ search }) => {
-  const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
+  const error = useError({ withModal: true });
   const setError = error.setError;
   const [isPending, setIsPending] = useState<boolean>(true);
   const endpoint = useEndpointListItemGlobalStateValue({
@@ -104,7 +104,7 @@ const Body: React.FC<Props> = ({ search }) => {
   if (signinOAuthCallback.error) {
     return (
       <div className="p-4">
-        <Error on={COLOR_SYSTEM.BACKGROUND} error={signinOAuthCallback.error} />
+        <Error error={signinOAuthCallback.error} />
       </div>
     );
   }
@@ -112,7 +112,6 @@ const Body: React.FC<Props> = ({ search }) => {
   return (
     <div>
       <Request
-        on={COLOR_SYSTEM.BACKGROUND}
         endpoint={signinOAuthCallback.endpoint}
         document={signinOAuthCallback.document}
         request={signinOAuthCallback.request}

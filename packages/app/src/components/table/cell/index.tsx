@@ -13,27 +13,25 @@ export type Props = BaseProps & {
   schema: Schema;
   value: any;
 };
-const Cell: React.FC<Props> = ({ on, schema, value }) => {
+const Cell: React.FC<Props> = ({ schema, value }) => {
   const content = useMemo<JSX.Element>(() => {
     if (_.isNil(value)) {
-      return <CellForTypeNullish on={on} schema={schema} value={value} />;
+      return <CellForTypeNullish schema={schema} value={value} />;
     }
     switch (schema.type) {
       case 'string':
-        return <CellForTypeString on={on} schema={schema} value={value} />;
+        return <CellForTypeString schema={schema} value={value} />;
       case 'number':
       case 'integer':
-        return (
-          <CellForTypeNumberAndInteger on={on} schema={schema} value={value} />
-        );
+        return <CellForTypeNumberAndInteger schema={schema} value={value} />;
       case 'object':
-        return <CellForTypeObject on={on} schema={schema} value={value} />;
+        return <CellForTypeObject schema={schema} value={value} />;
       case 'array':
-        return <CellForTypeArray on={on} schema={schema} value={value} />;
+        return <CellForTypeArray schema={schema} value={value} />;
       case 'boolean':
-        return <CellForTypeBoolean on={on} schema={schema} value={value} />;
+        return <CellForTypeBoolean schema={schema} value={value} />;
     }
-  }, [on, schema, value]);
+  }, [schema, value]);
 
   return <div className="text-xs">{content}</div>;
 };

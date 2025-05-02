@@ -10,7 +10,7 @@ import { BaseError } from '@/errors';
 import { useEndpoint } from '@/hooks/endpoint';
 import { useI18n } from '@/hooks/i18n';
 import useTheme from '@/hooks/theme';
-import { COLOR_SYSTEM, Endpoint } from '@/types';
+import { Endpoint } from '@/types';
 
 type Props = PageProps;
 const EndpointImportPagge: React.FC<Props> = ({ location }) => {
@@ -18,7 +18,7 @@ const EndpointImportPagge: React.FC<Props> = ({ location }) => {
   const { navigate } = useI18n();
 
   const { connect, addEndpoint } = useEndpoint();
-  const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
+  const error = useError({ withModal: true });
   const setError = error.setError;
   const [isPending, setIsPending] = useState<boolean>(true);
 

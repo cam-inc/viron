@@ -16,7 +16,6 @@ import { Props } from '../../index';
 const SchemaOfTypeArray: React.FC<Props> = ({
   endpoint,
   document,
-  on,
   name,
   schema,
   register,
@@ -113,7 +112,6 @@ const SchemaOfTypeArray: React.FC<Props> = ({
           <_Schema
             endpoint={endpoint}
             document={document}
-            on={on}
             name={`${name}.${index}`}
             schema={schema.items as Schema}
             formState={formState}

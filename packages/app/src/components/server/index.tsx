@@ -14,7 +14,7 @@ import { Server } from '@/types/oas';
 type Props = BaseProps & {
   server: Server;
 };
-const _Server: React.FC<Props> = ({ on, server, className = '' }) => {
+const _Server: React.FC<Props> = ({ server, className = '' }) => {
   return (
     <TooltipProvider>
       <Tooltip>
@@ -33,7 +33,7 @@ const _Server: React.FC<Props> = ({ on, server, className = '' }) => {
         </TooltipTrigger>
         {server.description && (
           <TooltipContent>
-            <CommonMark on={on} data={server.description} />
+            <CommonMark data={server.description} />
           </TooltipContent>
         )}
       </Tooltip>

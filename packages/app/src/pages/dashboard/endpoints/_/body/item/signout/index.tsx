@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/sheet';
 import { useEndpoint, UseEndpointReturn } from '@/hooks/endpoint';
 import { useTranslation } from '@/hooks/i18n';
-import { Authentication, COLOR_SYSTEM, Endpoint } from '@/types';
+import { Authentication, Endpoint } from '@/types';
 import { RequestValue } from '@/types/oas';
 
 export type Props = {
@@ -27,7 +27,7 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
     () => prepareSignout(endpoint, authentication),
     [prepareSignout, endpoint, authentication]
   );
-  const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
+  const error = useError({ withModal: true });
   const setError = error.setError;
 
   const handleSubmit = useCallback(
@@ -46,12 +46,7 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
   );
 
   if (signout.error || error.bind.error) {
-    return (
-      <Error
-        on={COLOR_SYSTEM.BACKGROUND}
-        error={signout.error ?? error.bind.error}
-      />
-    );
+    return <Error error={signout.error ?? error.bind.error} />;
   }
 
   return (
@@ -67,7 +62,6 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
           <SheetTitle>{t('signout')}</SheetTitle>
         </SheetHeader>
         <Request
-          on={COLOR_SYSTEM.SURFACE}
           className="h-full"
           endpoint={signout.endpoint}
           document={signout.document}

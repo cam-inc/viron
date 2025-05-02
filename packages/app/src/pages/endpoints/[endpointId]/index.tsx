@@ -29,7 +29,6 @@ import { useI18n } from '@/hooks/i18n';
 import useTheme from '@/hooks/theme';
 import Pages from '@/pages/endpoints/[endpointId]/_/navigation/pages';
 import { useEndpointListItemGlobalStateValue } from '@/store';
-import { COLOR_SYSTEM } from '@/types';
 import { Document, Info } from '@/types/oas';
 import Content from './_/content';
 import SubBody from './_/subBody';
@@ -249,10 +248,7 @@ const EndpointPage: React.FC<Props> = ({ params }) => {
               {page && endpoint && document && (
                 <div className="mx-10 py-6 h-full overflow-y-scroll">
                   {page.description ? (
-                    <CommonMark
-                      on={COLOR_SYSTEM.BACKGROUND}
-                      data={page.description}
-                    />
+                    <CommonMark data={page.description} />
                   ) : undefined}
                   <div
                     className="mt-10"

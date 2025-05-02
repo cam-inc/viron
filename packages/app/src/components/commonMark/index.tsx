@@ -7,7 +7,7 @@ import { CommonMark } from '@/types/oas';
 type Props = BaseProps & {
   data: CommonMark;
 };
-const _CommonMark: React.FC<Props> = ({ on, data, className = '' }) => {
+const _CommonMark: React.FC<Props> = ({ data, className = '' }) => {
   const parsedDescription = useMemo(() => {
     const md = markdownit('commonmark');
     return { __html: md.render(data) };

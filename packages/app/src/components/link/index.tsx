@@ -3,7 +3,7 @@ import { Link as I18nextLink } from 'gatsby-plugin-react-i18next';
 import React, { ComponentProps, forwardRef } from 'react';
 import { Props as BaseProps } from '@/components';
 
-type Props = Omit<BaseProps, 'on'> &
+type Props = BaseProps &
   Pick<ComponentProps<typeof I18nextLink>, 'to' | 'language'>;
 
 const Link = forwardRef<HTMLAnchorElement, Props>(

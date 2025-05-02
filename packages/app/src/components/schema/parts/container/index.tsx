@@ -29,7 +29,6 @@ export type Props = BaseProps & {
   renderHeadItem?: () => JSX.Element;
 };
 const Container: React.FC<Props> = ({
-  on,
   name,
   schema,
   formState,
@@ -75,7 +74,7 @@ const Container: React.FC<Props> = ({
         {isActive ? <LightbulbIcon /> : <LightbulbOffIcon />}
       </Button>
     );
-  }, [on, required, isActive, handleBulbClick]);
+  }, [required, isActive, handleBulbClick]);
 
   const arrowIcon = useMemo<JSX.Element>(
     () => (
@@ -83,7 +82,7 @@ const Container: React.FC<Props> = ({
         {isOpened ? <ChevronDownIcon /> : <ChevronRightIcon />}
       </Button>
     ),
-    [on, isOpened, handleArrowClick]
+    [isOpened, handleArrowClick]
   );
 
   const error = useError({ schema, name, errors: formState.errors });
@@ -117,7 +116,7 @@ const Container: React.FC<Props> = ({
           })}
         >
           {/* Info */}
-          {isInfoOpened && <Info on={on} schema={schema} />}
+          {isInfoOpened && <Info schema={schema} />}
           {/* Error */}
           {error && (
             <Alert variant="destructive">

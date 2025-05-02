@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useTranslation } from '@/hooks/i18n';
-import { COLOR_SYSTEM, Endpoint } from '@/types';
+import { Endpoint } from '@/types';
 import { Document } from '@/types/oas';
 import Thumbnail from '../thumbnail';
 
@@ -72,10 +72,7 @@ const Info: React.FC<Props> = ({ endpoint, document }) => {
           <div>
             {document.info.description && (
               <div className="my-4">
-                <CommonMark
-                  on={COLOR_SYSTEM.SURFACE}
-                  data={document.info.description}
-                />
+                <CommonMark data={document.info.description} />
               </div>
             )}
             <div className="flex flex-col items-start gap-1">
@@ -88,29 +85,20 @@ const Info: React.FC<Props> = ({ endpoint, document }) => {
                 </Button>
               )}
               {document.info.contact && (
-                <Contact
-                  on={COLOR_SYSTEM.SURFACE}
-                  data={document.info.contact}
-                />
+                <Contact data={document.info.contact} />
               )}
 
               {document.info.license && (
-                <License
-                  on={COLOR_SYSTEM.SURFACE}
-                  data={document.info.license}
-                />
+                <License data={document.info.license} />
               )}
               {document.externalDocs && (
-                <ExternalDocs
-                  on={COLOR_SYSTEM.SURFACE}
-                  data={document.externalDocs}
-                />
+                <ExternalDocs data={document.externalDocs} />
               )}
               {document.servers && (
                 <ul className="flex flex-col items-start gap-1">
                   {document.servers.map((server) => (
                     <li key={server.url}>
-                      <Server on={COLOR_SYSTEM.SURFACE} server={server} />
+                      <Server server={server} />
                     </li>
                   ))}
                 </ul>

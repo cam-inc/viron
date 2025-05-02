@@ -14,7 +14,6 @@ import { useAutocomplete, useDynamicEnum, useNameForError } from '../../hooks';
 import { Props } from '../../index';
 
 const SchemaOfTypeString: React.FC<Props> = ({
-  on,
   endpoint,
   document,
   name,
@@ -150,7 +149,7 @@ const SchemaOfTypeString: React.FC<Props> = ({
   }
 
   if (schema.format === 'wyswyg') {
-    return <Wyswyg on={on} onChange={handleWyswygChange} />;
+    return <Wyswyg onChange={handleWyswygChange} />;
   }
 
   if (schema.format === 'multiline') {

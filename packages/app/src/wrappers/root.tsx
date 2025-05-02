@@ -20,7 +20,7 @@ import {
   useAppThemeGlobalStateValue,
 } from '@/store';
 import '@/styles/global.css';
-import { ClassName, COLOR_SYSTEM } from '@/types';
+import { ClassName } from '@/types';
 
 type Props = {
   pluginOptions: PluginOptions;
@@ -34,7 +34,7 @@ const RootWrapper: React.FC<Props> = (props) => {
         <HelmetProvider>
           <DndProvider backend={HTML5Backend}>
             <GlobalStateProvider>
-              <ErrorBoundary on={COLOR_SYSTEM.BACKGROUND}>
+              <ErrorBoundary>
                 {/* Need to wrap a react component to encapsulate all state related processes inside the RecoilRoot component. */}
                 <Root {...props} />
               </ErrorBoundary>
@@ -145,7 +145,6 @@ const useRoot = (): UseRootReturn => {
 
   // Handle non-react-related errors that are dismissed.
   const error = useError({
-    on: COLOR_SYSTEM.SURFACE,
     withModal: true,
   });
   const setError = error.setError;

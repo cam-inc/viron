@@ -5,21 +5,6 @@ import {
   OperationId,
 } from '@/types/oas';
 
-export const COLOR_SYSTEM = {
-  PRIMARY: 'primary',
-  PRIMARY_CONTAINER: 'primary-container',
-  SECONDARY: 'secondary',
-  SECONDARY_CONTAINER: 'secondary-container',
-  TERTIARY: 'tertiary',
-  TERTIARY_CONTAINER: 'tertiary-container',
-  ERROR: 'error',
-  ERROR_CONTAINER: 'error-container',
-  SURFACE: 'surface',
-  SURFACE_VARIANT: 'surface-variant',
-  BACKGROUND: 'background',
-} as const;
-export type ColorSystem = (typeof COLOR_SYSTEM)[keyof typeof COLOR_SYSTEM];
-
 export type JsonStringifiable = Parameters<typeof JSON.stringify>[0];
 export type URL = string;
 export type Pathname = string;

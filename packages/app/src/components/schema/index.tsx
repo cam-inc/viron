@@ -32,7 +32,6 @@ export type Props = BaseProps & {
   activeRef: UseEliminateReturn['ref'];
 };
 const _Schema: React.FC<Props & Pick<ContainerProps, 'renderHeadItem'>> = ({
-  on,
   renderHeadItem,
   endpoint,
   document,
@@ -82,7 +81,6 @@ const _Schema: React.FC<Props & Pick<ContainerProps, 'renderHeadItem'>> = ({
 
   return (
     <Container
-      on={on}
       name={name}
       schema={schema}
       formState={formState}
@@ -97,7 +95,6 @@ const _Schema: React.FC<Props & Pick<ContainerProps, 'renderHeadItem'>> = ({
       <Component
         endpoint={endpoint}
         document={document}
-        on={on}
         name={name}
         schema={schema}
         register={register}

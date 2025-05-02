@@ -15,7 +15,7 @@ import { ExternalDocumentation } from '@/types/oas';
 type Props = BaseProps & {
   data: ExternalDocumentation;
 };
-const ExternalDocs: React.FC<Props> = ({ on, data }) => {
+const ExternalDocs: React.FC<Props> = ({ data }) => {
   return (
     <TooltipProvider>
       <Tooltip>
@@ -29,7 +29,7 @@ const ExternalDocs: React.FC<Props> = ({ on, data }) => {
         </TooltipTrigger>
         {data.description && (
           <TooltipContent>
-            <CommonMark on={on} data={data.description} />
+            <CommonMark data={data.description} />
           </TooltipContent>
         )}
       </Tooltip>

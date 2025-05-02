@@ -27,7 +27,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { BaseError } from '@/errors';
 import { useEndpoint } from '@/hooks/endpoint';
 import { useTranslation } from '@/hooks/i18n';
-import { Authentication, COLOR_SYSTEM, Endpoint } from '@/types';
+import { Authentication, Endpoint } from '@/types';
 import { Document } from '@/types/oas';
 import EditEndpoint from './edit';
 import Info from './info';
@@ -82,7 +82,7 @@ const Item: React.FC<Props> = ({ endpoint }) => {
 
   const content = useMemo<JSX.Element | null>(() => {
     if (isPending) {
-      return <SkeltonItem on={COLOR_SYSTEM.BACKGROUND} />;
+      return <SkeltonItem />;
     }
 
     return (

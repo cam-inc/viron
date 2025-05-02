@@ -8,7 +8,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet';
 import { BaseError } from '@/errors/index';
-import { COLOR_SYSTEM, Endpoint } from '@/types';
+import { Endpoint } from '@/types';
 import { Document, RequestValue } from '@/types/oas';
 import { UseSiblingsReturn } from '../../hooks/useSiblings';
 import Action from '../action';
@@ -65,7 +65,6 @@ const Sibling: React.FC<Props> = ({
           <SheetTitle>{label}</SheetTitle>
         </SheetHeader>
         <Request
-          on={COLOR_SYSTEM.SURFACE}
           endpoint={endpoint}
           document={document}
           request={sibling.request}

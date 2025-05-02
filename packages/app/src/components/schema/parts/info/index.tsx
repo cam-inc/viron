@@ -7,14 +7,14 @@ import { Schema } from '@/types/oas';
 export type Props = BaseProps & {
   schema: Schema;
 };
-const Info: React.FC<Props> = ({ on, schema, className = '' }) => {
+const Info: React.FC<Props> = ({ schema, className = '' }) => {
   return (
     <div
       className={classnames(`p-1 text-xxs bg-muted text-foreground`, className)}
     >
       <div>type: {schema.type}</div>
       {schema.title && <div>{schema.title}</div>}
-      {schema.description && <CommonMark on={on} data={schema.description} />}
+      {schema.description && <CommonMark data={schema.description} />}
     </div>
   );
 };

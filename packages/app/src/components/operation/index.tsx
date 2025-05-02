@@ -12,7 +12,7 @@ type Props = BaseProps & {
   document: Document;
   operation: Operation;
 };
-const _Operation: React.FC<Props> = ({ on, operation, className = '' }) => {
+const _Operation: React.FC<Props> = ({ operation, className = '' }) => {
   return (
     <div className={className}>
       <div className="flex flex-col gap-1">
@@ -26,12 +26,10 @@ const _Operation: React.FC<Props> = ({ on, operation, className = '' }) => {
         {operation.summary && (
           <div className="text-base font-bold">{operation.summary}</div>
         )}
-        {operation.description && (
-          <CommonMark on={on} data={operation.description} />
-        )}
+        {operation.description && <CommonMark data={operation.description} />}
         {operation.externalDocs && (
           <div className="flex">
-            <ExternalDocs on={on} data={operation.externalDocs} />
+            <ExternalDocs data={operation.externalDocs} />
           </div>
         )}
         {operation.tags && (
@@ -47,7 +45,7 @@ const _Operation: React.FC<Props> = ({ on, operation, className = '' }) => {
           <div className="flex items-center gap-2">
             {operation.servers.map((server, idx) => (
               <React.Fragment key={idx}>
-                <Server on={on} server={server} />
+                <Server server={server} />
               </React.Fragment>
             ))}
           </div>

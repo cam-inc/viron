@@ -21,7 +21,7 @@ import {
 import { useEndpoint, UseEndpointReturn } from '@/hooks/endpoint';
 import { useTranslation } from '@/hooks/i18n';
 import { useToast } from '@/hooks/use-toast';
-import { Authentication, AuthConfig, COLOR_SYSTEM, Endpoint } from '@/types/';
+import { Authentication, AuthConfig, Endpoint } from '@/types/';
 import { RequestValue } from '@/types/oas';
 
 export type Props = {
@@ -138,7 +138,7 @@ const Oidc: React.FC<{
     () => prepareSigninOidc(endpoint, authentication),
     [authentication, endpoint, prepareSigninOidc]
   );
-  const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
+  const error = useError({ withModal: true });
   const setError = error.setError;
 
   const handleSubmit = useCallback(
@@ -164,7 +164,6 @@ const Oidc: React.FC<{
 
   return (
     <Request
-      on={COLOR_SYSTEM.SURFACE}
       className="h-full"
       endpoint={signinOidc.endpoint}
       document={signinOidc.document}
@@ -188,7 +187,7 @@ const OAuth: React.FC<{
     () => prepareSigninOAuth(endpoint, authentication),
     [authentication, endpoint, prepareSigninOAuth]
   );
-  const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
+  const error = useError({ withModal: true });
   const setError = error.setError;
 
   const handleSubmit = useCallback(
@@ -214,7 +213,6 @@ const OAuth: React.FC<{
 
   return (
     <Request
-      on={COLOR_SYSTEM.SURFACE}
       className="h-full"
       endpoint={signinOAuth.endpoint}
       document={signinOAuth.document}
@@ -238,7 +236,7 @@ const Email: React.FC<{
     () => prepareSigninEmail(endpoint, authentication),
     [authentication, endpoint, prepareSigninEmail]
   );
-  const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
+  const error = useError({ withModal: true });
   const setError = error.setError;
 
   const handleSubmit = useCallback(
@@ -266,7 +264,6 @@ const Email: React.FC<{
 
   return (
     <Request
-      on={COLOR_SYSTEM.SURFACE}
       endpoint={signinEmail.endpoint}
       document={signinEmail.document}
       defaultValues={signinEmail.defaultValues}

@@ -9,7 +9,6 @@ import { Props } from '../../index';
 const SchemaOfTypeObject: React.FC<Props> = ({
   endpoint,
   document,
-  on,
   name,
   schema,
   register,
@@ -84,7 +83,6 @@ const SchemaOfTypeObject: React.FC<Props> = ({
               <_Schema
                 endpoint={endpoint}
                 document={document}
-                on={on}
                 name={`${name}.${_name}`}
                 schema={_schema}
                 formState={formState}
