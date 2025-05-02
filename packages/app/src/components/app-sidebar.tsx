@@ -4,7 +4,6 @@ import {
   FileTextIcon,
   RocketIcon,
   CircleHelpIcon,
-  GithubIcon,
 } from 'lucide-react';
 import * as React from 'react';
 import {
@@ -21,6 +20,7 @@ import { INTERNAL_PAGE_PATHS, URL } from '@/constants';
 import { useI18n, useTranslation } from '@/hooks/i18n';
 import Link from './link';
 import Logo from './logo';
+import { GithubLogo } from './logo/github';
 import { Select, SelectItem } from './ui/select';
 
 const data = {
@@ -55,7 +55,7 @@ const data = {
     {
       title: 'service.github',
       to: URL.GITHUB,
-      icon: GithubIcon,
+      icon: GithubLogo,
     },
   ],
 };

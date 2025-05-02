@@ -1,7 +1,7 @@
 import { ChevronRightIcon, MailIcon, KeyRoundIcon } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
 import { useError } from '@/components/error/';
-import GoogleLogo from '@/components/google';
+import GoogleLogo from '@/components/logo/google';
 import Request from '@/components/request';
 import { Button } from '@/components/ui/button';
 import {

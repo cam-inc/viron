@@ -1,8 +1,9 @@
 import { PageProps, graphql } from 'gatsby';
-import { ExternalLinkIcon, GithubIcon } from 'lucide-react';
+import { ExternalLinkIcon } from 'lucide-react';
 import React, { useCallback } from 'react';
 import Link from '@/components/link';
 import Logo from '@/components/logo';
+import { GithubLogo } from '@/components/logo/github';
 import Metadata from '@/components/metadata';
 import { Button } from '@/components/ui/button';
 import { Select, SelectItem } from '@/components/ui/select';
@@ -64,7 +65,7 @@ const HomePage: React.FC<Props> = () => {
           </ul>
           <ul>
             <NavigationListItem
-              icon={<GithubIcon />}
+              icon={<GithubLogo />}
               label="service.github"
               to={URL.GITHUB}
             />
