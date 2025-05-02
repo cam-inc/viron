@@ -1,8 +1,8 @@
-import { yupResolver } from '@hookform/resolvers/yup';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircleIcon } from 'lucide-react';
 import React, { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
+import { z } from 'zod';
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/alert';
 import { Button } from '~/components/ui/button';
 import {
@@ -38,16 +38,22 @@ const AddEndpoint: React.FC<Props> = ({ onAdd }) => {
 
   const schema = useMemo(
     () =>
-      yup.object().shape({
-        id: endpointId.required(),
-        url: url.required(),
+      z.object({
+        id: endpointId,
+        url: url,
       }),
     []
   );
   const form = useForm<
     Pick<Endpoint, 'id' | 'url' | 'groupId'> & { manual?: string }
   >({
-    resolver: yupResolver(schema),
+    resolver: zodResolver(schema),
+    shouldUnregister: true,
+    defaultValues: {
+      id: '',
+      url: '',
+      groupId: '',
+    },
   });
   const {
     handleSubmit: _handleSubmit,

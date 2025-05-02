@@ -500,7 +500,7 @@ export const getValidateFormat = function (
     }
     if (format === 'email') {
       return function (data: string) {
-        if (!email.isValidSync(data)) {
+        if (!email.safeParse(data).success) {
           return `Should be an e-mail string.`;
         }
         return true;

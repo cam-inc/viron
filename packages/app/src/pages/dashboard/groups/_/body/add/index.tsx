@@ -1,7 +1,7 @@
-import { yupResolver } from '@hookform/resolvers/yup';
+import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
+import { z } from 'zod';
 import { Button } from '~/components/ui/button';
 import {
   DialogContent,
@@ -27,23 +27,28 @@ const FORM_ID = 'add-group-form';
 
 export type Props = {
   onAdd: () => void;
-  onCancel: () => void;
 };
-const Add: React.FC<Props> = ({ onAdd, onCancel }) => {
+const Add: React.FC<Props> = ({ onAdd }) => {
   const { addGroup } = useEndpoint();
   const { t } = useTranslation();
 
   const schema = useMemo(
     () =>
-      yup.object().shape({
-        id: yup.string().required(),
-        name: yup.string().required(),
-        description: yup.string(),
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        description: z.string().optional(),
       }),
     []
   );
   const form = useForm<EndpointGroup & { manual?: string }>({
-    resolver: yupResolver(schema),
+    resolver: zodResolver(schema),
+    defaultValues: {
+      id: '',
+      name: '',
+      description: '',
+    },
+    shouldUnregister: true,
   });
   const { handleSubmit: _handleSubmit, setError, clearErrors } = form;
   const handleSubmit = useMemo(

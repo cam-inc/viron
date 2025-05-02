@@ -29,10 +29,7 @@ const Body: React.FC<Props> = ({ className }) => {
                 {t('addGroupButtonLabel')}
               </Button>
             </DialogTrigger>
-            <Add
-              onAdd={() => setAddGroupDialogOpen(false)}
-              onCancel={() => setAddGroupDialogOpen(false)}
-            />
+            <Add onAdd={() => setAddGroupDialogOpen(false)} />
           </Dialog>
         </div>
       </div>
