@@ -1,2 +1,0 @@
-oapi-codegen -generate "types,skip-prune,spec" -package components -o ./example/golang/routes/components/components.gen.go ./example/golang/openapi/yaml/components.yaml
-oapi-codegen -import-mapping ./components.yaml:github.com/cam-inc/viron/example/golang/routes/components -generate "types,chi-server,spec" -package root -o ./example/golang/routes/root/root.gen.go ./example/golang/openapi/yaml/root.yaml

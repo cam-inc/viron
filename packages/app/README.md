@@ -129,7 +129,7 @@ We are hoping to switch to [Cypress Component Testing](https://docs.cypress.io/g
 E2E and integration testings are executed and the result will be sent to Cypress Dashboard, which is open to public. (only the `app-production` project.)
 `CYPRESS_PROJECT_ID=<production project id> CYPRESS_RECORD_KEY=<production record key> npm run ci:production:record --workspace=@viron/app` to run for production environment.
 `CYPRESS_PROJECT_ID=<development project id> CYPRESS_RECORD_KEY=<development record key> npm run ci:development:record --workspace=@viron/app` to run for development environment.
-`npm run ci:local --workspace=@viron/app` to execute CI tasks locally for tesing purpose.
+`npm run ci:local --workspace=@viron/app` to execute CI tasks locally for testing purpose.
 
 ### Main Prerequisite Knowledge and Technologies
 
@@ -142,7 +142,6 @@ E2E and integration testings are executed and the result will be sent to Cypress
 - [OpenAPI Specification](https://swagger.io/specification/)
 - [i18next](https://www.i18next.com/)
 - [react-i18next](https://react.i18next.com/)
-- [Storybook](https://storybook.js.org/)
 - [Cypress](https://www.cypress.io/)
 - [Gatsby Unit Testing](https://www.gatsbyjs.com/docs/how-to/testing/unit-testing/)
 - [Gatsby Testing React Components](https://www.gatsbyjs.com/docs/how-to/testing/testing-react-components/)
