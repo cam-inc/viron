@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { Props as BaseProps } from '~/components';
-import { Endpoint } from '~/types';
-import { Document, Schema } from '~/types/oas';
+import { Props as BaseProps } from '@/components';
+import { Endpoint } from '@/types';
+import { Document, Schema } from '@/types/oas';
 import { useActive, UseEliminateReturn } from './hooks/index';
 import Container, { Props as ContainerProps } from './parts/container';
 import OneOf from './parts/oneOf';
@@ -10,8 +10,8 @@ import SchemaOfTypeArray from './types/array';
 import SchemaOfTypeBoolean from './types/boolean';
 import SchemaOfTypeInteger from './types/integer';
 import SchemaOfTypeNumber from './types/number';
-import SchemaOfTypeString from './types/string';
 import SchemaOfTypeObject from './types/object';
+import SchemaOfTypeString from './types/string';
 
 export type Props = BaseProps & {
   endpoint: Endpoint;
@@ -32,7 +32,6 @@ export type Props = BaseProps & {
   activeRef: UseEliminateReturn['ref'];
 };
 const _Schema: React.FC<Props & Pick<ContainerProps, 'renderHeadItem'>> = ({
-  on,
   renderHeadItem,
   endpoint,
   document,
@@ -82,7 +81,6 @@ const _Schema: React.FC<Props & Pick<ContainerProps, 'renderHeadItem'>> = ({
 
   return (
     <Container
-      on={on}
       name={name}
       schema={schema}
       formState={formState}
@@ -97,7 +95,6 @@ const _Schema: React.FC<Props & Pick<ContainerProps, 'renderHeadItem'>> = ({
       <Component
         endpoint={endpoint}
         document={document}
-        on={on}
         name={name}
         schema={schema}
         register={register}

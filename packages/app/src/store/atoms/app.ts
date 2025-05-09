@@ -1,5 +1,5 @@
 import { atom } from 'recoil';
-import { Theme, THEME } from '~/types/oas';
+import { Theme, THEME } from '@/types/oas';
 
 const NAME = 'app';
 const KEY = {
@@ -25,5 +25,5 @@ export const screen = atom<Screen>({
 
 export const theme = atom<Theme>({
   key: `${NAME}.${KEY.THEME}`,
-  default: THEME.BLUE,
+  default: 'default',
 });

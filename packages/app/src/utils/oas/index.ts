@@ -1,9 +1,9 @@
 import { lint as _lint } from '@viron/linter';
 import { JSONPath } from 'jsonpath-plus';
 import _ from 'lodash';
-import { EnvironmentalVariable, isEnvironmentalVariable } from '~/constants';
-import { Result, Success, Failure, BaseError, OASError } from '~/errors';
-import { Endpoint, URL, Pathname } from '~/types';
+import { EnvironmentalVariable, isEnvironmentalVariable } from '@/constants';
+import { Result, Success, Failure, BaseError, OASError } from '@/errors';
+import { Endpoint, URL, Pathname } from '@/types';
 import {
   Document,
   Info,
@@ -34,9 +34,9 @@ import {
   TableColumn,
   Sort,
   SORT,
-} from '~/types/oas';
-import { isRelativeURL } from '~/utils';
-import { serialize } from '~/utils/oas/style';
+} from '@/types/oas';
+import { isRelativeURL } from '@/utils';
+import { serialize } from '@/utils/oas/style';
 
 // Check whether an OAS document is valid or not.
 export const lint = (document: unknown): Result<null, BaseError> => {

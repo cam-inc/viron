@@ -1,7 +1,7 @@
 import { atom } from 'recoil';
-import { KEY as STORAGE_KEY } from '~/storage';
-import { localStoragePersistence } from '~/store/atomEffects';
-import { Endpoint, EndpointGroup } from '~/types';
+import { KEY as STORAGE_KEY } from '@/storage';
+import { localStoragePersistence } from '@/store/atomEffects';
+import { Endpoint, EndpointGroup } from '@/types';
 
 export const NAME = 'endpoint';
 const KEY = {

@@ -3,8 +3,8 @@ import {
   list as endpointListAtom,
   groupList as endpointGroupListAtom,
   NAME,
-} from '~/store/atoms/endpoint';
-import { Endpoint, EndpointGroup, EndpointGroupID, EndpointID } from '~/types';
+} from '@/store/atoms/endpoint';
+import { Endpoint, EndpointGroup, EndpointGroupID, EndpointID } from '@/types';
 
 const KEY = {
   LIST_BY_GROUP: 'listByGroup',

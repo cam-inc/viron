@@ -1,23 +1,21 @@
 import classnames from 'classnames';
+import { ChevronDownIcon, ChevronRightIcon } from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Props as BaseProps } from '~/components';
-import { SIZE as BUTTON_SIZE } from '~/components/button';
-import Button, { Props as ButtonProps } from '~/components/button';
-import ChevronDownIcon from '~/components/icon/chevronDown/outline';
-import ChevronRightIcon from '~/components/icon/chevronRight/outline';
-import Operation from '~/components/operation';
-import Schema from '~/components/schema';
-import { useEliminate } from '~/components/schema/hooks';
-import { useTranslation } from '~/hooks/i18n';
-import { COLOR_SYSTEM, Endpoint } from '~/types/index';
+import { Props as BaseProps } from '@/components';
+import Operation from '@/components/operation';
+import Schema from '@/components/schema';
+import { useEliminate } from '@/components/schema/hooks';
+import { useTranslation } from '@/hooks/i18n';
+import { Endpoint } from '@/types/index';
 import {
   Document,
   Request,
   RequestValue,
   Schema as SchemaType,
-} from '~/types/oas';
-import { pickContentType } from '~/utils/oas';
+} from '@/types/oas';
+import { pickContentType } from '@/utils/oas';
+import { Button } from '../ui/button';
 
 export type Props = BaseProps & {
   endpoint: Endpoint;
@@ -28,7 +26,6 @@ export type Props = BaseProps & {
   renderHead?: () => JSX.Element | null;
 };
 const _Request: React.FC<Props> = ({
-  on,
   endpoint,
   document,
   request,
@@ -64,13 +61,11 @@ const _Request: React.FC<Props> = ({
 
   // Common head open status.
   const [isCommonHeadOpened, setIsCommonHeadOpened] = useState<boolean>(true);
-  const handleCommonHeadOpenerClick = useCallback<
-    ButtonProps['onClick']
-  >(() => {
+  const handleCommonHeadOpenerClick = useCallback(() => {
     setIsCommonHeadOpened((currVal) => !currVal);
   }, []);
 
-  const handleSubmitClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleSubmitClick = useCallback(() => {
     // Do nothing.
   }, []);
 
@@ -79,22 +74,25 @@ const _Request: React.FC<Props> = ({
       <form className="h-full flex flex-col" onSubmit={_handleSubmit}>
         {/* Custom Head */}
         {renderHead && (
-          <div className={`flex-none p-2 border-b-2 border-thm-on-${on}-faint`}>
+          <div className={`flex-none p-2 border-b-2 border-border`}>
             {renderHead()}
           </div>
         )}
         {/* Common Head */}
-        <div
-          className={`flex-none flex gap-2 border-b-2 p-2 text-thm-on-${on} border-thm-on-${on}-faint`}
-        >
-          <div className={`flex-none bg-on-thm-${on}-faint`}>
+        <div className={`flex-none flex gap-2 border-b-2 p-2 border-border`}>
+          <div className="flex-none">
             <div className="flex items-center h-[22px]">
               <Button
-                variant="text"
-                on={on}
-                Icon={isCommonHeadOpened ? ChevronDownIcon : ChevronRightIcon}
+                variant="ghost"
+                size="icon"
                 onClick={handleCommonHeadOpenerClick}
-              />
+              >
+                {isCommonHeadOpened ? (
+                  <ChevronDownIcon />
+                ) : (
+                  <ChevronRightIcon />
+                )}
+              </Button>
             </div>
           </div>
           <div className="flex-1">
@@ -103,12 +101,8 @@ const _Request: React.FC<Props> = ({
               <div>{request.path}</div>
             </div>
             {isCommonHeadOpened && (
-              <div className={`pt-2 mt-2 border-t border-thm-on-${on}-faint`}>
-                <Operation
-                  on={on}
-                  document={document}
-                  operation={request.operation}
-                />
+              <div className={`pt-2 mt-2 border-t border-border`}>
+                <Operation document={document} operation={request.operation} />
               </div>
             )}
           </div>
@@ -119,7 +113,6 @@ const _Request: React.FC<Props> = ({
             <Schema
               endpoint={endpoint}
               document={document}
-              on={on}
               name="parameters"
               schema={{
                 type: 'object',
@@ -163,7 +156,6 @@ const _Request: React.FC<Props> = ({
             <Schema
               endpoint={endpoint}
               document={document}
-              on={on}
               name="requestBody"
               schema={
                 request.operation.requestBody.content[
@@ -187,15 +179,11 @@ const _Request: React.FC<Props> = ({
         </div>
         {/* Tail */}
         <div
-          className={`flex-none p-2 border-t-2 border-thm-on-${on}-faint flex justify-end gap-2`}
+          className={`flex-none p-2 border-t-2 border-border flex justify-end gap-2`}
         >
-          <Button
-            type="submit"
-            cs={COLOR_SYSTEM.PRIMARY}
-            size={BUTTON_SIZE.BASE}
-            label={t('submitButtonLabel')}
-            onClick={handleSubmitClick}
-          />
+          <Button type="submit" onClick={handleSubmitClick}>
+            {t('submitButtonLabel')}
+          </Button>
         </div>
       </form>
     </div>

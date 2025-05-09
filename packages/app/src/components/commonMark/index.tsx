@@ -1,13 +1,13 @@
 import classnames from 'classnames';
 import markdownit from 'markdown-it';
 import React, { useMemo } from 'react';
-import { Props as BaseProps } from '~/components';
-import { CommonMark } from '~/types/oas';
+import { Props as BaseProps } from '@/components';
+import { CommonMark } from '@/types/oas';
 
 type Props = BaseProps & {
   data: CommonMark;
 };
-const _CommonMark: React.FC<Props> = ({ on, data, className = '' }) => {
+const _CommonMark: React.FC<Props> = ({ data, className = '' }) => {
   const parsedDescription = useMemo(() => {
     const md = markdownit('commonmark');
     return { __html: md.render(data) };
@@ -15,7 +15,7 @@ const _CommonMark: React.FC<Props> = ({ on, data, className = '' }) => {
 
   return (
     <div
-      className={classnames(`text-xs text-thm-on-${on}`, className)}
+      className={classnames(`text-xs`, className)}
       dangerouslySetInnerHTML={parsedDescription}
     />
   );

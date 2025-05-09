@@ -1,40 +1,38 @@
-import classnames from 'classnames';
+import { GraduationCapIcon } from 'lucide-react';
 import React from 'react';
-import { Props as BaseProps } from '~/components';
-import AcademicCapIcon from '~/components/icon/academicCap/outline';
-import Link from '~/components/link';
-import { License } from '~/types/oas';
+import { Props as BaseProps } from '@/components';
+import Link from '@/components/link';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { License } from '@/types/oas';
+
 type Props = BaseProps & {
   data: License;
 };
 
-const _License: React.FC<Props> = ({ on, className = '', data }) => {
+const _License: React.FC<Props> = ({ className = '', data }) => {
   if (data.url) {
     return (
-      <Link
-        className={classnames('group focus:outline-none', className)}
-        to={data.url}
-      >
-        <div
-          className={`flex gap-1 items-center text-xs text-thm-on-${on} group-hover:underline group-active:text-thm-on-${on}-low group-focus:ring-2 group-focus:ring-thm-on-${on}`}
-        >
-          <AcademicCapIcon className="w-em" />
-          <div>{data.name}</div>
-        </div>
-      </Link>
+      <Button className={className} asChild variant="link">
+        <Link to={data.url}>
+          <GraduationCapIcon className="w-em" />
+          {data.name}
+        </Link>
+      </Button>
     );
   }
 
   return (
-    <div
-      className={classnames(
-        `flex gap-1 items-center text-xs text-thm-on-${on}`,
-        className
-      )}
+    <Button
+      className={cn('pointer-events-none', className)}
+      asChild
+      variant="link"
     >
-      <AcademicCapIcon className="w-em" />
-      <div>{data.name}</div>
-    </div>
+      <div>
+        <GraduationCapIcon className="w-em" />
+        <div>{data.name}</div>
+      </div>
+    </Button>
   );
 };
 export default _License;

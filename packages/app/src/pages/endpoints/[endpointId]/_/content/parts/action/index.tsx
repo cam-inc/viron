@@ -1,63 +1,39 @@
-import { IconType } from '@react-icons/all-files';
-import { BiAddToQueue } from '@react-icons/all-files/bi/BiAddToQueue';
-import { BiBandAid } from '@react-icons/all-files/bi/BiBandAid';
-import { BiDownvote } from '@react-icons/all-files/bi/BiDownvote';
-import { BiEdit } from '@react-icons/all-files/bi/BiEdit';
-import { BiHeadphone } from '@react-icons/all-files/bi/BiHeadphone';
-import { BiSticker } from '@react-icons/all-files/bi/BiSticker';
-import { BiTestTube } from '@react-icons/all-files/bi/BiTestTube';
-import { BiTrash } from '@react-icons/all-files/bi/BiTrash';
-import React, { useCallback, useMemo } from 'react';
-import Button, { Props as ButtonProps } from '~/components/button';
-import { COLOR_SYSTEM } from '~/types';
-import { METHOD, Request } from '~/types/oas';
+import {
+  DownloadIcon,
+  PencilIcon,
+  PlusIcon,
+  TrashIcon,
+  ListIcon,
+  InfoIcon,
+  PencilRulerIcon,
+  BugIcon,
+} from 'lucide-react';
+import React, { useMemo } from 'react';
+import { Method, METHOD } from '@/types/oas';
 
-type Props = {
-  request: Request;
-  onClick: () => void;
-};
-const Action: React.FC<Props> = ({ request, onClick }) => {
-  const Icon = useMemo<IconType>(() => {
-    switch (request.method) {
+export const ActionIcon: React.FC<{
+  className?: string;
+  method: Method;
+}> = ({ className, method }) => {
+  const Icon = useMemo(() => {
+    switch (method) {
       case METHOD.GET:
-        return BiDownvote;
+        return DownloadIcon;
       case METHOD.PUT:
-        return BiEdit;
+        return PencilIcon;
       case METHOD.POST:
-        return BiAddToQueue;
+        return PlusIcon;
       case METHOD.DELETE:
-        return BiTrash;
+        return TrashIcon;
       case METHOD.OPTIONS:
-        return BiSticker;
+        return ListIcon;
       case METHOD.HEAD:
-        return BiHeadphone;
+        return InfoIcon;
       case METHOD.PATCH:
-        return BiBandAid;
+        return PencilRulerIcon;
       case METHOD.TRACE:
-        return BiTestTube;
+        return BugIcon;
     }
-  }, [request]);
-
-  const handleClick = useCallback<ButtonProps['onClick']>(() => {
-    onClick();
-  }, [onClick]);
-
-  const label = useMemo<string>(() => {
-    const { operation } = request;
-    if (operation.summary) {
-      return operation.summary;
-    }
-    return operation.operationId || request.method;
-  }, [request]);
-
-  return (
-    <Button
-      variant="text"
-      on={COLOR_SYSTEM.SURFACE}
-      Icon={Icon}
-      label={label}
-      onClick={handleClick}
-    />
-  );
+  }, [method]);
+  return <Icon className={className} />;
 };
-export default Action;

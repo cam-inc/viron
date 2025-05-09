@@ -1,13 +1,19 @@
+import { LogOutIcon } from 'lucide-react';
 import React, { useCallback, useMemo } from 'react';
-import Button, { Props as ButtonProps } from '~/components/button';
-import Error, { useError } from '~/components/error';
-import LogoutIcon from '~/components/icon/logout/outline';
-import Request from '~/components/request';
-import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
-import { useTranslation } from '~/hooks/i18n';
-import Drawer, { useDrawer } from '~/portals/drawer';
-import { Authentication, COLOR_SYSTEM, Endpoint } from '~/types';
-import { RequestValue } from '~/types/oas';
+import Error, { useError } from '@/components/error';
+import Request from '@/components/request';
+import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import { useEndpoint, UseEndpointReturn } from '@/hooks/endpoint';
+import { useTranslation } from '@/hooks/i18n';
+import { Authentication, Endpoint } from '@/types';
+import { RequestValue } from '@/types/oas';
 
 export type Props = {
   endpoint: Endpoint;
@@ -21,13 +27,8 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
     () => prepareSignout(endpoint, authentication),
     [prepareSignout, endpoint, authentication]
   );
-  const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
+  const error = useError({ withModal: true });
   const setError = error.setError;
-
-  const drawer = useDrawer();
-  const handleClick = useCallback<ButtonProps['onClick']>(() => {
-    drawer.open();
-  }, [drawer]);
 
   const handleSubmit = useCallback(
     async (requestValue: RequestValue) => {
@@ -44,23 +45,23 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
     [signout, onSignout, setError]
   );
 
-  if (signout.error) {
-    return <Error on={COLOR_SYSTEM.BACKGROUND} error={signout.error} />;
+  if (signout.error || error.bind.error) {
+    return <Error error={signout.error ?? error.bind.error} />;
   }
 
   return (
-    <>
-      <Button
-        variant="outlined"
-        className="grow max-w-50%"
-        on={COLOR_SYSTEM.BACKGROUND}
-        IconRight={LogoutIcon}
-        label={t('signout')}
-        onClick={handleClick}
-      />
-      <Drawer {...drawer.bind}>
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="outline">
+          {t('signout')}
+          <LogOutIcon />
+        </Button>
+      </SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>{t('signout')}</SheetTitle>
+        </SheetHeader>
         <Request
-          on={COLOR_SYSTEM.SURFACE}
           className="h-full"
           endpoint={signout.endpoint}
           document={signout.document}
@@ -68,9 +69,8 @@ const Signout: React.FC<Props> = ({ endpoint, authentication, onSignout }) => {
           defaultValues={signout.defaultValues}
           onSubmit={handleSubmit}
         />
-      </Drawer>
-      <Error.renewal {...error.bind} withModal={true} />
-    </>
+      </SheetContent>
+    </Sheet>
   );
 };
 export default Signout;

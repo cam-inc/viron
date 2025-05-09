@@ -1,7 +1,7 @@
 import React from 'react';
-import { Props as BaseProps } from '~/components';
-import Error from '~/components/error';
-import { BaseError } from '~/errors/index';
+import { Props as BaseProps } from '@/components';
+import Error from '@/components/error';
+import { BaseError } from '@/errors/index';
 
 type FallbackProps = {
   error: BaseError;
@@ -10,7 +10,7 @@ type FallbackProps = {
 
 type Props = React.PropsWithRef<
   React.PropsWithChildren<
-    BaseProps<'on'> & {
+    BaseProps & {
       fallback?: React.ReactElement<
         unknown,
         string | React.FunctionComponent | typeof React.Component
@@ -92,7 +92,7 @@ class ErrorBoundary extends React.Component<Props, State> {
       return this.props.children;
     }
 
-    const { on, fallback, fallbackRender, FallbackComponent } = this.props;
+    const { fallback, fallbackRender, FallbackComponent } = this.props;
     const props: FallbackProps = {
       error,
       resetErrorBoundary: this.resetErrorBoundary,
@@ -107,7 +107,7 @@ class ErrorBoundary extends React.Component<Props, State> {
       return <FallbackComponent {...props} />;
     }
 
-    return <Error on={on} error={error} />;
+    return <Error error={error} />;
   }
 }
 

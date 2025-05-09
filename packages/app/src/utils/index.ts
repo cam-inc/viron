@@ -1,4 +1,4 @@
-import { URL } from '~/types';
+import { URL } from '@/types';
 
 const nodeEnv: string = process.env.GATSBY_MODE as string;
 

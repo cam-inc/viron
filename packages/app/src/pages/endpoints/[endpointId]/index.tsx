@@ -1,21 +1,36 @@
 import { useLocation } from '@reach/router';
 import { graphql, PageProps } from 'gatsby';
 import _ from 'lodash';
+import { ArrowLeftIcon } from 'lucide-react';
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import Error from '~/components/error';
-import Metadata from '~/components/metadata';
-import { BaseError } from '~/errors/index';
-import { useEndpoint } from '~/hooks/endpoint';
-import { useI18n } from '~/hooks/i18n';
-import useTheme from '~/hooks/theme';
-import Layout, { Props as LayoutProps } from '~/layouts/index';
-import { useEndpointListItemGlobalStateValue } from '~/store';
-import { COLOR_SYSTEM } from '~/types';
-import { Document, Info } from '~/types/oas';
-import Appbar from './_/appBar';
-import Body, { Props as BodyProps } from './_/body';
-import Navigation, { Props as NavigationProps } from './_/navigation';
+import CommonMark from '@/components/commonMark';
+import Link from '@/components/link';
+import Logo from '@/components/logo';
+import Metadata from '@/components/metadata';
+import { Button } from '@/components/ui/button';
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from '@/components/ui/resizable';
+import { Separator } from '@/components/ui/separator';
+import {
+  SidebarInset,
+  SidebarTrigger,
+  SidebarProvider,
+  SidebarHeader,
+  SidebarContent,
+  Sidebar,
+} from '@/components/ui/sidebar';
+import { BaseError } from '@/errors/index';
+import { useEndpoint } from '@/hooks/endpoint';
+import { useI18n } from '@/hooks/i18n';
+import useTheme from '@/hooks/theme';
+import Pages from '@/pages/endpoints/[endpointId]/_/navigation/pages';
+import { useEndpointListItemGlobalStateValue } from '@/store';
+import { Document, Info } from '@/types/oas';
+import Content from './_/content';
 import SubBody from './_/subBody';
 
 const splitter = ',';
@@ -107,15 +122,15 @@ const EndpointPage: React.FC<Props> = ({ params }) => {
     });
   }, [location.search]);
 
-  const handlePageSelect = useCallback<NavigationProps['onPageSelect']>(
-    (pageId) => {
+  const handlePageSelect = useCallback(
+    (pageId: string) => {
       _navigate(pageId, pinnedContentIds);
     },
     [_navigate, pinnedContentIds]
   );
 
-  const handleContentPin = useCallback<BodyProps['onPin']>(
-    (contentId) => {
+  const handleContentPin = useCallback(
+    (contentId: string) => {
       if (!selectedPageId) {
         return;
       }
@@ -124,8 +139,8 @@ const EndpointPage: React.FC<Props> = ({ params }) => {
     [selectedPageId, pinnedContentIds, _navigate]
   );
 
-  const handleContentUnpin = useCallback<BodyProps['onUnpin']>(
-    (contentId) => {
+  const handleContentUnpin = useCallback(
+    (contentId: string) => {
       if (!selectedPageId) {
         return;
       }
@@ -139,132 +154,143 @@ const EndpointPage: React.FC<Props> = ({ params }) => {
     [selectedPageId, pinnedContentIds, _navigate]
   );
 
-  const renderAppBar = useCallback<NonNullable<LayoutProps['renderAppBar']>>(
-    (args) => {
-      if (isPending || !endpoint || !document || error) {
-        return null;
-      }
-      const page = _.find(document.info['x-pages'], function (page) {
-        return page.id === selectedPageId;
+  const RenderSubBody = useMemo(() => {
+    if (isPending || !endpoint || !document || error) {
+      return null;
+    }
+    const contents: Info['x-pages'][number]['contents'][number][] = [];
+    document.info['x-pages'].forEach((page) => {
+      page.contents.forEach((_content) => {
+        if (pinnedContentIds.includes(_content.id)) {
+          contents.push({ ..._content });
+        }
       });
-      if (!page) {
-        return null;
-      }
-      return <Appbar {...args} page={page} />;
-    },
-    [endpoint, document, isPending, error, selectedPageId]
-  );
+    });
+    return (
+      <SubBody
+        endpoint={endpoint}
+        document={document}
+        contents={contents}
+        onPin={handleContentPin}
+        onUnpin={handleContentUnpin}
+      />
+    );
+  }, [
+    endpoint,
+    document,
+    isPending,
+    error,
+    handleContentPin,
+    handleContentUnpin,
+    pinnedContentIds,
+  ]);
 
-  const renderNavigation = useCallback<
-    NonNullable<LayoutProps['renderNavigation']>
-  >(
-    (args) => {
-      if (isPending || !endpoint || !document || error) {
-        return null;
-      }
-      if (!selectedPageId) {
-        return null;
-      }
-      return (
-        <Navigation
-          {...args}
-          document={document}
-          endpoint={endpoint}
-          pages={document.info['x-pages']}
-          selectedPageId={selectedPageId}
-          onPageSelect={handlePageSelect}
-        />
-      );
-    },
-    [endpoint, document, isPending, error, selectedPageId, handlePageSelect]
-  );
-
-  const renderBody = useCallback<LayoutProps['renderBody']>(
-    function (args) {
-      if (!endpoint || !document) {
-        return null;
-      }
-      if (isPending) {
-        // TODO: show spinner.
-        return null;
-      }
-      if (error) {
-        return <Error on={COLOR_SYSTEM.BACKGROUND} error={error} />;
-      }
-      const page = _.find(document.info['x-pages'], function (page) {
-        return page.id === selectedPageId;
-      });
-      if (!page) {
-        return null;
-      }
-      return (
-        <Body
-          {...args}
-          endpoint={endpoint}
-          document={document}
-          page={page}
-          onPin={handleContentPin}
-          onUnpin={handleContentUnpin}
-          pinnedContentIds={pinnedContentIds}
-        />
-      );
-    },
-    [
-      endpoint,
-      document,
-      isPending,
-      error,
-      selectedPageId,
-      handleContentPin,
-      handleContentUnpin,
-      pinnedContentIds,
-    ]
-  );
-
-  const renderSubBody = useCallback<NonNullable<LayoutProps['renderSubBody']>>(
-    (args) => {
-      if (isPending || !endpoint || !document || error) {
-        return null;
-      }
-      const contents: Info['x-pages'][number]['contents'][number][] = [];
-      document.info['x-pages'].forEach((page) => {
-        page.contents.forEach((_content) => {
-          if (pinnedContentIds.includes(_content.id)) {
-            contents.push({ ..._content });
-          }
-        });
-      });
-      return (
-        <SubBody
-          {...args}
-          endpoint={endpoint}
-          document={document}
-          contents={contents}
-          onPin={handleContentPin}
-          onUnpin={handleContentUnpin}
-        />
-      );
-    },
-    [
-      endpoint,
-      document,
-      isPending,
-      error,
-      handleContentPin,
-      handleContentUnpin,
-      pinnedContentIds,
-    ]
-  );
+  const pages = document?.info['x-pages'] || [];
+  const page = _.find(pages, function (page) {
+    return page.id === selectedPageId;
+  });
 
   return (
     <>
       <Metadata />
-      <Layout
-        renderAppBar={renderAppBar}
-        renderNavigation={renderNavigation}
-        renderBody={renderBody}
-        renderSubBody={pinnedContentIds.length ? renderSubBody : undefined}
-      />
+      <SidebarProvider>
+        <Sidebar variant="sidebar">
+          <SidebarHeader>
+            <Button className="h-auto" asChild variant="ghost">
+              <Link to="/dashboard/endpoints">
+                <article className="w-full flex justify-start items-center gap-2">
+                  <ArrowLeftIcon className="w-4 h-4 flex-none" />
+                  <div className="flex-none w-6 h-6 flex justify-center">
+                    {document?.info['x-thumbnail'] ? (
+                      <img
+                        className="object-contain rounded"
+                        src={document.info['x-thumbnail']}
+                      />
+                    ) : (
+                      <Logo className="w-6 h-6" />
+                    )}
+                  </div>
+                  <div className="flex-1 w-0">
+                    <h1 className="text-xxs font-bold truncate">
+                      {endpoint?.id}
+                    </h1>
+                    <h2 className="text-xxs text-muted-foreground truncate">
+                      {document?.info.title}
+                    </h2>
+                  </div>
+                </article>
+              </Link>
+            </Button>
+          </SidebarHeader>
+          <SidebarContent>
+            {selectedPageId && (
+              <Pages
+                pages={pages}
+                selectedPageId={selectedPageId}
+                onSelect={handlePageSelect}
+              />
+            )}
+          </SidebarContent>
+        </Sidebar>
+        <SidebarInset className="overflow-hidden">
+          <header className="group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 flex h-12 shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear">
+            <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
+              <SidebarTrigger className="-ml-1" />
+              <Separator
+                orientation="vertical"
+                className="mx-2 data-[orientation=vertical]:h-4"
+              />
+              <h1 className="text-base font-medium">{page?.title}</h1>
+            </div>
+          </header>
+          <ResizablePanelGroup direction="vertical">
+            <ResizablePanel>
+              {page && endpoint && document && (
+                <div className="mx-10 py-6 h-full overflow-y-scroll">
+                  {page.description ? (
+                    <CommonMark data={page.description} />
+                  ) : undefined}
+                  <div
+                    className="mt-10"
+                    style={{
+                      display: 'grid',
+                      gap: '8px',
+                      gridTemplateColumns:
+                        'repeat(auto-fit, minmax(360px, 1fr))',
+                      gridAutoRows: 'auto',
+                    }}
+                  >
+                    {page.contents.map((content) => {
+                      const style: React.CSSProperties = {};
+                      if (content.type === 'table') {
+                        style['gridColumn'] = '1/-1';
+                      }
+                      return (
+                        <div key={content.id} style={style}>
+                          <Content
+                            endpoint={endpoint}
+                            document={document}
+                            content={content}
+                            isPinned={pinnedContentIds.includes(content.id)}
+                            onPin={handleContentPin}
+                            onUnpin={handleContentUnpin}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </ResizablePanel>
+            {0 < pinnedContentIds.length && RenderSubBody && (
+              <>
+                <ResizableHandle withHandle />
+                <ResizablePanel>{RenderSubBody}</ResizablePanel>
+              </>
+            )}
+          </ResizablePanelGroup>
+        </SidebarInset>
+      </SidebarProvider>
     </>
   );
 };

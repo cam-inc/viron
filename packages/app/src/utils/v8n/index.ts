@@ -1,7 +1,7 @@
-import { string as yupString } from 'yup';
+import { z } from 'zod';
 
-export const endpointId = yupString().min(1).max(64);
-export const email = yupString().email();
+export const endpointId = z.string().min(1).max(64);
+export const email = z.string().email();
 // TODO: Support localhost.
-//export const url = yup.string().url();
-export const url = yupString();
+//export const url = z.string().url();
+export const url = z.string().min(1);

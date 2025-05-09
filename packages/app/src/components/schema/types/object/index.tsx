@@ -1,15 +1,14 @@
 import _ from 'lodash';
 import React, { useEffect } from 'react';
 import { Validate } from 'react-hook-form';
-import _Schema from '~/components/schema';
-import { getRegisterOptions } from '~/utils/oas/v8n';
+import _Schema from '@/components/schema';
+import { getRegisterOptions } from '@/utils/oas/v8n';
 import { useNameForError } from '../../hooks';
 import { Props } from '../../index';
 
 const SchemaOfTypeObject: React.FC<Props> = ({
   endpoint,
   document,
-  on,
   name,
   schema,
   register,
@@ -84,7 +83,6 @@ const SchemaOfTypeObject: React.FC<Props> = ({
               <_Schema
                 endpoint={endpoint}
                 document={document}
-                on={on}
                 name={`${name}.${_name}`}
                 schema={_schema}
                 formState={formState}
