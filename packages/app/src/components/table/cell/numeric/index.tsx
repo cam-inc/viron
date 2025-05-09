@@ -9,7 +9,7 @@ export type Props = BaseProps & {
 const CellForTypeNumeric: React.FC<Props> = ({ value }) => {
   return (
     <div className="whitespace-nowrap">
-      <div className="text-sm">{value.toLocaleString()}</div>
+      <div className="text-sm truncate">{value.toLocaleString()}</div>
     </div>
   );
 };

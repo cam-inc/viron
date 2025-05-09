@@ -34,6 +34,6 @@ const CellForTypeString: React.FC<Props> = ({ schema, value }) => {
         return <div className="text-sm">{value}</div>;
     }
   }, [schema, value]);
-  return <div className="whitespace-nowrap">{content}</div>;
+  return <div className="whitespace-nowrap truncate">{content}</div>;
 };
 export default CellForTypeString;

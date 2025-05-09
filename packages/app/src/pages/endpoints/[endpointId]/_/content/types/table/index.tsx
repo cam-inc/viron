@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Props as BaseProps } from '@/components';
+import Request from '@/components/request';
 import Cell from '@/components/table/cell';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,16 +19,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from '@/components/ui/sheet';
 import {
   Table,
@@ -37,6 +32,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { BaseError } from '@/errors';
 import { Endpoint } from '@/types';
 import {
   Document,
@@ -45,6 +41,7 @@ import {
   Sort,
   TableColumn,
   Schema,
+  RequestValue,
 } from '@/types/oas';
 import {
   extractTableColumns,
@@ -53,7 +50,7 @@ import {
 } from '@/utils/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
 import { UseDescendantsReturn } from '../../hooks/useDescendants';
-import Descendant, { Props as DescendantProps } from '../../parts/descendant';
+import { ActionIcon } from '../../parts/action';
 
 type Data = Record<string, any>;
 
@@ -63,8 +60,8 @@ type Props = {
   content: Content;
   base: UseBaseReturn;
   descendants: UseDescendantsReturn;
-  onDescendantOperationSuccess: DescendantProps['onOperationSuccess'];
-  onDescendantOperationFail: DescendantProps['onOperationFail'];
+  onDescendantOperationSuccess: OperationsProps['onOperationSuccess'];
+  onDescendantOperationFail: OperationsProps['onOperationFail'];
   sortState: [
     Record<string, Sort>,
     React.Dispatch<React.SetStateAction<Record<string, Sort>>>
@@ -197,67 +194,13 @@ const ContentTable: React.FC<Props> = ({
           </TableHeader>
           <TableBody>
             {dataSource.map((data, rowIndex) => (
-              <Sheet key={rowIndex}>
-                <SheetTrigger asChild>
-                  <TableRow className="cursor-pointer">
-                    {columns.map((column) => {
-                      if (column.schema.type === 'object') {
-                        console.dir(data[column.key], { depth: null });
-                        return (
-                          <TableCell key={column.key}>
-                            {data[column.key] ? (
-                              <Popover>
-                                <PopoverTrigger
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-8 px-2 space-x-0.5"
-                                  >
-                                    Show Details
-                                  </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-fit max-w-[100vw]">
-                                  <pre className="bg-muted p-3 rounded-md overflow-auto text-sm">
-                                    <code>
-                                      {JSON.stringify(
-                                        data[column.key],
-                                        null,
-                                        2
-                                      )}
-                                    </code>
-                                  </pre>
-                                </PopoverContent>
-                              </Popover>
-                            ) : null}
-                          </TableCell>
-                        );
-                      }
-                      return (
-                        <TableCell key={column.key}>
-                          <Cell
-                            schema={column.schema}
-                            value={data[column.key]}
-                          />
-                        </TableCell>
-                      );
-                    })}
-                    {0 < descendants.length && (
-                      <TableCell className="text-right sticky right-0 bg-background">
-                        {renderActions(data)}
-                      </TableCell>
-                    )}
-                  </TableRow>
-                </SheetTrigger>
-
-                <SheetContent>
-                  <SheetHeader>
-                    <SheetTitle>Data</SheetTitle>
-                  </SheetHeader>
-                  <RowData rowData={data} columns={columns} />
-                </SheetContent>
-              </Sheet>
+              <TableBodyRow
+                key={rowIndex}
+                columns={columns}
+                data={data}
+                descendants={descendants}
+                renderActions={renderActions}
+              />
             ))}
           </TableBody>
         </Table>
@@ -267,13 +210,52 @@ const ContentTable: React.FC<Props> = ({
 };
 export default ContentTable;
 
+const TableBodyRow: React.FC<{
+  columns: TableColumn[];
+  data: Data;
+  descendants: UseDescendantsReturn;
+  renderActions: NonNullable<(data: Data) => JSX.Element>;
+}> = ({ columns, data, descendants, renderActions }) => {
+  const [dateSheetOpen, setDateSheetOpen] = useState(false);
+  return (
+    <>
+      <TableRow
+        className="cursor-pointer"
+        onClick={() => setDateSheetOpen(true)}
+      >
+        {columns.map((column) => (
+          <TableCell key={column.key} className="max-w-[400px]">
+            <Cell schema={column.schema} value={data[column.key]} />
+          </TableCell>
+        ))}
+        {0 < descendants.length && (
+          <TableCell
+            className="text-right sticky right-0 bg-background"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {renderActions(data)}
+          </TableCell>
+        )}
+      </TableRow>
+      <Sheet open={dateSheetOpen} onOpenChange={setDateSheetOpen}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Data</SheetTitle>
+          </SheetHeader>
+          <RowData rowData={data} columns={columns} />
+        </SheetContent>
+      </Sheet>
+    </>
+  );
+};
+
 type OperationsProps = {
   endpoint: Endpoint;
   document: Document;
   descendants: UseDescendantsReturn;
-  data: DescendantProps['data'];
-  onOperationSuccess: DescendantProps['onOperationSuccess'];
-  onOperationFail: DescendantProps['onOperationFail'];
+  data: any;
+  onOperationSuccess: (data: any) => void;
+  onOperationFail: (error: BaseError) => void;
 };
 const Operations: React.FC<OperationsProps> = ({
   endpoint,
@@ -283,34 +265,82 @@ const Operations: React.FC<OperationsProps> = ({
   onOperationSuccess,
   onOperationFail,
 }) => {
+  const [selectedDescendant, setSelectedDescendant] =
+    useState<UseDescendantsReturn[number]>();
+  const [isPending, setIsPending] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
+
+  const handleRequestSubmit = useCallback(
+    async (requestValue: RequestValue) => {
+      if (!selectedDescendant) {
+        return;
+      }
+      setOpen(false);
+      setIsPending(true);
+      const { data, error } = await selectedDescendant.fetch(requestValue);
+      setIsPending(false);
+      if (data) {
+        onOperationSuccess(data);
+      }
+      if (error) {
+        onOperationFail(error);
+      }
+    },
+    [selectedDescendant, onOperationSuccess, onOperationFail]
+  );
+
+  function getLabel(descendant: UseDescendantsReturn[number]): string {
+    const { operation } = descendant.request;
+    if (operation.summary) {
+      return operation.summary;
+    }
+    return operation.operationId || descendant.request.method;
+  }
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8">
-          <CircleEllipsisIcon className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        {descendants.map((descendant, idx) => (
-          <DropdownMenuItem
-            key={idx}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-            }}
-          >
-            <Descendant
-              endpoint={endpoint}
-              document={document}
-              descendant={descendant}
-              data={data}
-              onOperationSuccess={onOperationSuccess}
-              onOperationFail={onOperationFail}
-            />
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8">
+            <CircleEllipsisIcon className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          {descendants.map((descendant, idx) => (
+            <DropdownMenuItem
+              key={idx}
+              onSelect={() => {
+                setSelectedDescendant(descendant);
+                setOpen(true);
+              }}
+              disabled={isPending}
+            >
+              <ActionIcon method={descendant.request.method} />
+              {getLabel(descendant)}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent>
+          {selectedDescendant && (
+            <>
+              <SheetHeader>
+                <SheetTitle>{getLabel(selectedDescendant)}</SheetTitle>
+              </SheetHeader>
+              <Request
+                endpoint={endpoint}
+                document={document}
+                request={selectedDescendant.request}
+                defaultValues={selectedDescendant.getDefaultValues(data)}
+                onSubmit={handleRequestSubmit}
+                className="h-full"
+              />
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
+    </>
   );
 };
 

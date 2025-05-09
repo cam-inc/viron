@@ -9,7 +9,7 @@ export type Props = BaseProps & {
 const CellForTypeArray: React.FC<Props> = ({ value }) => {
   return (
     <div className="whitespace-nowrap">
-      <div className="text-sm">{JSON.stringify(value)}</div>
+      <div className="text-sm truncate">{JSON.stringify(value)}</div>
     </div>
   );
 };

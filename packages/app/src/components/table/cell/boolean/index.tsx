@@ -9,7 +9,7 @@ export type Props = BaseProps & {
 const CellForTypeBoolean: React.FC<Props> = ({ value }) => {
   return (
     <div className="whitespace-nowrap">
-      <div className="text-sm">{value ? 'TRUE' : 'FALSE'}</div>
+      <div className="text-sm truncate">{value ? 'TRUE' : 'FALSE'}</div>
     </div>
   );
 };

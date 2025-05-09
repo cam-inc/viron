@@ -9,7 +9,7 @@ export type Props = BaseProps & {
 const CellForTypeNullish: React.FC<Props> = () => {
   return (
     <div className="whitespace-nowrap">
-      <div className="text-sm text-muted-foreground">-</div>
+      <div className="text-sm text-muted-foreground truncate">-</div>
     </div>
   );
 };
