@@ -1,58 +1,38 @@
-// TODO: lucide-reactに移行する
-import { IconType } from '@react-icons/all-files';
-import { BiAddToQueue } from '@react-icons/all-files/bi/BiAddToQueue';
-import { BiBandAid } from '@react-icons/all-files/bi/BiBandAid';
-import { BiDownvote } from '@react-icons/all-files/bi/BiDownvote';
-import { BiEdit } from '@react-icons/all-files/bi/BiEdit';
-import { BiHeadphone } from '@react-icons/all-files/bi/BiHeadphone';
-import { BiSticker } from '@react-icons/all-files/bi/BiSticker';
-import { BiTestTube } from '@react-icons/all-files/bi/BiTestTube';
-import { BiTrash } from '@react-icons/all-files/bi/BiTrash';
-import React, { forwardRef, useMemo } from 'react';
-import { Button, ButtonProps } from '@/components/ui/button';
-import { Method, METHOD, Request } from '@/types/oas';
-
-type Props = {
-  request: Request;
-  label?: string;
-} & ButtonProps;
-
-const Action = forwardRef<HTMLButtonElement, Props>(
-  ({ request, label, ...rest }, ref) => {
-    return (
-      <Button variant="ghost" ref={ref} {...rest}>
-        <ActionIcon method={request.method} className="h-4 w-4" />
-        {label}
-      </Button>
-    );
-  }
-);
-
-Action.displayName = 'Action';
-export default Action;
+import {
+  DownloadIcon,
+  PencilIcon,
+  PlusIcon,
+  TrashIcon,
+  ListIcon,
+  InfoIcon,
+  PencilRulerIcon,
+  BugIcon,
+} from 'lucide-react';
+import React, { useMemo } from 'react';
+import { Method, METHOD } from '@/types/oas';
 
 export const ActionIcon: React.FC<{
   className?: string;
   method: Method;
 }> = ({ className, method }) => {
-  const Icon = useMemo<IconType>(() => {
+  const Icon = useMemo(() => {
     switch (method) {
       case METHOD.GET:
-        return BiDownvote;
+        return DownloadIcon;
       case METHOD.PUT:
-        return BiEdit;
+        return PencilIcon;
       case METHOD.POST:
-        return BiAddToQueue;
+        return PlusIcon;
       case METHOD.DELETE:
-        return BiTrash;
+        return TrashIcon;
       case METHOD.OPTIONS:
-        return BiSticker;
+        return ListIcon;
       case METHOD.HEAD:
-        return BiHeadphone;
+        return InfoIcon;
       case METHOD.PATCH:
-        return BiBandAid;
+        return PencilRulerIcon;
       case METHOD.TRACE:
-        return BiTestTube;
+        return BugIcon;
     }
   }, [method]);
   return <Icon className={className} />;
