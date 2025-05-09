@@ -65,16 +65,12 @@ const Item: React.FC<Props> = ({ group }) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem onSelect={handleUpClick}>
-              <>
-                <ArrowUpIcon />
-                {t('moveUpButtonLabel')}
-              </>
+              <ArrowUpIcon />
+              {t('moveUpButtonLabel')}
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={handleDownClick}>
-              <>
-                <ArrowDownIcon />
-                {t('moveDownButtonLabel')}
-              </>
+              <ArrowDownIcon />
+              {t('moveDownButtonLabel')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
