@@ -43,11 +43,7 @@ const Add: React.FC<Props> = ({ onAdd }) => {
   );
   const form = useForm<EndpointGroup & { manual?: string }>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      id: '',
-      name: '',
-      description: '',
-    },
+
     shouldUnregister: true,
   });
   const { handleSubmit: _handleSubmit, setError, clearErrors } = form;
