@@ -110,9 +110,11 @@ const Tree: React.FC<{
   onSelect: (pageId: PageId) => void;
   selectedPageId?: string;
 }> = ({ pages, item, onSelect, selectedPageId }) => {
-  const page = pages?.find((p) => p.id === item);
-
+  // If the item is a string, it means it's a page id. We can find the leaf page from the pages array.
   if (typeof item === 'string') {
+    const page = pages.find((p) => p.id === item);
+    // Normally, the page should be found, but if not, we can simply return the item as a fallback.
+    const title = page?.title || item;
     return (
       <SidebarMenuButton
         className="data-[active=true]:bg-transparent"
@@ -121,11 +123,12 @@ const Tree: React.FC<{
         }}
         isActive={selectedPageId === page?.id}
       >
-        {item}
+        {title}
       </SidebarMenuButton>
     );
   }
 
+  // If the item is an object, it means it's a group. We need to render the group and its children.
   return (
     <SidebarMenuItem>
       <Collapsible
