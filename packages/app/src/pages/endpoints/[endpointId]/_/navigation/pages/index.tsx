@@ -117,7 +117,6 @@ const Tree: React.FC<{
     const title = page?.title || item;
     return (
       <SidebarMenuButton
-        className="data-[active=true]:bg-transparent"
         onClick={() => {
           page?.id && onSelect(page.id);
         }}
