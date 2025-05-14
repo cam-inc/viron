@@ -57,9 +57,11 @@ const Body: React.FC<Props> = ({ className }) => {
               <AccordionItem key={item.group.id} value={item.group.id}>
                 <AccordionTrigger>{item.group.name}</AccordionTrigger>
                 <AccordionContent className="space-y-4">
-                  <p className="text-sm text-muted-foreground">
-                    {item.group.description}
-                  </p>
+                  {item.group.description && (
+                    <p className="text-sm text-muted-foreground">
+                      {item.group.description}
+                    </p>
+                  )}
                   <EndpointList list={item.list} groupId={item.group.id} />
                 </AccordionContent>
               </AccordionItem>

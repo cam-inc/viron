@@ -37,7 +37,10 @@ const Add: React.FC<Props> = ({ onAdd }) => {
       z.object({
         id: z.string().min(1),
         name: z.string().min(1),
-        description: z.string().optional(),
+        description: z.preprocess(
+          (v) => (typeof v === 'string' && v.trim() === '' ? undefined : v),
+          z.string().optional()
+        ),
       }),
     []
   );
