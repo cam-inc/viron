@@ -35,15 +35,19 @@ const Add: React.FC<Props> = ({ onAdd }) => {
   const schema = useMemo(
     () =>
       z.object({
-        id: z.string(),
-        name: z.string(),
+        id: z.string().min(1),
+        name: z.string().min(1),
         description: z.string().optional(),
       }),
     []
   );
   const form = useForm<EndpointGroup & { manual?: string }>({
     resolver: zodResolver(schema),
-
+    defaultValues: {
+      id: '',
+      name: '',
+      description: '',
+    },
     shouldUnregister: true,
   });
   const { handleSubmit: _handleSubmit, setError, clearErrors } = form;
