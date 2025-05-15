@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { useMemo } from 'react';
-import { BaseError, getHTTPError, NetworkError } from '~/errors';
-import { Endpoint } from '~/types';
+import { BaseError, getHTTPError, NetworkError } from '@/errors';
+import { Endpoint } from '@/types';
 import {
   Document,
   Info,
@@ -9,8 +9,8 @@ import {
   OperationId,
   Request,
   RequestValue,
-} from '~/types/oas';
-import { promiseErrorHandler } from '~/utils';
+} from '@/types/oas';
+import { promiseErrorHandler } from '@/utils';
 import {
   extractRequest,
   extractParameters,
@@ -19,7 +19,7 @@ import {
   constructRequestInit,
   constructRequestPayloads,
   getContentBaseOperationResponseKeys,
-} from '~/utils/oas';
+} from '@/utils/oas';
 
 export type UseDescendantsReturn = {
   request: Request;

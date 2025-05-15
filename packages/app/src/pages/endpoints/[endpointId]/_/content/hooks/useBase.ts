@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { BaseError, getHTTPError, NetworkError } from '~/errors';
-import { Endpoint } from '~/types';
+import { BaseError, getHTTPError, NetworkError } from '@/errors';
+import { Endpoint } from '@/types';
 import {
   Document,
   Content,
@@ -9,8 +9,8 @@ import {
   Request as RequestType,
   RequestValue,
   TableColumn,
-} from '~/types/oas';
-import { promiseErrorHandler } from '~/utils';
+} from '@/types/oas';
+import { promiseErrorHandler } from '@/utils';
 import {
   extractRequest,
   cleanupRequestValue,
@@ -18,7 +18,7 @@ import {
   constructRequestInit,
   constructRequestPayloads,
   extractTableColumns,
-} from '~/utils/oas';
+} from '@/utils/oas';
 import useAutoRefresh from './useAutoRefresh';
 
 export type UseBaseReturn = {

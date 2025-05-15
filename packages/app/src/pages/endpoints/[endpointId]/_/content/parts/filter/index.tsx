@@ -1,14 +1,25 @@
-import React, { useCallback } from 'react';
-import Button, { Props as ButtonProps } from '~/components/button';
-import Head from '~/components/head';
-import BulbOutlineIcon from '~/components/icon/bulb/outline';
-import BulbSolidIcon from '~/components/icon/bulb/solid';
-import FilterOutlineIcon from '~/components/icon/filter/outline';
-import FilterSolidIcon from '~/components/icon/filter/solid';
-import Drawer, { useDrawer } from '~/portals/drawer';
-import Popover, { usePopover } from '~/portals/popover';
-import { COLOR_SYSTEM } from '~/types';
-import { Document, Content } from '~/types/oas';
+import {
+  FunnelIcon,
+  FunnelPlusIcon,
+  LightbulbIcon,
+  LightbulbOffIcon,
+} from 'lucide-react';
+import React, { useCallback, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { Document, Content } from '@/types/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
 
 export type Props = {
@@ -17,23 +28,10 @@ export type Props = {
   base: UseBaseReturn;
 };
 const Filter: React.FC<Props> = ({ base }) => {
-  const popover = usePopover<HTMLDivElement>();
-  const handleMouseEnter = useCallback(() => {
-    popover.open();
-  }, [popover]);
-  const handleMouseLeave = useCallback(() => {
-    popover.close();
-  }, [popover]);
+  const [open, setOpen] = useState(false);
 
-  const drawer = useDrawer();
-  const handleButtonClick = useCallback<
-    ButtonProps['onClick'] | ButtonProps['onClick']
-  >(() => {
-    drawer.open();
-  }, [drawer]);
-
-  const handleItemClick = useCallback<ButtonProps<string>['onClick']>(
-    (key) => {
+  const handleItemClick = useCallback(
+    (key: string) => {
       if (!base.filter.enabled) {
         return;
       }
@@ -43,79 +41,77 @@ const Filter: React.FC<Props> = ({ base }) => {
   );
 
   const handleApplyClick = useCallback(() => {
-    drawer.close();
-  }, [drawer]);
+    setOpen(false);
+  }, []);
 
   if (!base.filter.enabled) {
     return null;
   }
 
   return (
-    <>
-      <div
-        ref={popover.targetRef}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        {base.filter.filtered ? (
-          <Button
-            cs={COLOR_SYSTEM.PRIMARY}
-            Icon={FilterSolidIcon}
-            onClick={handleButtonClick}
-          />
-        ) : (
-          <Button
-            variant="text"
-            on={COLOR_SYSTEM.SURFACE}
-            Icon={FilterOutlineIcon}
-            onClick={handleButtonClick}
-          />
-        )}
-      </div>
-      <Drawer {...drawer.bind}>
-        <div className="h-full flex flex-col text-thm-on-surface">
-          {/* Head */}
-          <div className="flex-none p-2 border-b-2 border-thm-on-surface-faint">
-            <Head
-              on={COLOR_SYSTEM.SURFACE}
-              title="Filter"
-              description="Select items to show."
-            />
-          </div>
-          {/* Body */}
-          <div className="flex-1 min-h-0 flex flex-col">
-            <div className="px-2 pb-2 flex-1 min-h-0 overflow-y-scroll overscroll-y-contain">
-              <ul className="space-y-2">
-                {base.filter.list.map((item) => (
-                  <li key={item.key}>
-                    <Button<string>
-                      variant="text"
-                      className="block w-full"
-                      on={COLOR_SYSTEM.SURFACE}
-                      data={item.key}
-                      label={item.name}
-                      Icon={item.isActive ? BulbSolidIcon : BulbOutlineIcon}
-                      onClick={handleItemClick}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          {/* Tail */}
-          <div className="flex-none flex justify-end p-2 border-t-2 border-thm-on-surface-faint">
-            <Button
-              cs={COLOR_SYSTEM.PRIMARY}
-              label="Apply"
-              onClick={handleApplyClick}
-            />
+    <Sheet open={open} onOpenChange={setOpen}>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {base.filter.filtered ? (
+              <Button
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() => setOpen(true)}
+              >
+                <FunnelPlusIcon className="h-4 w-4" />
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                className="h-8 w-8"
+                onClick={() => setOpen(true)}
+              >
+                <FunnelIcon className="h-4 w-4" />
+              </Button>
+            )}
+          </TooltipTrigger>
+          <TooltipContent>Filter</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Filter</SheetTitle>
+          <SheetDescription>Select items to show.</SheetDescription>
+        </SheetHeader>
+        {/* Body */}
+        <div className="flex-1 min-h-0 flex flex-col">
+          <div className="px-2 py-2 flex-1 min-h-0 overflow-y-scroll overscroll-y-contain">
+            <ul className="space-y-2">
+              {base.filter.list.map((item) => (
+                <li key={item.key}>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-2"
+                    onClick={() => {
+                      handleItemClick(item.key);
+                    }}
+                  >
+                    {item.isActive ? (
+                      <LightbulbIcon className="h-4 w-4" />
+                    ) : (
+                      <LightbulbOffIcon className="h-4 w-4" />
+                    )}
+                    {item.name}
+                  </Button>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
-      </Drawer>
-      <Popover {...popover.bind}>
-        <div className="text-on-surface">Filter</div>
-      </Popover>
-    </>
+        {/* Tail */}
+        <div className="flex-none flex justify-end p-2 border-t-2 border-border">
+          <Button variant="default" onClick={handleApplyClick}>
+            Apply
+          </Button>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 };
 export default Filter;

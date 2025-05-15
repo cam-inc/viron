@@ -1,10 +1,10 @@
 import _ from 'lodash';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FieldError, UseFormReturn } from 'react-hook-form';
-import { ENVIRONMENTAL_VARIABLE } from '~/constants';
-import { Endpoint } from '~/types';
-import { Document, Schema, RequestParametersValue } from '~/types/oas';
-import { promiseErrorHandler } from '~/utils';
+import { ENVIRONMENTAL_VARIABLE } from '@/constants';
+import { Endpoint } from '@/types';
+import { Document, Schema, RequestParametersValue } from '@/types/oas';
+import { promiseErrorHandler } from '@/utils';
 import {
   extractXAutocomplete,
   extractRequest,
@@ -13,7 +13,7 @@ import {
   constructRequestInfo,
   constructRequestInit,
   constructRequestPayloads,
-} from '~/utils/oas';
+} from '@/utils/oas';
 
 export type UseActiveReturn = {
   isActive: boolean;

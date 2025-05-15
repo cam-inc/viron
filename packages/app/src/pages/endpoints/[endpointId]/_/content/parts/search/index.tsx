@@ -1,11 +1,21 @@
-import React, { useCallback } from 'react';
-import Button, { Props as ButtonProps } from '~/components/button';
-import SearchIcon from '~/components/icon/search/outline';
-import Request from '~/components/request';
-import Drawer, { useDrawer } from '~/portals/drawer';
-import Popover, { usePopover } from '~/portals/popover';
-import { COLOR_SYSTEM, Endpoint } from '~/types';
-import { Document, RequestValue } from '~/types/oas';
+import { SearchIcon } from 'lucide-react';
+import React, { useCallback, useState } from 'react';
+import Request from '@/components/request';
+import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { Endpoint } from '@/types';
+import { Document, RequestValue } from '@/types/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
 
 export type Props = {
@@ -14,44 +24,36 @@ export type Props = {
   base: UseBaseReturn;
 };
 const Search: React.FC<Props> = ({ endpoint, document, base }) => {
-  const drawer = useDrawer();
-  const handleButtonClick = useCallback<ButtonProps['onClick']>(() => {
-    drawer.open();
-  }, [drawer]);
-
+  const [open, setOpen] = useState(false);
   const handleRequestSubmit = useCallback(
     (requestValue: RequestValue) => {
-      drawer.close();
+      setOpen(false);
       base.fetch(requestValue);
     },
-    [drawer, base]
+    [base]
   );
 
-  const popover = usePopover<HTMLDivElement>();
-  const handleMouseEnter = useCallback(() => {
-    popover.open();
-  }, [popover]);
-  const handleMouseLeave = useCallback(() => {
-    popover.close();
-  }, [popover]);
-
   return (
-    <>
-      <div
-        ref={popover.targetRef}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        <Button
-          variant="text"
-          on={COLOR_SYSTEM.SURFACE}
-          Icon={SearchIcon}
-          onClick={handleButtonClick}
-        />
-      </div>
-      <Drawer {...drawer.bind}>
+    <Sheet open={open} onOpenChange={setOpen}>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              className="h-8 w-8"
+              onClick={() => setOpen(true)}
+            >
+              <SearchIcon className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Search</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Search</SheetTitle>
+        </SheetHeader>
         <Request
-          on={COLOR_SYSTEM.SURFACE}
           endpoint={endpoint}
           document={document}
           request={base.request}
@@ -59,11 +61,8 @@ const Search: React.FC<Props> = ({ endpoint, document, base }) => {
           onSubmit={handleRequestSubmit}
           className="h-full"
         />
-      </Drawer>
-      <Popover {...popover.bind}>
-        <div className="text-thm-on-surface whitespace-nowrap">Search</div>
-      </Popover>
-    </>
+      </SheetContent>
+    </Sheet>
   );
 };
 export default Search;

@@ -1,14 +1,18 @@
 import classnames from 'classnames';
+import {
+  LightbulbIcon,
+  LightbulbOffIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+  InfoIcon,
+  AlertCircleIcon,
+} from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
-import { Props as BaseProps } from '~/components';
-import Button, { Props as ButtonProps } from '~/components/button';
-import BulbOutlineIcon from '~/components/icon/bulb/outline';
-import BulbSolidIcon from '~/components/icon/bulb/solid';
-import ChevronDownIcon from '~/components/icon/chevronDown/outline';
-import ChevronRightIcon from '~/components/icon/chevronRight/outline';
-import InformationCircleIcon from '~/components/icon/informationCircle/outline';
-import { Schema } from '~/types/oas';
+import { Props as BaseProps } from '@/components';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Schema } from '@/types/oas';
 import { UseActiveReturn, useError } from '../../hooks';
 import Info from '../../parts/info';
 
@@ -25,7 +29,6 @@ export type Props = BaseProps & {
   renderHeadItem?: () => JSX.Element;
 };
 const Container: React.FC<Props> = ({
-  on,
   name,
   schema,
   formState,
@@ -40,20 +43,20 @@ const Container: React.FC<Props> = ({
     return splitted[splitted.length - 1];
   }, [name]);
   const [isOpened, setIsOpened] = useState<boolean>(isActive);
-  const handleArrowClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleArrowClick = useCallback(() => {
     if (!isActive) {
       return;
     }
     setIsOpened(!isOpened);
   }, [isOpened, isActive]);
 
-  const handleBulbClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleBulbClick = useCallback(() => {
     switchActive();
     setIsOpened(!isActive);
   }, [switchActive, isActive]);
 
   const [isInfoOpened, setIsInfoOpened] = useState<boolean>(false);
-  const handleInfoClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleInfoClick = useCallback(() => {
     setIsInfoOpened(!isInfoOpened);
     // open body element when changing to true.
     if (!isInfoOpened) {
@@ -67,32 +70,26 @@ const Container: React.FC<Props> = ({
       //return <AiFillBulb className="inline" />;
     }
     return (
-      <Button
-        variant="text"
-        on={on}
-        Icon={isActive ? BulbSolidIcon : BulbOutlineIcon}
-        onClick={handleBulbClick}
-      />
+      <Button variant="ghost" size="icon" onClick={handleBulbClick}>
+        {isActive ? <LightbulbIcon /> : <LightbulbOffIcon />}
+      </Button>
     );
-  }, [on, required, isActive, handleBulbClick]);
+  }, [required, isActive, handleBulbClick]);
 
   const arrowIcon = useMemo<JSX.Element>(
     () => (
-      <Button
-        variant="text"
-        on={on}
-        Icon={isOpened ? ChevronDownIcon : ChevronRightIcon}
-        onClick={handleArrowClick}
-      />
+      <Button variant="ghost" size="icon" onClick={handleArrowClick}>
+        {isOpened ? <ChevronDownIcon /> : <ChevronRightIcon />}
+      </Button>
     ),
-    [on, isOpened, handleArrowClick]
+    [isOpened, handleArrowClick]
   );
 
   const error = useError({ schema, name, errors: formState.errors });
 
   return (
     <div
-      className={classnames(`flex flex-col gap-2 text-xs text-thm-on-${on}`, {
+      className={classnames(`flex flex-col gap-2 text-xs`, {
         'opacity-25': !isActive,
       })}
     >
@@ -102,19 +99,16 @@ const Container: React.FC<Props> = ({
         {renderHeadItem?.()}
         {activeIcon}
         {isActive && (
-          <Button
-            variant="text"
-            on={on}
-            Icon={InformationCircleIcon}
-            onClick={handleInfoClick}
-          />
+          <Button variant="ghost" size="icon" onClick={handleInfoClick}>
+            <InfoIcon />
+          </Button>
         )}
         <div className="text-sm">{displayName}</div>
         {schema.deprecated && <div className="font-bold">deprecated</div>}
       </div>
       {/* Body */}
       <div
-        className={`flex-1 ml-4 pl-4 border-l border-thm-on-${on}-slight hover:border-thm-on-${on}-low`}
+        className={`flex-1 ml-4 pl-4 border-l border-border hover:border-primary`}
       >
         <div
           className={classnames('space-y-2', {
@@ -122,12 +116,14 @@ const Container: React.FC<Props> = ({
           })}
         >
           {/* Info */}
-          {isInfoOpened && <Info on={on} schema={schema} />}
+          {isInfoOpened && <Info schema={schema} />}
           {/* Error */}
           {error && (
-            <p className="font-bold p-1 bg-thm-error text-thm-on-error">
-              {error.message}
-            </p>
+            <Alert variant="destructive">
+              <AlertCircleIcon className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription> {error.message}</AlertDescription>
+            </Alert>
           )}
           {/* Children */}
           <div>{children}</div>

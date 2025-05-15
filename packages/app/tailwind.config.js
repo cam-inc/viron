@@ -1,137 +1,118 @@
-/** @type {import("@types/tailwindcss/tailwind-config").TailwindConfig } */
-const COLORS = {
-  'thm-primary': 'var(--thm-primary)',
-  'thm-on-primary': 'var(--thm-on-primary)',
-  'thm-on-primary-high': 'var(--thm-on-primary-high)',
-  'thm-on-primary-low': 'var(--thm-on-primary-low)',
-  'thm-on-primary-slight': 'var(--thm-on-primary-slight)',
-  'thm-on-primary-faint': 'var(--thm-on-primary-faint)',
-  'thm-primary-container': 'var(--thm-primary-container)',
-  'thm-on-primary-container': 'var(--thm-on-primary-container)',
-  'thm-on-primary-container-high': 'var(--thm-on-primary-container-high)',
-  'thm-on-primary-container-low': 'var(--thm-on-primary-container-low)',
-  'thm-on-primary-container-slight': 'var(--thm-on-primary-container-slight)',
-  'thm-on-primary-container-faint': 'var(--thm-on-primary-container-faint)',
-  'thm-secondary': 'var(--thm-secondary)',
-  'thm-on-secondary': 'var(--thm-on-secondary)',
-  'thm-on-secondary-high': 'var(--thm-on-secondary-high)',
-  'thm-on-secondary-low': 'var(--thm-on-secondary-low)',
-  'thm-on-secondary-slight': 'var(--thm-on-secondary-slight)',
-  'thm-on-secondary-faint': 'var(--thm-on-secondary-faint)',
-  'thm-secondary-container': 'var(--thm-secondary-container)',
-  'thm-on-secondary-container': 'var(--thm-on-secondary-container)',
-  'thm-on-secondary-container-high': 'var(--thm-on-secondary-container-high)',
-  'thm-on-secondary-container-low': 'var(--thm-on-secondary-container-low)',
-  'thm-on-secondary-container-slight':
-    'var(--thm-on-secondary-container-slight)',
-  'thm-on-secondary-container-faint': 'var(--thm-on-secondary-container-faint)',
-  'thm-tertiary': 'var(--thm-tertiary)',
-  'thm-on-tertiary': 'var(--thm-on-tertiary)',
-  'thm-on-tertiary-high': 'var(--thm-on-tertiary-high)',
-  'thm-on-tertiary-low': 'var(--thm-on-tertiary-low)',
-  'thm-on-tertiary-slight': 'var(--thm-on-tertiary-slight)',
-  'thm-on-tertiary-faint': 'var(--thm-on-tertiary-faint)',
-  'thm-tertiary-container': 'var(--thm-tertiary-container)',
-  'thm-on-tertiary-container': 'var(--thm-on-tertiary-container)',
-  'thm-on-tertiary-container-high': 'var(--thm-on-tertiary-container-high)',
-  'thm-on-tertiary-container-low': 'var(--thm-on-tertiary-container-low)',
-  'thm-on-tertiary-container-slight': 'var(--thm-on-tertiary-container-slight)',
-  'thm-on-tertiary-container-faint': 'var(--thm-on-tertiary-container-faint)',
-  'thm-error': 'var(--thm-error)',
-  'thm-on-error': 'var(--thm-on-error)',
-  'thm-on-error-high': 'var(--thm-on-error-high)',
-  'thm-on-error-low': 'var(--thm-on-error-low)',
-  'thm-on-error-slight': 'var(--thm-on-error-slight)',
-  'thm-on-error-faint': 'var(--thm-on-error-faint)',
-  'thm-error-container': 'var(--thm-error-container)',
-  'thm-on-error-container': 'var(--thm-on-error-container)',
-  'thm-on-error-container-high': 'var(--thm-on-error-container-high)',
-  'thm-on-error-container-low': 'var(--thm-on-error-container-low)',
-  'thm-on-error-container-slight': 'var(--thm-on-error-container-slight)',
-  'thm-on-error-container-faint': 'var(--thm-on-error-container-faint)',
-  'thm-background': 'var(--thm-background)',
-  'thm-on-background': 'var(--thm-on-background)',
-  'thm-on-background-high': 'var(--thm-on-background-high)',
-  'thm-on-background-low': 'var(--thm-on-background-low)',
-  'thm-on-background-slight': 'var(--thm-on-background-slight)',
-  'thm-on-background-faint': 'var(--thm-on-background-faint)',
-  'thm-surface': 'var(--thm-surface)',
-  'thm-on-surface': 'var(--thm-on-surface)',
-  'thm-on-surface-high': 'var(--thm-on-surface-high)',
-  'thm-on-surface-low': 'var(--thm-on-surface-low)',
-  'thm-on-surface-slight': 'var(--thm-on-surface-slight)',
-  'thm-on-surface-faint': 'var(--thm-on-surface-faint)',
-  'thm-surface-variant': 'var(--thm-surface-variant)',
-  'thm-on-surface-variant': 'var(--thm-on-surface-variant)',
-  'thm-on-surface-variant-high': 'var(--thm-on-surface-variant-high)',
-  'thm-on-surface-variant-low': 'var(--thm-on-surface-variant-low)',
-  'thm-on-surface-variant-slight': 'var(--thm-on-surface-variant-slight)',
-  'thm-on-surface-variant-faint': 'var(--thm-on-surface-variant-faint)',
-  'thm-outline': 'var(--thm-outline)',
+// TODO: oas.tsと共通化
+const THEME = {
+  RED: 'red',
+  ULTIMATE_ORANGE: 'ultimate orange',
+  ORANGE_JUICE: 'orange juice',
+  AMBER: 'amber',
+  YELLOW: 'yellow',
+  LIMONCELLO: 'limoncello',
+  RADIUMM: 'radium',
+  HARLEQUIN: 'harlequin',
+  GREEN: 'green',
+  LUCENT_LIME: 'lucent lime',
+  GUPPIE_GREEN: 'guppie green',
+  MINTY_PARADISE: 'minty paradise',
+  AQUA: 'aqua',
+  CAPRI: 'capri',
+  BRESCIAN_BLUE: 'brescian blue',
+  RARE_BLUE: 'rare blue',
+  BLUE: 'blue',
+  ELECTRIC_ULTRAMARINE: 'electric ultramarine',
+  VIOLENT_VIOLET: 'violent violet',
+  ELECTRIC_PURPLE: 'electric purple',
+  MAGENDA: 'magenta',
+  BRUTAL_PINK: 'brutal pink',
+  NEON_ROSE: 'neon rose',
+  ELECTRIC_CRIMSON: 'electric crimson',
 };
 
+/** @type {import("@types/tailwindcss/tailwind-config").TailwindConfig } */
 module.exports = {
+  darkMode: ['class'],
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   safelist: (function () {
-    const keys = Object.keys(COLORS);
-    const PREFIXES = [
-      'bg',
-      'hover:bg',
-      'active:bg',
-      'focus:bg',
-      'group-hover:bg',
-      'group-active:bg',
-      'group-focus:bg',
-      'border',
-      'hover:border',
-      'active:border',
-      'focus:border',
-      'group-hover:border',
-      'group-active:border',
-      'group-focus:border',
-      'text',
-      'hover:text',
-      'active:text',
-      'focus:text',
-      'group-hover:text',
-      'group-active:text',
-      'group-focus:text',
-      'ring',
-      'hover:ring',
-      'active:ring',
-      'focus:ring',
-      'group-hover:ring',
-      'group-active:ring',
-      'group-focus:ring',
-      'divide',
-    ];
-
     const safelist = [];
-    PREFIXES.forEach(function (prefix) {
-      keys.forEach(function (key) {
-        safelist.push(`${prefix}-${key}`);
-      });
+    Object.values(THEME).forEach((theme) => {
+      safelist.push(`theme-${theme.replace(/\s/g, '-')}`);
     });
     return safelist;
   })(),
   theme: {
-    screens: {
-      lg: '640px',
-    },
-    // Utilities by a-z order.
     extend: {
       keyframes: {
-        'move-left-and-back': {
-          '0%': { transform: 'translateX(0)' },
-          '25%': { transform: 'translateX(-6px)' },
-          '100%': { transform: 'translateX(0)' },
+        'accordion-down': {
+          from: {
+            height: '0',
+          },
+          to: {
+            height: 'var(--radix-accordion-content-height)',
+          },
+        },
+        'accordion-up': {
+          from: {
+            height: 'var(--radix-accordion-content-height)',
+          },
+          to: {
+            height: '0',
+          },
         },
       },
       animation: {
-        'spin-slow': 'spin 3s linear infinite',
-        'move-left-and-back': 'move-left-and-back 2s ease-out infinite',
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
       },
-      colors: COLORS,
+      colors: {
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        card: {
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
+        },
+        popover: {
+          DEFAULT: 'hsl(var(--popover))',
+          foreground: 'hsl(var(--popover-foreground))',
+        },
+        primary: {
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
+        },
+        secondary: {
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))',
+        },
+        muted: {
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
+        },
+        accent: {
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
+        },
+        destructive: {
+          DEFAULT: 'hsl(var(--destructive))',
+          foreground: 'hsl(var(--destructive-foreground))',
+        },
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
+        chart: {
+          1: 'hsl(var(--chart-1))',
+          2: 'hsl(var(--chart-2))',
+          3: 'hsl(var(--chart-3))',
+          4: 'hsl(var(--chart-4))',
+          5: 'hsl(var(--chart-5))',
+        },
+        sidebar: {
+          DEFAULT: 'hsl(var(--sidebar-background))',
+          foreground: 'hsl(var(--sidebar-foreground))',
+          primary: 'hsl(var(--sidebar-primary))',
+          'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+          accent: 'hsl(var(--sidebar-accent))',
+          'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+          border: 'hsl(var(--sidebar-border))',
+          ring: 'hsl(var(--sidebar-ring))',
+        },
+      },
       fontSize: {
         em: '1em',
         xxs: ['0.625rem', '1rem'],
@@ -157,7 +138,6 @@ module.exports = {
         '75%': '75%',
       },
       spacing: {
-        em: '1em',
         15: '3.75rem',
         17: '4.25rem',
         18: '4.5rem',
@@ -186,24 +166,21 @@ module.exports = {
         49: '12.25rem',
         50: '12.5rem',
         51: '12.75rem',
+        em: '1em',
       },
       zIndex: {
         splash: 11,
-        'wrapper-progress': 10,
-        'wrapper-notification': 9,
-        'wrapper-popover': 8,
-        'wrapper-modal': 7,
-        'wrapper-drawer': 6,
-        'layout-systembar': 5,
-        'layout-navigation': 4,
-        'layout-appbar': 3,
-        'layout-subbody': 2,
-        'layout-body': 1,
+      },
+      borderRadius: {
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
       },
     },
   },
   plugins: [
     require('@tailwindcss/aspect-ratio'),
     require('@tailwindcss/container-queries'),
+    require('tailwindcss-animate'),
   ],
 };

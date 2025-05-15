@@ -1,18 +1,58 @@
-import React, { useCallback, useMemo } from 'react';
-import Button, { Props as ButtonProps } from '~/components/button';
-import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/outline';
-import Table, { Props as TableProps } from '~/components/table';
-import Popover, { usePopover } from '~/portals/popover';
-import { COLOR_SYSTEM, Endpoint } from '~/types';
-import { Document, Content, SORT, Sort } from '~/types/oas';
+import {
+  CircleEllipsisIcon,
+  ChevronRightIcon,
+  ChevronDownIcon,
+  ClipboardCopyIcon,
+  ArrowDownUpIcon,
+  ArrowDownAZIcon,
+  ArrowUpZAIcon,
+} from 'lucide-react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Props as BaseProps } from '@/components';
+import Request from '@/components/request';
+import Cell from '@/components/table/cell';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { BaseError } from '@/errors';
+import { Endpoint } from '@/types';
+import {
+  Document,
+  Content,
+  SORT,
+  Sort,
+  TableColumn,
+  Schema,
+  RequestValue,
+} from '@/types/oas';
 import {
   extractTableColumns,
   getTableRows,
   mergeTableSortRequestValue,
-} from '~/utils/oas';
+} from '@/utils/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
 import { UseDescendantsReturn } from '../../hooks/useDescendants';
-import Descendant, { Props as DescendantProps } from '../../parts/descendant';
+import { ActionIcon } from '../../parts/action';
+
+type Data = Record<string, any>;
 
 type Props = {
   endpoint: Endpoint;
@@ -20,8 +60,8 @@ type Props = {
   content: Content;
   base: UseBaseReturn;
   descendants: UseDescendantsReturn;
-  onDescendantOperationSuccess: DescendantProps['onOperationSuccess'];
-  onDescendantOperationFail: DescendantProps['onOperationFail'];
+  onDescendantOperationSuccess: OperationsProps['onOperationSuccess'];
+  onDescendantOperationFail: OperationsProps['onOperationFail'];
   sortState: [
     Record<string, Sort>,
     React.Dispatch<React.SetStateAction<Record<string, Sort>>>
@@ -38,7 +78,7 @@ const ContentTable: React.FC<Props> = ({
   sortState,
 }) => {
   const [sorts, setSorts] = sortState;
-  const columns = useMemo<TableProps['columns']>(() => {
+  const columns = useMemo<TableColumn[]>(() => {
     const extractTableColumnsResult = extractTableColumns(document, content);
     if (extractTableColumnsResult.isFailure()) {
       return [];
@@ -57,12 +97,12 @@ const ContentTable: React.FC<Props> = ({
       });
   }, [document, content, base, sorts]);
 
-  const dataSource = useMemo<TableProps['dataSource']>(
+  const dataSource = useMemo<Data[]>(
     () => getTableRows(document, content, base.data),
     [document, content, base]
   );
 
-  const renderActions = useCallback<NonNullable<TableProps['renderActions']>>(
+  const renderActions = useCallback<NonNullable<(data: Data) => JSX.Element>>(
     (data) => {
       return (
         <Operations
@@ -84,10 +124,8 @@ const ContentTable: React.FC<Props> = ({
     ]
   );
 
-  const handleRequestSortChange = useCallback<
-    NonNullable<TableProps['onRequestSortChange']>
-  >(
-    (key, sort) => {
+  const handleRequestSortChange = useCallback(
+    (key: TableColumn['key'], sort: Sort) => {
       const newSorts = {
         ...sorts,
         [key]: sort,
@@ -105,26 +143,119 @@ const ContentTable: React.FC<Props> = ({
   );
 
   return (
-    <>
-      <Table
-        on={COLOR_SYSTEM.BACKGROUND}
-        columns={columns}
-        dataSource={dataSource}
-        renderActions={descendants.length ? renderActions : undefined}
-        onRequestSortChange={handleRequestSortChange}
-      />
-    </>
+    <div className="border-b border-x">
+      <div className="overflow-x-auto">
+        <Table className="relative">
+          <TableHeader>
+            <TableRow>
+              {columns.map((column) => {
+                if (!column.isSortable) {
+                  return <TableHead key={column.key}>{column.name}</TableHead>;
+                }
+                return (
+                  <TableHead key={column.key}>
+                    <Button
+                      variant="ghost"
+                      className="flex items-center gap-2"
+                      onClick={() => {
+                        switch (column.sort) {
+                          case SORT.ASC:
+                            handleRequestSortChange(column.key, SORT.DESC);
+                            break;
+                          case SORT.DESC:
+                            handleRequestSortChange(column.key, SORT.NONE);
+                            break;
+                          case SORT.NONE:
+                            handleRequestSortChange(column.key, SORT.ASC);
+                            break;
+                          default:
+                            break;
+                        }
+                      }}
+                    >
+                      <span>{column.name}</span>
+                      {column.sort === SORT.NONE && (
+                        <ArrowDownUpIcon className="size-4 text-muted-foreground" />
+                      )}
+                      {column.sort === SORT.ASC && (
+                        <ArrowDownAZIcon className="size-4" />
+                      )}
+                      {column.sort === SORT.DESC && (
+                        <ArrowUpZAIcon className="size-4" />
+                      )}
+                    </Button>
+                  </TableHead>
+                );
+              })}
+              {0 < descendants.length && (
+                <TableHead className="text-right sticky right-0 bg-background" />
+              )}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {dataSource.map((data, rowIndex) => (
+              <TableBodyRow
+                key={rowIndex}
+                columns={columns}
+                data={data}
+                descendants={descendants}
+                renderActions={renderActions}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   );
 };
 export default ContentTable;
+
+const TableBodyRow: React.FC<{
+  columns: TableColumn[];
+  data: Data;
+  descendants: UseDescendantsReturn;
+  renderActions: NonNullable<(data: Data) => JSX.Element>;
+}> = ({ columns, data, descendants, renderActions }) => {
+  const [dateSheetOpen, setDateSheetOpen] = useState(false);
+  return (
+    <>
+      <TableRow
+        className="cursor-pointer"
+        onClick={() => setDateSheetOpen(true)}
+      >
+        {columns.map((column) => (
+          <TableCell key={column.key} className="max-w-[400px]">
+            <Cell schema={column.schema} value={data[column.key]} />
+          </TableCell>
+        ))}
+        {0 < descendants.length && (
+          <TableCell
+            className="text-right sticky right-0 bg-background"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {renderActions(data)}
+          </TableCell>
+        )}
+      </TableRow>
+      <Sheet open={dateSheetOpen} onOpenChange={setDateSheetOpen}>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle>Data</SheetTitle>
+          </SheetHeader>
+          <RowData rowData={data} columns={columns} />
+        </SheetContent>
+      </Sheet>
+    </>
+  );
+};
 
 type OperationsProps = {
   endpoint: Endpoint;
   document: Document;
   descendants: UseDescendantsReturn;
-  data: DescendantProps['data'];
-  onOperationSuccess: DescendantProps['onOperationSuccess'];
-  onOperationFail: DescendantProps['onOperationFail'];
+  data: any;
+  onOperationSuccess: (data: any) => void;
+  onOperationFail: (error: BaseError) => void;
 };
 const Operations: React.FC<OperationsProps> = ({
   endpoint,
@@ -134,47 +265,206 @@ const Operations: React.FC<OperationsProps> = ({
   onOperationSuccess,
   onOperationFail,
 }) => {
-  const popover = usePopover<HTMLDivElement>();
-  const handleButtonClick = useCallback<ButtonProps['onClick']>(
-    (_, event) => {
-      event?.stopPropagation();
-      popover.open();
+  const [selectedDescendant, setSelectedDescendant] =
+    useState<UseDescendantsReturn[number]>();
+  const [isPending, setIsPending] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
+
+  const handleRequestSubmit = useCallback(
+    async (requestValue: RequestValue) => {
+      if (!selectedDescendant) {
+        return;
+      }
+      setOpen(false);
+      setIsPending(true);
+      const { data, error } = await selectedDescendant.fetch(requestValue);
+      setIsPending(false);
+      if (data) {
+        onOperationSuccess(data);
+      }
+      if (error) {
+        onOperationFail(error);
+      }
     },
-    [popover]
+    [selectedDescendant, onOperationSuccess, onOperationFail]
   );
-  const handleDescendantClick = useCallback<
-    NonNullable<DescendantProps['onClick']>
-  >(() => {
-    popover.hide();
-  }, [popover]);
+
+  function getLabel(descendant: UseDescendantsReturn[number]): string {
+    const { operation } = descendant.request;
+    if (operation.summary) {
+      return operation.summary;
+    }
+    return operation.operationId || descendant.request.method;
+  }
 
   return (
     <>
-      <div ref={popover.targetRef}>
-        <Button
-          variant="text"
-          on={COLOR_SYSTEM.SURFACE}
-          Icon={DotsCircleHorizontalIcon}
-          onClick={handleButtonClick}
-        />
-      </div>
-      <Popover {...popover.bind}>
-        <ul>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8">
+            <CircleEllipsisIcon className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
           {descendants.map((descendant, idx) => (
-            <li key={idx}>
-              <Descendant
+            <DropdownMenuItem
+              key={idx}
+              onSelect={() => {
+                setSelectedDescendant(descendant);
+                setOpen(true);
+              }}
+              disabled={isPending}
+            >
+              <ActionIcon method={descendant.request.method} />
+              {getLabel(descendant)}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent>
+          {selectedDescendant && (
+            <>
+              <SheetHeader>
+                <SheetTitle>{getLabel(selectedDescendant)}</SheetTitle>
+              </SheetHeader>
+              <Request
                 endpoint={endpoint}
                 document={document}
-                descendant={descendant}
-                data={data}
-                onOperationSuccess={onOperationSuccess}
-                onOperationFail={onOperationFail}
-                onClick={handleDescendantClick}
+                request={selectedDescendant.request}
+                defaultValues={selectedDescendant.getDefaultValues(data)}
+                onSubmit={handleRequestSubmit}
+                className="h-full"
               />
-            </li>
-          ))}
-        </ul>
-      </Popover>
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
     </>
+  );
+};
+
+const RowData: React.FC<
+  BaseProps & {
+    rowData: Data;
+    columns: TableColumn[];
+  }
+> = ({ rowData, columns }) => {
+  return (
+    <div className="px-10 py-10 flex flex-col h-full w-full">
+      <div className="flex-1 overflow-scroll space-y-10">
+        {Object.keys(rowData).map((objectKey, index) => (
+          <Accordion
+            key={index}
+            schema={columns.find((column) => column.key === objectKey)?.schema}
+            data={rowData}
+            objectKey={objectKey}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const Accordion: React.FC<
+  BaseProps & {
+    schema?: Schema;
+    data: Data;
+    objectKey: string;
+  }
+> = ({ schema, data, objectKey }) => {
+  const [isOpened, setIsOpened] = useState<boolean>(true);
+  const handleCopyClick = useCallback(() => {
+    globalThis.navigator.clipboard.writeText(data[objectKey]);
+  }, [data, objectKey]);
+
+  const displayValue = (value: string | number | boolean) => {
+    switch (typeof value) {
+      case 'string':
+        return value;
+      case 'number':
+        return value.toLocaleString();
+      case 'boolean':
+        return String(value).toUpperCase();
+    }
+  };
+
+  const previewValue = (value: string | number | boolean) => {
+    switch (schema?.format) {
+      case 'uri-image':
+        return (
+          <>
+            {typeof value === 'string' && (
+              <div className="size-96">
+                <img
+                  className="block size-full object-contain"
+                  src={value}
+                  alt={objectKey}
+                />
+              </div>
+            )}
+          </>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div>
+      <div className="inline-flex items-center gap-1 whitespace-nowrap">
+        <Button
+          variant="ghost"
+          className="mr-0 ml-auto"
+          onClick={() => {
+            setIsOpened((prev) => !prev);
+          }}
+        >
+          {isOpened ? (
+            <ChevronDownIcon className="h-4 w-4" />
+          ) : (
+            <ChevronRightIcon className="h-4 w-4" />
+          )}
+        </Button>
+        <div className="text-sm">
+          <span className="font-bold">{objectKey}</span>
+          {schema?.description && (
+            <span className="ml-2 text-muted-foreground">
+              {schema.description}
+            </span>
+          )}
+        </div>
+      </div>
+      {isOpened && (
+        <div className="ml-5 pl-4 border-l border-border flex flex-col items-start space-y-4">
+          {data[objectKey] && typeof data[objectKey] === 'object' ? (
+            Object.keys(data[objectKey]).map((childObjectKey, index) => (
+              <Accordion
+                key={index}
+                schema={schema?.properties?.[childObjectKey]}
+                data={data[objectKey]}
+                objectKey={childObjectKey}
+              />
+            ))
+          ) : (
+            <>
+              <div className="bg-muted/50 rounded-lg px-2.5 p-3 inline-flex items-center whitespace-nowrap mr-5">
+                <span className="mr-2 text-xs">
+                  {displayValue(data[objectKey])}
+                </span>
+                <Button
+                  variant="ghost"
+                  className="mr-0 ml-auto"
+                  onClick={handleCopyClick}
+                >
+                  <ClipboardCopyIcon className="h-4 w-4" />
+                </Button>
+              </div>
+              {previewValue(data[objectKey])}
+            </>
+          )}
+        </div>
+      )}
+    </div>
   );
 };

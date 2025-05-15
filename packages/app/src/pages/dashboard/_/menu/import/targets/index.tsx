@@ -1,16 +1,15 @@
 import classnames from 'classnames';
+import {
+  CircleArrowDownIcon,
+  CircleCheckIcon,
+  AlertTriangleIcon,
+  Loader2Icon,
+} from 'lucide-react';
 import React, { useCallback, useState } from 'react';
-import { SIZE as BUTTON_SIZE } from '~/components/button';
-import Button, { Props as ButtonProps } from '~/components/button';
-import Head from '~/components/head';
-import ArrowCircleDownIcon from '~/components/icon/arrowCircleDown/outline';
-import CheckCircleIcon from '~/components/icon/checkCircle/outline';
-import ColorSwatchIcon from '~/components/icon/colorSwatch/outline';
-import ExclamationIcon from '~/components/icon/exclamation/outline';
-import Spinner from '~/components/spinner';
-import { BaseError } from '~/errors';
-import { useEndpoint } from '~/hooks/endpoint';
-import { COLOR_SYSTEM, Endpoint, EndpointGroup } from '~/types';
+import { Button } from '@/components/ui/button';
+import { BaseError } from '@/errors';
+import { useEndpoint } from '@/hooks/endpoint';
+import { Endpoint, EndpointGroup } from '@/types';
 
 export type Props = {
   endpointList: Endpoint[];
@@ -18,28 +17,24 @@ export type Props = {
 };
 const Targets: React.FC<Props> = ({ endpointList }) => {
   return (
-    <div>
-      <Head
-        on={COLOR_SYSTEM.BACKGROUND}
-        title={
-          <div className="flex items-center gap-2">
-            <ColorSwatchIcon className="w-em" />
-            <div>Import Endpoints</div>
-          </div>
-        }
-        description="Click import button to add an endpoint into your dashboard."
-      />
-      <ul className="flex flex-col">
-        {endpointList.map((endpoint, idx) => (
-          <li
-            key={idx}
-            className="py-4 border-b last:border-b-0 border-dotted border-thm-on-surface-slight"
-          >
-            <Target endpoint={endpoint} />
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ul className="flex flex-col">
+      {endpointList.map((endpoint, idx) => (
+        <li
+          key={idx}
+          className="py-4 border-b last:border-b-0 border-dotted border-border"
+        >
+          <Target endpoint={endpoint} />
+        </li>
+      ))}
+      {endpointList.map((endpoint, idx) => (
+        <li
+          key={idx}
+          className="py-4 border-b last:border-b-0 border-dotted border-border"
+        >
+          <Target endpoint={endpoint} />
+        </li>
+      ))}
+    </ul>
   );
 };
 export default Targets;
@@ -52,7 +47,7 @@ const Target: React.FC<{
   const [error, setError] = useState<BaseError | null>(null);
   const { connect, addEndpoint } = useEndpoint();
 
-  const handleImportClick = useCallback<ButtonProps['onClick']>(async () => {
+  const handleImportClick = useCallback(async () => {
     if (isPending || isDone) {
       return;
     }
@@ -71,44 +66,35 @@ const Target: React.FC<{
   }, [isPending, isDone, connect, addEndpoint, endpoint]);
 
   return (
-    <div className="flex items-center gap-4 border-l-4 border-thm-primary pl-4">
+    <div className="flex items-center gap-4 border-l-4 border-primary pl-4">
       <div className="flex-1 flex flex-col gap-1">
-        <div className="text-sm text-thm-on-surface">{endpoint.id}</div>
-        <div className="text-xs text-thm-on-surface-low">{endpoint.url}</div>
+        <div className="text-sm">{endpoint.id}</div>
+        <div className="text-xs text-muted-foreground">{endpoint.url}</div>
       </div>
       <div className="flex-none">
         {isDone ? (
           <div
-            className={classnames(
-              'flex items-center gap-2 text-thm-on-surface-low',
-              {
-                'text-thm-on-surface-low': error,
-                'text-thm-on-surface': !error,
-              }
-            )}
+            className={classnames('flex items-center gap-2', {
+              'text-muted-foreground': error,
+            })}
           >
             <div>
               {error ? (
-                <ExclamationIcon className="w-8" />
+                <AlertTriangleIcon className="w-8" />
               ) : (
-                <CheckCircleIcon className="w-8" />
+                <CircleCheckIcon className="w-8" />
               )}
             </div>
           </div>
         ) : (
-          <>
+          <Button disabled={isPending} onClick={handleImportClick}>
             {isPending ? (
-              <Spinner className="w-4" on={COLOR_SYSTEM.SURFACE} />
+              <Loader2Icon className="animate-spin" />
             ) : (
-              <Button
-                cs={COLOR_SYSTEM.PRIMARY}
-                label="Import"
-                Icon={ArrowCircleDownIcon}
-                size={BUTTON_SIZE.XS}
-                onClick={handleImportClick}
-              />
+              <CircleArrowDownIcon />
             )}
-          </>
+            Import
+          </Button>
         )}
       </div>
     </div>
