@@ -5,3 +5,4 @@ export const email = z.string().email();
 // TODO: Support localhost.
 //export const url = z.string().url();
 export const url = z.string().min(1);
+export const groupId = z.string().optional();

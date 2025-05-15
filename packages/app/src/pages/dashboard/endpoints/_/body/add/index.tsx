@@ -25,7 +25,7 @@ import { Select, SelectItem } from '@/components/ui/select';
 import { useEndpoint } from '@/hooks/endpoint';
 import { useTranslation } from '@/hooks/i18n';
 import { Endpoint } from '@/types';
-import { endpointId, url } from '@/utils/v8n';
+import { endpointId, url, groupId } from '@/utils/v8n';
 
 const FORM_ID = 'add-endpoint-form';
 
@@ -41,6 +41,7 @@ const AddEndpoint: React.FC<Props> = ({ onAdd }) => {
       z.object({
         id: endpointId,
         url: url,
+        groupId: groupId,
       }),
     []
   );

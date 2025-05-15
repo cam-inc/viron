@@ -25,7 +25,7 @@ import { Select, SelectItem } from '@/components/ui/select';
 import { useEndpoint } from '@/hooks/endpoint';
 import { useTranslation } from '@/hooks/i18n';
 import { Endpoint } from '@/types';
-import { endpointId, url } from '@/utils/v8n';
+import { endpointId, url, groupId } from '@/utils/v8n';
 
 const FORM_ID = 'edit-endpoint-form';
 
@@ -43,6 +43,7 @@ const EditEndpoint: React.FC<Props> = ({ onOpenChange, endpoint }) => {
       z.object({
         id: endpointId,
         url: url,
+        groupId: groupId,
       }),
     []
   );
