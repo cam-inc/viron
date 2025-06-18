@@ -90,7 +90,9 @@ const useRoot = (): UseRootReturn => {
         cls.startsWith('theme-')
       )
     );
-    document.body.classList.add(`theme-${theme.replace(/\s/g, '-')}`);
+    if (theme) {
+      document.body.classList.add(`theme-${theme.replace(/\s/g, '-')}`);
+    }
   }, [theme]);
 
   // Watch screen size.
