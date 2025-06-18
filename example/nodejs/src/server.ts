@@ -1,21 +1,24 @@
-import https from 'https';
-import { ctx, logger } from './context';
+import { createServer } from 'https';
 import { createApplication } from './application';
+import { SERVICE_ENV } from './constants';
+import { ctx, logger } from './context';
 import { getCertificate } from './helpers/ssl';
 
 logger.info(`Set mode. mode=${ctx.mode}`);
 
-const main = async (): Promise<void> => {
+const main = async (ssl: boolean): Promise<void> => {
   await ctx.init();
+
   const app = await createApplication();
-  const server = https.createServer(await getCertificate(), app);
+  const options = ssl ? await getCertificate() : {};
+  const server = createServer(options, app);
 
   /**
    * Start Express server.
    */
   server.listen(app.get('port'), () => {
     logger.info(
-      '@viron/example/nodejs is running at https://local-api.viron.work:%d in %s mode',
+      '@viron/example/nodejs is running on port %d in %s mode',
       app.get('port'),
       app.get('env')
     );
@@ -23,4 +26,4 @@ const main = async (): Promise<void> => {
   });
 };
 
-main();
+main(process.env.SERVICE_ENV === SERVICE_ENV.LOCAL);
