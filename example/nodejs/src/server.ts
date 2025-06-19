@@ -20,7 +20,8 @@ const main = async (ssl: boolean): Promise<void> => {
    */
   server.listen(app.get('port'), () => {
     logger.info(
-      '@viron/example/nodejs is running on http(s)://%s:%d in %s mode',
+      '@viron/example/nodejs is running on %s://%s:%d in %s mode',
+      ssl ? 'https' : 'http',
       app.get('host'),
       app.get('port'),
       app.get('env')
