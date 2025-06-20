@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
-import { Endpoint } from '~/types';
-import { Document, Content } from '~/types/oas';
+import { Endpoint } from '@/types';
+import { Document, Content } from '@/types/oas';
 import useBase, { UseBaseReturn } from './useBase';
-import useSiblings, { UseSiblingsReturn } from './useSiblings';
 import useDescendants, { UseDescendantsReturn } from './useDescendants';
+import useSiblings, { UseSiblingsReturn } from './useSiblings';
 
 export type UseContentReturn = {
   base: UseBaseReturn;

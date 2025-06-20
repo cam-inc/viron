@@ -1,24 +1,21 @@
 import _ from 'lodash';
+import { CirclePlusIcon, CircleMinusIcon } from 'lucide-react';
 import React, { useCallback, useEffect } from 'react';
 import { Validate } from 'react-hook-form';
-import { SIZE as BUTTON_SIZE } from '~/components/button';
-import Button, { Props as ButtonProps } from '~/components/button';
-import MinusIcon from '~/components/icon/minusCircle/outline';
-import PlusIcon from '~/components/icon/plusCircle/outline';
-import _Schema from '~/components/schema';
-import { Schema } from '~/types/oas';
-import { getDefaultValue } from '~/utils/oas';
-import { getRegisterOptions } from '~/utils/oas/v8n';
+import _Schema from '@/components/schema';
+import { Button } from '@/components/ui/button';
+import { useTranslation } from '@/hooks/i18n';
+import { Schema } from '@/types/oas';
+import { getDefaultValue } from '@/utils/oas';
+import { getRegisterOptions } from '@/utils/oas/v8n';
 import { useNameForError } from '../../hooks';
 import { Props } from '../../index';
-import { useTranslation } from '~/hooks/i18n';
 
 // Functions like `append` from useFieldArray accepts argument of type object only.
 // Use `setValue` to append data of type other than object.
 const SchemaOfTypeArray: React.FC<Props> = ({
   endpoint,
   document,
-  on,
   name,
   schema,
   register,
@@ -73,18 +70,18 @@ const SchemaOfTypeArray: React.FC<Props> = ({
     setError,
   ]);
 
-  const handleAppendClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleAppendClick = useCallback(() => {
     const defaultValue = getDefaultValue(schema.items as Schema);
     setValue(name, [...(data || []), defaultValue]);
   }, [setValue, name, JSON.stringify(data)]);
 
-  const handlePrependClick = useCallback<ButtonProps['onClick']>(() => {
+  const handlePrependClick = useCallback(() => {
     const defaultValue = getDefaultValue(schema.items as Schema);
     setValue(name, [defaultValue, ...(data || [])]);
   }, [setValue, name, JSON.stringify(data)]);
 
-  const handleRemoveClick = useCallback<ButtonProps<number>['onClick']>(
-    (from) => {
+  const handleRemoveClick = useCallback(
+    (from: number) => {
       const newData = [...(data || [])];
       newData.splice(from, 1);
       setValue(name, newData);
@@ -92,8 +89,8 @@ const SchemaOfTypeArray: React.FC<Props> = ({
     [setValue, name, JSON.stringify(data)]
   );
 
-  const handleInsertClick = useCallback<ButtonProps<number>['onClick']>(
-    (to) => {
+  const handleInsertClick = useCallback(
+    (to: number) => {
       const defaultValue = getDefaultValue(schema.items as Schema);
       const newData = [...(data || [])];
       newData.splice(to, 0, defaultValue);
@@ -105,21 +102,16 @@ const SchemaOfTypeArray: React.FC<Props> = ({
   return (
     <div className="space-y-2">
       {!!(data || []).length && (
-        <Button
-          variant="text"
-          on={on}
-          size={BUTTON_SIZE.XS}
-          Icon={PlusIcon}
-          label={t('prependButtonLabel')}
-          onClick={handlePrependClick}
-        />
+        <Button variant="ghost" onClick={handlePrependClick}>
+          <CirclePlusIcon />
+          {t('prependButtonLabel')}
+        </Button>
       )}
       {(data || []).map((_, index) => (
         <React.Fragment key={index}>
           <_Schema
             endpoint={endpoint}
             document={document}
-            on={on}
             name={`${name}.${index}`}
             schema={schema.items as Schema}
             formState={formState}
@@ -136,41 +128,27 @@ const SchemaOfTypeArray: React.FC<Props> = ({
             isDeepActive={isDeepActive}
             activeRef={activeRef}
             renderHeadItem={() => (
-              <Button<number>
-                variant="text"
-                className="block"
-                on={on}
-                size={BUTTON_SIZE.XS}
-                data={index}
-                Icon={MinusIcon}
-                label={t('removeButtonLabel')}
-                onClick={handleRemoveClick}
-              />
+              <Button variant="ghost" onClick={() => handleRemoveClick(index)}>
+                <CircleMinusIcon />
+                {t('removeButtonLabel')}
+              </Button>
             )}
           />
           {index < (data || []).length - 1 && (
-            <Button<number>
-              variant="text"
-              className="block"
-              on={on}
-              size={BUTTON_SIZE.XS}
-              data={index + 1}
-              Icon={PlusIcon}
-              label={t('insertButtonLabel')}
-              onClick={handleInsertClick}
-            />
+            <Button
+              variant="ghost"
+              onClick={() => handleInsertClick(index + 1)}
+            >
+              <CirclePlusIcon />
+              {t('insertButtonLabel')}
+            </Button>
           )}
         </React.Fragment>
       ))}
-      <Button
-        variant="text"
-        className="block"
-        on={on}
-        size={BUTTON_SIZE.XS}
-        Icon={PlusIcon}
-        label={t('appendButtonLabel')}
-        onClick={handleAppendClick}
-      />
+      <Button variant="ghost" onClick={handleAppendClick}>
+        <CirclePlusIcon />
+        {t('appendButtonLabel')}
+      </Button>
     </div>
   );
 };

@@ -1,6 +1,6 @@
-import { useEffect, useMemo } from 'react';
 import _ from 'lodash';
-import { Content } from '~/types/oas';
+import { useEffect, useMemo } from 'react';
+import { Content } from '@/types/oas';
 
 export type UseAutoRefreshReturn = {
   enabled: boolean;

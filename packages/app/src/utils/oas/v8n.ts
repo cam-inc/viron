@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { RegisterOptions, Validate } from 'react-hook-form';
-import { Schema } from '~/types/oas';
-import { email } from '~/utils/v8n';
+import { Schema } from '@/types/oas';
+import { email } from '@/utils/v8n';
 
 export const getRegisterOptions = function ({
   required,
@@ -500,7 +500,7 @@ export const getValidateFormat = function (
     }
     if (format === 'email') {
       return function (data: string) {
-        if (!email.isValidSync(data)) {
+        if (!email.safeParse(data).success) {
           return `Should be an e-mail string.`;
         }
         return true;

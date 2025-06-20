@@ -16,6 +16,7 @@
     "en": "English",
     "ja": "日本語"
   },
+  "error": "エラーが発生しました",
   "fetchError": "エラーが発生しました。<br>エラー内容をご確認の上、再度お試しいただくか、しばらくお待ちください。",
   "detail": "詳細",
   "endpoint": "管理画面",
@@ -51,6 +52,7 @@
   "exportEndpoints": "$t(endpoint)リストのエクスポート",
   "importEndpoints": "$t(endpoint)リストのインポート",
   "enterEndpoint": "管理画面",
+  "signin": "ログイン",
   "signout": "サインアウト",
   "oidc": "SSO",
   "oAuth": "Google",

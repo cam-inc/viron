@@ -1,7 +1,7 @@
 import EditorJS, { EditorConfig, OutputData } from '@editorjs/editorjs';
 import classnames from 'classnames';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Props as BaseProps } from '~/components';
+import { Props as BaseProps } from '@/components';
 
 export type Props = BaseProps & {
   initialData?: OutputData;
@@ -9,7 +9,6 @@ export type Props = BaseProps & {
   onChange: NonNullable<EditorConfig['onChange']>;
 };
 const Wyswyg: React.FC<Props> = ({
-  on,
   className = '',
   initialData,
   readOnly = false,
@@ -52,7 +51,7 @@ const Wyswyg: React.FC<Props> = ({
   return (
     <div
       id={holder}
-      className={classnames(`border-2 border-thm-on-${on}`, className)}
+      className={classnames(`border-2 border-border`, className)}
     />
   );
 };

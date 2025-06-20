@@ -1,4 +1,4 @@
-import { isSSR } from '~/utils';
+import { isSSR } from '@/utils';
 
 export const INTERNAL_PAGE_PATHS = {
   ROOT: '/',
