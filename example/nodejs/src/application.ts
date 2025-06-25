@@ -57,14 +57,17 @@ export interface PluginContext extends ExegesisPluginContext {
   origRes: ExegesisServerResponse;
 }
 
-export const createApplication = async (): Promise<Express> => {
+export const createApplication = async (
+  host = process.env.SERVICE_HOST ?? 'localhost',
+  port = Number(process.env.SERVICE_PORT) || 3000
+): Promise<Express> => {
   // Create Express server
   const app = express();
 
   // Express configuration
   app.disable('x-powered-by');
-  app.set('host', process.env.SERVICE_HOST || 'localhost');
-  app.set('port', process.env.SERVICE_PORT || 3000);
+  app.set('host', host);
+  app.set('port', port);
 
   app.use(compression());
   app.use(json());

@@ -12,7 +12,19 @@ Provides an Example API environment using `docker-compose`.
 
 #### Cert Files
 
-Get `viron.crt`, `viron.csr` and `viron.key` files and place them under the `example/[lang]/cert` directory.
+Create SSL certificates using mkcert for `local-api.viron.work` domain and place them under the `./cert` directory:
+
+```shell
+# Install mkcert (if not already installed)
+# macOS: brew install mkcert
+# Linux: see https://github.com/FiloSottile/mkcert#installation
+
+# Install the local CA
+mkcert -install
+
+# Generate certificates for local-api.viron.work
+mkcert -cert-file ./cert/viron.crt -key-file ./cert/viron.key local-api.viron.work
+```
 
 #### .env
 
