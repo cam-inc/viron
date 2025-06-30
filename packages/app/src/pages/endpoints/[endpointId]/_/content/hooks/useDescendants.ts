@@ -10,7 +10,7 @@ import {
   Request,
   RequestValue,
 } from '@/types/oas';
-import { promiseErrorHandler } from '@/utils';
+import { promiseErrorHandler, safeResponseJson } from '@/utils';
 import {
   extractRequest,
   extractParameters,
@@ -187,7 +187,7 @@ const useDescendants = function (
               data: null,
             };
           }
-          const data = await response.json();
+          const data = await safeResponseJson(response);
           return {
             data,
           };

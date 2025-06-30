@@ -1,5 +1,11 @@
 # @viron/app
 
+## 2.17.0
+
+### Minor Changes
+
+- 2e2cb3dd: replace design system into shadcn
+
 ## 2.16.0
 
 ### Minor Changes
