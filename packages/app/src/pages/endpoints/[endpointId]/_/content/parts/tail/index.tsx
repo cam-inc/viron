@@ -1,6 +1,6 @@
 import React from 'react';
-import { ClassName } from '~/types';
-import { Document, Content } from '~/types/oas';
+import { ClassName } from '@/types';
+import { Document, Content } from '@/types/oas';
 import { UseBaseReturn } from '../../hooks/useBase';
 import Pagination from '../pagination/index';
 

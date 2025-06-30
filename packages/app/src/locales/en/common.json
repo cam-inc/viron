@@ -16,6 +16,7 @@
     "en": "English",
     "ja": "日本語"
   },
+  "error": "An error has occurred",
   "fetchError": "An error has occurred. <br>Please check the error details and try again, or wait for a while.",
   "detail": "detail",
   "endpoint": "Endpoint",
@@ -51,6 +52,7 @@
   "exportEndpoints": "Export $t(endpoints)",
   "importEndpoints": "Import $t(endpoints)",
   "enterEndpoint": "Enter",
+  "signin": "Login",
   "signout": "Signout",
   "oidc": "SSO",
   "oAuth": "Google",

@@ -8,6 +8,18 @@
 [![Read the Docs](https://img.shields.io/readthedocs/pip.svg)](https://discovery.viron.plus/docs/introduction/)
 [![GitHub last commit](https://img.shields.io/github/last-commit/cam-inc/viron.svg)]()
 
+# 📣 Notice of Repository Structure Change
+
+The Golang component has been migrated to a separate repository ([viron-go](https://github.com/cam-inc/viron-go)). If you are using the Go implementation, please refer to that repository.
+
+This change provides the following benefits:
+
+- Separation and optimization of development and CI/CD flows for Node.js and Go
+- Improved flexibility for updates and releases for each language
+- A more understandable structure for contributors
+
+# User Interface
+
 <div align="center">
   <img src="./arts/responsive/desktop.png" align="top" style="width:70%;" />
   <img src="./arts/responsive/mobile.png" align="top" style="width:25%;" />

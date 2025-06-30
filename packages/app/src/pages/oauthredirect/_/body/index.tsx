@@ -1,22 +1,20 @@
-import classnames from 'classnames';
+import { Loader2Icon } from 'lucide-react';
 import { parse } from 'query-string';
 import React, { useCallback, useEffect, useState } from 'react';
-import Error, { useError } from '~/components/error';
-import Request from '~/components/request';
-import Spinner from '~/components/spinner';
-import { BaseError } from '~/errors';
-import { useEndpoint, UseEndpointReturn } from '~/hooks/endpoint';
-import { Props as LayoutProps } from '~/layouts';
-import { KEY, get } from '~/storage';
-import { useEndpointListItemGlobalStateValue } from '~/store';
-import { COLOR_SYSTEM, EndpointID } from '~/types';
-import { RequestValue } from '~/types/oas';
+import Error, { useError } from '@/components/error';
+import Request from '@/components/request';
+import { BaseError } from '@/errors';
+import { useEndpoint, UseEndpointReturn } from '@/hooks/endpoint';
+import { KEY, get } from '@/storage';
+import { useEndpointListItemGlobalStateValue } from '@/store';
+import { EndpointID } from '@/types';
+import { RequestValue } from '@/types/oas';
 
-export type Props = Parameters<LayoutProps['renderBody']>[0] & {
+export type Props = {
   search: string;
 };
-const Body: React.FC<Props> = ({ className = '', search }) => {
-  const error = useError({ on: COLOR_SYSTEM.SURFACE, withModal: true });
+const Body: React.FC<Props> = ({ search }) => {
+  const error = useError({ withModal: true });
   const setError = error.setError;
   const [isPending, setIsPending] = useState<boolean>(true);
   const endpoint = useEndpointListItemGlobalStateValue({
@@ -95,13 +93,8 @@ const Body: React.FC<Props> = ({ className = '', search }) => {
 
   if (isPending) {
     return (
-      <div
-        className={classnames(
-          'p-4 flex justify-center items-center h-full',
-          className
-        )}
-      >
-        <Spinner className="w-8" on={COLOR_SYSTEM.BACKGROUND} />
+      <div className="p-4 flex justify-center items-center h-full">
+        <Loader2Icon className="size-8 animate-spin" />
       </div>
     );
   }
@@ -110,8 +103,8 @@ const Body: React.FC<Props> = ({ className = '', search }) => {
   }
   if (signinOAuthCallback.error) {
     return (
-      <div className={classnames('p-4', className)}>
-        <Error on={COLOR_SYSTEM.BACKGROUND} error={signinOAuthCallback.error} />
+      <div className="p-4">
+        <Error error={signinOAuthCallback.error} />
       </div>
     );
   }
@@ -119,14 +112,13 @@ const Body: React.FC<Props> = ({ className = '', search }) => {
   return (
     <div>
       <Request
-        on={COLOR_SYSTEM.BACKGROUND}
         endpoint={signinOAuthCallback.endpoint}
         document={signinOAuthCallback.document}
         request={signinOAuthCallback.request}
         defaultValues={signinOAuthCallback.defaultValues}
         onSubmit={handleSubmit}
       />
-      <Error.renewal {...error.bind} withModal={true} />
+      <Error {...error.bind} withModal={true} />
     </div>
   );
 };

@@ -1,8 +1,0 @@
-CREATE TABLE IF NOT EXISTS revokedtokens (
-    id INTEGER UNSIGNED NOT NULL auto_increment ,
-    token VARCHAR(256) NOT NULL,
-    revokedAt DATETIME NOT NULL,
-    createdAt DATETIME NOT NULL,
-    updatedAt DATETIME NOT NULL,
-    PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;

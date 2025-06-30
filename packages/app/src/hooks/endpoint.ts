@@ -5,7 +5,7 @@ import {
   ENVIRONMENTAL_VARIABLE,
   OAUTH_REDIRECT_URI,
   OIDC_REDIRECT_URI,
-} from '~/constants';
+} from '@/constants';
 import {
   BaseError,
   NetworkError,
@@ -20,9 +20,9 @@ import {
   UnexpectedError,
   getHTTPError,
   EndpointUndefinedError,
-} from '~/errors';
-import { useI18n } from '~/hooks/i18n';
-import { remove, KEY, set } from '~/storage';
+} from '@/errors';
+import { useI18n } from '@/hooks/i18n';
+import { remove, KEY, set } from '@/storage';
 import {
   useEndpointListGlobalState,
   useEndpointListByGroupGlobalStateValue,
@@ -30,7 +30,7 @@ import {
   useEndpointGroupListGlobalStateSet,
   useEndpointGroupListSortedGlobalStateValue,
   useEndpointGroupListGlobalState,
-} from '~/store';
+} from '@/store';
 import {
   Endpoint,
   EndpointID,
@@ -39,15 +39,15 @@ import {
   Distribution,
   Authentication,
   URL,
-} from '~/types';
+} from '@/types';
 import {
   Document,
   Request,
   RequestValue,
   RequestParametersValue,
   RequestRequestBodyValue,
-} from '~/types/oas';
-import { promiseErrorHandler } from '~/utils';
+} from '@/types/oas';
+import { promiseErrorHandler } from '@/utils';
 import {
   lint,
   resolve,
@@ -57,7 +57,7 @@ import {
   constructRequestInfo,
   constructRequestInit,
   constructRequestPayloads,
-} from '~/utils/oas';
+} from '@/utils/oas';
 
 export type UseEndpointReturn = {
   list: Endpoint[];

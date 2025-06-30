@@ -1,15 +1,25 @@
-import React, { useCallback } from 'react';
-import Button, { Props as ButtonProps } from '~/components/button';
-import Head from '~/components/head';
-import ArrowDownIcon from '~/components/icon/arrowCircleDown/outline';
-import ArrowUpIcon from '~/components/icon/arrowCircleUp/outline';
-import DotsCircleHorizontalIcon from '~/components/icon/dotsCircleHorizontal/outline';
-import TrashIcon from '~/components/icon/trash/outline';
-import { useEndpoint } from '~/hooks/endpoint';
-import { useTranslation } from '~/hooks/i18n';
-import Modal, { useModal } from '~/portals/modal';
-import Popover, { usePopover } from '~/portals/popover';
-import { COLOR_SYSTEM, EndpointGroup } from '~/types';
+import { ArrowDownIcon, ArrowUpIcon, MenuIcon, TrashIcon } from 'lucide-react';
+import React, { useCallback, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useEndpoint } from '@/hooks/endpoint';
+import { useTranslation } from '@/hooks/i18n';
+import { EndpointGroup } from '@/types';
 
 export type Props = {
   group: EndpointGroup;
@@ -17,147 +27,82 @@ export type Props = {
 const Item: React.FC<Props> = ({ group }) => {
   const { removeGroup, ascendGroup, descendGroup } = useEndpoint();
   const { t } = useTranslation();
+  const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
 
-  const menuPopover = usePopover<HTMLDivElement>();
-  const handleMenuClick = useCallback<ButtonProps['onClick']>(() => {
-    menuPopover.open();
-  }, [menuPopover]);
-
-  const handleUpClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleUpClick = useCallback(() => {
     ascendGroup(group.id);
-    menuPopover.close();
-  }, [group, ascendGroup, menuPopover]);
+  }, [group, ascendGroup]);
 
-  const handleDownClick = useCallback<ButtonProps['onClick']>(() => {
+  const handleDownClick = useCallback(() => {
     descendGroup(group.id);
-    menuPopover.close();
-  }, [group, descendGroup, menuPopover]);
+  }, [group, descendGroup]);
 
-  const removeConfirmationModal = useModal({});
-
-  const handleRemoveClick = useCallback<ButtonProps['onClick']>(() => {
-    removeConfirmationModal.open();
-  }, [removeConfirmationModal]);
-
-  const handleRemoveConfirmationRequestCancel = useCallback<
-    RemoveConfirmationProps['onRequestCancel']
-  >(() => {
-    removeConfirmationModal.close();
-  }, [removeConfirmationModal]);
-
-  const handleRemoveConfirmationRequestRemove = useCallback<
-    RemoveConfirmationProps['onRequestRemove']
-  >(() => {
-    removeConfirmationModal.close();
+  const handleRemoveConfirmationRequestRemove = useCallback(() => {
+    setRemoveDialogOpen(false);
     removeGroup(group.id);
-  }, [group, removeGroup, removeConfirmationModal]);
+  }, [group, removeGroup]);
 
   return (
-    <>
-      <div className="flex items-center gap-2 p-2 hover:bg-thm-on-background-faint">
-        <div className="flex-1">
-          <div className="text-base font-bold">{group.name}</div>
-          <div className="flex items-center gap-2">
-            <div className="text-xs text-thm-on-background-low">{group.id}</div>
-            {group.description && (
-              <div className="text-sm text-thm-on-background-low">
-                {group.description}
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="flex-none flex items-center gap-2">
-          <div ref={menuPopover.targetRef}>
-            <Button
-              variant="text"
-              on={COLOR_SYSTEM.BACKGROUND}
-              Icon={DotsCircleHorizontalIcon}
-              label={t('menuButtonLabel')}
-              onClick={handleMenuClick}
-            />
-          </div>
-          {/*
-             TODO: 編集機能。
-          <OnButton
-            on={COLOR_SYSTEM.BACKGROUND}
-            label="Edit"
-            Icon={PencilIcon}
-            onClick={handleEditClick}
-          />
-       */}
-          <Button
-            on={COLOR_SYSTEM.BACKGROUND}
-            label={t('removeButtonLabel')}
-            Icon={TrashIcon}
-            onClick={handleRemoveClick}
-          />
+    <div className="flex items-center gap-2 p-2 hover:bg-muted/50">
+      <div className="flex-1">
+        <div className="text-base font-bold">{group.name}</div>
+        <div className="flex items-center gap-2">
+          <div className="text-xs text-muted-foreground">{group.id}</div>
+          {group.description && (
+            <div className="text-sm text-muted-foreground">
+              {group.description}
+            </div>
+          )}
         </div>
       </div>
-      <Popover {...menuPopover.bind}>
-        <Button
-          variant="text"
-          on={COLOR_SYSTEM.BACKGROUND}
-          label={t('moveUpButtonLabel')}
-          Icon={ArrowUpIcon}
-          onClick={handleUpClick}
-        />
-        <Button
-          variant="text"
-          on={COLOR_SYSTEM.BACKGROUND}
-          label={t('moveDownButtonLabel')}
-          Icon={ArrowDownIcon}
-          onClick={handleDownClick}
-        />
-      </Popover>
-      <Modal {...removeConfirmationModal.bind}>
-        <RemoveConfirmation
-          onRequestCancel={handleRemoveConfirmationRequestCancel}
-          onRequestRemove={handleRemoveConfirmationRequestRemove}
-        />
-      </Modal>
-    </>
-  );
-};
-export default Item;
+      <div className="flex-none flex items-center gap-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost">
+              <MenuIcon />
+              {t('menuButtonLabel')}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onSelect={handleUpClick}>
+              <ArrowUpIcon />
+              {t('moveUpButtonLabel')}
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={handleDownClick}>
+              <ArrowDownIcon />
+              {t('moveDownButtonLabel')}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-type RemoveConfirmationProps = {
-  onRequestCancel: () => void;
-  onRequestRemove: () => void;
-};
-const RemoveConfirmation: React.FC<RemoveConfirmationProps> = ({
-  onRequestCancel,
-  onRequestRemove,
-}) => {
-  const { t } = useTranslation();
-
-  const handleCancelClick = useCallback<ButtonProps['onClick']>(() => {
-    onRequestCancel();
-  }, [onRequestCancel]);
-
-  const handleRemoveClick = useCallback<ButtonProps['onClick']>(() => {
-    onRequestRemove();
-  }, [onRequestRemove]);
-
-  return (
-    <div className="space-y-8">
-      <Head
-        on={COLOR_SYSTEM.SURFACE}
-        title={t('removeModal.title')}
-        description={t('removeModal.description')}
-      />
-      <div className="flex justify-end gap-2">
-        <Button
-          variant="outlined"
-          on={COLOR_SYSTEM.SURFACE}
-          label={t('cancelButtonLabel')}
-          onClick={handleCancelClick}
-        />
-        <Button
-          cs={COLOR_SYSTEM.PRIMARY}
-          label={t('removeButtonLabel')}
-          onClick={handleRemoveClick}
-        />
+        <Dialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <TrashIcon />
+              {t('removeButtonLabel')}
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{t('removeModal.title')}</DialogTitle>
+              <DialogDescription>
+                {t('removeModal.description')}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button type="button" variant="secondary">
+                  {t('cancelButtonLabel')}
+                </Button>
+              </DialogClose>
+              <Button onClick={handleRemoveConfirmationRequestRemove}>
+                {t('removeButtonLabel')}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
 };
+export default Item;

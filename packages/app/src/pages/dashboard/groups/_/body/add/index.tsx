@@ -1,40 +1,59 @@
-import { yupResolver } from '@hookform/resolvers/yup';
-import React, { useCallback, useMemo } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import React, { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
-import Button, { Props as ButtonProps } from '~/components/button';
-import Head from '~/components/head';
-import Textinput from '~/components/textinput';
-import { useEndpoint } from '~/hooks/endpoint';
-import { useTranslation } from '~/hooks/i18n';
-import { COLOR_SYSTEM, EndpointGroup } from '~/types';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
+import {
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { useEndpoint } from '@/hooks/endpoint';
+import { useTranslation } from '@/hooks/i18n';
+import { EndpointGroup } from '@/types';
+
+const FORM_ID = 'add-group-form';
 
 export type Props = {
   onAdd: () => void;
-  onCancel: () => void;
 };
-const Add: React.FC<Props> = ({ onAdd, onCancel }) => {
+const Add: React.FC<Props> = ({ onAdd }) => {
   const { addGroup } = useEndpoint();
   const { t } = useTranslation();
 
   const schema = useMemo(
     () =>
-      yup.object().shape({
-        id: yup.string().required(),
-        name: yup.string().required(),
-        description: yup.string(),
+      z.object({
+        id: z.string().min(1),
+        name: z.string().min(1),
+        description: z.preprocess(
+          (v) => (typeof v === 'string' && v.trim() === '' ? undefined : v),
+          z.string().optional()
+        ),
       }),
     []
   );
-  const {
-    register,
-    handleSubmit: _handleSubmit,
-    formState,
-    setError,
-    clearErrors,
-  } = useForm<EndpointGroup & { manual?: string }>({
-    resolver: yupResolver(schema),
+  const form = useForm<EndpointGroup & { manual?: string }>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      id: '',
+      name: '',
+      description: '',
+    },
+    shouldUnregister: true,
   });
+  const { handleSubmit: _handleSubmit, setError, clearErrors } = form;
   const handleSubmit = useMemo(
     () =>
       _handleSubmit((data) => {
@@ -52,62 +71,63 @@ const Add: React.FC<Props> = ({ onAdd, onCancel }) => {
     [_handleSubmit, addGroup, setError, clearErrors, onAdd]
   );
 
-  const handleCancelClick = useCallback<ButtonProps['onClick']>(() => {
-    onCancel();
-  }, [onCancel]);
-  const handleAddClick = useCallback<ButtonProps['onClick']>(() => {
-    // Do nothing.
-  }, []);
-
   return (
-    <div>
-      <form className="space-y-8" onSubmit={handleSubmit}>
-        <div>
-          <Head
-            on={COLOR_SYSTEM.SURFACE}
-            title={t('createGroup.head.title')}
-            description={t('createGroup.head.description')}
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>{t('createGroup.head.title')}</DialogTitle>
+        <DialogDescription>
+          {t('createGroup.head.description')}
+        </DialogDescription>
+      </DialogHeader>
+      <Form {...form}>
+        <form id={FORM_ID} className="space-y-4 py-4" onSubmit={handleSubmit}>
+          <FormField
+            control={form.control}
+            name="id"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('createGroup.idFormLabel')}</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </div>
-        <div className="space-y-4">
-          <Textinput
-            type="text"
-            label={t('createGroup.idFormLabel')}
-            on={COLOR_SYSTEM.SURFACE}
-            error={formState.errors.id}
-            render={(bind) => <input {...bind} {...register('id')} />}
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('createGroup.nameFormLabel')}</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          <Textinput
-            type="text"
-            label={t('createGroup.nameFormLabel')}
-            on={COLOR_SYSTEM.SURFACE}
-            error={formState.errors.name}
-            render={(bind) => <input {...bind} {...register('name')} />}
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{t('createGroup.descriptionFormLabel')}</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-          <Textinput
-            type="text"
-            label={t('createGroup.descriptionFormLabel')}
-            on={COLOR_SYSTEM.SURFACE}
-            error={formState.errors.description}
-            render={(bind) => <input {...bind} {...register('description')} />}
-          />
-        </div>
-        <div className="flex justify-end gap-2">
-          <Button
-            variant="outlined"
-            on={COLOR_SYSTEM.SURFACE}
-            label={t('createGroup.cancelButtonLabel')}
-            onClick={handleCancelClick}
-          />
-          <Button
-            type="submit"
-            cs={COLOR_SYSTEM.PRIMARY}
-            label={t('createGroup.addButtonLabel')}
-            onClick={handleAddClick}
-          />
-        </div>
-      </form>
-    </div>
+        </form>
+      </Form>
+      <DialogFooter>
+        <Button form={FORM_ID} type="submit">
+          {t('createGroup.addButtonLabel')}
+        </Button>
+      </DialogFooter>
+    </DialogContent>
   );
 };
 export default Add;
