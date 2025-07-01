@@ -124,8 +124,8 @@ const SchemaOfTypeString: React.FC<Props> = ({
 
   if (isDynamicEnumEnabled) {
     return (
-      <Select {...register(name, registerOptions)}>
-        <SelectItem value={undefined}>---</SelectItem>
+      <Select {...register(name, registerOptions)} value={data ?? ''}>
+        <SelectItem value="">---</SelectItem>
         {dynamicEnumList.map((item, idx) => (
           <SelectItem key={idx} value={item}>
             {item}
@@ -137,8 +137,8 @@ const SchemaOfTypeString: React.FC<Props> = ({
 
   if (schema.enum) {
     return (
-      <Select {...register(name, registerOptions)}>
-        <SelectItem value={undefined}>---</SelectItem>
+      <Select {...register(name, registerOptions)} value={data ?? ''}>
+        <SelectItem value="">---</SelectItem>
         {schema.enum.map((item, idx) => (
           <SelectItem key={idx} value={item}>
             {item}
