@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BaseError, getHTTPError, NetworkError } from '@/errors';
 import { Endpoint } from '@/types';
@@ -10,7 +9,7 @@ import {
   RequestValue,
   TableColumn,
 } from '@/types/oas';
-import { promiseErrorHandler } from '@/utils';
+import { promiseErrorHandler, safeResponseJson } from '@/utils';
 import {
   extractRequest,
   cleanupRequestValue,
@@ -103,7 +102,7 @@ const useBase = (
         setIsPending(false);
         return;
       }
-      const data: unknown = await response.json();
+      const data = await safeResponseJson(response);
       setData(data);
       setError(null);
       setIsPending(false);
