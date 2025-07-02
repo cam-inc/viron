@@ -1,5 +1,5 @@
 import { PageProps, graphql } from 'gatsby';
-import { ExternalLinkIcon } from 'lucide-react';
+import { FileTextIcon, RocketIcon, CircleHelpIcon } from 'lucide-react';
 import React, { useCallback } from 'react';
 import Link from '@/components/link';
 import Logo from '@/components/logo';
@@ -48,17 +48,17 @@ const HomePage: React.FC<Props> = () => {
         <div className="text-xs mt-20 [&>ul]:flex [&>ul]:gap-x-4 [&>ul]:gap-y-2 [&>ul]:flex-wrap space-y-4">
           <ul>
             <NavigationListItem
-              icon={<ExternalLinkIcon />}
+              icon={<FileTextIcon />}
               label="documentation"
               to={URL.DOCUMENTATION}
             />
             <NavigationListItem
-              icon={<ExternalLinkIcon />}
+              icon={<RocketIcon />}
               label="releaseNotes"
               to={URL.RELEASE_NOTES}
             />
             <NavigationListItem
-              icon={<ExternalLinkIcon />}
+              icon={<CircleHelpIcon />}
               label="help"
               to={URL.HELP}
             />
