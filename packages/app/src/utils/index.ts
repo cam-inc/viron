@@ -33,3 +33,32 @@ export const promiseErrorHandler = async function <T, E = Error>(
   }
   return [res as T, err as E];
 };
+
+/**
+ * Safely parse JSON from HTTP response, handling empty responses (204 No Content, etc.)
+ * @param response - The HTTP response object
+ * @returns Promise that resolves to parsed JSON data or null for empty responses
+ */
+export const safeResponseJson = async function <T = unknown>(
+  response: Response
+): Promise<T | null> {
+  // Check if response has content before attempting to parse JSON
+  const contentType = response.headers.get('content-type');
+  const contentLength = response.headers.get('content-length');
+
+  // Handle empty responses (204 No Content, etc.) or responses without JSON content
+  if (
+    response.status === 204 || // No Content
+    contentLength === '0' ||
+    !contentType?.includes('application/json')
+  ) {
+    return null;
+  }
+
+  try {
+    return await response.json();
+  } catch {
+    // If JSON parsing fails, return null instead of throwing error
+    return null;
+  }
+};
