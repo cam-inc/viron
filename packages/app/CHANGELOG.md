@@ -1,5 +1,12 @@
 # @viron/app
 
+## 2.17.1
+
+### Patch Changes
+
+- 9f692c20: Implement utility function to safely parse JSON from HTTP responses
+- fea3b2a4: correct initial Enum value not reflected in UI
+
 ## 2.17.0
 
 ### Minor Changes
