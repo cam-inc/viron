@@ -285,7 +285,11 @@ const EndpointPage: React.FC<Props> = ({ params }) => {
             {0 < pinnedContentIds.length && RenderSubBody && (
               <>
                 <ResizableHandle withHandle />
-                <ResizablePanel>{RenderSubBody}</ResizablePanel>
+                <ResizablePanel>
+                  <div className="mx-10 py-6 h-full overflow-y-scroll">
+                    {RenderSubBody}
+                  </div>
+                </ResizablePanel>
               </>
             )}
           </ResizablePanelGroup>
