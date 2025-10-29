@@ -1,6 +1,6 @@
 {
   "name": "@viron/linter",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -20,5 +20,8 @@
   "engines": {
     "node": ">=15.13.0",
     "npm": ">=7.9.0"
+  },
+  "repository": {
+    "url": "https://github.com/cam-inc/viron"
   }
 }

@@ -7,6 +7,10 @@ on:
     paths:
       - "packages/linter/**"
 
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
+
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
@@ -19,17 +23,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+          registry-url: 'https://registry.npmjs.org'
           cache: "npm"
+      - name: Update npm
+        run: npm install -g npm@11.6.2
       - name: Install dependencies and Build
         run: |
           echo "Installing packages..."
           npm ci
           npm run build -w packages/linter
-      - name: Set NPM_TOKEN
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-      - name: Publish
+      - name: Publish with OIDC
         run: |
           echo "Publishing..."
           npm publish -w packages/linter
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

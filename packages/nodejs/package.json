@@ -1,6 +1,6 @@
 {
   "name": "@viron/lib",
-  "version": "2.6.0",
+  "version": "2.6.2",
   "scripts": {
     "prebuild": "npm run clean",
     "build": "tsc --project tsconfig.json && cp -fr src/openapi dist/",
@@ -67,5 +67,8 @@
   "engines": {
     "node": ">=14"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "url": "https://github.com/cam-inc/viron"
+  }
 }
