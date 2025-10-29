@@ -1,5 +1,13 @@
 # @viron/nodejs
 
+## 2.6.3
+
+### Patch Changes
+
+- Granular npm access token lifetime limits
+- Updated dependencies
+  - @viron/linter@0.0.4
+
 ## 2.6.0
 
 ### Minor Changes
