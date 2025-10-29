@@ -25,7 +25,7 @@ const Body: React.FC<Props> = ({
   }, [selectedContentId, contents]);
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="flex flex-col">
       <Tabs value={selectedContentId} onValueChange={setSelectedContentId}>
         <TabsList>
           {contents.map((content) => (
