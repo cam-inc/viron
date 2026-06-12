@@ -182,7 +182,7 @@ export const listPolicies = async (
   const policies = roleId
     ? await casbin.getFilteredPolicy(0, roleId)
     : await casbin.getPolicy();
-  return policies.map((policy) => parsePolicy(policy as Policy));
+  return policies.map((policy: unknown) => parsePolicy(policy as Policy));
 };
 
 // 指定したロールを持つユーザーの一覧を取得
@@ -240,7 +240,7 @@ export const hasPermissionByResourceId = async (
   const casbin = repositoryContainer.getCasbin();
   await sync();
   const tasks = permissions.map((permission) =>
-    casbin.enforce(id, resourceId, permission).catch((e) => {
+    casbin.enforce(id, resourceId, permission).catch((e: unknown) => {
       debug(
         'Casbin Enforce failure. id: %s, resourceId: %s, permission: %s, error: %o',
         id,
