@@ -598,6 +598,61 @@ describe('domains/adminrole', () => {
         })
       );
     });
+
+    it('Preserve g-rules (user-role assignments) when updating role permissions.', async () => {
+      // Setup: Add users to the role before updating permissions
+      const userId1 = 'user1';
+      const userId2 = 'user2';
+      await casbin.addRoleForUser(userId1, 'editor');
+      await casbin.addRoleForUser(userId2, 'editor');
+
+      // Verify initial state: users have the role
+      const initialUsers = await listUsers('editor');
+      assert.deepStrictEqual(initialUsers.sort(), [userId1, userId2]);
+
+      // Update role permissions
+      const result = await updatePermissionsForRole('editor', [
+        {
+          resourceId: 'news',
+          permission: PERMISSION.READ,
+        },
+        {
+          resourceId: 'news',
+          permission: PERMISSION.WRITE,
+        },
+      ]);
+      assert.strictEqual(result, true);
+
+      // Verify p-rules are updated correctly
+      const actualPolicies = await listPolicies('editor');
+      assert.strictEqual(actualPolicies.length, 2);
+      assert(
+        actualPolicies.every((a) => {
+          if (a.resourceId !== 'news') {
+            return false;
+          }
+          return (
+            a.permission === PERMISSION.READ ||
+            a.permission === PERMISSION.WRITE
+          );
+        })
+      );
+
+      // Critical: Verify g-rules (user-role assignments) are preserved
+      const usersAfterUpdate = await listUsers('editor');
+      assert.deepStrictEqual(usersAfterUpdate.sort(), [userId1, userId2]);
+
+      // Verify users can still be identified with the role
+      const rolesForUser1 = await listRoles(userId1);
+      const rolesForUser2 = await listRoles(userId2);
+      assert.deepStrictEqual(rolesForUser1, ['editor']);
+      assert.deepStrictEqual(rolesForUser2, ['editor']);
+
+      // Verify database consistency by forcing a policy reload
+      await casbin.loadPolicy();
+      const usersAfterReload = await listUsers('editor');
+      assert.deepStrictEqual(usersAfterReload.sort(), [userId1, userId2]);
+    });
   });
 
   describe('updateOneById', () => {

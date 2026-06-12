@@ -1,5 +1,11 @@
 # @viron/nodejs
 
+## 2.6.4
+
+### Patch Changes
+
+- Casbin custom update bug fix
+
 ## 2.6.3
 
 ### Patch Changes
