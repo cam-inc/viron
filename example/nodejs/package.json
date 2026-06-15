@@ -18,7 +18,7 @@
     "i18next-fs-backend": "^1.1.1",
     "i18next-http-middleware": "^3.1.0",
     "mime-types": "^2.1.31",
-    "mongoose": "6.1.8",
+    "mongoose": "6.11.3",
     "multer": "^1.4.3",
     "multer-s3": "^3.0.1",
     "mysql2": "^2.2.5",
