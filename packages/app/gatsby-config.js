@@ -65,7 +65,7 @@ module.exports = {
       resolve: 'gatsby-plugin-react-i18next',
       options: {
         localeJsonSourceName: 'locale', // name given to 'gatsby-source-filesystem' plugin.
-        languages: ['en', 'ja'],
+        languages: ['en', 'ja', 'ko'],
         defaultLanguage: 'en',
         fallbackLanguage: 'en',
         /** @see https://github.com/microapps/gatsby-plugin-react-i18next/issues/171 */
