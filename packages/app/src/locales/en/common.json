@@ -14,7 +14,8 @@
   },
   "language": {
     "en": "English",
-    "ja": "日本語"
+    "ja": "日本語",
+    "ko": "한국어"
   },
   "error": "An error has occurred",
   "fetchError": "An error has occurred. <br>Please check the error details and try again, or wait for a while.",

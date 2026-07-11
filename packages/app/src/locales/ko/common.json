@@ -1,0 +1,111 @@
+{
+  "version": "ver. {{version}}",
+  "catchphrase": "Give OAS, Get GUI.",
+  "subCatchphrase": "An Open-Source Frontend-NoCode<br />Administration GUI Tool.",
+  "welcomeMessage": "Viron에 오신 것을 환영합니다!",
+  "description": "Viron은 통일된 사용성과 대시보드를 갖춘 오픈소스 관리 도구입니다. OpenAPI(Swagger) 규격에 맞는 API만 작성하면 프론트엔드 개발, 디자인, 학습 비용 없이 여러 개의 관리 화면과 대시보드를 만들 수 있습니다.",
+  "startButtonLabel": "시작하기",
+  "documentation": "문서",
+  "releaseNotes": "릴리스 노트",
+  "help": "도움말",
+  "service": {
+    "twitter": "Twitter",
+    "github": "GitHub"
+  },
+  "language": {
+    "en": "English",
+    "ja": "日本語",
+    "ko": "한국어"
+  },
+  "error": "오류가 발생했습니다",
+  "fetchError": "오류가 발생했습니다.<br>오류 내용을 확인한 후 다시 시도하거나 잠시 기다려 주세요.",
+  "detail": "상세",
+  "endpoint": "엔드포인트",
+  "endpoints": "엔드포인트",
+  "group": "그룹",
+  "groups": "그룹",
+  "createGroup": {
+    "head": {
+      "title": "그룹 생성",
+      "description": "엔드포인트를 그룹으로 관리합니다"
+    },
+    "idFormLabel": "ID",
+    "nameFormLabel": "이름",
+    "descriptionFormLabel": "설명",
+    "addButtonLabel": "추가",
+    "cancelButtonLabel": "취소"
+  },
+  "endpointsTabLabel": "$t(endpoints)",
+  "groupsTabLabel": "$t(groups)",
+  "dashboard": {
+    "endpoints": {
+      "title": "대시보드",
+      "description": "개인 전용 대시보드입니다.",
+      "emptyMessage": "아직 등록된 엔드포인트가 없습니다.<br>$t(addEndpointButtonLabel) 버튼으로 추가할 수 있습니다."
+    },
+    "groups": {
+      "title": "$t(groups)",
+      "description": "여기에서 $t(groups)을(를) 관리하세요."
+    }
+  },
+  "addEndpointButtonLabel": "$t(endpoint) 추가",
+  "addGroupButtonLabel": "$t(group) 추가",
+  "exportEndpoints": "$t(endpoints) 내보내기",
+  "importEndpoints": "$t(endpoints) 가져오기",
+  "enterEndpoint": "입장",
+  "signin": "로그인",
+  "signout": "로그아웃",
+  "oidc": "SSO",
+  "oAuth": "Google",
+  "email": "이메일로 로그인",
+  "addEndpoint": {
+    "title": "$t(endpoint) 생성",
+    "idInputLabel": "ID",
+    "idInputPlaceholder": "Demo",
+    "urlInputLabel": "URL",
+    "urlInputPlaceholder": "https://demo.viron.plus",
+    "groupInputLabel": "$t(group)",
+    "groupInputDescription": "$t(endpoint)을(를) 원하는 그룹에 추가할 수 있습니다. 그룹은 대시보드에서 추가할 수 있습니다.",
+    "addButtonLabel": "생성",
+    "cancelButtonLabel": "취소"
+  },
+  "editEndpoint": {
+    "title": "$t(endpoint) 편집",
+    "idInputLabel": "ID",
+    "urlInputLabel": "URL",
+    "groupInputLabel": "$t(group)",
+    "groupInputDescription": "$t(endpoint)을(를) 원하는 그룹에 추가할 수 있습니다. 그룹은 대시보드에서 추가할 수 있습니다.",
+    "updateButtonLabel": "업데이트",
+    "cancelButtonLabel": "취소"
+  },
+  "endpointEditButtonLabel": "편집",
+  "endpointInformationButtonLabel": "정보",
+  "endpointQRCodeShareButtonLabel": "QR 코드",
+  "removeEndpointButtonLabel": "삭제",
+  "endpointInformation": {
+    "title": "정보"
+  },
+  "endpointQRCodeShare": {
+    "title": "QR 코드",
+    "copyUrlButtonLabel": "URL 복사"
+  },
+  "internalPagePaths": {
+    "root": "홈",
+    "endpoints": "엔드포인트",
+    "groups": "그룹",
+    "dashboard": "대시보드"
+  },
+  "prependButtonLabel": "맨 앞에 추가",
+  "insertButtonLabel": "삽입",
+  "appendButtonLabel": "추가",
+  "removeButtonLabel": "삭제",
+  "submitButtonLabel": "제출",
+  "cancelButtonLabel": "취소",
+  "moveUpButtonLabel": "위로 이동",
+  "moveDownButtonLabel": "아래로 이동",
+  "menuButtonLabel": "메뉴",
+  "removeModal": {
+    "title": "그룹 삭제",
+    "description": "정말 삭제하시겠습니까? 그룹 내 엔드포인트는 그룹에서 해제된 상태로 남습니다."
+  }
+}
