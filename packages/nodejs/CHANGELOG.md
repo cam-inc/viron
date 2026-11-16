@@ -1,5 +1,11 @@
 # @viron/nodejs
 
+## 2.6.5
+
+### Patch Changes
+
+- Update cookie from 0.6.0 to 0.7.2
+
 ## 2.6.4
 
 ### Patch Changes
