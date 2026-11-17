@@ -1,11 +1,17 @@
 name: Publish NPM Package - Viron/lib
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop
     paths:
       - "packages/nodejs/**"
+      # A lockfile-only fix must still reach this workflow. Re-running a
+      # failed job checks out the original commit, so it cannot pick up a
+      # later lockfile fix.
+      - "package-lock.json"
+      - ".github/workflows/publish-package-viorn-lib.yml"
 
 permissions:
   id-token: write  # Required for OIDC
@@ -35,5 +41,10 @@ jobs:
           npm run build -w packages/nodejs
       - name: Publish with OIDC
         run: |
-          echo "Publishing..."
+          VERSION="$(node -p "require('./packages/nodejs/package.json').version")"
+          if npm view "@viron/lib@${VERSION}" version >/dev/null 2>&1; then
+            echo "@viron/lib@${VERSION} is already published. Skipping."
+            exit 0
+          fi
+          echo "Publishing @viron/lib@${VERSION}..."
           npm publish -w packages/nodejs
