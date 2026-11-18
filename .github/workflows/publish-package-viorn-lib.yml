@@ -7,6 +7,10 @@ on:
     paths:
       - "packages/nodejs/**"
 
+permissions:
+  id-token: write  # Required for OIDC
+  contents: read
+      
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
@@ -14,23 +18,22 @@ jobs:
       matrix:
         node-version: [20.x]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: ${{ matrix.node-version }}
+          registry-url: 'https://registry.npmjs.org'
           cache: "npm"
+      - name: Update npm
+        run: npm install -g npm@11.6.2
       - name: Install dependencies and Build
         run: |
           echo "Installing packages..."
           npm ci
           npm run build -w packages/linter
           npm run build -w packages/nodejs
-      - name: Set NPM_TOKEN
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-      - name: Publish
+      - name: Publish with OIDC
         run: |
           echo "Publishing..."
           npm publish -w packages/nodejs
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

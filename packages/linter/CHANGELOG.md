@@ -1,5 +1,11 @@
 # @viron/linter
 
+## 0.0.4
+
+### Patch Changes
+
+- Granular npm access token lifetime limits
+
 ## 0.0.2
 
 ### Patch Changes

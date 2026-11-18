@@ -1,5 +1,11 @@
 # @viron/app
 
+## 2.17.2
+
+### Patch Changes
+
+- 7ee19928: Added padding to the subbody and enabled scrolling.
+
 ## 2.17.1
 
 ### Patch Changes

@@ -218,7 +218,9 @@ export const updatePermissionsForRole = async (
     ({ resourceId, permission }): Policy =>
       genPolicy(roleId, resourceId, permission)
   );
-  await removeRole(roleId);
+  // removeRole（casbin.deleteRole）は g ルール（ユーザー・ロール割り当て）も
+  // DB から削除してしまうため、p ルール（ポリシー）のみ削除する
+  await casbin.removeFilteredPolicy(0, roleId);
   await Promise.all(policies.map((policy) => casbin.addPolicy(...policy)));
   return true;
 };
