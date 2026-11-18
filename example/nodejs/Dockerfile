@@ -1,5 +1,4 @@
-ARG DOCKER_PROXY_HOST="docker.io"
-FROM ${DOCKER_PROXY_HOST}/node:22
+FROM node:24.22.3
 
 # 環境変数の設定
 USER node
